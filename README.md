@@ -1,7 +1,7 @@
 # sfayn_gqlserver
 
 Working on ecommerce site and would like to use graphene graphql server to serve client request.
-Django have a builtin user management one reasons that i decided to use django graphene over apollo server
+Django have a builtin user management one reason that i decided to use django graphene over apollo server
 
 ## Getting Started
 
@@ -9,7 +9,7 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Prerequisites
 
-What things you need to install the software and how to install them
+refer to requirements file
 
 ```
 Give examples
@@ -22,7 +22,7 @@ A step by step series of examples that tell you how to get a development env run
 Say what the step will be
 
 ```
-Give the example
+pip install -r requirements
 ```
 
 And repeat
@@ -35,7 +35,9 @@ End with an example of getting some data out of the system or using it for a lit
 
 ## Running the tests
 
-Explain how to run the automated tests for this system
+```
+python manage.py runserver 0.0.0.0:8000
+```
 
 ### Break down into end to end tests
 
@@ -55,27 +57,25 @@ Give an example
 
 ## Deployment
 
-Add additional notes about how to deploy this on a live system
+Coming soon
 
 ## Built With
 
-* [Dropwizard](http://www.dropwizard.io/1.0.2/docs/) - The web framework used
-* [Maven](https://maven.apache.org/) - Dependency Management
-* [ROME](https://rometools.github.io/rome/) - Used to generate RSS Feeds
+* [Django](https://docs.djangoproject.com) - The web framework used
+* [Django Graphene](https://docs.graphene-python.org/projects/django/en/latest/tutorial-plain/#) - Django GraphSQL server
 
 ## Contributing
 
-Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c63ec426) for details on our code of conduct, and the process for submitting pull requests to us.
+
 
 ## Versioning
 
-We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/your/project/tags). 
+
 
 ## Authors
 
-* **Billie Thompson** - *Initial work* - [PurpleBooth](https://github.com/PurpleBooth)
+* **josnin** - *One of my work* - [sfayn_gqlserver](https://github.com/josnin)
 
-See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
 
 ## License
 
@@ -83,7 +83,7 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 
 ## Acknowledgments
 
-* Hat tip to anyone whose code was used
-* Inspiration
-* etc
+* Django Graphene
+* CB
+
 
