@@ -3,6 +3,9 @@
 Working on ecommerce site and would like to use graphene graphql server to serve client request.
 Django have a builtin user management one reason that i decided to use django graphene over apollo server
 
+![image](https://user-images.githubusercontent.com/3206118/56402350-8acc4900-628f-11e9-9baa-d3a71771e941.png)
+
+
 ## Getting Started
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
