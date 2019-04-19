@@ -1,6 +1,6 @@
 # sfayn_gqlserver
 
-Working on ecommerce site and would like to use graphene graphql server to server client request
+Working on ecommerce site and would like to use graphene graphql server to serve client request.
 Django have a builtin user management one reasons that i decided to use django graphene over apollo server
 
 ## Getting Started
