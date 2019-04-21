@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand, CommandError
-from cb.models import Product
+from cb.models import Product, ProductWarehouse, ProductOriginalImg, ProductDescImg
 from django.conf import settings
 import json
 import hashlib
@@ -10,6 +10,15 @@ class Command(BaseCommand):
 
     #def add_arguments(self, parser):
     #    parser.add_argument('poll_id', nargs='+', type=int)
+
+    UNWANTED_KEYS = ("original_img", "desc_img", "map", "warehouse_list")
+
+    def remove_unwanted_keys(self, items=None):
+        for k in self.UNWANTED_KEYS:
+            if k in items:
+                items.pop(k)
+        return items
+
 
     def handle(self, *args, **options):
 
@@ -38,16 +47,70 @@ class Command(BaseCommand):
         res = requests.post(prod_url, {'token': token, 'goods_sn': json.dumps(goods_sn)} )
 
         prods = json.loads(res.text)['msg']
-        sku = None
 
         for p in prods:
-            if not Product.objects.filter(sku=p["sku"]).exists():
-                x = Product()
-                for f in Product._meta.get_fields():
-                    if f.name == "sku" and p.get(f.name):
-                        sku = p.get(f.name)
-                    if f.name != "id" and p.get(f.name):
-                        setattr(x, f.name, p.get(f.name))
-                x.save()
-                self.stdout.write(self.style.SUCCESS("pullpush sku:{} -ok".format(sku)))
+
+            #{'status': 0, 'msg': 'Product unavailable or out of circulation', 'errcode': 15015}
+            if p.get("errcode"): #skip when theres error in API results
+                continue #next item if this have error
+
+            warehouse_list = None
+            if p.get("warehouse_list"):
+                warehouse_list = p.get("warehouse_list")
+            
+            original_img = None
+            if p.get("original_img"):
+                original_img = p.get("original_img")
+            
+            desc_img = None
+            if p.get("desc_img"):
+                desc_img = p.get("desc_img")
+
+            sku_items = self.remove_unwanted_keys(p) #cleanup unwanted keys. it will cause error in get or create
+
+            sku_obj, sku_created = Product.objects.update_or_create(**sku_items)
+            if sku_created:
+                self.stdout.write(self.style.SUCCESS("newly created sku:{} title:{}".format(sku_obj.sku, sku_obj.title)))
+            else:
+                self.stdout.write(self.style.SUCCESS("updated sku:{} title:{}".format(sku_obj.sku, sku_obj.title)))
+
+
+            if warehouse_list:
+                for wl in warehouse_list.values(): #multiple list of dict
+                    w_items = {}
+                    w_items["product_id"] = sku_obj.sku
+                    w_items["defaults"] = wl
+                    w_obj, w_created = ProductWarehouse.objects.update_or_create(**w_items)
+                    if w_created:
+                        self.stdout.write(self.style.SUCCESS("newly created warehouse:{}".format(w_obj.warehouse)))
+                    else:
+                        self.stdout.write(self.style.SUCCESS("updated warehouse:{}".format(w_obj.warehouse)))
+
+
+            if original_img:
+                for oi in original_img:
+                    oi_items = {}
+                    oi_items["product_id"] = sku_obj.sku
+                    oi_items["defaults"] = {}
+                    oi_items["defaults"]["original_img"] = oi
+                    oi_obj, oi_created = ProductOriginalImg.objects.update_or_create(**oi_items)
+                    if oi_created:
+                        self.stdout.write(self.style.SUCCESS("newly created original img:{}".format(oi_obj.original_img)))
+                    else:
+                        self.stdout.write(self.style.SUCCESS("updated original img:{}".format(oi_obj.original_img)))
+
+
+            if desc_img:
+                for di in desc_img:
+                    di_items = {}
+                    di_items["product_id"] = sku_obj.sku
+                    di_items["defaults"] = {}
+                    di_items["defaults"]["desc_img"] = di
+                    di_obj, di_created = ProductDescImg.objects.update_or_create(**di_items)
+                    if di_created:
+                        self.stdout.write(self.style.SUCCESS("newly created desc img:{}".format(di_obj.desc_img)))
+                    else:
+                        self.stdout.write(self.style.SUCCESS("updated desc img:{}".format(di_obj.desc_img)))
+
+
 
