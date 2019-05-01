@@ -1,44 +1,98 @@
 import graphene
 
+from graphene import relay
 from graphene_django.types import DjangoObjectType
+from graphene_django.filter import DjangoFilterConnectionField
 
 from .models import Product, ProductWarehouse, ProductOriginalImg, ProductDescImg
 
-class ProductType(DjangoObjectType):
+class ProductNode(DjangoObjectType):
     class Meta:
         model = Product
+        filter_fields = {"title": ["exact", "icontains", "istartswith"], "sku": ["exact"]}
+        interfaces = (relay.Node,)
 
 
-class ProductWarehouseType(DjangoObjectType):
+class ProductWarehouseNode(DjangoObjectType):
     class Meta:
         model = ProductWarehouse
+        filter_fields = ("warehouse",)
+        interfaces = (relay.Node,)
 
 
-class ProductOriginalImgType(DjangoObjectType):
+class ProductOriginalImgNode(DjangoObjectType):
     class Meta:
         model = ProductOriginalImg
+        filter_fields = ("original_img",)
+        interfaces = (relay.Node,)
 
 
-class ProductDescImgType(DjangoObjectType):
+class ProductDescImgNode(DjangoObjectType):
     class Meta:
         model = ProductDescImg
+        filter_fields = ("desc_img",)
+        interfaces = (relay.Node,)
 
 
 class Query(object):
-    all_products = graphene.List(ProductType)
-    all_warehouses = graphene.List(ProductWarehouseType)
-    all_originalimgs = graphene.List(ProductOriginalImgType)
-    all_descimgs = graphene.List(ProductDescImgType)
+    product = relay.Node.Field(ProductNode)
+    all_products = DjangoFilterConnectionField(ProductNode)
 
-    def resolve_all_products(self, info, **kwargs):
-        return Product.objects.all()
+    warehouse = relay.Node.Field(ProductWarehouseNode)
+    all_warehouses = DjangoFilterConnectionField(ProductWarehouseNode)
 
-    def resolve_all_warehouses(self, info, **kwargs):
-        return ProductWarehouse.objects.select_related('product').all()
+    original_img = relay.Node.Field(ProductOriginalImgNode)
+    all_original_imgs = DjangoFilterConnectionField(ProductOriginalImgNode)
 
-    def resolve_all_originalimgs(self, info, **kwargs):
-        return ProductOriginalImg.objects.select_related('product').all()
-    
-    def resolve_all_descimgs(self, info, **kwargs):
-        return ProductDescImg.objects.select_related('product').all()
-    
+    desc_img = relay.Node.Field(ProductDescImgNode)
+    all_desc_imgs = DjangoFilterConnectionField(ProductDescImgNode)
+
+#class ProductType(DjangoObjectType):
+#    class Meta:
+#        model = Product
+#
+#
+#class ProductWarehouseType(DjangoObjectType):
+#    class Meta:
+#        model = ProductWarehouse
+#
+#
+#class ProductOriginalImgType(DjangoObjectType):
+#    class Meta:
+#        model = ProductOriginalImg
+#
+#
+#class ProductDescImgType(DjangoObjectType):
+#    class Meta:
+#        model = ProductDescImg
+#
+#
+#class Query(object):
+#    all_products = graphene.List(ProductType, 
+#                                 title=graphene.String(),
+#                                 sku=graphene.Int())
+#    all_warehouses = graphene.List(ProductWarehouseType)
+#    all_originalimgs = graphene.List(ProductOriginalImgType)
+#    all_descimgs = graphene.List(ProductDescImgType)
+#
+#
+#    def resolve_all_products(self, info, **kwargs):
+#        title = kwargs.get("title")
+#        sku = kwargs.get("sku")
+#
+#        if title is not None:
+#            return Product.objects.filter(title__contains=title)
+#
+#        if sku is not None:
+#            return Product.objects.get(sku=sku)
+#        return Product.objects.all()
+#
+#    def resolve_all_warehouses(self, info, **kwargs):
+#        return ProductWarehouse.objects.select_related('product').all()
+#
+#    def resolve_all_originalimgs(self, info, **kwargs):
+#        return ProductOriginalImg.objects.select_related('product').all()
+#    
+#    def resolve_all_descimgs(self, info, **kwargs):
+#        return ProductDescImg.objects.select_related('product').all()
+#    
