@@ -4,7 +4,14 @@ from graphene import relay
 from graphene_django.types import DjangoObjectType
 from graphene_django.filter import DjangoFilterConnectionField
 
-from .models import Product, ProductWarehouse, ProductOriginalImg, ProductDescImg
+from .models import Product, ProductWarehouse, ProductOriginalImg, ProductDescImg, ProductParent
+
+class ProductParentNode(DjangoObjectType):
+    class Meta:
+        model = ProductParent
+        filter_fields = ("parent_sn",)
+        interfaces = (relay.Node,)
+
 
 class ProductNode(DjangoObjectType):
     class Meta:
@@ -35,6 +42,9 @@ class ProductDescImgNode(DjangoObjectType):
 
 
 class Query(object):
+    productparent = relay.Node.Field(ProductParentNode)
+    all_productparents = DjangoFilterConnectionField(ProductParentNode)
+    
     product = relay.Node.Field(ProductNode)
     all_products = DjangoFilterConnectionField(ProductNode)
 
