@@ -4,12 +4,21 @@ from graphene import relay
 from graphene_django.types import DjangoObjectType
 from graphene_django.filter import DjangoFilterConnectionField
 
-from .models import Product, ProductWarehouse, ProductOriginalImg, ProductDescImg, ProductParent
+from .models import Product, ProductWarehouse, ProductOriginalImg, ProductDescImg, ProductParent, ProductCategory
 
 class ProductParentNode(DjangoObjectType):
     class Meta:
         model = ProductParent
-        filter_fields = ("parent_sn",)
+        filter_fields = {
+                'parent2product__cat__cat_name': ['exact', 'icontains'],
+                'parent_sn': ['exact', 'icontains', 'istartswith'],
+                } 
+        interfaces = (relay.Node,)
+
+class ProductCategoryNode(DjangoObjectType):
+    class Meta:
+        model = ProductCategory
+        filter_fields = ("cat_name",)
         interfaces = (relay.Node,)
 
 
@@ -44,6 +53,9 @@ class ProductDescImgNode(DjangoObjectType):
 class Query(object):
     productparent = relay.Node.Field(ProductParentNode)
     all_productparents = DjangoFilterConnectionField(ProductParentNode)
+
+    productcategory = relay.Node.Field(ProductCategoryNode)
+    all_productcategory = DjangoFilterConnectionField(ProductCategoryNode)
     
     product = relay.Node.Field(ProductNode)
     all_products = DjangoFilterConnectionField(ProductNode)
