@@ -76,6 +76,8 @@ SHIPPING_ATTRIBUTES_CHOICES = (
     (143, "Lead-acid batteries"),
 )
 # Create your models here.
+
+
 class ProductCategory(models.Model):
     cat_id = models.PositiveIntegerField(primary_key=True)
     cat_name = models.CharField(max_length=100)
@@ -98,7 +100,7 @@ class ProductParent(models.Model):
 
 class Product(models.Model):
     #id = models.AutoField(primary_key=True)
-    sku = models.CharField(max_length=50, primary_key=True) #Product code
+    sku = models.IntegerField(primary_key=True) #Product code
     parent_sn = models.ForeignKey(ProductParent, null=True, related_name="parent2product", on_delete=models.CASCADE)
     status = models.IntegerField(null=True) #Product state: 1(normal), 0(abnormal). State of 0, there is no corresponding information
     title = models.CharField(max_length=100, null=True) #Product title
@@ -108,7 +110,7 @@ class Product(models.Model):
     ship_weight = models.FloatField(null=True) #	Selling weight(KG)
     volume_weight = models.FloatField(null=True) #Volume weight(KG)
     #cat_id = models.IntegerField(null=True) #Category ID
-    cat = models.ForeignKey(ProductCategory, on_delete=models.CASCADE, null=True) #Category ID
+    cat = models.ForeignKey(ProductCategory, on_delete=models.CASCADE, null=True, related_name="cat2product") #Category ID
     parent_id = models.IntegerField(null=True) #Parent category ID
     goods_brand = models.CharField(max_length=30, null=True)	 #Product brand
     purchase_title = models.CharField(max_length=100, null=True) #Chinese title
@@ -139,7 +141,7 @@ class Product(models.Model):
 
 
     def __str__(self):
-        return self.sku
+        return "sku:{}".format(self.sku)
 
 
 class ProductWarehouse(models.Model):
@@ -194,4 +196,9 @@ class ProductDescImg(models.Model):
     desc_img = models.CharField(max_length=250, null=True) #	array	Description image url. One-dimensional array
 
 
-
+class ProductStock(models.Model):
+    goods_sn = models.ForeignKey(Product, related_name="prod2stock", null=True, on_delete=models.CASCADE) #Product code
+    warehouse = models.ForeignKey(ProductWarehouse, related_name="warehouse2stock", null=True, on_delete=models.CASCADE)
+    status = models.IntegerField(null=True) #State: 1(stock available); 0(stock unavailable)
+    goods_number = models.PositiveIntegerField(null=True) #Available stock
+    goods_state = models.CharField(max_length=50, null=True) #	Supply State

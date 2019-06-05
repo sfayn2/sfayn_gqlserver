@@ -74,6 +74,8 @@ class Command(BaseCommand):
 
                     sku_obj, sku_created = Product.objects.update_or_create(**sku_items)
 
+
+
                     warehouse_list = None
                     if p.get("warehouse_list"):
                         warehouse_list = p.get("warehouse_list")
@@ -86,6 +88,19 @@ class Command(BaseCommand):
                             w_obj, w_created = ProductWarehouse.objects.get_or_create(**w_items)
                             if w_created:
                                 self.stdout.write(self.style.SUCCESS("newly created warehouse:{}".format(w_obj.warehouse)))
+
+                            #stocks
+                            #stocks_url = "{}/v2/product/stock".format(settings.CB_DOMAIN)
+                            #print (stocks_url)
+                            #print (p.get("sku"))
+                            #print (wl["warehouse"])
+                            #print (wl["goods_number"])
+                            #stocks_res = requests.post(stocks_url, {'token': token, 'goods_sn': json.dumps([p.get("sku")]), 'warehouse': wl["warehouse"]  } )
+                            #print({'token': token, 'goods_sn': p.get("sku"), 'warehouse': wl["warehouse"]  }) 
+                            #stocks = json.loads(stocks_res.text)['msg']
+                            #print (stocks_res)
+                            #print (stocks)
+                            #stocks
 
                     desc_img = None
                     if p.get("desc_img"):

@@ -10,7 +10,6 @@ class ProductParentNode(DjangoObjectType):
     class Meta:
         model = ProductParent
         filter_fields = {
-                'parent2product__cat__cat_name': ['exact', 'icontains'],
                 'parent_sn': ['exact', 'icontains', 'istartswith'],
                 } 
         interfaces = (relay.Node,)
@@ -25,7 +24,10 @@ class ProductCategoryNode(DjangoObjectType):
 class ProductNode(DjangoObjectType):
     class Meta:
         model = Product
-        filter_fields = {"title": ["exact", "icontains", "istartswith"], "sku": ["exact"]}
+        filter_fields = {"title": ["exact", "icontains", "istartswith"], 
+                         "sku": ["exact"],
+                         "cat__cat_name": ["exact", "icontains"]
+                         }
         interfaces = (relay.Node,)
 
 
