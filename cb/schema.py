@@ -3,8 +3,19 @@ import graphene
 from graphene import relay
 from graphene_django.types import DjangoObjectType
 from graphene_django.filter import DjangoFilterConnectionField
+import django_filters
+from django_filters.filters import *
 
 from .models import Product, ProductWarehouse, ProductOriginalImg, ProductDescImg, ProductParent, ProductCategory
+
+
+class ProductParentFilter(django_filters.FilterSet):
+    #having problem so decided to custom filter for __in  
+    parent2product__cat__cat_id__in = django_filters.BaseInFilter(field_name="parent2product__cat__cat_id", lookup_expr='in')
+
+    class Meta:
+        model = ProductParent
+        fields = ("parent2product__cat__cat_id",)
 
 class ProductParentNode(DjangoObjectType):
     class Meta:
@@ -17,18 +28,29 @@ class ProductParentNode(DjangoObjectType):
 class ProductCategoryNode(DjangoObjectType):
     class Meta:
         model = ProductCategory
-        filter_fields = ("cat_name",)
+        filter_fields = ("cat_name", "level", "parent_id", "cat_id")
         interfaces = (relay.Node,)
 
+class ProductFilter(django_filters.FilterSet):
+    #having problem so decided to custom filter for __in  
+    cat__cat_id__in = django_filters.BaseInFilter(field_name="cat__cat_id", lookup_expr='in')
 
-class ProductNode(DjangoObjectType):
     class Meta:
         model = Product
         filter_fields = {"title": ["exact", "icontains", "istartswith"], 
                          "sku": ["exact"],
-                         "cat__cat_name": ["exact", "icontains"]
+                         "cat__cat_name": ["exact", "icontains"],
+                         "cat__cat_id": ["exact"]
                          }
+        fields = ()
+        #fields = ("cat__cat_id",)
+
+class ProductNode(DjangoObjectType):
+    class Meta:
+        model = Product
+        filterset_class = ProductFilter
         interfaces = (relay.Node,)
+
 
 
 class ProductWarehouseNode(DjangoObjectType):

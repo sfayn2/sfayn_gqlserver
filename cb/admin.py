@@ -48,7 +48,7 @@ class ProductDescImgAdmin(admin.ModelAdmin):
         return obj.product.title
 
 class ProductCategoryAdmin(admin.ModelAdmin):
-    search_fields = ('cat_name',)
+    search_fields = ('cat_name', 'cat_id', 'parent_id')
     list_display = ('parent_id', 'cat_id', 'cat_name',)
 
 # Register your models here.
