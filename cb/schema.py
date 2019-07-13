@@ -6,7 +6,8 @@ from graphene_django.filter import DjangoFilterConnectionField
 import django_filters
 from django_filters.filters import *
 
-from .models import Product, ProductWarehouse, ProductOriginalImg, ProductDescImg, ProductParent, ProductCategory
+from .models import (Product, ProductWarehouse, 
+        ProductOriginalImg, ProductDescImg, ProductParent, ProductCategory, ShoppingCart)
 
 
 class ProductParentFilter(django_filters.FilterSet):
@@ -45,12 +46,12 @@ class ProductFilter(django_filters.FilterSet):
         fields = ()
         #fields = ("cat__cat_id",)
 
+
 class ProductNode(DjangoObjectType):
     class Meta:
         model = Product
         filterset_class = ProductFilter
         interfaces = (relay.Node,)
-
 
 
 class ProductWarehouseNode(DjangoObjectType):
@@ -73,8 +74,51 @@ class ProductDescImgNode(DjangoObjectType):
         filter_fields = ("desc_img",)
         interfaces = (relay.Node,)
 
+class ShoppingCartNode(DjangoObjectType):
+    class Meta:
+        model = ShoppingCart
+        exclude_fields = ("user__password",) #dunno why cant hide
+        filter_fields = ("product__title", "product__sku", "user__id")
+        interfaces = (relay.Node,)
+
+class ShoppingCartMutation(graphene.Mutation):
+    class Arguments:
+        user = graphene.ID(required=True)
+        product = graphene.ID(required=True)
+        quantity = graphene.ID(required=True)
+
+    shopping_cart = graphene.Field(ShoppingCartNode)
+
+    def mutate(self, info, user, product, quantity):
+        sc = ShoppingCart()
+        sc.product_id = product
+        sc.user_id = user
+        sc.quantity = quantity
+        sc.save()
+
+        return ShoppingCartMutation(shopping_cart=sc)
+
+
+from django.contrib.auth import get_user_model
+class UserType(DjangoObjectType):
+    class Meta:
+        model = get_user_model()
+        print ()
+
+
+class Query1(graphene.AbstractType):
+    me = graphene.List(UserType)
+
+    def resolve_me(self, info):
+        user = info.context.user
+        if user.is_anonymous:
+            raise Exception("Not logged in!")
+        return get_user_model().objects.all()
+
 
 class Query(object):
+
+
     productparent = relay.Node.Field(ProductParentNode)
     all_productparents = DjangoFilterConnectionField(ProductParentNode)
 
@@ -92,6 +136,10 @@ class Query(object):
 
     desc_img = relay.Node.Field(ProductDescImgNode)
     all_desc_imgs = DjangoFilterConnectionField(ProductDescImgNode)
+
+    shopping_cart = relay.Node.Field(ShoppingCartNode)
+    all_shopping_cart = DjangoFilterConnectionField(ShoppingCartNode)
+
 
 #class ProductType(DjangoObjectType):
 #    class Meta:

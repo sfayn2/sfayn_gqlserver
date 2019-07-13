@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 
 WAREHOUSE_CHOICES = (
@@ -202,3 +203,15 @@ class ProductStock(models.Model):
     status = models.IntegerField(null=True) #State: 1(stock available); 0(stock unavailable)
     goods_number = models.PositiveIntegerField(null=True) #Available stock
     goods_state = models.CharField(max_length=50, null=True) #	Supply State
+
+
+class ShoppingCart(models.Model):
+    id = models.AutoField(primary_key=True)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="prod2shopcart")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="+")
+    quantity = models.IntegerField(null=True)
+    date_created = models.DateTimeField(auto_now_add=True) #added to know when its created (pullpush in sfayn)
+    date_modified = models.DateTimeField(auto_now=True) #added to know when its modified 
+
+    class Meta:
+        unique_together = ("product", "user")

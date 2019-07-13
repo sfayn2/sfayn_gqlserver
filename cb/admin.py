@@ -1,5 +1,6 @@
 from django.contrib import admin
-from .models import Product, ProductWarehouse, ProductOriginalImg, ProductDescImg, ProductCategory
+from .models import (Product, ProductWarehouse, ProductOriginalImg, 
+        ProductDescImg, ProductCategory, ShoppingCart)
 
 # Register your models here.
 
@@ -51,9 +52,26 @@ class ProductCategoryAdmin(admin.ModelAdmin):
     search_fields = ('cat_name', 'cat_id', 'parent_id')
     list_display = ('parent_id', 'cat_id', 'cat_name',)
 
+
+class ShoppingCartAdmin(admin.ModelAdmin):
+    search_fields = ('product__title', 'product__sku', 'user__username')
+    list_display = ('user__username', 'product__sku', 'product__title', 'quantity', 'date_created')
+    list_display_links = ('user__username',)
+
+    def product__sku(self, obj):
+        return obj.product.sku
+
+    def product__title(self, obj):
+        return obj.product.title
+
+    def user__username(self, obj):
+        return obj.user.username
+
+
 # Register your models here.
 admin.site.register(Product, ProductAdmin)
 admin.site.register(ProductWarehouse, ProductWarehouseAdmin)
 admin.site.register(ProductOriginalImg, ProductOriginalImgAdmin)
 admin.site.register(ProductDescImg, ProductDescImgAdmin)
 admin.site.register(ProductCategory, ProductCategoryAdmin)
+admin.site.register(ShoppingCart, ShoppingCartAdmin)
