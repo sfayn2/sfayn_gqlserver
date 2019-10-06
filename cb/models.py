@@ -215,3 +215,4 @@ class ShoppingCart(models.Model):
 
     class Meta:
         unique_together = ("product", "user")
+

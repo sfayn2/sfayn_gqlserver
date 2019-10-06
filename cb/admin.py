@@ -55,7 +55,7 @@ class ProductCategoryAdmin(admin.ModelAdmin):
 
 class ShoppingCartAdmin(admin.ModelAdmin):
     search_fields = ('product__title', 'product__sku', 'user__username')
-    list_display = ('user__username', 'product__sku', 'product__title', 'quantity', 'date_created')
+    list_display = ('user__username', 'product__sku', 'product__title', 'quantity', 'date_created', 'date_modified')
     list_display_links = ('user__username',)
 
     def product__sku(self, obj):

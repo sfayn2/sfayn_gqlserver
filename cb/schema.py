@@ -5,6 +5,7 @@ from graphene_django.types import DjangoObjectType
 from graphene_django.filter import DjangoFilterConnectionField
 import django_filters
 from django_filters.filters import *
+#from django.db.models import F, Sum, FloatField
 
 from .models import (Product, ProductWarehouse, 
         ProductOriginalImg, ProductDescImg, ProductParent, ProductCategory, ShoppingCart)
@@ -81,22 +82,37 @@ class ShoppingCartNode(DjangoObjectType):
         filter_fields = ("product__title", "product__sku", "user__id")
         interfaces = (relay.Node,)
 
+    #total_price = graphene.Float()
+    #total_amount = graphene.Float()
+    #def resolve_total_price(self, info):
+    #    return self.product.warehouse.values_list('price', flat=True)[0]*self.quantity
+
+    #def resolve_total_amount(self, info):
+    #    return ShoppingCart.objects.aggregate(total_amount=Sum(F('product__warehouse__price')*F('quantity'), output_field=FloatField()))['total_amount']
+
 class ShoppingCartMutation(graphene.Mutation):
     class Arguments:
         user = graphene.ID(required=True)
         product = graphene.ID(required=True)
         quantity = graphene.ID(required=True)
+        mode = graphene.ID(required=True)
 
     shopping_cart = graphene.Field(ShoppingCartNode)
 
-    def mutate(self, info, user, product, quantity):
-        sc = ShoppingCart()
-        sc.product_id = product
-        sc.user_id = user
-        sc.quantity = quantity
-        sc.save()
+    def mutate(self, info, user, product, quantity, mode):
+        if int(mode) == 0: #add
+            sc = ShoppingCart()
+            sc.product_id = product
+            sc.user_id = user
+            sc.quantity = quantity
+            sc.save()
+        elif int(mode) == 1: #update
+            sc = ShoppingCart.objects.get(product_id=product, user_id=user)
+            sc.quantity = quantity
+            sc.save()
 
         return ShoppingCartMutation(shopping_cart=sc)
+
 
 
 from django.contrib.auth import get_user_model
