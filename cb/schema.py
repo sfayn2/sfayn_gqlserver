@@ -5,6 +5,7 @@ from graphene_django.types import DjangoObjectType
 from graphene_django.filter import DjangoFilterConnectionField
 import django_filters
 from django_filters.filters import *
+from django.db.models import Sum, F, FloatField
 #from django.db.models import F, Sum, FloatField
 
 from .models import (Product, ProductWarehouse, 
@@ -82,13 +83,13 @@ class ShoppingCartNode(DjangoObjectType):
         filter_fields = ("product__title", "product__sku", "user__id")
         interfaces = (relay.Node,)
 
-    #total_price = graphene.Float()
-    #total_amount = graphene.Float()
-    #def resolve_total_price(self, info):
-    #    return self.product.warehouse.values_list('price', flat=True)[0]*self.quantity
+    total_price = graphene.Float()
+    total_amount = graphene.Float()
+    def resolve_total_price(self, info):
+        return float(self.product.warehouse.values_list('price', flat=True)[0])*float(self.quantity)
 
     #def resolve_total_amount(self, info):
-    #    return ShoppingCart.objects.aggregate(total_amount=Sum(F('product__warehouse__price')*F('quantity'), output_field=FloatField()))['total_amount']
+    #    return ShoppingCart.objects.filter(user_id=self.user_id).aggregate(total_amount=Sum(F('product__warehouse__price')*F('quantity'), output_field=FloatField()))['total_amount']
 
 class ShoppingCartMutation(graphene.Mutation):
     class Arguments:
