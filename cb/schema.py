@@ -7,6 +7,7 @@ import django_filters
 from django_filters.filters import *
 from django.db.models import Sum, F, FloatField
 #from django.db.models import F, Sum, FloatField
+from services import get_shoppingcart_total_count, get_shoppingcart_group_by_warehouse
 
 from .models import (Product, ProductWarehouse, 
         ProductOriginalImg, ProductDescImg, ProductParent, ProductCategory, ShoppingCart)
@@ -84,12 +85,14 @@ class ShoppingCartNode(DjangoObjectType):
         interfaces = (relay.Node,)
 
     total_price = graphene.Float()
-    total_amount = graphene.Float()
+    total_count = graphene.Float()
+
     def resolve_total_price(self, info):
         return float(self.product.warehouse.values_list('price', flat=True)[0])*float(self.quantity)
 
-    #def resolve_total_amount(self, info):
-    #    return ShoppingCart.objects.filter(user_id=self.user_id).aggregate(total_amount=Sum(F('product__warehouse__price')*F('quantity'), output_field=FloatField()))['total_amount']
+    def resolve_total_count(self, info):
+       return get_shoppingcart_total_count(self.user_id) 
+
 
 class ShoppingCartMutation(graphene.Mutation):
     class Arguments:
@@ -133,6 +136,19 @@ class Query1(graphene.AbstractType):
         return get_user_model().objects.all()
 
 
+class WarehouseShoppingCartObjectType(graphene.ObjectType):
+    name = graphene.String()
+    #shopping_cart = graphene.List(ShoppingCartNode)
+    #shopping_cart = relay.Node.Field(ShoppingCartNode)
+    shopping_cart = DjangoFilterConnectionField(ShoppingCartNode) #i need this to have a filter. but dont need edges nodes here for pagination
+
+class WarehouseShoppingCartListType(graphene.ObjectType):
+    warehouses = graphene.List(WarehouseShoppingCartObjectType)
+
+
+
+
+
 class Query(object):
 
 
@@ -156,6 +172,12 @@ class Query(object):
 
     shopping_cart = relay.Node.Field(ShoppingCartNode)
     all_shopping_cart = DjangoFilterConnectionField(ShoppingCartNode)
+
+    all_shopping_cart_warehouse = graphene.List(WarehouseShoppingCartListType)
+
+
+    def resolve_all_shopping_cart_warehouse(self, info, **kwargs):
+        return get_shoppingcart_group_by_warehouse()
 
 
 #class ProductType(DjangoObjectType):
