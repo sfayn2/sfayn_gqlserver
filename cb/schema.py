@@ -35,26 +35,30 @@ class ProductCategoryNode(DjangoObjectType):
         filter_fields = ("cat_name", "level", "parent_id", "cat_id")
         interfaces = (relay.Node,)
 
-class ProductFilter(django_filters.FilterSet):
+#class ProductFilter(django_filters.FilterSet):
+#    #having problem so decided to custom filter for __in  
+#    cat__cat_id__in = django_filters.BaseInFilter(field_name="cat__cat_id", lookup_expr='in')
+#
+#    class Meta:
+#        model = Product
+#        filter_fields = {"title": ["exact", "icontains", "istartswith"], 
+#                         "sku": ["exact"],
+#                         "cat__cat_name": ["exact", "icontains"],
+#                         "cat__cat_id": ["exact"]
+#                         }
+
+
+class ProductNode(DjangoObjectType):
     #having problem so decided to custom filter for __in  
     cat__cat_id__in = django_filters.BaseInFilter(field_name="cat__cat_id", lookup_expr='in')
-
     class Meta:
         model = Product
+        interfaces = (relay.Node,)
         filter_fields = {"title": ["exact", "icontains", "istartswith"], 
                          "sku": ["exact"],
                          "cat__cat_name": ["exact", "icontains"],
                          "cat__cat_id": ["exact"]
                          }
-        fields = ()
-        #fields = ("cat__cat_id",)
-
-
-class ProductNode(DjangoObjectType):
-    class Meta:
-        model = Product
-        filterset_class = ProductFilter
-        interfaces = (relay.Node,)
 
 
 class ProductWarehouseNode(DjangoObjectType):
