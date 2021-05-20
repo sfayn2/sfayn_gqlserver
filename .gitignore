@@ -1,6 +1,6 @@
 /db.sqlite3
-/sfayn_gqlserver/settings.py
 /env
 __pycache__/
 *.py[cod]
 **/__pycache__/
+*.env
