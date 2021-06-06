@@ -25,11 +25,13 @@ def get_shoppingcart_group_by_warehouse():
             product__warehouse__warehouse=temp['name']
         )
 
+        if temp["shopping_cart"].exists():
+            total_count += temp['shopping_cart'].count()
+
         final_warehouse.append(temp)
-        total_count += 1
 
     return [{ "warehouses": final_warehouse, 
-              "totalCount": total_count  } ]
+              "total_count": total_count  } ]
 
 
 
