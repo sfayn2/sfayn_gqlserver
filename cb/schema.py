@@ -7,15 +7,28 @@ import django_filters
 from django_filters.filters import *
 from django.db.models import Sum, F, FloatField
 #from django.db.models import F, Sum, FloatField
-from services import get_shoppingcart_total_count, get_shoppingcart_group_by_warehouse
+from services import (
+    get_shoppingcart_total_count, 
+    get_shoppingcart_group_by_warehouse
+)
 
-from .models import (Product, ProductWarehouse, 
-        ProductOriginalImg, ProductDescImg, ProductParent, ProductCategory, ShoppingCart)
+from .models import (
+    Product, 
+    ProductWarehouse, 
+    ProductOriginalImg, 
+    ProductDescImg, 
+    ProductParent, 
+    ProductCategory, 
+    ShoppingCart
+)
+from .enums import ShopCartMode
 
 
 class ProductParentFilter(django_filters.FilterSet):
     #having problem so decided to custom filter for __in  
-    parent2product__cat__cat_id__in = django_filters.BaseInFilter(field_name="parent2product__cat__cat_id", lookup_expr='in')
+    parent2product__cat__cat_id__in = django_filters.BaseInFilter(
+        field_name="parent2product__cat__cat_id", lookup_expr='in'
+    )
 
     class Meta:
         model = ProductParent
@@ -35,22 +48,13 @@ class ProductCategoryNode(DjangoObjectType):
         filter_fields = ("cat_name", "level", "parent_id", "cat_id")
         interfaces = (relay.Node,)
 
-#class ProductFilter(django_filters.FilterSet):
-#    #having problem so decided to custom filter for __in  
-#    cat__cat_id__in = django_filters.BaseInFilter(field_name="cat__cat_id", lookup_expr='in')
-#
-#    class Meta:
-#        model = Product
-#        filter_fields = {"title": ["exact", "icontains", "istartswith"], 
-#                         "sku": ["exact"],
-#                         "cat__cat_name": ["exact", "icontains"],
-#                         "cat__cat_id": ["exact"]
-#                         }
-
 
 class ProductNode(DjangoObjectType):
     #having problem so decided to custom filter for __in  
-    cat__cat_id__in = django_filters.BaseInFilter(field_name="cat__cat_id", lookup_expr='in')
+    cat__cat_id__in = django_filters.BaseInFilter(
+        field_name="cat__cat_id", 
+        lookup_expr='in'
+    )
     class Meta:
         model = Product
         interfaces = (relay.Node,)
@@ -102,24 +106,34 @@ class ShoppingCartMutation(graphene.Mutation):
     class Arguments:
         user = graphene.ID(required=True)
         product = graphene.ID(required=True)
-        quantity = graphene.ID(required=True)
+        quantity = graphene.ID(required=False)
         mode = graphene.ID(required=True)
 
     shopping_cart = graphene.Field(ShoppingCartNode)
+    ok = graphene.Boolean()
 
-    def mutate(self, info, user, product, quantity, mode):
-        if int(mode) == 0: #add
+    def mutate(self, info, user, product, mode, quantity=None):
+
+        ok = False
+
+        if ShopCartMode.ADD == int(mode):
             sc = ShoppingCart()
             sc.product_id = product
             sc.user_id = user
             sc.quantity = quantity
-            sc.save()
-        elif int(mode) == 1: #update
+            ok = sc.save()
+
+        elif ShopCartMode.UPDATE == int(mode): 
             sc = ShoppingCart.objects.get(product_id=product, user_id=user)
             sc.quantity = quantity
-            sc.save()
+            ok = sc.save()
 
-        return ShoppingCartMutation(shopping_cart=sc)
+        elif ShopCartMode.DELETE == int(mode): 
+            ok = ShoppingCart.objects.get(product_id=product, user_id=user).delete()
+
+            return ShoppingCartMutation(ok=ok)
+
+        return ShoppingCartMutation(ok=ok, shopping_cart=sc)
 
 
 
@@ -141,14 +155,12 @@ class Query1(graphene.AbstractType):
 
 
 class WarehouseShoppingCartObjectType(graphene.ObjectType):
-    name = graphene.String()
-    #shopping_cart = graphene.List(ShoppingCartNode)
-    #shopping_cart = relay.Node.Field(ShoppingCartNode)
+    name = graphene.String() #warehouse name
     shopping_cart = DjangoFilterConnectionField(ShoppingCartNode) #i need this to have a filter. but dont need edges nodes here for pagination
 
 class WarehouseShoppingCartListType(graphene.ObjectType):
     warehouses = graphene.List(WarehouseShoppingCartObjectType)
-
+    total_count = graphene.Int()
 
 
 

@@ -151,7 +151,7 @@ GRAPHENE = {
 
 #CORS
 CORS_ORIGIN_WHITELIST = (
-        '192.168.1.88:4300',
+    '192.168.1.88:4200',
 )
 
 #for JWT Token

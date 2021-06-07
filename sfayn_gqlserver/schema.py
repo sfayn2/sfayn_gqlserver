@@ -3,10 +3,6 @@ import graphql_jwt
 
 import cb.schema
 
-#class Query(cb.schema.Query, graphene.ObjectType, cb.schema.Query1):
-#    #This class will inherit from multiple queries
-#    #as we begin to add more apps to our project
-#    pass
 class Query(cb.schema.Query, cb.schema.Query1, graphene.ObjectType):
     #This class will inherit from multiple queries
     #as we begin to add more apps to our project
