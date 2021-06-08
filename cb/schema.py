@@ -129,9 +129,8 @@ class ShoppingCartMutation(graphene.Mutation):
             ok = sc.save()
 
         elif ShopCartMode.DELETE == int(mode): 
-            ok = ShoppingCart.objects.get(product_id=product, user_id=user).delete()
-
-            return ShoppingCartMutation(ok=ok)
+            sc = ShoppingCart.objects.get(product_id=product, user_id=user)
+            ok = sc.delete()
 
         return ShoppingCartMutation(ok=ok, shopping_cart=sc)
 
