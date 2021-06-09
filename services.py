@@ -1,5 +1,5 @@
 
-from cb.models import ShoppingCart
+from cb.models import ShoppingCart, WAREHOUSE_CHOICES
 from django.db.models import Count
 
 def get_shoppingcart_total_count(user_id):
@@ -16,13 +16,14 @@ def get_shoppingcart_group_by_warehouse():
 
     final_warehouse = []
     total_count = 0
+    warehouse_dict = dict(WAREHOUSE_CHOICES)
 
     for name in warehouse_original_list:
 
         temp = {}
-        temp['name'] = name['product__warehouse__warehouse']
+        temp['name'] = warehouse_dict[name['product__warehouse__warehouse']]
         temp['shopping_cart'] = ShoppingCart.objects.filter(
-            product__warehouse__warehouse=temp['name']
+            product__warehouse__warehouse=name['product__warehouse__warehouse']
         )
 
         if temp["shopping_cart"].exists():
