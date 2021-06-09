@@ -66,10 +66,15 @@ class ProductNode(DjangoObjectType):
 
 
 class ProductWarehouseNode(DjangoObjectType):
+    warehouse_display = graphene.String()
     class Meta:
         model = ProductWarehouse
         filter_fields = ("warehouse",)
         interfaces = (relay.Node,)
+
+    #use to display choice real value
+    def resolve_warehouse_display(self, info):
+        return self.get_warehouse_display()
 
 
 class ProductOriginalImgNode(DjangoObjectType):
@@ -140,7 +145,6 @@ from django.contrib.auth import get_user_model
 class UserType(DjangoObjectType):
     class Meta:
         model = get_user_model()
-        print ()
 
 
 class Query1(graphene.AbstractType):
