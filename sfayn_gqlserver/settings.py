@@ -43,6 +43,8 @@ INSTALLED_APPS = [
     'cb',
     'graphene_django',
     'corsheaders',
+    'product',
+    'shop'
 ]
 
 MIDDLEWARE = [
