@@ -10,12 +10,12 @@ class Query(product.schema.Query, shop.schema.Query, graphene.ObjectType):
     #as we begin to add more apps to our project
     pass
 
-#class Mutation(graphene.ObjectType):
+class Mutation(graphene.ObjectType):
+    shopcart = shop.schema.ShopCartMutation.Field()
 #    shopping_cart = cb.schema.ShoppingCartMutation.Field()
 #    token_auth = graphql_jwt.ObtainJSONWebToken.Field()
 #    verify_token = graphql_jwt.Verify.Field()
 #    refresh_token = graphql_jwt.Refresh.Field()
 #
-#schema = graphene.Schema(query=Query, mutation=Mutation)
-schema = graphene.Schema(query=Query)
+schema = graphene.Schema(query=Query, mutation=Mutation)
 
