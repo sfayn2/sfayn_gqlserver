@@ -9,8 +9,6 @@ def get_shopcart_group_by_owner():
         )
     )
 
-    import pdb; pdb.set_trace()
-
     final_owner = []
     total_count = 0
 

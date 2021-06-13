@@ -21,6 +21,9 @@ class ShopCartNode(DjangoObjectType):
     total_price = graphene.Float()
     total_count = graphene.Float()
 
+    def resolve_total_price(self, info):
+        return float(self.product_variant.price)*float(self.quantity)
+
 
 class Query(object):
     shopcart = relay.Node.Field(ShopCartNode)
