@@ -13,6 +13,9 @@ from .models import (
 from .enums import (
     ShopCartMode
 )
+from product.models import (
+    ProductVariant
+)
 
 
 class ShopCartNode(DjangoObjectType):
@@ -47,14 +50,15 @@ class ShopCartMutation(graphene.Mutation):
         #product_variant = from_global_id(product_variant)
 
         if ShopCartMode.ADD == int(mode):
+            pv = ProductVariant.objects.get(sku=sku)
             sc = ShopCart()
-            sc.product_variant_id = product_variant
+            sc.product_variant = pv
             sc.created_by_id = user
             sc.quantity = quantity
             ok = sc.save()
 
         elif ShopCartMode.UPDATE == int(mode): 
-            sc = ShopCart.objects.get(product_variant_id=product_variant, created_by_id=user)
+            sc = ShopCart.objects.get(product_variant__sku=sku, created_by_id=user)
             sc.quantity = quantity
             ok = sc.save()
 
