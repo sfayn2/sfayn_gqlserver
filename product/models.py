@@ -29,6 +29,7 @@ class ProductParent(models.Model):
     goods_brand = models.CharField(max_length=30, null=True, blank=True)
     goods_desc = models.TextField(null=True) 
     status = models.IntegerField(null=True, choices=STATUS_CHOICES) 
+    publish = models.BooleanField(default=False) 
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user2product")
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True) 
