@@ -37,6 +37,10 @@ class ProductParent(models.Model):
     def __str__(self):
         return "ParentSn:{} Title:{}".format(self.parent_sn, self.title)
 
+#TODO later
+#class ProductVariantItems(models.Model):
+#    pass
+
 
 class ProductVariant(models.Model):
     id = models.AutoField(primary_key=True)
