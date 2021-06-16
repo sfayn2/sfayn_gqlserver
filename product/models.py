@@ -29,7 +29,7 @@ class ProductParent(models.Model):
     goods_brand = models.CharField(max_length=30, null=True, blank=True)
     goods_desc = models.TextField(null=True) 
     status = models.IntegerField(null=True, choices=STATUS_CHOICES) 
-    publish = models.BooleanField(default=False) 
+    #publish = models.BooleanField(default=False) 
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user2product")
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True) 
@@ -54,7 +54,7 @@ class ProductVariant(models.Model):
     default = models.BooleanField(default=False)
 
     def __str__(self):
-        return "{}-{}-{}-{}".format(self.parent_sn_id, self.sku, self.name, self.options)
+        return "ParentSn({}) sku({}) Name({}) Options({})".format(self.parent_sn, self.sku, self.name, self.options)
 
 
 

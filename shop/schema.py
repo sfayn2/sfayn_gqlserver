@@ -8,7 +8,9 @@ import django_filters
 from django_filters.filters import *
 from django.db.models import Sum, F, FloatField
 from .models import (
-    ShopCart
+    ShopCart,
+    ShopOrder,
+    ShopOrderItem,
 )
 from .enums import (
     ShopCartMode
@@ -16,6 +18,20 @@ from .enums import (
 from product.models import (
     ProductVariant
 )
+
+
+class ShopOrderNode(DjangoObjectType):
+    class Meta:
+        model = ShopOrder
+        filter_fields = ("id",)
+        interfaces = (relay.Node,)
+
+
+class ShopOrderItemNode(DjangoObjectType):
+    class Meta:
+        model = ShopOrderItem
+        filter_fields = ("order_id",)
+        interfaces = (relay.Node,)
 
 
 class ShopCartNode(DjangoObjectType):
@@ -73,3 +89,8 @@ class Query(object):
     shopcart = relay.Node.Field(ShopCartNode)
     all_shopcart = DjangoFilterConnectionField(ShopCartNode)
 
+    shoporderitems = relay.Node.Field(ShopOrderItemNode)
+    all_shoporderitems = DjangoFilterConnectionField(ShopOrderItemNode)
+
+    shoporder = relay.Node.Field(ShopOrderNode)
+    all_shoporder = DjangoFilterConnectionField(ShopOrderNode)
