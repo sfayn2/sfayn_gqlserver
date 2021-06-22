@@ -4,8 +4,16 @@ import graphql_jwt
 import cb.schema
 import product.schema
 import shop.schema
+import customer.schema
+import accounts.schema
 
-class Query(product.schema.Query, shop.schema.Query, graphene.ObjectType):
+class Query(
+    product.schema.Query, 
+    shop.schema.Query, 
+    customer.schema.Query,
+    accounts.schema.Query,
+    graphene.ObjectType
+):
     #This class will inherit from multiple queries
     #as we begin to add more apps to our project
     pass
