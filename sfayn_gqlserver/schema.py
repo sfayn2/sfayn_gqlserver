@@ -5,13 +5,13 @@ import cb.schema
 import product.schema
 import shop.schema
 import customer.schema
-import accounts.schema
+import account.schema
 
 class Query(
     product.schema.Query, 
     shop.schema.Query, 
     customer.schema.Query,
-    accounts.schema.Query,
+    account.schema.Query,
     graphene.ObjectType
 ):
     #This class will inherit from multiple queries
