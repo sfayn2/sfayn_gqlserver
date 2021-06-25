@@ -37,7 +37,6 @@ class ShopOrderItemNode(DjangoObjectType):
 class ShopCartNode(DjangoObjectType):
     class Meta:
         model = ShopCart
-        exclude_fields = ("user__password",) #dunno why cant hide
         filter_fields = ("created_by__id",)
         interfaces = (relay.Node,)
 
@@ -48,8 +47,8 @@ class ShopCartNode(DjangoObjectType):
         return float(self.product_variant.price)*float(self.quantity)
 
 
-class ShopCartMutation(graphene.Mutation):
-    class Arguments:
+class ShopCartMutation(relay.ClientIDMutation):
+    class Input:
         user = graphene.ID(required=True)
         sku = graphene.ID(required=True)
         quantity = graphene.ID(required=False)
@@ -58,12 +57,13 @@ class ShopCartMutation(graphene.Mutation):
     shopcart = graphene.Field(ShopCartNode)
     ok = graphene.Boolean()
 
-    def mutate(self, info, user, sku, mode, quantity=None):
+    @classmethod
+    def mutate_and_get_payload(cls, root, info, user, sku, mode, quantity=None):
 
         ok = False
-
         #need to convert back the relay id
         #product_variant = from_global_id(product_variant)
+        user = from_global_id(user)[1] #it returns ('UserNode', '1')
 
         if ShopCartMode.ADD == int(mode):
             pv = ProductVariant.objects.get(sku=sku)

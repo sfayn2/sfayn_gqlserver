@@ -50,7 +50,7 @@ class ProductVariant(models.Model):
     price = models.FloatField(null=True, blank=True)
     name = models.CharField(max_length=50, null=True, blank=True) #Colour
     options = models.CharField(max_length=50, null=True, blank=True) # Red/Blue?
-    img_url = models.CharField(max_length=250, null=True, blank=True) #TODO imagefield
+    img_url = models.CharField(max_length=300, null=True, blank=True) #TODO imagefield
     default = models.BooleanField(default=False)
 
     def __str__(self):
@@ -61,7 +61,7 @@ class ProductVariant(models.Model):
 class ProductImage(models.Model):
     id = models.AutoField(primary_key=True)
     parent_sn = models.ForeignKey("product.ProductParent", on_delete=models.CASCADE, null=True, related_name="parent2image") 
-    img_url = models.CharField(max_length=250, null=True) #TODO imagefield
+    img_url = models.CharField(max_length=300, null=True) #TODO imagefield
     cover_photo = models.BooleanField(default=False)
 
 
