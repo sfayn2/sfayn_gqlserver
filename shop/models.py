@@ -51,15 +51,16 @@ class ShopOrderItem(models.Model):
 
 
 class ShopOrder(models.Model):
-    STATUS_CHOICES = (
-        (0, "Waiting for Payment"),
-        (1, "Paid"),
-        (2, "Processing"),
-        (3, "Shipped Out"),
-        (4, "Refunded"),
-        (5, "Cancel"),
-        (6, "Completed"),
-    )
+
+    class Status(models.IntegerChoices):
+        WAITING_FOR_PAYMENT = 0
+        PAID = 1
+        PROCESSING = 2
+        SHIPPED_OUT = 3
+        REFUNDED = 4
+        CANCEL = 5
+        COMPLETED = 6
+
     id = models.AutoField(primary_key=True)
     payment_method = models.ForeignKey(
         "payment.PaymentMethod", 
@@ -79,7 +80,7 @@ class ShopOrder(models.Model):
     status = models.IntegerField(
         blank=True, 
         null=True, 
-        choices=STATUS_CHOICES
+        choices=Status.choices
     )
     created_by = models.ForeignKey(
         User, 

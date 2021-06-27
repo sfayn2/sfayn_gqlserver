@@ -22,6 +22,7 @@ class Query(
 
 class Mutation(graphene.ObjectType):
     shopcart = shop.schema.ShopCartMutation.Field()
+    shoporder = shop.schema.ShopOrderMutation.Field()
 #    shopping_cart = cb.schema.ShoppingCartMutation.Field()
 #    token_auth = graphql_jwt.ObtainJSONWebToken.Field()
 #    verify_token = graphql_jwt.Verify.Field()

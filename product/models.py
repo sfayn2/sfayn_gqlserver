@@ -3,24 +3,27 @@ from django.contrib.auth.models import User
 
 # Create your models here.
 class ProductCategory(models.Model):
-    LEVEL_CHOICES = (
-        (1,	"Level 1"),
-        (2,	"Level 2"),
-        (3,	"Level 3"),
-    )
+
+    class LevelChoices(models.IntegerChoices):
+        LEVEL_1 = 1
+        LEVEL_2 = 2
+        LEVEL_3 = 3
+
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100)
     parent = models.ForeignKey('self', blank=True, null=True, on_delete=models.CASCADE)
-    level = models.IntegerField(null=True, choices=LEVEL_CHOICES) 
+    level = models.IntegerField(null=True, choices=LevelChoices.choices) 
 
     def __str__(self):
         return "Level({}) ParentId({}) Id({}) Name({})".format(self.level, self.parent_id, self.id, self.name, self.level)
 
 
 class ProductParent(models.Model):
-    STATUS_CHOICES = (
-        (0,	"Active"),
-    )
+
+    class Status(models.IntegerChoices):
+        INACTIVE = 0
+        ACTIVE = 1
+
     #we can add more attributes later
     id = models.AutoField(primary_key=True)
     parent_sn = models.CharField(max_length=50) #CharField to accept multiple sku datatype 
@@ -28,7 +31,7 @@ class ProductParent(models.Model):
     category = models.ForeignKey("product.ProductCategory", on_delete=models.CASCADE, null=True, related_name="cat2product") 
     goods_brand = models.CharField(max_length=30, null=True, blank=True)
     goods_desc = models.TextField(null=True) 
-    status = models.IntegerField(null=True, choices=STATUS_CHOICES) 
+    status = models.IntegerField(null=True, choices=Status.choices) 
     #publish = models.BooleanField(default=False) 
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user2product")
     date_created = models.DateTimeField(auto_now_add=True)
