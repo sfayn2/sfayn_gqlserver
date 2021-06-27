@@ -21,10 +21,14 @@ from product.models import (
 
 
 class ShopOrderNode(DjangoObjectType):
+    status = graphene.String()
     class Meta:
         model = ShopOrder
         filter_fields = ("id",)
         interfaces = (relay.Node,)
+
+    def resolve_status(self, info):
+        return self.get_status_display()
 
 
 class ShopOrderItemNode(DjangoObjectType):
@@ -121,6 +125,40 @@ class ShopOrderMutation(relay.ClientIDMutation):
         ok = so.save()
 
         return ShopOrderMutation(ok=ok, shoporder=so)
+
+
+class ShopOrderItemMutation(relay.ClientIDMutation):
+    class Input:
+        user = graphene.ID(required=True)
+        order = graphene.ID(required=True)
+        cart = graphene.ID(required=True)
+
+    shoporderitem = graphene.Field(ShopOrderItemNode)
+    ok = graphene.Boolean()
+
+    @classmethod
+    def mutate_and_get_payload(
+        cls, 
+        root, 
+        info, 
+        user, 
+        order, 
+        cart,
+    ):
+
+        ok = False
+        user_id = from_global_id(user)[1] #it returns ('UserNode', '1')
+        order_id = from_global_id(order)[1]
+        cart_id = from_global_id(cart)[1]
+
+        s = ShopOrderItem()
+        s.order_id = order_id
+        s.shopcart_id = cart_id
+        s.created_by_id = user_id
+
+        ok = s.save()
+
+        return ShopOrderItemMutation(ok=ok, shoporderitem=s)
 
 
 class Query(object):
