@@ -131,7 +131,7 @@ class ShopOrderItemMutation(relay.ClientIDMutation):
     class Input:
         user = graphene.ID(required=True)
         order = graphene.ID(required=True)
-        cart = graphene.ID(required=True)
+        item = graphene.ID(required=True)
 
     shoporderitem = graphene.Field(ShopOrderItemNode)
     ok = graphene.Boolean()
@@ -143,13 +143,13 @@ class ShopOrderItemMutation(relay.ClientIDMutation):
         info, 
         user, 
         order, 
-        cart,
+        item,
     ):
 
         ok = False
         user_id = from_global_id(user)[1] #it returns ('UserNode', '1')
         order_id = from_global_id(order)[1]
-        cart_id = from_global_id(cart)[1]
+        cart_id = from_global_id(item)[1]
 
         s = ShopOrderItem()
         s.order_id = order_id
