@@ -28,7 +28,12 @@ class ShopOrderNode(DjangoObjectType):
         interfaces = (relay.Node,)
 
     def resolve_status(self, info):
-        return self.get_status_display()
+        for status in self.Status:
+            if status.value == int(self.status):
+                return status.label
+
+        # below doesnt work for mutation that return non relay result??
+        #return self.get_status_display()
 
 
 class ShopOrderItemNode(DjangoObjectType):
@@ -159,6 +164,34 @@ class ShopOrderItemMutation(relay.ClientIDMutation):
         ok = s.save()
 
         return ShopOrderItemMutation(ok=ok, shoporderitem=s)
+
+
+class ShopOrderStatusMutation(relay.ClientIDMutation):
+    class Input:
+        order = graphene.ID(required=True)
+        status = graphene.ID(required=True)
+
+    shoporder = graphene.Field(ShopOrderNode)
+    ok = graphene.Boolean()
+
+    @classmethod
+    def mutate_and_get_payload(
+        cls, 
+        root, 
+        info, 
+        order, 
+        status
+    ):
+
+        ok = False
+        order_id = from_global_id(order)[1] 
+
+        so = ShopOrder.objects.get(id=order_id)
+        so.status = status
+
+        ok = so.save()
+
+        return ShopOrderStatusMutation(ok=ok, shoporder=so)
 
 
 class Query(object):
