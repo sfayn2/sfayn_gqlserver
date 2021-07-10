@@ -16,7 +16,7 @@ from .enums import (
     ShopCartMode
 )
 from product.models import (
-    ProductVariant
+    ProductVariantItem
 )
 
 
@@ -75,7 +75,7 @@ class ShopCartMutation(relay.ClientIDMutation):
         user = from_global_id(user)[1] #it returns ('UserNode', '1')
 
         if ShopCartMode.ADD == int(mode):
-            pv = ProductVariant.objects.get(sku=sku)
+            pv = ProductVariantItem.objects.get(sku=sku)
             sc = ShopCart()
             sc.product_variant = pv
             sc.created_by_id = user

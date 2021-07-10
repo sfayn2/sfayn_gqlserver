@@ -17,6 +17,9 @@ class ProductCategory(models.Model):
     level = models.IntegerField(null=True, choices=LevelChoices.choices) 
     img_upload = models.ImageField(upload_to=path_and_rename, null=True, blank=True, help_text="Primary img")
     img_url = models.CharField(max_length=300, null=True, blank=True, help_text="secondary img") #TODO imagefield
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user2category")
+    date_created = models.DateTimeField(auto_now_add=True)
+    date_modified = models.DateTimeField(auto_now=True) 
 
     def __str__(self):
         return "Level({}) ParentId({}) Id({}) Name({})".format(self.level, self.parent_id, self.id, self.name, self.level)
@@ -44,26 +47,36 @@ class ProductParent(models.Model):
     def __str__(self):
         return "ParentSn:{} Title:{}".format(self.parent_sn, self.title)
 
-#TODO later
-#class ProductVariantItems(models.Model):
-#    pass
-
 
 class ProductVariant(models.Model):
     id = models.AutoField(primary_key=True)
-    parent_sn = models.ForeignKey("product.ProductParent", on_delete=models.CASCADE, null=True, related_name="product2variants") 
+    name = models.CharField(max_length=100, blank=True, null=True)
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user2variant")
+    date_created = models.DateTimeField(auto_now_add=True)
+    date_modified = models.DateTimeField(auto_now=True) 
+
+    def __str__(self):
+        return self.name
+
+
+class ProductVariantItem(models.Model):
+    id = models.AutoField(primary_key=True)
+    product_variant = models.ForeignKey("product.ProductVariant", on_delete=models.CASCADE, null=True, related_name="variant2item", blank=True) 
+    parent_sn = models.ForeignKey("product.ProductParent", on_delete=models.CASCADE, null=True, related_name="product2variantitem") 
     sku = models.CharField(max_length=50)
     quantity = models.IntegerField(null=True, blank=True)
     price = models.FloatField(null=True, blank=True)
-    name = models.CharField(max_length=50, null=True, blank=True) #Colour
+    name = models.CharField(max_length=50, null=True, blank=True) #Colour #TO REMOVE??
     options = models.CharField(max_length=50, null=True, blank=True) # Red/Blue?
     img_upload = models.ImageField(upload_to=path_and_rename, null=True, blank=True, help_text="Primary img")
     img_url = models.CharField(max_length=300, null=True, blank=True, help_text="secondary img") 
     default = models.BooleanField(default=False)
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user2variantsitem")
+    date_created = models.DateTimeField(auto_now_add=True)
+    date_modified = models.DateTimeField(auto_now=True) 
 
     def __str__(self):
         return "ParentSn({}) sku({}) Name({}) Options({})".format(self.parent_sn, self.sku, self.name, self.options)
-
 
 
 class ProductImage(models.Model):
@@ -72,6 +85,9 @@ class ProductImage(models.Model):
     img_upload = models.ImageField(upload_to=path_and_rename, null=True, blank=True, help_text="Primary img")
     img_url = models.CharField(max_length=300, null=True, help_text="Secondary img", blank=True)
     cover_photo = models.BooleanField(default=False)
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user2img")
+    date_created = models.DateTimeField(auto_now_add=True)
+    date_modified = models.DateTimeField(auto_now=True) 
 
 
 class ProductVideo(models.Model):
@@ -79,6 +95,9 @@ class ProductVideo(models.Model):
     parent_sn = models.ForeignKey("product.ProductParent", on_delete=models.CASCADE, null=True, related_name="parent2video") 
     video_upload = models.FileField(upload_to=path_and_rename, null=True, blank=True, help_text="Primary file")
     video_url = models.CharField(max_length=250, null=True, blank=True) 
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user2video")
+    date_created = models.DateTimeField(auto_now_add=True)
+    date_modified = models.DateTimeField(auto_now=True) 
 
 
 class ProductTag(models.Model):
@@ -95,7 +114,7 @@ class ProductTag(models.Model):
 class ProductTagItem(models.Model):
     id = models.AutoField(primary_key=True)
     product_tag = models.ForeignKey("product.ProductTag", on_delete=models.CASCADE, null=True, related_name="tag2items", blank=True) 
-    product_variant = models.ForeignKey("product.ProductVariant", on_delete=models.CASCADE, null=True, related_name="variant2tag", blank=True) 
+    product_variant = models.ForeignKey("product.ProductVariantItem", on_delete=models.CASCADE, null=True, related_name="variant2tag", blank=True) 
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user2tagitems")
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True) 

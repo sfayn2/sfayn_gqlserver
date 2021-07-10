@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 class ShopCart(models.Model):
     id = models.AutoField(primary_key=True)
     product_variant = models.ForeignKey(
-        'product.ProductVariant', 
+        'product.ProductVariantItem', 
         on_delete=models.CASCADE, 
         related_name="prodvariant2cart"
     )
@@ -19,7 +19,7 @@ class ShopCart(models.Model):
     date_modified = models.DateTimeField(auto_now=True) 
 
     def __str__(self):
-        return "ProductionVariant({}) Qty({})".format(self.product_variant, self.quantity)
+        return "ProductionVariantItem({}) Qty({})".format(self.product_variant, self.quantity)
 
 
 class ShopOrderItem(models.Model):

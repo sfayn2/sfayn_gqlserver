@@ -1,12 +1,13 @@
 from django.contrib import admin
 from .models import (
     ProductParent,
-    ProductVariant,
     ProductVideo,
     ProductImage,
     ProductCategory,
     ProductTag,
-    ProductTagItem
+    ProductTagItem,
+    ProductVariant,
+    ProductVariantItem,
 )
 
 # Register your models here.
@@ -53,10 +54,22 @@ class ProductTagItemAdmin(admin.ModelAdmin):
     list_display = ("product_tag", "product_variant")
 
 
+class ProductVariantAdmin(admin.ModelAdmin):
+    search_fields = ("name",)
+    list_display = ("name", )
+
+
+class ProductVariantItemAdmin(admin.ModelAdmin):
+    search_fields = ("sku",)
+    list_display = ("product_variant", "options", "sku", "parent_sn", "quantity", "price")
+    list_display_links = ("sku", )
+
+
 admin.site.register(ProductParent, ProductParentAdmin)
 admin.site.register(ProductCategory, ProductCategoryAdmin)
-admin.site.register(ProductVariant, ProductVariantAdmin)
 admin.site.register(ProductImage, ProductImageAdmin)
 admin.site.register(ProductVideo, ProductVideoAdmin)
 admin.site.register(ProductTag, ProductTagAdmin)
 admin.site.register(ProductTagItem, ProductTagItemAdmin)
+admin.site.register(ProductVariant, ProductVariantAdmin)
+admin.site.register(ProductVariantItem, ProductVariantItemAdmin)

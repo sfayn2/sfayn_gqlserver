@@ -10,6 +10,7 @@ from django.db.models import Sum, F, FloatField
 from .models import (
     ProductParent,
     ProductVariant,
+    ProductVariantItem,
     ProductVideo,
     ProductImage,
     ProductCategory
@@ -36,15 +37,6 @@ class ProductCategoryNode(DjangoObjectType):
         return self.get_level_display()
 
 
-class ProductVariantNode(DjangoObjectType):
-    class Meta:
-        model = ProductVariant
-        interfaces = (relay.Node,)
-        filter_fields = {
-            "sku": ["exact"],
-        }
-
-
 class ProductImageNode(DjangoObjectType):
     class Meta:
         model = ProductImage
@@ -63,6 +55,13 @@ class ProductVariantNode(DjangoObjectType):
     class Meta:
         model = ProductVariant
         interfaces = (relay.Node,)
+        filter_fields = ("name",)
+
+
+class ProductVariantItemNode(DjangoObjectType):
+    class Meta:
+        model = ProductVariantItem
+        interfaces = (relay.Node,)
         filter_fields = ("sku",)
 
 
@@ -73,11 +72,17 @@ class Query(object):
     productparent = relay.Node.Field(ProductParentNode)
     all_productparents = DjangoFilterConnectionField(ProductParentNode)
     
-    productvariant = relay.Node.Field(ProductVariantNode)
-    all_productvariants = DjangoFilterConnectionField(ProductVariantNode)
+    #productvariant = relay.Node.Field(ProductVariantNode)
+    #all_productvariants = DjangoFilterConnectionField(ProductVariantNode)
 
     productimage = relay.Node.Field(ProductImageNode)
     all_productimage = DjangoFilterConnectionField(ProductImageNode)
 
     productvideo = relay.Node.Field(ProductVideoNode)
     all_productvideo = DjangoFilterConnectionField(ProductVideoNode)
+
+    productvariant = relay.Node.Field(ProductVariantNode)
+    all_productvariants = DjangoFilterConnectionField(ProductVariantNode)
+
+    productvariantitem = relay.Node.Field(ProductVariantItemNode)
+    all_productvariantitems = DjangoFilterConnectionField(ProductVariantItemNode)
