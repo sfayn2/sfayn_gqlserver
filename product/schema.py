@@ -26,10 +26,14 @@ class ProductParentNode(DjangoObjectType):
 
 
 class ProductCategoryNode(DjangoObjectType):
+    level = graphene.String()
     class Meta:
         model = ProductCategory
         interfaces = (relay.Node,)
-        filter_fields = ("name",)
+        filter_fields = ("name", "level")
+
+    def resolve_level(self, info):
+        return self.get_level_display()
 
 
 class ProductVariantNode(DjangoObjectType):

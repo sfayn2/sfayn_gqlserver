@@ -4,7 +4,9 @@ from .models import (
     ProductVariant,
     ProductVideo,
     ProductImage,
-    ProductCategory
+    ProductCategory,
+    ProductTag,
+    ProductTagItem
 )
 
 # Register your models here.
@@ -41,8 +43,20 @@ class ProductVideoAdmin(admin.ModelAdmin):
     list_display = ("parent_sn", "video_url")
 
 
+class ProductTagAdmin(admin.ModelAdmin):
+    search_fields = ("name",)
+    list_display = ("name", )
+
+
+class ProductTagItemAdmin(admin.ModelAdmin):
+    search_fields = ("product_tag",)
+    list_display = ("product_tag", "product_variant")
+
+
 admin.site.register(ProductParent, ProductParentAdmin)
 admin.site.register(ProductCategory, ProductCategoryAdmin)
 admin.site.register(ProductVariant, ProductVariantAdmin)
 admin.site.register(ProductImage, ProductImageAdmin)
 admin.site.register(ProductVideo, ProductVideoAdmin)
+admin.site.register(ProductTag, ProductTagAdmin)
+admin.site.register(ProductTagItem, ProductTagItemAdmin)
