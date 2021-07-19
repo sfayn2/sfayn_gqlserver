@@ -7,6 +7,7 @@ import shop.schema
 import customer.schema
 import account.schema
 import payment.schema
+import promotional.schema
 
 class Query(
     product.schema.Query, 
@@ -14,6 +15,7 @@ class Query(
     customer.schema.Query,
     account.schema.Query,
     payment.schema.Query,
+    promotional.schema.Query,
     graphene.ObjectType
 ):
     #This class will inherit from multiple queries
