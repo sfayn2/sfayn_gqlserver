@@ -6,6 +6,6 @@ from .models import (
 # Register your models here.
 class PromotionalBannerAdmin(admin.ModelAdmin):
     search_fields = ("name",)
-    list_display = ("name", "img_upload", "img_url")
+    list_display = ("name", "img_upload", "img_url", "display_order")
 
 admin.site.register(PromotionalBanner, PromotionalBannerAdmin)
