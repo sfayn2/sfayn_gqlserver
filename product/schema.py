@@ -15,14 +15,27 @@ from .models import (
     ProductImage,
     ProductCategory
 )
+from django.db.models import Q
+
+class ProductParentNodeFilter(django_filters.FilterSet):
+    keyword = CharFilter(method='or_custom_filter')
+
+    class Meta:
+        model = ProductParent
+        fields = ['keyword']
+
+    def or_custom_filter(self, queryset, name, value):
+        return queryset.filter(Q(title__icontains=value)|Q(goods_desc__icontains=value))
 
 
 class ProductParentNode(DjangoObjectType):
     class Meta:
         model = ProductParent
-        filter_fields = {
-                'parent_sn': ['exact', 'icontains', 'istartswith'],
-                } 
+        filterset_class = ProductParentNodeFilter
+        #filter_fields = {
+        #  'parent_sn': ['exact', 'icontains', 'istartswith'],
+        #  'title': ['icontains']
+        #} 
         interfaces = (relay.Node,)
 
 
