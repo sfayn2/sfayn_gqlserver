@@ -25,7 +25,21 @@ class ProductParentNodeFilter(django_filters.FilterSet):
         fields = ['keyword']
 
     def or_custom_filter(self, queryset, name, value):
-        return queryset.filter(Q(title__icontains=value)|Q(goods_desc__icontains=value))
+        value = eval(value) 
+
+        keyword = value.get("keyword")
+        minprice = value.get("minprice")
+        maxprice = value.get("maxprice")
+
+        queryset  = queryset.filter(Q(title__icontains=keyword)|Q(goods_desc__icontains=keyword))
+
+        if minprice and maxprice:
+            queryset = queryset.filter(
+                product2variantitem__price__gte=minprice,
+                product2variantitem__price__lte=maxprice
+            ).distinct()
+
+        return queryset
 
 
 class ProductParentNode(DjangoObjectType):
@@ -75,7 +89,11 @@ class ProductVariantItemNode(DjangoObjectType):
     class Meta:
         model = ProductVariantItem
         interfaces = (relay.Node,)
-        filter_fields = ("sku",)
+        #filter_fields = ("sku",)
+        filter_fields = {
+          'sku': ['exact'],
+          'price': ['gte', 'lte']
+        } 
 
 
 class Query(object):
