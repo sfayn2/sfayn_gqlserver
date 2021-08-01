@@ -16,6 +16,7 @@ from .models import (
     ProductCategory
 )
 from django.db.models import Q
+from services import get_list_from_global_id
 
 class ProductParentNodeFilter(django_filters.FilterSet):
     keyword = CharFilter(method='or_custom_filter')
@@ -24,12 +25,16 @@ class ProductParentNodeFilter(django_filters.FilterSet):
     #    model = ProductParent
     #    fields = ['keyword']
 
+
     def or_custom_filter(self, queryset, name, value):
         value = eval(value) 
 
         keyword = value.get("keyword")
         minprice = value.get("minprice")
         maxprice = value.get("maxprice")
+
+        brand = value.get("brand") #list of str
+        category = value.get("category") #list of str
 
         queryset  = queryset.filter(Q(title__icontains=keyword)|Q(goods_desc__icontains=keyword))
 
@@ -38,6 +43,14 @@ class ProductParentNodeFilter(django_filters.FilterSet):
                 product2variantitem__price__gte=minprice,
                 product2variantitem__price__lte=maxprice
             ).distinct()
+
+        if brand:
+            queryset = queryset.filter(goods_brand__in=brand.split(","))
+
+        if category:
+            final_id = get_list_from_global_id(category)
+            queryset = queryset.filter(category_id__in=final_id)
+
 
         return queryset
 
