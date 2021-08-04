@@ -18,31 +18,45 @@ from .models import (
 from django.db.models import Q
 from services import get_list_from_global_id
 
+
+
+class ProductVariantItemNode(DjangoObjectType):
+    class Meta:
+        model = ProductVariantItem
+        #filterset_class = ProductVariantItemNodeFilter
+        interfaces = (relay.Node,)
+        filter_fields = ("sku",)
+        #filter_fields = {
+        #  'sku': ['exact'],
+        #  'price': ['gte', 'lte']
+        #} 
+
+
 class ProductParentNodeFilter(django_filters.FilterSet):
     keyword = CharFilter(method='or_custom_filter')
+    min_price__gte = django_filters.NumberFilter(field_name='min_price', lookup_expr='gte')
+    min_price__lte = django_filters.NumberFilter(field_name='min_price', lookup_expr='lte')
 
     #class Meta:
     #    model = ProductParent
-    #    fields = ['keyword']
+    #    fields = ['id', 'title']
+
+    order_by = django_filters.OrderingFilter(
+        fields=(
+            ('min_price', 'min_price'),
+        )
+    )
 
 
     def or_custom_filter(self, queryset, name, value):
         value = eval(value) 
 
         keyword = value.get("keyword")
-        minprice = value.get("minprice")
-        maxprice = value.get("maxprice")
 
         brand = value.get("brand") #list of str
         category = value.get("category") #list of str
 
         queryset  = queryset.filter(Q(title__icontains=keyword)|Q(goods_desc__icontains=keyword))
-
-        if minprice and maxprice:
-            queryset = queryset.filter(
-                product2variantitem__price__gte=minprice,
-                product2variantitem__price__lte=maxprice
-            ).distinct()
 
         if brand:
             queryset = queryset.filter(goods_brand__in=brand.split(","))
@@ -51,18 +65,14 @@ class ProductParentNodeFilter(django_filters.FilterSet):
             final_id = get_list_from_global_id(category)
             queryset = queryset.filter(category_id__in=final_id)
 
-
         return queryset
 
 
 class ProductParentNode(DjangoObjectType):
+
     class Meta:
         model = ProductParent
         filterset_class = ProductParentNodeFilter
-        #filter_fields = {
-        #  'parent_sn': ['exact', 'icontains', 'istartswith'],
-        #  'title': ['icontains']
-        #} 
         interfaces = (relay.Node,)
 
 
@@ -105,16 +115,6 @@ class ProductVariantNode(DjangoObjectType):
         interfaces = (relay.Node,)
         filter_fields = ("name",)
 
-
-class ProductVariantItemNode(DjangoObjectType):
-    class Meta:
-        model = ProductVariantItem
-        interfaces = (relay.Node,)
-        #filter_fields = ("sku",)
-        filter_fields = {
-          'sku': ['exact'],
-          'price': ['gte', 'lte']
-        } 
 
 
 class Query(object):
