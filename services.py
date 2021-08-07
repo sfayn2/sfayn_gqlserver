@@ -2,6 +2,8 @@
 from cb.models import ShoppingCart, WAREHOUSE_CHOICES
 from django.db.models import Count
 from graphql_relay import from_global_id
+from django.db.models import Min, Max
+from product.models import ProductVariantItem
 
 def get_shoppingcart_total_count(user_id):
     return ShoppingCart.objects.filter(user_id=user_id).count()
@@ -42,6 +44,14 @@ def get_list_from_global_id(data):
         #need to convert graphene relay id to db id
         final_id.append(from_global_id(d)[1]) 
     return final_id
+
+def get_price_range(id):
+    qset = ProductVariantItem.objects.filter(parent_sn_id=id)
+    min_price =  qset.aggregate(Min("price"))["price__min"]
+    max_price =  qset.aggregate(Max("price"))["price__max"]
+    if min_price == max_price:
+        return "${}".format(min_price)
+    return "${} ~ ${}".format(min_price, max_price)
 
 
 

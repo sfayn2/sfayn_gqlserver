@@ -16,7 +16,10 @@ from .models import (
     ProductCategory
 )
 from django.db.models import Q
-from services import get_list_from_global_id
+from services import (
+    get_list_from_global_id, 
+    get_price_range
+)
 
 
 class ProductVariantItemNodeFilter(django_filters.FilterSet):
@@ -65,12 +68,17 @@ class ProductVariantItemNode(DjangoObjectType):
         #} 
 
 
+
 class ProductParentNode(DjangoObjectType):
+    price_range = graphene.String()
 
     class Meta:
         model = ProductParent
         filter_fields = ("id", )
         interfaces = (relay.Node,)
+
+    def resolve_price_range(self, info):
+        return get_price_range(self.id)
 
 
 class ProductCategoryNodeFilter(django_filters.FilterSet):
