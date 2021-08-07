@@ -39,11 +39,6 @@ class ProductParent(models.Model):
     goods_brand = models.CharField(max_length=30, null=True, blank=True)
     goods_desc = models.TextField(null=True) 
     status = models.IntegerField(null=True, choices=Status.choices) 
-    min_price = models.FloatField(null=True, blank=True) #if multiple variants
-    max_price = models.FloatField(null=True, blank=True) #display min/max price 
-    totalQty = models.IntegerField(null=True, blank=True, help_text="sum of variants qty, if any")
-    img_upload = models.ImageField(upload_to=path_and_rename, null=True, blank=True, help_text="Primary img")
-    img_url = models.CharField(max_length=300, null=True, blank=True, help_text="secondary img") 
     #publish = models.BooleanField(default=False) 
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user2product")
     date_created = models.DateTimeField(auto_now_add=True)

@@ -19,34 +19,19 @@ from django.db.models import Q
 from services import get_list_from_global_id
 
 
-
-class ProductVariantItemNode(DjangoObjectType):
-    class Meta:
-        model = ProductVariantItem
-        #filterset_class = ProductVariantItemNodeFilter
-        interfaces = (relay.Node,)
-        filter_fields = ("sku",)
-        #filter_fields = {
-        #  'sku': ['exact'],
-        #  'price': ['gte', 'lte']
-        #} 
-
-
-class ProductParentNodeFilter(django_filters.FilterSet):
+class ProductVariantItemNodeFilter(django_filters.FilterSet):
+    sku = django_filters.CharFilter()
+    default = django_filters.BooleanFilter()
+    #title = django_filters.CharFilter(field_name='parent_sn__title', lookup_expr="icontains")
     keyword = CharFilter(method='or_custom_filter')
-    min_price__gte = django_filters.NumberFilter(field_name='min_price', lookup_expr='gte')
-    min_price__lte = django_filters.NumberFilter(field_name='min_price', lookup_expr='lte')
-
-    #class Meta:
-    #    model = ProductParent
-    #    fields = ['id', 'title']
+    price__gte = django_filters.NumberFilter(field_name='price', lookup_expr='gte')
+    price__lte = django_filters.NumberFilter(field_name='price', lookup_expr='lte')
 
     order_by = django_filters.OrderingFilter(
         fields=(
-            ('min_price', 'min_price'),
+            ('price', 'price'),
         )
     )
-
 
     def or_custom_filter(self, queryset, name, value):
         value = eval(value) 
@@ -56,23 +41,35 @@ class ProductParentNodeFilter(django_filters.FilterSet):
         brand = value.get("brand") #list of str
         category = value.get("category") #list of str
 
-        queryset  = queryset.filter(Q(title__icontains=keyword)|Q(goods_desc__icontains=keyword))
+        queryset  = queryset.filter(Q(parent_sn__title__icontains=keyword)|Q(parent_sn__goods_desc__icontains=keyword))
 
         if brand:
-            queryset = queryset.filter(goods_brand__in=brand.split(","))
+            queryset = queryset.filter(parent_sn__goods_brand__in=brand.split(","))
 
         if category:
             final_id = get_list_from_global_id(category)
-            queryset = queryset.filter(category_id__in=final_id)
+            queryset = queryset.filter(parent_sn__category_id__in=final_id)
 
         return queryset
+
+
+
+class ProductVariantItemNode(DjangoObjectType):
+    class Meta:
+        model = ProductVariantItem
+        filterset_class = ProductVariantItemNodeFilter
+        interfaces = (relay.Node,)
+        #filter_fields = {
+        #  'sku': ['exact'],
+        #  'price': ['gte', 'lte']
+        #} 
 
 
 class ProductParentNode(DjangoObjectType):
 
     class Meta:
         model = ProductParent
-        filterset_class = ProductParentNodeFilter
+        filter_fields = ("id", )
         interfaces = (relay.Node,)
 
 
