@@ -9,7 +9,6 @@ from django.db.models import Sum, F, FloatField
 #from django.db.models import F, Sum, FloatField
 from services import (
     get_shoppingcart_total_count, 
-    get_shoppingcart_group_by_warehouse
 )
 
 from .models import (
@@ -195,8 +194,6 @@ class Query(object):
     all_shopping_cart_warehouse = graphene.List(WarehouseShoppingCartListType)
 
 
-    def resolve_all_shopping_cart_warehouse(self, info, **kwargs):
-        return get_shoppingcart_group_by_warehouse()
 
 
 #class ProductType(DjangoObjectType):

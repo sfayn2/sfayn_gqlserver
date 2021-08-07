@@ -18,7 +18,8 @@ from .models import (
 from django.db.models import Q
 from services import (
     get_list_from_global_id, 
-    get_price_range
+    get_price_min,
+    get_price_max
 )
 
 
@@ -70,16 +71,19 @@ class ProductVariantItemNode(DjangoObjectType):
 
 
 class ProductParentNode(DjangoObjectType):
-    price_range = graphene.String()
+    price_min = graphene.Float()
+    price_max = graphene.Float()
 
     class Meta:
         model = ProductParent
         filter_fields = ("id", )
         interfaces = (relay.Node,)
 
-    def resolve_price_range(self, info):
-        return get_price_range(self.id)
+    def resolve_price_min(self, info):
+        return get_price_min(self.id)
 
+    def resolve_price_max(self, info):
+        return get_price_max(self.id)
 
 class ProductCategoryNodeFilter(django_filters.FilterSet):
     id = GlobalIDMultipleChoiceFilter() #filter by List not actually working
