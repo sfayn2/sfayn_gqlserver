@@ -18,7 +18,7 @@ Django==3.2.4
 django-cors-headers==3.7.0
 django-extensions==2.2.1
 django-filter==2.4.0
-django-graphql-jwt==0.3.0
+django-graphql-jwt==0.3.4
 django-sslserver==0.20
 graphene==2.1.8
 graphene-django==2.15.0
@@ -40,7 +40,7 @@ Pygments==2.3.1
 PyHamcrest==1.9.0
 PyJWT==2.1.0
 PyQt5==5.11.3
-PyQt5-sip==4.19.13
+PyQt5_sip==4.19.13
 python-dateutil==2.8.0
 python-dotenv==0.17.1
 pytz==2018.9
