@@ -7,6 +7,7 @@ from graphene_django.filter import DjangoFilterConnectionField
 import django_filters
 from django_filters.filters import *
 from django.db.models import Sum, F, FloatField
+from graphql_jwt.decorators import login_required
 from .models import (
     ShopCart,
     ShopOrder,
@@ -67,6 +68,7 @@ class ShopCartMutation(relay.ClientIDMutation):
     ok = graphene.Boolean()
 
     @classmethod
+    @login_required
     def mutate_and_get_payload(cls, root, info, user, sku, mode, quantity=None):
 
         ok = False
@@ -105,6 +107,7 @@ class ShopOrderMutation(relay.ClientIDMutation):
     ok = graphene.Boolean()
 
     @classmethod
+    @login_required
     def mutate_and_get_payload(
         cls, 
         root, 
@@ -142,6 +145,7 @@ class ShopOrderItemMutation(relay.ClientIDMutation):
     ok = graphene.Boolean()
 
     @classmethod
+    @login_required
     def mutate_and_get_payload(
         cls, 
         root, 
@@ -175,6 +179,7 @@ class ShopOrderStatusMutation(relay.ClientIDMutation):
     ok = graphene.Boolean()
 
     @classmethod
+    @login_required
     def mutate_and_get_payload(
         cls, 
         root, 
