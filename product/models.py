@@ -66,7 +66,6 @@ class ProductVariantItem(models.Model):
     sku = models.CharField(max_length=50)
     quantity = models.IntegerField(null=True, blank=True)
     price = models.FloatField(null=True, blank=True)
-    name = models.CharField(max_length=50, null=True, blank=True) #Colour #TO REMOVE??
     options = models.CharField(max_length=50, null=True, blank=True) # Red/Blue?
     img_upload = models.ImageField(upload_to=path_and_rename, null=True, blank=True, help_text="Primary img")
     img_url = models.CharField(max_length=300, null=True, blank=True, help_text="secondary img") 
