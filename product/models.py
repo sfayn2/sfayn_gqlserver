@@ -75,7 +75,7 @@ class ProductVariantItem(models.Model):
     date_modified = models.DateTimeField(auto_now=True) 
 
     def __str__(self):
-        return "ParentSn({}) sku({}) Name({}) Options({})".format(self.parent_sn, self.sku, self.name, self.options)
+        return "ParentSn({}) sku({}) Name({}) Options({})".format(self.parent_sn, self.sku, self.product_variant.name, self.options)
 
 
 class ProductImage(models.Model):
