@@ -19,7 +19,7 @@ class ProductParentAdmin(admin.ModelAdmin):
 
 class ProductCategoryAdmin(admin.ModelAdmin):
     search_fields = ("name",)
-    list_display = ("level", "parent_name", "name")
+    list_display = ("id", "level", "parent_name", "name")
 
     @admin.display(empty_value="Not applicable")
     def parent_name(self, obj):

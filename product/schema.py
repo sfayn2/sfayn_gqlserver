@@ -19,7 +19,8 @@ from django.db.models import Q
 from services import (
     get_list_from_global_id, 
     get_price_min,
-    get_price_max
+    get_price_max,
+    get_l3_categories
 )
 
 
@@ -44,15 +45,29 @@ class ProductVariantItemNodeFilter(django_filters.FilterSet):
 
         brand = value.get("brand") #list of str
         category = value.get("category") #list of str
+        level = value.get("level") #list of str
 
-        queryset  = queryset.filter(Q(parent_sn__title__icontains=keyword)|Q(parent_sn__goods_desc__icontains=keyword))
+
+        if keyword:
+            #handle main search, filter by brand, category, price
+            queryset  = queryset.filter(
+                Q(parent_sn__title__icontains=keyword)|
+                Q(parent_sn__goods_desc__icontains=keyword)
+            )
+
+            if category:
+                category_id = get_list_from_global_id(category)
+                queryset = queryset.filter(parent_sn__category_id__in=category_id)
+
+        elif category and level:
+            #to handle search by parent category
+            category_id = get_list_from_global_id(category)
+            l3_categories = get_l3_categories(category_id, int(level))
+            queryset = queryset.filter(parent_sn__category_id__in=l3_categories)
 
         if brand:
-            queryset = queryset.filter(parent_sn__goods_brand__in=brand.split(","))
+            queryset = queryset.filter(parent_sn__goods_brand__in=brand)
 
-        if category:
-            final_id = get_list_from_global_id(category)
-            queryset = queryset.filter(parent_sn__category_id__in=final_id)
 
         return queryset
 
@@ -88,6 +103,7 @@ class ProductParentNode(DjangoObjectType):
 class ProductCategoryNodeFilter(django_filters.FilterSet):
     id = GlobalIDMultipleChoiceFilter() #filter by List not actually working
     level = django_filters.CharFilter()
+    parent = django_filters.CharFilter()
 
 class ProductCategoryNode(DjangoObjectType):
     level = graphene.String()
