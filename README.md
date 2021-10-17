@@ -1,92 +1,36 @@
 # sfayn_gqlserver
 
+
 Working on ecommerce site and would like to use graphene graphql server to serve client request.
 Django have a builtin user management one reason that i decided to use django graphene over apollo server
 
-![image](https://user-images.githubusercontent.com/3206118/56402350-8acc4900-628f-11e9-9baa-d3a71771e941.png)
+![image](https://user-images.githubusercontent.com/3206118/137609211-6e4a7123-e34f-434b-9655-9d46eda3e9c2.png)
 
 
-## Getting Started
+## Demo
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
+https://sfayn-backend.herokuapp.com/graphql/
 
-### Prerequisites
-
-refer to requirements file
-
+## Installation 
 ```
-Give examples
-```
-
-### Installing
-
-A step by step series of examples that tell you how to get a development env running
-
-Say what the step will be
-
-```
+cd /home/{username}/sfayn_gqlserver
 pip install -r requirements
 ```
 
-And repeat
-
+## How to run development server? 
 ```
-until finished
-```
-
-End with an example of getting some data out of the system or using it for a little demo
-
-## Running the tests
-
-```
-python manage.py runserver 0.0.0.0:8000
+python manage.py runserver 0.0.0.0:4000
 ```
 
-### Break down into end to end tests
 
-Explain what these tests test and why
+### Help
 
-```
-Give an example
-```
-
-### And coding style tests
-
-Explain what these tests test and why
-
-```
-Give an example
-```
-
-## Deployment
-
-Coming soon
-
-## Built With
-
-* [Django](https://docs.djangoproject.com) - The web framework used
-* [Django Graphene](https://docs.graphene-python.org/projects/django/en/latest/tutorial-plain/#) - Django GraphSQL server
-
-## Contributing
+Need help? Open an issue in: [ISSUES](https://github.com/sfayn2/sfayn_gqlserver/issues)
 
 
-
-## Versioning
-
-
-
-## Authors
-
-* **josnin** - *One of my work* - [sfayn_gqlserver](https://github.com/josnin)
+### Contributing
+Want to improve and add feature? Fork the repo, add your changes and send a pull request.
 
 
-## License
-
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
-
-## Acknowledgments
-
-* Django Graphene
-* CB
 
 
