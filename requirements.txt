@@ -14,11 +14,13 @@ colorama==0.4.1
 constantly==15.1.0
 curtsies==0.3.0
 daphne==2.3.0
+dj-database-url==0.5.0
 Django==3.2.5
 django-cors-headers==3.7.0
 django-extensions==2.2.1
 django-filter==2.4.0
 django-graphql-jwt==0.3.4
+django-heroku==0.3.1
 django-sslserver==0.20
 graphene==2.1.8
 graphene-django==2.15.0
@@ -26,6 +28,7 @@ graphql-core==2.3.2
 graphql-relay==2.0.1
 graphql-ws==0.3.0
 greenlet==0.4.15
+gunicorn==20.1.0
 hyperlink==19.0.0
 idna==2.8
 incremental==17.5.0
@@ -36,6 +39,7 @@ pandas==0.24.2
 petl==1.2.0
 Pillow==5.3.0
 promise==2.3
+psycopg2==2.7.7
 Pygments==2.3.1
 PyHamcrest==1.9.0
 PyJWT==2.1.0
@@ -56,8 +60,7 @@ Twisted==19.2.0
 txaio==18.8.1
 typing==3.6.6
 typing-extensions==3.10.0.0
-urllib3==1.26.5
+urllib3==1.24.1
 wcwidth==0.1.7
+whitenoise==5.3.0
 zope.interface==4.6.0
-gunicorn
-django-heroku
