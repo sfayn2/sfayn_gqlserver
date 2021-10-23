@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'storages',
     'cb',
     'graphene_django',
     'corsheaders',
@@ -138,6 +139,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media/') # media folder
 MEDIA_URL = '/media/'
 
 
+
 #CB
 CB_DOMAIN = os.getenv("CB_DOMAIN")
 
@@ -174,3 +176,8 @@ AUTHENTICATION_BACKENDS = [
 
 # Activate Django-Heroku.
 django_heroku.settings(locals())
+
+#TODO to separate this in production.py settings
+#added after django_heroku clashing with each other & this will override django_heroku
+#use dedicated Media Server to have a full control of images, it override config & use cdn for static & media
+from .cdn.conf import * #noqa
