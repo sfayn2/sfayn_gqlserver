@@ -11,6 +11,7 @@ bpython==0.17.1
 certifi==2019.3.9
 channels==2.2.0
 chardet==3.0.4
+charset-normalizer==2.0.7
 Click==7.0
 colorama==0.4.1
 constantly==15.1.0
@@ -53,7 +54,7 @@ python-dateutil==2.8.0
 python-dotenv==0.17.1
 pytz==2018.9
 PyYAML==5.1.2
-requests==2.21.0
+requests==2.26.0
 Rx==1.6.1
 s3transfer==0.5.0
 singledispatch==3.4.0.3
