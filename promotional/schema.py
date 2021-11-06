@@ -12,11 +12,26 @@ from .models import (
 )
 
 
+class PromotionalBannerNodeFilter(django_filters.FilterSet):
+
+	# need to define fields of valid choices in orderBy
+    order_by = django_filters.OrderingFilter(
+        fields=(
+            ('display_order', 'display_order'),
+        )
+    )
+
+    class Meta:
+        model = PromotionalBanner
+        fields = ('created_by', 'order_by')
+
+
+
 class PromotionalBannerNode(DjangoObjectType):
     class Meta:
         model = PromotionalBanner
         interfaces = (relay.Node,)
-        filter_fields = ("created_by", )
+        filterset_class = PromotionalBannerNodeFilter
 
 
 class Query(object):
