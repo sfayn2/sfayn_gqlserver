@@ -11,7 +11,6 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 """
 
 import os
-import django_heroku
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -165,7 +164,6 @@ GRAPHENE = {
 #CORS
 CORS_ORIGIN_WHITELIST = (
     'http://192.168.1.88:4200',
-    'https://sfayn2.github.io'
 )
 
 #for JWT Token
@@ -174,10 +172,3 @@ AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
 ]
 
-# Activate Django-Heroku.
-django_heroku.settings(locals())
-
-#TODO to separate this in production.py settings
-#added after django_heroku clashing with each other & this will override django_heroku
-#use dedicated Media Server to have a full control of images, it override config & use cdn for static & media
-from .cdn.conf import * #noqa
