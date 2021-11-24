@@ -41,7 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'storages',
-    'cb',
+    #'cb',
     'graphene_django',
     'corsheaders',
     'product',
@@ -139,7 +139,7 @@ MEDIA_URL = '/media/'
 
 
 
-#CB
+
 CB_DOMAIN = os.getenv("CB_DOMAIN")
 
 #secret for getting token
