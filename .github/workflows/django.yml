@@ -10,6 +10,23 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres   
+        # Provide the password for postgres
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: mydb
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          # Maps tcp port 5432 on service container to the host
+          - 5432:5432
     strategy:
       max-parallel: 4
       matrix:
@@ -30,7 +47,13 @@ jobs:
         SECRET_KEY: '*ht-$58ds7tp3+@ms0%*5d_a=a343$9ko&#pd+@34&3-3=dvkm'        
         DJANGO_SUPERUSER_PASSWORD: admin
         DJANGO_SUPERUSER_USERNAME: admin
-        DJANGO_SUPERUSER_EMAIL: admin@gmail.com        
+        DJANGO_SUPERUSER_EMAIL: admin@gmail.com   
+        DJANGO_SETTINGS_MODULE: sfayn_gqlserver.production
+        PSQL_NAME: chatdb       
+        PSQL_HOST: 127.0.0.1
+        PSQL_PORT: 5432
+        PSQL_USER: postgres        
+        PSQL_PASS: postgres
       run: |
         python manage.py migrate
         python manage.py createsuperuser --no-input      
