@@ -1,5 +1,7 @@
 # sfayn_gqlserver
 
+[![Django CI](https://github.com/sfayn2/sfayn_gqlserver/actions/workflows/django.yml/badge.svg)](https://github.com/sfayn2/sfayn_gqlserver/actions/workflows/django.yml)
+
 
 Working on ecommerce site and would like to use graphene graphql server to serve client request.
 Django have a builtin user management one reason that i decided to use django graphene over apollo server
