@@ -49,7 +49,7 @@ jobs:
         DJANGO_SUPERUSER_USERNAME: admin
         DJANGO_SUPERUSER_EMAIL: admin@gmail.com   
         DJANGO_SETTINGS_MODULE: sfayn_gqlserver.production
-        PSQL_NAME: chatdb       
+        PSQL_NAME: mydb       
         PSQL_HOST: 127.0.0.1
         PSQL_PORT: 5432
         PSQL_USER: postgres        
