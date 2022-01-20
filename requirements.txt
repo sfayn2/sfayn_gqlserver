@@ -42,7 +42,7 @@ libtmux==0.8.2
 numpy==1.16.3
 pandas==0.24.2
 petl==1.2.0
-Pillow==5.3.0
+Pillow==9.0.0
 promise==2.3
 psycopg2==2.7.7
 Pygments==2.3.1
