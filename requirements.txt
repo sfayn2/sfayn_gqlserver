@@ -39,7 +39,7 @@ incremental==17.5.0
 jmespath==0.10.0
 kaptan==0.5.12
 libtmux==0.8.2
-numpy==1.16.3
+numpy==1.21.0
 pandas==0.24.2
 petl==1.2.0
 Pillow==9.0.0
