@@ -45,7 +45,7 @@ petl==1.2.0
 Pillow==9.0.0
 promise==2.3
 psycopg2==2.7.7
-Pygments==2.3.1
+Pygments==2.7.4
 PyHamcrest==1.9.0
 PyJWT==2.1.0
 PyQt5==5.11.3
