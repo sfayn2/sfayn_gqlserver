@@ -53,7 +53,7 @@ PyQt5_sip==4.19.13
 python-dateutil==2.8.0
 python-dotenv==0.17.1
 pytz==2018.9
-PyYAML==5.1.2
+PyYAML==5.4
 requests==2.26.0
 Rx==1.6.1
 s3transfer==0.5.0
