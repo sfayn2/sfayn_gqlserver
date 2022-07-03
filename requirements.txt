@@ -37,11 +37,11 @@ greenlet==0.4.15
 gunicorn==20.1.0
 hyperlink==21.0.0
 idna==2.8
-incremental==17.5.0
+incremental==21.3.0
 jmespath==0.10.0
 kaptan==0.5.12
 libtmux==0.8.2
-numpy==1.21.0
+numpy==1.21.6
 pandas==0.24.2
 petl==1.6.8
 Pillow==9.0.1
@@ -65,7 +65,7 @@ six==1.12.0
 sqlparse==0.3.0
 text-unidecode==1.3
 tmuxp==1.5.3
-Twisted==20.3.0
+Twisted==22.4.0
 txaio==22.2.1
 typing==3.6.6
 typing-extensions==3.10.0.0
