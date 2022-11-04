@@ -65,7 +65,7 @@ six==1.12.0
 sqlparse==0.3.0
 text-unidecode==1.3
 tmuxp==1.5.3
-Twisted==22.4.0
+Twisted==22.10.0
 txaio==22.2.1
 typing==3.6.6
 typing-extensions==3.10.0.0
