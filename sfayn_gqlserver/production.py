@@ -1,8 +1,10 @@
 from .settings import *
+from dotenv import load_dotenv
 #import django_heroku
 #import dj_database_url #something wrong can't download the latest
 load_dotenv('.env.production')
 
+SECRET_KEY = os.getenv("SECRET_KEY")
 
 DATABASES = {
     'default': {
