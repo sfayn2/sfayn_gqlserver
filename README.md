@@ -11,7 +11,7 @@ Django have a builtin user management one reason that i decided to use django gr
 
 ## Demo
 
-https://sfayn-backend.herokuapp.com/graphql/
+https://demo.josnin.dev/sfayn-backend/graphql/
 
 ## Installation 
 ```
