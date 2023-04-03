@@ -44,7 +44,7 @@ libtmux==0.8.2
 numpy==1.21.6
 pandas==0.24.2
 petl==1.6.8
-Pillow==9.0.1
+Pillow==9.3.0
 promise==2.3
 psycopg2-binary
 pycparser==2.21
