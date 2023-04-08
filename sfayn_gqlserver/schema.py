@@ -1,7 +1,7 @@
 import graphene
 import graphql_jwt
 
-import cb.schema
+#import cb.schema
 import product.schema
 import shop.schema
 import customer.schema
