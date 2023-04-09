@@ -1,10 +1,11 @@
 from .settings import *
 from dotenv import load_dotenv
-#import django_heroku
-#import dj_database_url #something wrong can't download the latest
+
 load_dotenv('.env.production')
 
 SECRET_KEY = os.getenv("SECRET_KEY")
+
+DEBUG = False
 
 DATABASES = {
     'default': {
@@ -18,13 +19,7 @@ DATABASES = {
 }
 
 
-#DATABASES['default'] = dj_database_url.parse(
-#    os.getenv('DATABASE_URL'),
-#)
-
-
-
-ALLOWED_HOSTS = ['sfayn-backend.herokuapp.com']
+ALLOWED_HOSTS = ['demo.josnin.dev']
 
 
 #CORS
@@ -32,10 +27,3 @@ CORS_ORIGIN_WHITELIST = (
     'https://sfayn2.github.io',
 )
 
-# Activate Django-Heroku.
-#django_heroku.settings(locals())
-
-#TODO to separate this in production.py settings
-#added after django_heroku clashing with each other & this will override django_heroku
-#use dedicated Media Server to have a full control of images, it override config & use cdn for static & media
-from .cdn.conf import * #noqa

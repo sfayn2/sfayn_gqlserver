@@ -1,7 +1,10 @@
 /db.sqlite3
 /env
+/env3.9
 __pycache__/
 *.py[cod]
 **/__pycache__/
 *.env
+*.swp
+*.env.production
 media/
