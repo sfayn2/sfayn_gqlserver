@@ -31,4 +31,5 @@ CORS_ORIGIN_WHITELIST = (
 PREFIX_URL = "sfayn-gql/"
 STATIC_URL = f'/{PREFIX_URL}static/'
 MEDIA_URL = f'/{PREFIX_URL}media/'
+CSRF_COOKIE_NAME = "csrf-sfayn-token"
 
