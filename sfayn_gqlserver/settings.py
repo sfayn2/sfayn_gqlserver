@@ -29,6 +29,7 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 DEBUG = True
 
 ALLOWED_HOSTS = ['192.168.1.88']
+CSRF_TRUSTED_ORIGINS = ['http://192.168.1.88:4200']
 
 
 # Application definition
@@ -130,6 +131,7 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
+PREFIX_URL = ""
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATIC_URL = '/static/'
@@ -139,18 +141,6 @@ MEDIA_URL = '/media/'
 
 
 
-
-CB_DOMAIN = os.getenv("CB_DOMAIN")
-
-#secret for getting token
-CB_CLIENT_SECRET = os.getenv("CB_CLIENT_SECRET")
-
-#additional requirements for getting token
-CB_ADD_REQ_TOKEN = { 
-    "email": os.getenv("CB_ADD_REQ_TOKEN_EMAIL"), 
-    "password": os.getenv("CB_ADD_REQ_TOKEN_PASS"), 
-    "client_id": os.getenv("CB_ADD_REQ_TOKEN_CLIENT_ID") 
-} 
 
 
 #GRAPHENE

@@ -73,3 +73,6 @@ admin.site.register(ProductTag, ProductTagAdmin)
 admin.site.register(ProductTagItem, ProductTagItemAdmin)
 admin.site.register(ProductVariant, ProductVariantAdmin)
 admin.site.register(ProductVariantItem, ProductVariantItemAdmin)
+
+admin.site.site_url = '/graphql'
+admin.site.site_header = 'Sfayn Settings'    

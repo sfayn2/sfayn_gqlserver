@@ -69,9 +69,9 @@ class ShoppingCartAdmin(admin.ModelAdmin):
 
 
 # Register your models here.
-admin.site.register(Product, ProductAdmin)
-admin.site.register(ProductWarehouse, ProductWarehouseAdmin)
-admin.site.register(ProductOriginalImg, ProductOriginalImgAdmin)
-admin.site.register(ProductDescImg, ProductDescImgAdmin)
-admin.site.register(ProductCategory, ProductCategoryAdmin)
-admin.site.register(ShoppingCart, ShoppingCartAdmin)
+#admin.site.register(Product, ProductAdmin)
+#admin.site.register(ProductWarehouse, ProductWarehouseAdmin)
+#admin.site.register(ProductOriginalImg, ProductOriginalImgAdmin)
+#admin.site.register(ProductDescImg, ProductDescImgAdmin)
+#admin.site.register(ProductCategory, ProductCategoryAdmin)
+#admin.site.register(ShoppingCart, ShoppingCartAdmin)
