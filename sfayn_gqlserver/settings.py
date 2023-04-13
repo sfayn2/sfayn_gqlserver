@@ -162,3 +162,4 @@ AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
 ]
 
+VIEW_SITE_URL = f"{PREFIX_URL}/graphql"

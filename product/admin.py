@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.conf import settings
 from .models import (
     ProductParent,
     ProductVideo,
@@ -74,5 +75,5 @@ admin.site.register(ProductTagItem, ProductTagItemAdmin)
 admin.site.register(ProductVariant, ProductVariantAdmin)
 admin.site.register(ProductVariantItem, ProductVariantItemAdmin)
 
-admin.site.site_url = '/graphql'
+admin.site.site_url = settings.VIEW_SITE_URL
 admin.site.site_header = 'Sfayn Settings'    
