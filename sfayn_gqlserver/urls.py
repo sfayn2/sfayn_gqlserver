@@ -23,8 +23,8 @@ from django.views.static import serve
 
 
 urlpatterns = [
-     path(f'{settings.PREFIX_URL}admin/', admin.site.urls),
-     path(f'{settings.PREFIX_URL}graphql/', csrf_exempt(GraphQLView.as_view(graphiql=True))),
+     path('admin/', admin.site.urls),
+     path('graphql/', csrf_exempt(GraphQLView.as_view(graphiql=True))),
 ]
 
 

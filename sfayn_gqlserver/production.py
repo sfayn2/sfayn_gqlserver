@@ -28,9 +28,9 @@ CORS_ORIGIN_WHITELIST = (
     'https://sfayn2.github.io',
 )
 
-PREFIX_URL = "sfayn-gql/"
-STATIC_URL = f'/{PREFIX_URL}static/'
-MEDIA_URL = f'/{PREFIX_URL}media/'
+FORCE_SCRIPT_NAME = "/sfayn-gql/"
+STATIC_URL = 'static/'
+MEDIA_URL = 'media/'
 CSRF_COOKIE_NAME = "csrf-sfayn-token"
-VIEW_SITE_URL = f"/{PREFIX_URL}graphql"
+VIEW_SITE_URL = f"{FORCE_SCRIPT_NAME}graphql/"
 
