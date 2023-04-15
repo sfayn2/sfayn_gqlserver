@@ -1,7 +1,31 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
+from django.contrib.sites.models import Site
 
 # Create your models here.
+class ShopProfile(Site):
+    #shop = models.OneToOneField(Site, on_delete=models.CASCADE, related_name="shopprofile")
+    shop_desc = models.CharField(null=True, max_length=50) 
+    group = models.ForeignKey(
+        Group, 
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE, 
+        related_name="grp2shopprofile"
+    )
+    created_by = models.ForeignKey(
+        User, 
+        on_delete=models.CASCADE, 
+        related_name="user2shopprofile"
+    )
+    date_created = models.DateTimeField(auto_now_add=True) 
+    date_modified = models.DateTimeField(auto_now=True) 
+
+    def __str__(self):
+        return self.name
+
+
+# TODO: to obsolete just handle Cart in front end
 class ShopCart(models.Model):
     id = models.AutoField(primary_key=True)
     product_variant = models.ForeignKey(
@@ -21,7 +45,7 @@ class ShopCart(models.Model):
     def __str__(self):
         return "ProductionVariantItem({}) Qty({})".format(self.product_variant, self.quantity)
 
-
+# TODO: moved to Order models
 class ShopOrderItem(models.Model):
     id = models.AutoField(primary_key=True)
     order = models.ForeignKey(
@@ -50,6 +74,7 @@ class ShopOrderItem(models.Model):
         return "Order({}) ShopCart({})".format(self.order, self.shopcart)
 
 
+# TODO: moved to Order models
 class ShopOrder(models.Model):
 
     class Status(models.IntegerChoices):

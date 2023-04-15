@@ -41,8 +41,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
     'storages',
-    'cb',
     'graphene_django',
     'corsheaders',
     'product',
@@ -50,7 +50,10 @@ INSTALLED_APPS = [
     'customer',
     'payment',
     'account',
-    'promotional'
+    'promotional',
+    'order',
+    'discount',
+    'tag'
 ]
 
 MIDDLEWARE = [

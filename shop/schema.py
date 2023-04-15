@@ -12,6 +12,7 @@ from .models import (
     ShopCart,
     ShopOrder,
     ShopOrderItem,
+    ShopProfile
 )
 from .enums import (
     ShopCartMode
@@ -20,6 +21,11 @@ from product.models import (
     ProductVariantItem
 )
 
+class ShopProfileNode(DjangoObjectType):
+    class Meta:
+        model = ShopProfile
+        filter_fields = ("id",)
+        interfaces = (relay.Node,)
 
 class ShopOrderNode(DjangoObjectType):
     status = graphene.String()
@@ -200,6 +206,8 @@ class ShopOrderStatusMutation(relay.ClientIDMutation):
 
 
 class Query(object):
+
+    # TODO: to obsolete
     shopcart = relay.Node.Field(ShopCartNode)
     all_shopcart = DjangoFilterConnectionField(ShopCartNode)
 
@@ -208,3 +216,7 @@ class Query(object):
 
     shoporder = relay.Node.Field(ShopOrderNode)
     all_shoporder = DjangoFilterConnectionField(ShopOrderNode)
+    # TODO: to obsolete
+
+    shopprofile = relay.Node.Field(ShopProfileNode)
+    all_shopprofile = DjangoFilterConnectionField(ShopProfileNode)

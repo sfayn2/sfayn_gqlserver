@@ -1,5 +1,4 @@
 
-from cb.models import ShoppingCart, WAREHOUSE_CHOICES
 from django.db.models import Count
 from graphql_relay import from_global_id
 from django.db.models import Min, Max
@@ -8,8 +7,6 @@ from product.models import (
     ProductCategory
 )
 
-def get_shoppingcart_total_count(user_id):
-    return ShoppingCart.objects.filter(user_id=user_id).count()
 
 def get_list_from_global_id(data):
     final_id = []
