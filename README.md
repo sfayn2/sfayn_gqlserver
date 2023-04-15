@@ -2,9 +2,13 @@
 
 [![Django CI](https://github.com/sfayn2/sfayn_gqlserver/actions/workflows/django.yml/badge.svg)](https://github.com/sfayn2/sfayn_gqlserver/actions/workflows/django.yml)
 
+# Basic GraphQl Api for creating Ecommerce site
 
-Working on ecommerce site and would like to use graphene graphql server to serve client request.
-Django have a builtin user management one reason that i decided to use django graphene over apollo server
+* Focus on designing your own frontend Store Template
+* Django Admin to create your own Shop data (ex. Shop, Products, Order, Customer, etc.)
+
+
+
 
 ![image](https://user-images.githubusercontent.com/3206118/137609211-6e4a7123-e34f-434b-9655-9d46eda3e9c2.png)
 
