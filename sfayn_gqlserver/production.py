@@ -23,10 +23,6 @@ ALLOWED_HOSTS = ['demo.josnin.dev']
 CSRF_TRUSTED_ORIGINS = ['https://demo.josnin.dev']
 
 
-#CORS
-CORS_ORIGIN_WHITELIST = (
-    'https://sfayn2.github.io',
-)
 
 CSRF_COOKIE_NAME = "_csrf-s"
 VIEW_SITE_URL = "/sfayn-gql/graphql/"

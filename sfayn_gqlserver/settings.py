@@ -151,9 +151,14 @@ GRAPHENE = {
 }
 
 #CORS
-CORS_ORIGIN_WHITELIST = (
-    'http://192.168.1.88:4200',
-)
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_METHODS = [
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
+]
 
 #for JWT Token
 AUTHENTICATION_BACKENDS = [
