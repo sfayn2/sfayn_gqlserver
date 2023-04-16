@@ -40,43 +40,33 @@ class Discount(models.Model):
         return self.name
 
 
-class DiscountTypePercentage(models.Model):
-
+class DiscountTypeAbstract(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=25)
+    start_date = models.DateTimeField() 
+    end_date = models.DateTimeField() 
+    created_by = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE, 
+    )
+    date_created = models.DateTimeField(auto_now_add=True) 
+    date_modified = models.DateTimeField(auto_now=True) 
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        abstract = True
+
+
+
+class DiscountTypePercentage(DiscountTypeAbstract):
     minimum_quantity = models.IntegerField(null=True)
     discount_percentage = models.FloatField(null=True, blank=True, help_text="Discount by percentage")
-    start_date = models.DateTimeField() 
-    end_date = models.DateTimeField() 
-    created_by = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE, 
-        related_name="user2discountpercentage"
-    )
-    date_created = models.DateTimeField(auto_now_add=True) 
-    date_modified = models.DateTimeField(auto_now=True) 
-
-    def __str__(self):
-        return self.name
 
 
-class DiscountTypeBuyXGetX(models.Model):
-
-    id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=25)
+class DiscountTypeBuyXGetX(DiscountTypeAbstract):
     buy_quantity = models.IntegerField(null=True)
     get_quantity = models.IntegerField(null=True)
-    start_date = models.DateTimeField() 
-    end_date = models.DateTimeField() 
-    created_by = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE, 
-        related_name="user2buyxgetx"
-    )
-    date_created = models.DateTimeField(auto_now_add=True) 
-    date_modified = models.DateTimeField(auto_now=True) 
-
-    def __str__(self):
-        return self.name
 
 
