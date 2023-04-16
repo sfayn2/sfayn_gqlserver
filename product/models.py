@@ -77,7 +77,7 @@ class ProductVariantItem(models.Model):
     def __str__(self):
         return "ParentSn({}) sku({}) Name({}) Options({})".format(self.parent_sn, self.sku, self.product_variant.name, self.options)
 
-
+#TODO to obsolet
 class ProductImage(models.Model):
     id = models.AutoField(primary_key=True)
     parent_sn = models.ForeignKey("product.ProductParent", on_delete=models.CASCADE, null=True, related_name="parent2image") 
@@ -89,6 +89,7 @@ class ProductImage(models.Model):
     date_modified = models.DateTimeField(auto_now=True) 
 
 
+# TODO to obsolete
 class ProductVideo(models.Model):
     id = models.AutoField(primary_key=True)
     parent_sn = models.ForeignKey("product.ProductParent", on_delete=models.CASCADE, null=True, related_name="parent2video") 

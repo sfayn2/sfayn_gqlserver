@@ -1,8 +1,6 @@
 from django.contrib import admin
 from django.conf import settings
 from .models import (
-    ProductImage,
-    ProductVideo,
     ProductParent,
     ProductCategory,
     ProductVariantItem,
@@ -10,13 +8,6 @@ from .models import (
 
 class ProductVariantItemInline(admin.TabularInline):
         model = ProductVariantItem
-
-class ProductImageInline(admin.TabularInline):
-    model = ProductImage
-
-
-class ProductVideoInline(admin.TabularInline):
-    model = ProductVideo
 
 
 # Register your models here.
@@ -27,8 +18,6 @@ class ProductParentAdmin(admin.ModelAdmin):
 
     inlines = [
         ProductVariantItemInline,
-        ProductImageInline,
-        ProductVideoInline
     ]
 
 

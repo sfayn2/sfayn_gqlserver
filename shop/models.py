@@ -19,9 +19,6 @@ class ShopProfile(Site):
         related_name="user2shopprofile"
     )
     product = models.ManyToManyField('product.ProductParent', blank=True, related_name="prod2shop")
-
-    #category = models.ManyToManyField('product.ProductCategory', blank=True, related_name="category2shop")
-    promotional_banner = models.ManyToManyField('promotional.PromotionalBanner', blank=True, related_name="banner2shop")
     #what else?
     date_created = models.DateTimeField(auto_now_add=True) 
     date_modified = models.DateTimeField(auto_now=True) 
