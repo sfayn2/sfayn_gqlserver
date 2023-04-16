@@ -36,7 +36,6 @@ class ProductParent(models.Model):
     parent_sn = models.CharField(max_length=50) #CharField to accept multiple sku datatype 
     title = models.CharField(max_length=100, null=True) 
     category = models.ForeignKey("product.ProductCategory", on_delete=models.CASCADE, null=True, related_name="cat2product") 
-    shop = models.ForeignKey("shop.ShopProfile", on_delete=models.CASCADE, null=True, blank=True, related_name="shop2product")
     goods_brand = models.CharField(max_length=30, null=True, blank=True)
     goods_desc = models.TextField(null=True) 
     status = models.IntegerField(null=True, choices=Status.choices) 

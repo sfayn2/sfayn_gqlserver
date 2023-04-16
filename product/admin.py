@@ -14,7 +14,7 @@ from .models import (
 # Register your models here.
 class ProductParentAdmin(admin.ModelAdmin):
     search_fields = ("title",)
-    list_display = ("parent_sn", "title", "shop")
+    list_display = ("parent_sn", "title")
     list_display_links = ("title",)
 
     def shop(self, obj):
