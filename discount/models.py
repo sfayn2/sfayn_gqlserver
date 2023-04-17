@@ -10,18 +10,18 @@ class Discount(models.Model):
 
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=25)
-    discount_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, help_text="Select a discount rules for shop, tags, or any product variants")
+    discount_type = models.ForeignKey(
+            ContentType, 
+            on_delete=models.CASCADE, 
+            help_text="Select a discount rules for shop, tags, or any product variants",
+            limit_choices_to={"app_label": "discount"}, #how to exclude self
+    )
     object_id = models.PositiveIntegerField()
     discount_object = GenericForeignKey("discount_type", "object_id")
     shop = models.ManyToManyField('shop.ShopProfile', blank=True, related_name="shop2discount")
     tag = models.ManyToManyField('tag.Tag', blank=True, related_name="tag2discount")
     product_variant = models.ManyToManyField('product.ProductVariantItem', blank=True, related_name="prodvariant2discount")
     category = models.ManyToManyField('product.ProductCategory', blank=True, related_name="category2discount")
-    #minimum_quantity = models.IntegerField(null=True)
-    #discount_price = models.FloatField(null=True, blank=True, help_text="Discount by Price")
-    #discount_percentage = models.FloatField(null=True, blank=True, help_text="Discount by percentage")
-    #start_date = models.DateTimeField() 
-    #end_date = models.DateTimeField() 
     status = models.IntegerField(
         blank=True, 
         null=True, 
@@ -69,4 +69,11 @@ class DiscountTypeBuyXGetX(DiscountTypeAbstract):
     buy_quantity = models.IntegerField(null=True)
     get_quantity = models.IntegerField(null=True)
 
+
+class DiscountTypeVoucher(DiscountTypeAbstract):
+    voucher = models.CharField(max_length=15, help_text="Need to enter the voucher to use")
+    min_spend = models.FloatField(null=True, blank=True, help_text="N% min spend")
+    capped_at = models.FloatField(null=True, blank=True, help_text="Capped at N%")
+    free_shipping = models.BooleanField(default=False, help_text="select for free shipping")
+    use = models.BooleanField(default=False)
 

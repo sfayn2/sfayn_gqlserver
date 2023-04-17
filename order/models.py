@@ -27,7 +27,7 @@ class OrderItem(models.Model):
     date_modified = models.DateTimeField(auto_now=True) 
 
     def __str__(self):
-        return "Order({}) ShopCart({})".format(self.order, self.shopcart)
+        return "Order({}) ShopCart({})".format(self.order, self.product_variant)
 
 
 class Order(models.Model):
