@@ -60,9 +60,10 @@ class DiscountTypeAbstract(models.Model):
 
 
 
-class DiscountTypePercentage(DiscountTypeAbstract):
+class DiscountTypePercentageOrFixAmount(DiscountTypeAbstract):
     minimum_quantity = models.IntegerField(null=True)
-    discount_percentage = models.FloatField(null=True, blank=True, help_text="Discount by percentage")
+    by_percentage = models.FloatField(null=True, blank=True, help_text="Discount by percentage")
+    fix_amount = models.FloatField(null=True, blank=True, help_text="Discount by fix amount")
 
 
 class DiscountTypeBuyXGetX(DiscountTypeAbstract):
