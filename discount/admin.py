@@ -2,7 +2,8 @@ from django.contrib import admin
 from .models import (
     Discount,
     DiscountTypePercentage,
-    DiscountTypeBuyXGetX
+    DiscountTypeBuyXGetX,
+    DiscountTypeVoucher
 )
 
 class DiscountTypePercentageAdmin(admin.ModelAdmin):
@@ -16,6 +17,12 @@ class DiscountTypeBuyXGetXAdmin(admin.ModelAdmin):
     list_display = ("id", "name", "buy_quantity", "get_quantity", "start_date", "end_date", "created_by")
     list_display_links = ("name", )
 
+
+class DiscountTypeVoucherAdmin(admin.ModelAdmin):
+    search_fields = ("created_by",)
+    list_display = ("id", "name", "voucher", "min_spend", "capped_at", "free_shipping", "use", "created_by")
+    list_display_links = ("name", )
+
 class DiscountAdmin(admin.ModelAdmin):
     filter_horizontal = ('shop', 'tag', 'product_variant', 'category')
     search_fields = ("created_by",)
@@ -25,3 +32,4 @@ class DiscountAdmin(admin.ModelAdmin):
 admin.site.register(Discount, DiscountAdmin)
 admin.site.register(DiscountTypePercentage, DiscountTypePercentageAdmin)
 admin.site.register(DiscountTypeBuyXGetX, DiscountTypeBuyXGetXAdmin)
+admin.site.register(DiscountTypeVoucher, DiscountTypeVoucherAdmin)
