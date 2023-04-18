@@ -2,6 +2,7 @@ from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.contrib.auth.models import User, Group
+from utils.utils import path_and_rename
 
 # Create your models here.
 class Discount(models.Model):
@@ -73,8 +74,11 @@ class DiscountTypeBuyXGetX(DiscountTypeAbstract):
 
 class DiscountTypeVoucher(DiscountTypeAbstract):
     voucher = models.CharField(max_length=15, help_text="Need to enter the voucher to use")
-    min_spend = models.FloatField(null=True, blank=True, help_text="N% min spend")
-    capped_at = models.FloatField(null=True, blank=True, help_text="Capped at N%")
+    percent_offer = models.FloatField(null=True, blank=True, help_text="N% offer")
+    fix_offer = models.FloatField(null=True, blank=True, help_text="fix amount offer")
+    min_spend = models.FloatField(null=True, blank=True, help_text="min price spend")
+    capped_at = models.FloatField(null=True, blank=True, help_text="max discount price")
     free_shipping = models.BooleanField(default=False, help_text="select for free shipping")
-    use = models.BooleanField(default=False)
+    usage_limit = models.IntegerField(default=1, help_text="limited to number of use")
+    img_upload = models.ImageField(upload_to=path_and_rename, null=True, blank=True, help_text="Voucher img")
 

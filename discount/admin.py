@@ -20,7 +20,7 @@ class DiscountTypeBuyXGetXAdmin(admin.ModelAdmin):
 
 class DiscountTypeVoucherAdmin(admin.ModelAdmin):
     search_fields = ("created_by",)
-    list_display = ("id", "name", "voucher", "min_spend", "capped_at", "free_shipping", "use", "created_by")
+    list_display = ("id", "name", "voucher", "percent_offer", "fix_offer", "min_spend", "capped_at", "free_shipping", "usage_limit", "created_by")
     list_display_links = ("name", )
 
 class DiscountAdmin(admin.ModelAdmin):
