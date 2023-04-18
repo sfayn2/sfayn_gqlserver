@@ -53,7 +53,8 @@ INSTALLED_APPS = [
     'promotional',
     'order',
     'discount',
-    'tag'
+    'tag',
+    'accounts'
 ]
 
 MIDDLEWARE = [

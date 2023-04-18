@@ -9,4 +9,4 @@ class CustomerAddressAdmin(admin.ModelAdmin):
     list_display = ("id", "address", )
     list_display_links = ("address",)
 
-admin.site.register(CustomerAddress, CustomerAddressAdmin)
+#admin.site.register(CustomerAddress, CustomerAddressAdmin)
