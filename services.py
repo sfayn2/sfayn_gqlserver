@@ -1,4 +1,5 @@
 
+from django.contrib import admin
 from django.db.models import Count
 from graphql_relay import from_global_id
 from django.db.models import Min, Max
@@ -55,5 +56,18 @@ def get_l3_categories(category_id_list, level):
     return l3_categories
 
 
+class CommonAdmin(admin.ModelAdmin):
+    readonly_fields = ["created_by"]
+    def save_model(self, request, obj, form, change):
+        obj.created_by = request.user
+        super().save_model(request, obj, form, change)
 
-    
+    def has_change_permission(self, request, obj=None):
+        if obj and not request.user.id == obj.created_by.id:
+            return False
+        return True
+
+    def has_delete_permission(self, request, obj=None):
+        if obj and not request.user.id == obj.created_by.id:
+            return False
+        return True

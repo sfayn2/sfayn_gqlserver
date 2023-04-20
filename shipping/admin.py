@@ -1,18 +1,23 @@
 from django.contrib import admin
 from .models import Zone, Method
+from services import CommonAdmin
 
 # Register your models here.
+class ZoneAdmin(CommonAdmin):
+    search_fields = ("name", "country", "region")
+    list_display_links = ("name",)
+    list_display = []
+    for field in Zone._meta.get_fields():
+        if not field.name in ("zone2method", ): #dont includ related 
+            list_display.append(field.name)
 
 
-class ZoneAdmin(admin.ModelAdmin):
-    list_display = ["name", "country", "region"]
-
-
-class MethodAdmin(admin.ModelAdmin):
+class MethodAdmin(CommonAdmin):
+    search_fields = ("title", "desc",)
     filter_horizontal = ('zone', 'tag')
     list_display_links = ("title",)
-    
     list_display = []
+    
     for field in Method._meta.get_fields():
         if not field.name in ("zone", "tag"):
             list_display.append(field.name)
@@ -27,6 +32,8 @@ class MethodAdmin(admin.ModelAdmin):
 
     get_zones.short_description = 'Covered Zones' 
     get_tags.short_description = 'Covered Tags' 
+
+
 
 admin.site.register(Zone, ZoneAdmin)
 admin.site.register(Method, MethodAdmin)

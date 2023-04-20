@@ -172,3 +172,5 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 VIEW_SITE_URL = "/graphql"
+
+SITE_ID = 1
