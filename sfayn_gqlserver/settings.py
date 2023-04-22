@@ -56,7 +56,8 @@ INSTALLED_APPS = [
     'tag',
     'accounts',
     'shipping',
-    'warehouse'
+    'warehouse',
+    'tax'
 ]
 
 MIDDLEWARE = [
