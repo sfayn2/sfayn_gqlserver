@@ -55,7 +55,8 @@ INSTALLED_APPS = [
     'discount',
     'tag',
     'accounts',
-    'shipping'
+    'shipping',
+    'warehouse'
 ]
 
 MIDDLEWARE = [

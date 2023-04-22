@@ -34,9 +34,21 @@ class ProductCategoryAdmin(admin.ModelAdmin):
 
 
 
+class ProductVariantItemAdmin(admin.ModelAdmin):
+    search_fields = ("sku", "parent_sn__title")
+    list_display = ("id", "product_variant", "get_product_title", "sku", "quantity", "price", "options", "img_url", "default", "created_by", "date_created", "date_modified")
+    list_display_links = ("get_product_title",)
+
+
+    def get_product_title(self, obj):
+        return obj.parent_sn.title
+
+    get_product_title.short_description = "Product Title" 
+
 
 admin.site.register(ProductParent, ProductParentAdmin)
 admin.site.register(ProductCategory, ProductCategoryAdmin)
+admin.site.register(ProductVariantItem, ProductVariantItemAdmin)
 
 admin.site.site_url = settings.VIEW_SITE_URL
 admin.site.site_header = 'Sfayn Settings'    
