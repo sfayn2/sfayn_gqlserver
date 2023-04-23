@@ -28,7 +28,7 @@ class ProductCategory(models.Model):
 class ProductParent(models.Model):
 
     class Status(models.IntegerChoices):
-        UNDER_REVIEW = 0
+        PENDING_REVIEW = 0
         APPROVED = 1
         REJECTED = 2
 
