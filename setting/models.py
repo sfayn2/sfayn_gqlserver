@@ -13,7 +13,9 @@ class Setting(Site):
     weight_unit = models.CharField(null=True, max_length=5, help_text="all products weight unit will be default in {weight_unit}") 
     dimensions_unit = models.CharField(null=True, max_length=5, help_text="all products weight unit will be default in {dimensions_unit}") 
     product_approval = models.IntegerField(default=1, choices=ProductApprovalType.choices, help_text="when product is created it requires approval before it can be published?") 
-    currency = models.CharField(max_length=10, help_text="USD, SGD, ..") 
+    country = models.CharField(null=True, blank=True, max_length=25, help_text="Singapore, .. ?") 
+    currency = models.CharField(null=True, blank=True, max_length=10, help_text="USD, SGD, ..") 
+    multi_vendor = models.BooleanField(default=1, help_text="allow external sellers")
     #commision??
     #payment schedule?
     created_by = models.ForeignKey(
