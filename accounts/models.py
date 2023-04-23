@@ -16,3 +16,11 @@ class Address(models.Model):
 
     def __str__(self):
         return f"{self.address} {self.postal} {self.country}, {self.region}"
+
+
+class GroupProfile(Group):
+    role = models.CharField(max_length=50, help_text="use comma for multiple roles ex. VENDOR,STORE_OWNER")
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user2group")
+    date_created = models.DateTimeField(auto_now_add=True) 
+    date_modified = models.DateTimeField(auto_now=True) 
+
