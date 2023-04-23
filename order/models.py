@@ -11,7 +11,7 @@ class OrderItem(models.Model):
         null=True, 
         blank=True
     )
-    product_variant = models.OneToOneField(
+    product_variant = models.ForeignKey(
         'product.ProductVariantItem', 
         on_delete=models.CASCADE, 
         related_name="_prodvariant2cart"
@@ -27,7 +27,7 @@ class OrderItem(models.Model):
     date_modified = models.DateTimeField(auto_now=True) 
 
     def __str__(self):
-        return "Order({}) ShopCart({})".format(self.order, self.product_variant)
+        return f"Item {self.product_variant} ({self.quantity})"
 
 
 class Order(models.Model):
@@ -49,14 +49,28 @@ class Order(models.Model):
         null=True, 
         blank=True
     )
-    customer_address = models.ForeignKey(
-        "customer.CustomerAddress", 
+
+    shipping_address = models.ForeignKey(
+        "accounts.Address", 
         on_delete=models.CASCADE,
-        related_name="_customer2order", 
+        related_name="address2order", 
         null=True, 
-        blank=True
+        blank=True,
+        help_text="delivery address"
     )
+    tax = models.ForeignKey(
+        "tax.Tax", 
+        on_delete=models.CASCADE,
+        related_name="tax2order", 
+        null=True, 
+        blank=True,
+        help_text="Country tax applied"
+    )
+    shipping_fee = models.FloatField(null=True, blank=True, help_text="locked-in shipping fee")
+    discount_fee = models.FloatField(null=True, blank=True, help_text="locked-in discount fee")
+    tax_rate = models.FloatField(null=True, blank=True, help_text="locked-in tax rate")
     total_amount = models.FloatField(null=True, blank=True)
+    notes = models.TextField(help_text="Customer notes to seller", blank=True)
     status = models.IntegerField(
         blank=True, 
         null=True, 
@@ -71,11 +85,6 @@ class Order(models.Model):
     date_modified = models.DateTimeField(auto_now=True) 
 
     def __str__(self):
-        return "PaymentMethod({}) CustomerAddress({}) TotalAmount({}) Status({})".format(
-            self.payment_method,
-            self.customer_address,
-            self.total_amount,
-            self.status
-        )
+        return f"OrderID:{self.id} - {self.shipping_address} ( {self.get_status_display()} )"
 
 

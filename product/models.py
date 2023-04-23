@@ -28,8 +28,9 @@ class ProductCategory(models.Model):
 class ProductParent(models.Model):
 
     class Status(models.IntegerChoices):
-        INACTIVE = 0
-        ACTIVE = 1
+        UNDER_REVIEW = 0
+        APPROVED = 1
+        REJECTED = 2
 
     #we can add more attributes later
     id = models.AutoField(primary_key=True)
@@ -60,6 +61,11 @@ class ProductVariant(models.Model):
 
 
 class ProductVariantItem(models.Model):
+
+    class Status(models.IntegerChoices):
+        INACTIVE = 0
+        ACTIVE = 1
+
     id = models.AutoField(primary_key=True)
     product_variant = models.ForeignKey("product.ProductVariant", on_delete=models.CASCADE, null=True, related_name="variant2item", blank=True) 
     parent_sn = models.ForeignKey("product.ProductParent", on_delete=models.CASCADE, null=True, related_name="product2variantitem") 
@@ -70,12 +76,16 @@ class ProductVariantItem(models.Model):
     img_upload = models.ImageField(upload_to=path_and_rename, null=True, blank=True, help_text="Primary img")
     img_url = models.CharField(max_length=300, null=True, blank=True, help_text="secondary img") 
     default = models.BooleanField(default=False, help_text="default to display in product details page of similar product")
+    status = models.IntegerField(null=True, choices=Status.choices, default=0) 
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user2variantsitem")
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True) 
 
     def __str__(self):
         return "ParentSn({}) sku({}) Name({}) Options({})".format(self.parent_sn, self.sku, self.product_variant.name, self.options)
+
+
+
 
 #TODO to obsolet
 class ProductImage(models.Model):

@@ -1,4 +1,5 @@
 from django.contrib import admin
+from services import CommonAdmin
 from .models import (
     Order,
     OrderItem
@@ -7,10 +8,10 @@ from .models import (
 class OrderItemInline(admin.TabularInline):
     model = OrderItem
 
-class OrderAdmin(admin.ModelAdmin):
+class OrderAdmin(CommonAdmin):
     search_fields = ("created_by",)
-    list_display = ("id", "payment_method", "customer_address", )
-    list_display_links = ("payment_method", "customer_address")
+    list_display = ("id", "payment_method", "shipping_address", "tax", "shipping_fee", "discount_fee", "tax_rate", "total_amount", "notes", "status", "created_by", "date_created", "date_modified")
+    list_display_links = ("shipping_address",)
 
     inlines = [
         OrderItemInline,
