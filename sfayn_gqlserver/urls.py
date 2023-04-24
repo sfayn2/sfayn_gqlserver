@@ -37,5 +37,9 @@ if settings.DEBUG:
     ]
 
 admin.site.site_url = settings.VIEW_SITE_URL
-admin.site.site_title = Site.objects.get_current() 
-admin.site.site_header = Site.objects.get_current() 
+try:
+    admin.site.site_title = Site.objects.get_current() 
+    admin.site.site_header = Site.objects.get_current() 
+except:
+    # django migrate will check urls.py expects to have a runtime since Site is not ready
+    pass
