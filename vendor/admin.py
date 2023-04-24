@@ -1,5 +1,7 @@
 from django.contrib import admin
-from common import CommonAdmin
+from common import (
+        CommonAdmin,
+        get_list_display)
 from .models import (
     Vendor
 )
@@ -8,7 +10,8 @@ from .models import (
 # Register your models here.
 class VendorAdmin(CommonAdmin):
     search_fields = ("name", "desc")
-    list_display_links = ("desc",)
-    list_display = ("name", "desc", "logo", "status", "created_by", "date_created", "date_modified")
+    list_display_links = ("name",)
+    list_display = get_list_display(Vendor, ("vendor2discount",))
+    readonly_fields = ["created_by", "status"]
 
 admin.site.register(Vendor, VendorAdmin)
