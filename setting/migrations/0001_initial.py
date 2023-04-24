@@ -5,12 +5,6 @@ import django.contrib.sites.models
 from django.db import migrations, models
 import django.db.models.deletion
 
-def create_default_site(apps, schema_editor):
-    """Populate the sites model"""
-
-    # Register SITE_ID = 1
-    Site.objects.create(domain='demo.josnin.dev', name='Sfayn GQLServer')
-
 
 class Migration(migrations.Migration):
 
@@ -39,7 +33,4 @@ class Migration(migrations.Migration):
                 ('objects', django.contrib.sites.models.SiteManager()),
             ],
         ),
-		operations = [
-        	migrations.RunPython(create_default_site)
-    	]
     ]
