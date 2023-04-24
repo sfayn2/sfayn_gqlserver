@@ -1,6 +1,6 @@
 from django.contrib import admin
 from .models import Warehouse, Stock
-from product.models import ProductVariantItem
+from product.models import VariantItem
 from services import CommonAdmin
 
 # Register your models here.
@@ -21,7 +21,7 @@ class StockAdmin(CommonAdmin):
 
 
     def get_product_title(self, obj):
-        return obj.product_variant.parent_sn.title
+        return obj.product_variant.product_sn.title
 
     get_warehouse_name.short_description = "Warehouse Name"
     get_product_title.short_description = "Product Title" 

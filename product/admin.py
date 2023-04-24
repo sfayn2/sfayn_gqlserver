@@ -1,26 +1,26 @@
 from django.contrib import admin
 from .models import (
-    ProductParent,
-    ProductCategory,
-    ProductVariantItem,
+    Product,
+    Category,
+    VariantItem,
 )
 
-class ProductVariantItemInline(admin.TabularInline):
-        model = ProductVariantItem
+class VariantItemInline(admin.TabularInline):
+        model = VariantItem
 
 
 # Register your models here.
-class ProductParentAdmin(admin.ModelAdmin):
+class ProductAdmin(admin.ModelAdmin):
     search_fields = ("title",)
-    list_display = ("parent_sn", "title")
+    list_display = ("product_sn", "title")
     list_display_links = ("title",)
 
     inlines = [
-        ProductVariantItemInline,
+        VariantItemInline,
     ]
 
 
-class ProductCategoryAdmin(admin.ModelAdmin):
+class CategoryAdmin(admin.ModelAdmin):
     search_fields = ("name",)
     list_display = ("id", "level", "parent_name", "name")
 
@@ -33,19 +33,19 @@ class ProductCategoryAdmin(admin.ModelAdmin):
 
 
 
-class ProductVariantItemAdmin(admin.ModelAdmin):
-    search_fields = ("sku", "parent_sn__title")
+class VariantItemAdmin(admin.ModelAdmin):
+    search_fields = ("sku", "product_sn__title")
     list_display = ("id", "product_variant", "get_product_title", "sku", "quantity", "price", "options", "img_url", "default", "created_by", "date_created", "date_modified")
     list_display_links = ("get_product_title",)
 
 
     def get_product_title(self, obj):
-        return obj.parent_sn.title
+        return obj.product_sn.title
 
     get_product_title.short_description = "Product Title" 
 
 
-admin.site.register(ProductParent, ProductParentAdmin)
-admin.site.register(ProductCategory, ProductCategoryAdmin)
-admin.site.register(ProductVariantItem, ProductVariantItemAdmin)
+admin.site.register(Product, ProductAdmin)
+admin.site.register(Category, CategoryAdmin)
+admin.site.register(VariantItem, VariantItemAdmin)
 

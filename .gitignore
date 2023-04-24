@@ -8,5 +8,6 @@ __pycache__/
 *.swp
 *.swo
 *.orig
+*.sqlite3.*
 *.env.production
 media/

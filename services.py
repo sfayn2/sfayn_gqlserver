@@ -4,8 +4,8 @@ from django.db.models import Count
 from graphql_relay import from_global_id
 from django.db.models import Min, Max
 from product.models import (
-    ProductVariantItem,
-    ProductCategory
+    VariantItem,
+    Category
 )
 
 
@@ -18,16 +18,16 @@ def get_list_from_global_id(data):
 
 
 def get_price_min(id):
-    qset = ProductVariantItem.objects.filter(parent_sn_id=id)
+    qset = VariantItem.objects.filter(parent_sn_id=id)
     return qset.aggregate(Min("price"))["price__min"]
 
 def get_price_max(id):
-    qset = ProductVariantItem.objects.filter(parent_sn_id=id)
+    qset = VariantItem.objects.filter(parent_sn_id=id)
     return qset.aggregate(Max("price"))["price__max"]
 
 def get_l3_categories(category_id_list, level):
 
-    category = ProductCategory
+    category = Category
     category_qset = category.objects.all()
     l3_categories = None
 

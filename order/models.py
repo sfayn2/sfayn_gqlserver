@@ -12,7 +12,7 @@ class OrderItem(models.Model):
         blank=True
     )
     product_variant = models.ForeignKey(
-        'product.ProductVariantItem', 
+        'product.VariantItem', 
         on_delete=models.CASCADE, 
         related_name="_prodvariant2cart"
     )

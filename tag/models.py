@@ -19,7 +19,7 @@ class Tag(models.Model):
 class TagItem(models.Model):
     id = models.AutoField(primary_key=True)
     tag = models.ForeignKey("tag.Tag", on_delete=models.CASCADE, null=True, related_name="tags2items", blank=True) 
-    product_variant = models.ForeignKey("product.ProductVariantItem", on_delete=models.CASCADE, null=True, related_name="variant2tags", blank=True) 
+    product_variant = models.ForeignKey("product.VariantItem", on_delete=models.CASCADE, null=True, related_name="variant2tags", blank=True) 
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user2tagsitem")
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True) 
