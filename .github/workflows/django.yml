@@ -57,5 +57,4 @@ jobs:
       run: |
         python manage.py migrate
         python manage.py createsuperuser --no-input      
-        python manage.py loaddata site.json
         python manage.py test
