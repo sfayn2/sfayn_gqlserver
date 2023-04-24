@@ -44,8 +44,13 @@ class OrderMutation(relay.ClientIDMutation):
     class Input:
         user = graphene.ID(required=True)
         payment = graphene.ID(required=True)
-        customer_address = graphene.ID(required=True)
+        shipping_address = graphene.ID(required=True)
+        tax = graphene.ID(required=True)
+        shipping_fee = graphene.Float(required=False) #optional?
+        discount_fee = graphene.Float(required=False) #optional?
+        tax_rate = graphene.Float(required=False) #optional?
         total_amount = graphene.Float(required=True)
+        notes = graphene.String(required=False)
 
     order = graphene.Field(OrderNode)
     ok = graphene.Boolean()
@@ -58,20 +63,31 @@ class OrderMutation(relay.ClientIDMutation):
         info, 
         user, 
         payment, 
-        customer_address,
-        total_amount
+        shipping_address,
+        tax,
+        total_amount,
+        shipping_fee,
+        discount_fee,
+        tax_rate,
+        notes
     ):
 
         ok = False
         user_id = from_global_id(user)[1] #it returns ('UserNode', '1')
         payment_id = from_global_id(payment)[1]
-        customer_address_id = from_global_id(customer_address)[1]
+        shipping_address_id = from_global_id(shipping_address)[1]
+        tax_id = from_global_id(tax)[1]
 
         so = Order()
         so.payment_method_id = payment_id
-        so.customer_address_id = customer_address_id
+        so.shipping_address_id = shipping_address_id
+        so.tax_id = tax_id
         so.created_by_id = user_id
+        so.shipping_fee = shipping_fee
+        so.discount_fee = discount_fee
+        so.tax_rate = tax_rate
         so.total_amount = total_amount
+        so.notes = notes
         so.status = so.Status.WAITING_FOR_PAYMENT
 
         ok = so.save()
@@ -96,18 +112,28 @@ class OrderItemMutation(relay.ClientIDMutation):
         info, 
         user, 
         order, 
-        item,
+        product,
+        quantity
     ):
 
         ok = False
         user_id = from_global_id(user)[1] #it returns ('UserNode', '1')
         order_id = from_global_id(order)[1]
-        product_variant_id = from_global_id(item)[1]
+        #cart_id = from_global_id(item)[1] > let front end store do this?
+        product_variant_id =  from_global_id(product)[1]
+        ordered_quantity = quantity
 
         s = OrderItem()
         s.order_id = order_id
-        s.product_variant_id = product_variant_id 
         s.created_by_id = user_id
+        s.product_variant_id = product_variant_id
+
+        product_variant = ProductVariantItem.objects.get(id=product_variant_id)
+        if product_variant.quantity < ordered_quantity:
+            raise "Not enough stock!"
+
+        s.quantity = quantity
+        s.locked_in_price = product_variant.price
 
         ok = s.save()
 
@@ -150,3 +176,4 @@ class Query(object):
 
     order = relay.Node.Field(OrderNode)
     all_order = DjangoFilterConnectionField(OrderNode)
+

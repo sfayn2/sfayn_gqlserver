@@ -2,7 +2,6 @@ import graphene
 import graphql_jwt
 
 import product.schema
-import shop.schema
 import order.schema
 import tag.schema
 import discount.schema
@@ -26,12 +25,6 @@ class Query(
     pass
 
 class Mutation(graphene.ObjectType):
-
-    #TODO: to obsolete
-    shopcart = shop.schema.ShopCartMutation.Field()
-    #shoporder = shop.schema.ShopOrderMutation.Field()
-    shoporderitem = shop.schema.ShopOrderItemMutation.Field()
-    shoporderstatus = shop.schema.ShopOrderStatusMutation.Field()
 
     orderitem = order.schema.OrderItemMutation.Field()
     orderstatus = order.schema.OrderStatusMutation.Field()
