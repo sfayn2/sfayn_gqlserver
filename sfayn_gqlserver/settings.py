@@ -42,20 +42,19 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
-    'storages',
     'graphene_django',
     'corsheaders',
     'product',
-    'payment',
-    'order',
-    'discount',
-    'tag',
     'accounts',
-    'shipping',
+    'payment',
+    'tag',
     'warehouse',
     'tax',
+    'vendor',
+    'shipping',
+    'discount',
     'setting',
-    'vendor'
+    'order',
 ]
 
 MIDDLEWARE = [
