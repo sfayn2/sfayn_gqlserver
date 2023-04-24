@@ -1,6 +1,6 @@
 from django.contrib import admin
 from .models import Address, GroupProfile, Role
-from services import CommonAdmin
+from common import CommonAdmin
 
 # Register your models here.
 class AddressAdmin(CommonAdmin):

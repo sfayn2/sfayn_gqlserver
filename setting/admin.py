@@ -1,5 +1,5 @@
 from django.contrib import admin
-from services import CommonAdmin
+from common import CommonAdmin
 from .models import (
     Setting
 )

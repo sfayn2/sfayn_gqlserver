@@ -30,7 +30,7 @@ class Stock(models.Model):
         OUT_OF_STOCK = 1
 
     warehouse = models.ForeignKey('warehouse.Warehouse', on_delete=models.CASCADE, related_name="warehouse2stock")
-    product_variant = models.ForeignKey('product.VariantItem', on_delete=models.CASCADE, related_name="product_variant2stock")
+    product_variant = models.ForeignKey('product.VariantItem', on_delete=models.CASCADE, related_name="prodvariant2stock")
     stock = models.IntegerField(null=True, blank=True, help_text="warehouse stocks ")
     price = models.FloatField(null=True, blank=True, help_text="warehouse pricing")
     status = models.IntegerField(null=True, choices=Status.choices) 

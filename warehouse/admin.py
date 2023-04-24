@@ -1,7 +1,7 @@
 from django.contrib import admin
 from .models import Warehouse, Stock
 from product.models import VariantItem
-from services import CommonAdmin
+from common import CommonAdmin
 
 # Register your models here.
 class WarehouseAdmin(CommonAdmin):

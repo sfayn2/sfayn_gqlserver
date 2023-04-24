@@ -1,6 +1,6 @@
 from django.contrib import admin
 from .models import Tax
-from services import CommonAdmin
+from common import CommonAdmin
 
 # Register your models here.
 class TaxAdmin(CommonAdmin):

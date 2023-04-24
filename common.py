@@ -72,3 +72,11 @@ class CommonAdmin(admin.ModelAdmin):
         #if obj and not request.user.id == obj.created_by.id:
         #    return False
         #return True
+
+
+def get_list_display(model=None, exclude_fields=None):
+    list_display = []
+    for field in model._meta.get_fields(include_parents=False):
+        if not field.name in exclude_fields:
+            list_display.append(field.name)
+    return list_display

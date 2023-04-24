@@ -7,21 +7,21 @@ class OrderItem(models.Model):
     order = models.ForeignKey(
         "order.Order", 
         on_delete=models.CASCADE,
-        related_name="_order2orderitem", 
+        related_name="order2orderitem", 
         null=True, 
         blank=True
     )
     product_variant = models.ForeignKey(
         'product.VariantItem', 
         on_delete=models.CASCADE, 
-        related_name="_prodvariant2cart"
+        related_name="prodvariant2orderitem"
     )
     quantity = models.IntegerField(null=True)
     locked_in_price = models.FloatField(null=True, blank=True, help_text="Locked-In Price, This wont use the new product price once item is ordered")
     created_by = models.ForeignKey(
         User,
         on_delete=models.CASCADE, 
-        related_name="_user2orderitem"
+        related_name="user2orderitem"
     )
     date_created = models.DateTimeField(auto_now_add=True) 
     date_modified = models.DateTimeField(auto_now=True) 
@@ -45,7 +45,7 @@ class Order(models.Model):
     payment_method = models.ForeignKey(
         "payment.PaymentMethod", 
         on_delete=models.CASCADE,
-        related_name="_payment2order", 
+        related_name="payment2order", 
         null=True, 
         blank=True
     )
@@ -79,7 +79,7 @@ class Order(models.Model):
     created_by = models.ForeignKey(
         User, 
         on_delete=models.CASCADE, 
-        related_name="_user2order"
+        related_name="user2order"
     )
     date_created = models.DateTimeField(auto_now_add=True) 
     date_modified = models.DateTimeField(auto_now=True) 

@@ -22,7 +22,10 @@ class Category(models.Model):
     date_modified = models.DateTimeField(auto_now=True) 
 
     def __str__(self):
-        return "Level({}) ParentId({}) Id({}) Name({})".format(self.level, self.parent_id, self.id, self.name, self.level)
+        if self.parent:
+            return f"{self.name} - {self.parent} (level: {self.level})"
+        else:
+            return f"{self.name} (level: {self.level})"
 
 
 class Product(models.Model):
@@ -39,7 +42,7 @@ class Product(models.Model):
     category = models.ForeignKey("product.Category", on_delete=models.CASCADE, null=True, related_name="cat2product") 
     goods_brand = models.CharField(max_length=30, null=True, blank=True)
     goods_desc = models.TextField(null=True) 
-    status = models.IntegerField(null=True, choices=Status.choices) 
+    status = models.IntegerField(null=True, choices=Status.choices, default=0) 
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user2product")
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True) 
