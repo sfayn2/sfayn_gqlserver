@@ -6,7 +6,6 @@ import shop.schema
 import order.schema
 import tag.schema
 import discount.schema
-import customer.schema
 import accounts.schema
 import payment.schema
 import promotional.schema
@@ -17,7 +16,6 @@ class Query(
     order.schema.Query, 
     tag.schema.Query, 
     discount.schema.Query, 
-    customer.schema.Query,
     accounts.schema.Query,
     payment.schema.Query,
     promotional.schema.Query,
