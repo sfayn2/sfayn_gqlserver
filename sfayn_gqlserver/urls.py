@@ -15,6 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from django.contrib.sites.models import Site
 from graphene_django.views import GraphQLView
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
@@ -34,3 +35,7 @@ if settings.DEBUG:
             'document_root': settings.MEDIA_ROOT,
         }),
     ]
+
+admin.site.site_url = settings.VIEW_SITE_URL
+admin.site.site_title = Site.objects.get_current() 
+admin.site.site_header = Site.objects.get_current() 

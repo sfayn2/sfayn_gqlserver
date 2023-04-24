@@ -68,6 +68,7 @@ class CommonAdmin(admin.ModelAdmin):
         return True
 
     def has_delete_permission(self, request, obj=None):
-        if obj and not request.user.id == obj.created_by.id:
-            return False
-        return True
+        return False # disable hard delete
+        #if obj and not request.user.id == obj.created_by.id:
+        #    return False
+        #return True

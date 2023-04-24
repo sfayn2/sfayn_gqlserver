@@ -1,5 +1,4 @@
 from django.contrib import admin
-from django.conf import settings
 from .models import (
     ProductParent,
     ProductCategory,
@@ -50,5 +49,3 @@ admin.site.register(ProductParent, ProductParentAdmin)
 admin.site.register(ProductCategory, ProductCategoryAdmin)
 admin.site.register(ProductVariantItem, ProductVariantItemAdmin)
 
-admin.site.site_url = settings.VIEW_SITE_URL
-admin.site.site_header = 'Sfayn Settings'    
