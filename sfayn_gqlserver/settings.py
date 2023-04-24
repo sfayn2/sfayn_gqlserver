@@ -49,7 +49,6 @@ INSTALLED_APPS = [
     'shop',
     'customer',
     'payment',
-    'account',
     'promotional',
     'order',
     'discount',
