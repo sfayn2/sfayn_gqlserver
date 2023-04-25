@@ -49,11 +49,16 @@ class Order(models.Model):
         null=True, 
         blank=True
     )
+    shipping_method = models.ForeignKey(
+        "shipping.Method", 
+        on_delete=models.CASCADE,
+        related_name="shipping2order", 
+        null=True, 
+        blank=True
+    )
     discount = models.ManyToManyField(
         "discount.Discount", 
-        on_delete=models.CASCADE,
         related_name="discount2order", 
-        null=True, 
         blank=True
     )
 

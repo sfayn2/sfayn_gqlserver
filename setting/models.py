@@ -7,8 +7,7 @@ class Setting(models.Model):
 
     class ProductApprovalType(models.IntegerChoices):
         PENDING_REVIEW = 0
-        APPROVED = 1
-        REJECTED = 2
+        APPROVED = 1 #auto approve?
 
     site = models.OneToOneField(Site, on_delete=models.CASCADE)
     weight_unit = models.CharField(null=True, max_length=5, help_text="all products weight unit will be default in {weight_unit}") 
