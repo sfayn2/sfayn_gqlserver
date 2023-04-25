@@ -28,10 +28,12 @@ class Stock(models.Model):
     class Status(models.IntegerChoices):
         IN_STOCK = 0
         OUT_OF_STOCK = 1
+        LOW_STOCK = 2
 
     warehouse = models.ForeignKey('warehouse.Warehouse', on_delete=models.CASCADE, related_name="warehouse2stock")
     product_variant = models.ForeignKey('product.VariantItem', on_delete=models.CASCADE, related_name="prodvariant2stock")
     stock = models.IntegerField(null=True, blank=True, help_text="warehouse stocks ")
+    low_stock = models.IntegerField(null=True, blank=True, help_text="warehouse low stock to track inventory? ")
     price = models.FloatField(null=True, blank=True, help_text="warehouse pricing")
     status = models.IntegerField(null=True, choices=Status.choices) 
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user2stock")

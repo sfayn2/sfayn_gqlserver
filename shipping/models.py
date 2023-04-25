@@ -22,10 +22,15 @@ class Zone(models.Model):
         return f'{self.name} {self.country}, {self.region}'
 
 
+#class Dimensions(models.Model):
+#    weight
+#    package_length
+#    package_width
+#    package_depth
+
 class Method(models.Model):
     id = models.AutoField(primary_key=True)
     zone = models.ManyToManyField('shipping.Zone', related_name="zone2method", blank=True)
-    tag = models.ManyToManyField('tag.Tag', related_name="tag2method", blank=True)
     #TODO: shipping carrier and duties  & tax??
     #carrier 1 to many?
     #tax 1 to many?

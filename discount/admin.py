@@ -24,7 +24,7 @@ class DiscountTypeVoucherAdmin(admin.ModelAdmin):
     list_display_links = ("name", )
 
 class DiscountAdmin(admin.ModelAdmin):
-    filter_horizontal = ('vendor', 'tag', 'product_variant', 'category')
+    filter_horizontal = ('vendor', 'tag', 'product_variant', 'category', 'shipping_method')
     search_fields = ("created_by",)
     list_display = ("id", "name", "discount_type", "status")
     list_display_links = ("name", )

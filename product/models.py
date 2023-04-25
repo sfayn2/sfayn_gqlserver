@@ -68,11 +68,9 @@ class VariantItem(models.Model):
         INACTIVE = 0
         ACTIVE = 1
 
-    id = models.AutoField(primary_key=True)
+    sku = models.CharField(max_length=50, primary_key=True)
     product_variant = models.ForeignKey("product.Variant", on_delete=models.CASCADE, null=True, related_name="variant2item", blank=True) 
     product_sn = models.ForeignKey("product.Product", on_delete=models.CASCADE, null=True, related_name="product2variantitem") 
-    sku = models.CharField(max_length=50)
-    quantity = models.IntegerField(null=True, blank=True, help_text="allocated or reserved quantity")
     price = models.FloatField(null=True, blank=True, help_text="sale price, exclusive of tax")
     options = models.CharField(max_length=50, null=True, blank=True) # Red/Blue?
     img_upload = models.ImageField(upload_to=path_and_rename, null=True, blank=True, help_text="Primary img")

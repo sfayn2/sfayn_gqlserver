@@ -21,6 +21,7 @@ class Discount(models.Model):
     discount_object = GenericForeignKey("discount_type", "object_id")
     vendor = models.ManyToManyField('vendor.Vendor', blank=True, related_name="vendor2discount")
     tag = models.ManyToManyField('tag.Tag', blank=True, related_name="tag2discount")
+    shipping_method = models.ManyToManyField('shipping.Method', blank=True, related_name="shipmethod2discount")
     product_variant = models.ManyToManyField('product.VariantItem', blank=True, related_name="prodvariant2discount")
     category = models.ManyToManyField('product.Category', blank=True, related_name="category2discount")
     status = models.IntegerField(
