@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from utils.utils import path_and_rename
 
 # Create your models here.
 class Warehouse(models.Model):
@@ -9,11 +10,11 @@ class Warehouse(models.Model):
         IN_ACTIVE = 1
 
     name = models.CharField(max_length=20) #can be outsource?
-    address = models.TextField()
-    postal = models.CharField(max_length=50)
-    country = models.CharField(max_length=50)
-    region = models.CharField(max_length=50)
-    company_url = models.CharField(max_length=200)
+    address = models.TextField(blank=True)
+    postal = models.CharField(max_length=50, blank=True, null=True)
+    country = models.CharField(max_length=50, blank=True, null=True)
+    region = models.CharField(max_length=50, blank=True, null=True)
+    company_url = models.CharField(max_length=200, blank=True, null=True)
     logo = models.ImageField(upload_to=path_and_rename, null=True, blank=True, help_text="company logo")
     handling_fee = models.FloatField(null=True, blank=True, help_text="Add handling fee per order")
     manage_warehouse = models.BooleanField(default=True, help_text="DIY managed your own warehouse")
