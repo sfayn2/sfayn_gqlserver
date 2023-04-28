@@ -8,12 +8,15 @@ class Warehouse(models.Model):
         ACTIVE = 0
         IN_ACTIVE = 1
 
-    name = models.CharField(max_length=20)
+    name = models.CharField(max_length=20) #can be outsource?
     address = models.TextField()
     postal = models.CharField(max_length=50)
     country = models.CharField(max_length=50)
     region = models.CharField(max_length=50)
+    company_url = models.CharField(max_length=200)
+    logo = models.ImageField(upload_to=path_and_rename, null=True, blank=True, help_text="company logo")
     handling_fee = models.FloatField(null=True, blank=True, help_text="Add handling fee per order")
+    manage_warehouse = models.BooleanField(default=True, help_text="DIY managed your own warehouse")
     status = models.IntegerField(null=True, choices=Status.choices) 
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user2warehouse")
     date_created = models.DateTimeField(auto_now_add=True) 
