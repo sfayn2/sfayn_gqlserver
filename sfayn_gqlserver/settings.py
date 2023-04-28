@@ -55,7 +55,8 @@ INSTALLED_APPS = [
     'discount',
     'setting',
     'order',
-    'fulfillment'
+    'fulfillment',
+    'webhook'
 ]
 
 MIDDLEWARE = [
