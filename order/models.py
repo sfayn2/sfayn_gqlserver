@@ -120,7 +120,6 @@ class Order(models.Model):
     )
     amount_paid = models.FloatField(null=True, blank=True, help_text="amount paid by customer") 
     customer_note = models.TextField(help_text="Customer notes to seller", blank=True)
-    tracking_number = models.CharField(max_length=120, blank=True, null=True, help_text="fulfillment tracking number")
     status = models.IntegerField(
         blank=True, 
         null=True, 
@@ -140,3 +139,38 @@ class Order(models.Model):
         return f"OrderID:{self.id} - {self.shipping_address} ( {self.get_status_display()} )"
 
 
+# one order can possibly have multiple fulfillment
+class OrderFulfillment(models.Model):
+
+    order = models.ForeignKey(
+        "order.Order", 
+        on_delete=models.CASCADE,
+        related_name="order2orderfulfill", 
+        null=True, 
+        blank=True
+    )
+    tracking_number = models.CharField(max_length=120, blank=True, null=True, help_text="a string fulfillment tracking number")
+
+    fulfillment = models.ForeignKey(
+        "fulfillment.Fulfillment", 
+        on_delete=models.CASCADE,
+        related_name="fulfill2orderfulfill", 
+        null=True, 
+        blank=True
+    )
+
+    #Locked fulfillment info
+    name = models.CharField(max_length=20) #can be outsource?
+    company_url = models.CharField(max_length=200, blank=True, null=True)
+    tracker_url = models.CharField(max_length=200, blank=True, null=True)
+    logo = models.ImageField(upload_to=path_and_rename, null=True, blank=True, help_text="company logo")
+    #Locked fulfillment info
+
+    #should always be system user??
+    created_by = models.ForeignKey(
+        User, 
+        on_delete=models.CASCADE, 
+        related_name="user2orderfulfillment"
+    )
+    date_created = models.DateTimeField(auto_now_add=True) 
+    date_modified = models.DateTimeField(auto_now=True) 
