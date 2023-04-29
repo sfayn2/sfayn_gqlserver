@@ -5,10 +5,6 @@ from utils.utils import path_and_rename
 # Create your models here.
 class Warehouse(models.Model):
 
-    class Status(models.IntegerChoices):
-        ACTIVE = 0
-        IN_ACTIVE = 1
-
     name = models.CharField(max_length=20) #can be outsource?
     address = models.TextField(blank=True)
     postal = models.CharField(max_length=50, blank=True, null=True)
@@ -18,7 +14,7 @@ class Warehouse(models.Model):
     logo = models.ImageField(upload_to=path_and_rename, null=True, blank=True, help_text="company logo")
     handling_fee = models.FloatField(null=True, blank=True, help_text="Add handling fee per order")
     manage_warehouse = models.BooleanField(default=True, help_text="DIY managed your own warehouse")
-    status = models.IntegerField(null=True, choices=Status.choices) 
+    is_active = models.BooleanField(default=False)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user2warehouse")
     date_created = models.DateTimeField(auto_now_add=True) 
     date_modified = models.DateTimeField(auto_now=True) 
