@@ -8,20 +8,20 @@ from common import (
 class ZoneAdmin(CommonAdmin):
     search_fields = ("name", "country", "region")
     list_display_links = ("name",)
-    list_display = get_list_display(Zone, ("zone2method",))
+    list_display = get_list_display(Zone, ("shipping_method",))
+    list_display.append("get_shipping_methods")
+
+    def get_shipping_methods(self, obj):
+        return " | ".join([str(p) for p in obj.shipping_method.all()])
+
+    get_shipping_methods.short_description = 'All Shipping Methods'
 
 
 class MethodAdmin(CommonAdmin):
-    search_fields = ("title", "desc",)
-    filter_horizontal = ('zone', )
-    list_display_links = ("title",)
-    list_display = get_list_display(Method, ("zone",))
-    list_display.append("get_zones")
-
-    def get_zones(self, obj):
-        return " | ".join([str(p) for p in obj.zone.all()])
-
-    get_zones.short_description = 'Covered Zones' 
+    search_fields = ("name", "desc",)
+    filter_horizontal = ('classification', )
+    list_display_links = ("name",)
+    list_display = get_list_display(Method, ("classification", ))
 
 
 

@@ -75,6 +75,13 @@ class VariantItem(models.Model):
     options = models.CharField(max_length=50, null=True, blank=True) # Red/Blue?
     img_upload = models.ImageField(upload_to=path_and_rename, null=True, blank=True, help_text="Primary img")
     img_url = models.CharField(max_length=300, null=True, blank=True, help_text="secondary img") 
+
+    #use to calculate shipping cost?? should be in other model?
+    weight = models.FloatField(null=True, blank=True, help_text="product  weight")
+    package_length = models.FloatField(null=True, blank=True, help_text="package weight")
+    package_width = models.FloatField(null=True, blank=True, help_text="package width")
+    package_height = models.FloatField(null=True, blank=True, help_text="package height")
+
     default = models.BooleanField(default=False, help_text="default to display in product details page of similar product")
     status = models.IntegerField(null=True, choices=Status.choices, default=0) 
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user2variantsitem")
