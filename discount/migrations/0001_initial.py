@@ -3,7 +3,7 @@
 from django.conf import settings
 from django.db import migrations, models
 import django.db.models.deletion
-import utils.utils
+import utils
 
 
 class Migration(migrations.Migration):
@@ -36,7 +36,7 @@ class Migration(migrations.Migration):
                 ('capped_at', models.FloatField(blank=True, help_text='max discount price', null=True)),
                 ('free_shipping', models.BooleanField(default=False, help_text='select for free shipping')),
                 ('usage_limit', models.IntegerField(default=1, help_text='limited to number of use')),
-                ('img_upload', models.ImageField(blank=True, help_text='Voucher img', null=True, upload_to=utils.utils.path_and_rename)),
+                ('img_upload', models.ImageField(blank=True, help_text='Voucher img', null=True, upload_to=utils.path_and_rename)),
                 ('created_by', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
             ],
             options={

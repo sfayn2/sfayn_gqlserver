@@ -3,7 +3,7 @@
 from django.conf import settings
 from django.db import migrations, models
 import django.db.models.deletion
-import utils.utils
+import utils
 
 
 class Migration(migrations.Migration):
@@ -27,7 +27,7 @@ class Migration(migrations.Migration):
                 ('name', models.CharField(max_length=20)),
                 ('company_url', models.CharField(blank=True, max_length=200, null=True)),
                 ('tracker_url', models.CharField(blank=True, max_length=200, null=True)),
-                ('logo', models.ImageField(blank=True, help_text='company logo', null=True, upload_to=utils.utils.path_and_rename)),
+                ('logo', models.ImageField(blank=True, help_text='company logo', null=True, upload_to=utils.path_and_rename)),
                 ('date_created', models.DateTimeField(auto_now_add=True)),
                 ('date_modified', models.DateTimeField(auto_now=True)),
                 ('created_by', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='user2orderfulfillment', to=settings.AUTH_USER_MODEL)),

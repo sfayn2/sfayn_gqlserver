@@ -3,7 +3,7 @@
 from django.conf import settings
 from django.db import migrations, models
 import django.db.models.deletion
-import utils.utils
+import utils
 
 
 class Migration(migrations.Migration):
@@ -21,7 +21,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(primary_key=True, serialize=False)),
                 ('name', models.CharField(blank=True, max_length=100, null=True)),
-                ('img_upload', models.ImageField(blank=True, help_text='Primary img', null=True, upload_to=utils.utils.path_and_rename)),
+                ('img_upload', models.ImageField(blank=True, help_text='Primary img', null=True, upload_to=utils.path_and_rename)),
                 ('img_url', models.CharField(blank=True, help_text='secondary img', max_length=300, null=True)),
                 ('date_created', models.DateTimeField(auto_now_add=True)),
                 ('date_modified', models.DateTimeField(auto_now=True)),

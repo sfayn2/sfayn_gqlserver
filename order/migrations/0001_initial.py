@@ -3,7 +3,7 @@
 from django.conf import settings
 from django.db import migrations, models
 import django.db.models.deletion
-import utils.utils
+import utils
 
 
 class Migration(migrations.Migration):
@@ -62,7 +62,7 @@ class Migration(migrations.Migration):
                 ('product_price', models.FloatField(blank=True, help_text='undiscounted price', null=True)),
                 ('product_options', models.CharField(blank=True, max_length=50, null=True)),
                 ('product_variant_name', models.CharField(blank=True, max_length=50, null=True)),
-                ('product_img_upload', models.ImageField(blank=True, help_text='Primary img', null=True, upload_to=utils.utils.path_and_rename)),
+                ('product_img_upload', models.ImageField(blank=True, help_text='Primary img', null=True, upload_to=utils.path_and_rename)),
                 ('product_img_url', models.CharField(blank=True, help_text='secondary img', max_length=300, null=True)),
                 ('discounts', models.FloatField(blank=True, help_text='discounts per item', null=True)),
                 ('discounted_price', models.FloatField(blank=True, help_text='(product_price*order_quantity)-discounts_fee ', null=True)),

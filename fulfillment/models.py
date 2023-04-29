@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from utils.utils import path_and_rename
+from utils import path_and_rename
 
 # Create your models here.
 class Fulfillment(models.Model): #Fulfillment service

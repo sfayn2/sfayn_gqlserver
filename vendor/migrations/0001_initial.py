@@ -3,7 +3,7 @@
 from django.conf import settings
 from django.db import migrations, models
 import django.db.models.deletion
-import utils.utils
+import utils
 
 
 class Migration(migrations.Migration):
@@ -21,7 +21,7 @@ class Migration(migrations.Migration):
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.CharField(help_text="Vendor's Name", max_length=20)),
                 ('desc', models.TextField(help_text='I sell what?')),
-                ('logo', models.ImageField(blank=True, null=True, upload_to=utils.utils.path_and_rename)),
+                ('logo', models.ImageField(blank=True, null=True, upload_to=utils.path_and_rename)),
                 ('status', models.IntegerField(choices=[(0, 'Pending Review'), (1, 'Approved'), (2, 'Rejected')], default=0, null=True)),
                 ('date_created', models.DateTimeField(auto_now_add=True)),
                 ('date_modified', models.DateTimeField(auto_now=True)),

@@ -3,7 +3,7 @@
 from django.conf import settings
 from django.db import migrations, models
 import django.db.models.deletion
-import utils.utils
+import utils
 
 
 class Migration(migrations.Migration):
@@ -22,7 +22,7 @@ class Migration(migrations.Migration):
                 ('name', models.CharField(max_length=20)),
                 ('company_url', models.CharField(blank=True, max_length=200, null=True)),
                 ('tracker_url', models.CharField(blank=True, max_length=200, null=True)),
-                ('logo', models.ImageField(blank=True, help_text='company logo', null=True, upload_to=utils.utils.path_and_rename)),
+                ('logo', models.ImageField(blank=True, help_text='company logo', null=True, upload_to=utils.path_and_rename)),
                 ('manage_fulfillment', models.BooleanField(default=True, help_text='DIY managed your own fulfillment')),
                 ('status', models.IntegerField(choices=[(0, 'Active'), (1, 'In Active')], null=True)),
                 ('date_created', models.DateTimeField(auto_now_add=True)),

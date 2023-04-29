@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from utils.utils import path_and_rename
+from utils import path_and_rename
 
 
 # Create your models here.
@@ -64,10 +64,6 @@ class Variant(models.Model):
 
 class VariantItem(models.Model):
 
-    class Status(models.IntegerChoices):
-        INACTIVE = 0
-        ACTIVE = 1
-
     sku = models.CharField(max_length=50, primary_key=True)
     product_variant = models.ForeignKey("product.Variant", on_delete=models.CASCADE, null=True, related_name="variant2item", blank=True) 
     product_sn = models.ForeignKey("product.Product", on_delete=models.CASCADE, null=True, related_name="product2variantitem") 
@@ -83,7 +79,7 @@ class VariantItem(models.Model):
     package_height = models.FloatField(null=True, blank=True, help_text="package height")
 
     default = models.BooleanField(default=False, help_text="default to display in product details page of similar product")
-    status = models.IntegerField(null=True, choices=Status.choices, default=0) 
+    is_active = models.BooleanField(default=False)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user2variantsitem")
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True) 

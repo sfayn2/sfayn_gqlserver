@@ -2,7 +2,7 @@ from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.contrib.auth.models import User, Group
-from utils.utils import path_and_rename
+from utils import path_and_rename
 
 # Create your models here.
 class Discount(models.Model):
