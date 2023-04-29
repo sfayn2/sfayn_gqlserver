@@ -6,8 +6,6 @@ from utils.utils import path_and_rename
 
 # Create your models here.
 class Discount(models.Model):
-    class Status(models.IntegerChoices):
-        ENABLED = 1
 
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=25)
@@ -24,12 +22,7 @@ class Discount(models.Model):
     shipping_method = models.ManyToManyField('shipping.Method', blank=True, related_name="shipmethod2discount")
     product_variant = models.ManyToManyField('product.VariantItem', blank=True, related_name="prodvariant2discount")
     category = models.ManyToManyField('product.Category', blank=True, related_name="category2discount")
-    status = models.IntegerField(
-        blank=True, 
-        null=True, 
-        default=True,
-        choices=Status.choices
-    )
+    is_enable = models.BooleanField(default=False)
     created_by = models.ForeignKey(
         User,
         on_delete=models.CASCADE, 

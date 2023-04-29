@@ -59,7 +59,7 @@ class Method(models.Model):
     desc = models.CharField(max_length=150)
     classification = models.ManyToManyField('shipping.Classification', related_name="class2shipmethod", blank=True)
     cost = models.FloatField(null=True, blank=True, help_text="cost or overall cost?")
-    enable = models.BooleanField(default=False)
+    is_enable = models.BooleanField(default=False)
     created_by = models.ForeignKey(
         User, 
         null=True,
