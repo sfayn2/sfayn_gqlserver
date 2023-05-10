@@ -134,8 +134,17 @@ class OrderFulfillment(models.Model):
         null=True, 
         blank=True
     )
+    order_item = models.ForeignKey(
+        "order.OrderItem", 
+        on_delete=models.CASCADE,
+        related_name="orderitem2orderfulfill", 
+        null=True, 
+        blank=True,
+        help_text="Not applicable if all items has the same fulfillment"
+    )
     tracking_number = models.CharField(max_length=120, blank=True, null=True, help_text="a string fulfillment tracking number")
 
+    #should this be under Shipping method?
     fulfillment = models.ForeignKey(
         "fulfillment.Fulfillment", 
         on_delete=models.CASCADE,
@@ -151,8 +160,15 @@ class OrderFulfillment(models.Model):
     logo = models.ImageField(upload_to=path_and_rename, null=True, blank=True, help_text="company logo")
     #Locked fulfillment info
 
+    shipping_method = models.ForeignKey(
+        "shipping.Method", 
+        on_delete=models.CASCADE,
+        related_name="shipmethod2orderfulfillment", 
+        null=True, 
+        blank=True,
+    )
+
     #Locked shipping method info
-    shipping_method_id = models.IntegerField(null=True, blank=True)
     shipping_title = models.CharField(null=True, blank=True, max_length=50, help_text="ex. Free shipping, Local pickup")
     shipping_desc = models.CharField(null=True, blank=True, max_length=150)
     shipping_cost = models.FloatField(null=True, blank=True, help_text="cost or overall cost?")
