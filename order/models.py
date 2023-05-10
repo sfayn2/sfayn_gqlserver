@@ -70,27 +70,7 @@ class Order(models.Model):
     #Locked payment info
     payment_method_name = models.CharField(max_length=50, null=True, blank=True)
 
-    #Locked shipping method info
-    shipping_method_id = models.IntegerField(null=True, blank=True)
-    shipping_title = models.CharField(null=True, blank=True, max_length=50, help_text="ex. Free shipping, Local pickup")
-    shipping_desc = models.CharField(null=True, blank=True, max_length=150)
-    shipping_cost = models.FloatField(null=True, blank=True, help_text="cost or overall cost?")
-    #Locked shipping method info
 
-    shipping_address = models.ForeignKey(
-        "accounts.Address", 
-        on_delete=models.CASCADE,
-        related_name="address2order", 
-        null=True, 
-        blank=True,
-        help_text="delivery address"
-    )
-    #Locked shipping address info
-    shipping_address = models.TextField(blank=True)
-    shipping_postal = models.CharField(max_length=50)
-    shipping_country = models.CharField(max_length=50)
-    shipping_region = models.CharField(max_length=50)
-    #Locked shipping address info
 
     tax = models.ForeignKey(
         "tax.Tax", 
@@ -142,6 +122,11 @@ class Order(models.Model):
 # one order can possibly have multiple fulfillment
 class OrderFulfillment(models.Model):
 
+    class Status(models.IntegerChoices):
+        NOT_FULFILLED = 0
+        FULFILLED = 1
+        CANCEL = 2
+
     order = models.ForeignKey(
         "order.Order", 
         on_delete=models.CASCADE,
@@ -165,6 +150,34 @@ class OrderFulfillment(models.Model):
     tracker_url = models.CharField(max_length=200, blank=True, null=True)
     logo = models.ImageField(upload_to=path_and_rename, null=True, blank=True, help_text="company logo")
     #Locked fulfillment info
+
+    #Locked shipping method info
+    shipping_method_id = models.IntegerField(null=True, blank=True)
+    shipping_title = models.CharField(null=True, blank=True, max_length=50, help_text="ex. Free shipping, Local pickup")
+    shipping_desc = models.CharField(null=True, blank=True, max_length=150)
+    shipping_cost = models.FloatField(null=True, blank=True, help_text="cost or overall cost?")
+    #Locked shipping method info
+
+    shipping_address = models.ForeignKey(
+        "accounts.Address", 
+        on_delete=models.CASCADE,
+        related_name="address2orderfulfillment", 
+        null=True, 
+        blank=True,
+        help_text="delivery address"
+    )
+    #Locked shipping address info
+    shipping_address = models.TextField(blank=True)
+    shipping_postal = models.CharField(max_length=50)
+    shipping_country = models.CharField(max_length=50)
+    shipping_region = models.CharField(max_length=50)
+    #Locked shipping address info
+
+    status = models.IntegerField(
+        blank=True, 
+        null=True, 
+        choices=Status.choices
+    )
 
     #should always be system user??
     created_by = models.ForeignKey(
