@@ -14,6 +14,7 @@ class Warehouse(models.Model):
     logo = models.ImageField(upload_to=path_and_rename, null=True, blank=True, help_text="company logo")
     handling_fee = models.FloatField(null=True, blank=True, help_text="Add handling fee per order")
     manage_warehouse = models.BooleanField(default=True, help_text="DIY managed your own warehouse")
+    #fulfillment_center
     is_active = models.BooleanField(default=False)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user2warehouse")
     date_created = models.DateTimeField(auto_now_add=True) 

@@ -52,12 +52,19 @@ class Classification(models.Model):
 
 class Method(models.Model):
     id = models.AutoField(primary_key=True)
-    #TODO: shipping carrier and duties  & tax??
-    #carrier 1 to many?
     #tax 1 to many?
     name = models.CharField(max_length=50, help_text="ex. Free shipping, Local pickup")
-    desc = models.CharField(max_length=150)
+    note = models.CharField(max_length=150, help_text="ex. 2-5 days delivery", blank=True, null=True)
     classification = models.ManyToManyField('shipping.Classification', related_name="class2shipmethod", blank=True)
+
+    #fulfillment provider or carrier?
+    provider = models.ForeignKey(
+        'fulfillment.Fulfillment', 
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE, 
+        related_name="fulfillment2method"
+    )
     cost = models.FloatField(null=True, blank=True, help_text="cost or overall cost?")
     is_enable = models.BooleanField(default=False)
     created_by = models.ForeignKey(

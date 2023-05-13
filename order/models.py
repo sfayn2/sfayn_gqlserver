@@ -54,10 +54,11 @@ class Order(models.Model):
         WAITING_FOR_PAYMENT = 0
         PAID = 1
         PROCESSING = 2
-        SHIPPED_OUT = 3
-        REFUNDED = 4
-        CANCEL = 5
-        COMPLETED = 6
+        PARTIALLY_SHIPPED_OUT = 3 #split shipment
+        SHIPPED_OUT = 4
+        REFUNDED = 5
+        CANCEL = 6
+        COMPLETED = 7
 
     id = models.AutoField(primary_key=True)
     payment_method = models.ForeignKey(
@@ -144,17 +145,10 @@ class OrderFulfillment(models.Model):
     )
     tracking_number = models.CharField(max_length=120, blank=True, null=True, help_text="a string fulfillment tracking number")
 
-    #should this be under Shipping method?
-    fulfillment = models.ForeignKey(
-        "fulfillment.Fulfillment", 
-        on_delete=models.CASCADE,
-        related_name="fulfill2orderfulfill", 
-        null=True, 
-        blank=True
-    )
 
     #Locked fulfillment info
-    name = models.CharField(max_length=20) #can be outsource?
+    fulfillment_id = models.IntegerField()
+    provider_name = models.CharField(max_length=20) 
     company_url = models.CharField(max_length=200, blank=True, null=True)
     tracker_url = models.CharField(max_length=200, blank=True, null=True)
     logo = models.ImageField(upload_to=path_and_rename, null=True, blank=True, help_text="company logo")
@@ -169,9 +163,9 @@ class OrderFulfillment(models.Model):
     )
 
     #Locked shipping method info
-    shipping_title = models.CharField(null=True, blank=True, max_length=50, help_text="ex. Free shipping, Local pickup")
-    shipping_desc = models.CharField(null=True, blank=True, max_length=150)
-    shipping_cost = models.FloatField(null=True, blank=True, help_text="cost or overall cost?")
+    shipping_method_name = models.CharField(null=True, blank=True, max_length=50, help_text="ex. Free shipping, Local pickup")
+    shipping_method_note = models.CharField(null=True, blank=True, max_length=150, help_text="ex. 2-3 days delivery")
+    shipping_mehotd_cost = models.FloatField(null=True, blank=True, help_text="cost or overall cost?")
     #Locked shipping method info
 
     shipping_address = models.ForeignKey(
@@ -182,6 +176,7 @@ class OrderFulfillment(models.Model):
         blank=True,
         help_text="delivery address"
     )
+
     #Locked shipping address info
     shipping_address = models.TextField(blank=True)
     shipping_postal = models.CharField(max_length=50)

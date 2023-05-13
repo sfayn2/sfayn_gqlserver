@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from utils import path_and_rename
 
 # Create your models here.
-class Fulfillment(models.Model): #Fulfillment service
+class Fulfillment(models.Model): #Fulfillment service / Carrier
 
     name = models.CharField(max_length=20) #can be outsource?
     company_url = models.CharField(max_length=200, blank=True, null=True)
