@@ -146,18 +146,18 @@ class OrderFulfillment(models.Model):
     tracking_number = models.CharField(max_length=120, blank=True, null=True, help_text="a string fulfillment tracking number")
 
 
-    #Locked fulfillment info
-    fulfillment_id = models.IntegerField()
-    provider_name = models.CharField(max_length=20) 
+    #Locked provider info
+    provider_id = models.IntegerField(null=True, blank=True)
+    provider_name = models.CharField(max_length=20, null=True, blank=True) 
     company_url = models.CharField(max_length=200, blank=True, null=True)
     tracker_url = models.CharField(max_length=200, blank=True, null=True)
     logo = models.ImageField(upload_to=path_and_rename, null=True, blank=True, help_text="company logo")
-    #Locked fulfillment info
+    #Locked provider info
 
     shipping_method = models.ForeignKey(
         "shipping.Method", 
         on_delete=models.CASCADE,
-        related_name="shipmethod2orderfulfillment", 
+        related_name="shipmethod2fulfillment", 
         null=True, 
         blank=True,
     )
@@ -171,7 +171,7 @@ class OrderFulfillment(models.Model):
     shipping_address = models.ForeignKey(
         "accounts.Address", 
         on_delete=models.CASCADE,
-        related_name="address2orderfulfillment", 
+        related_name="address2fulfillment", 
         null=True, 
         blank=True,
         help_text="delivery address"

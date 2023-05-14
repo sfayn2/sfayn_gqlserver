@@ -50,6 +50,8 @@ class Classification(models.Model):
     date_modified = models.DateTimeField(auto_now=True) 
 
 
+
+
 class Method(models.Model):
     id = models.AutoField(primary_key=True)
     #tax 1 to many?
@@ -59,11 +61,11 @@ class Method(models.Model):
 
     #fulfillment provider or carrier?
     provider = models.ForeignKey(
-        'fulfillment.Fulfillment', 
+        'provider.Provider', 
         null=True,
         blank=True,
         on_delete=models.CASCADE, 
-        related_name="fulfillment2method"
+        related_name="provider2method"
     )
     cost = models.FloatField(null=True, blank=True, help_text="cost or overall cost?")
     is_enable = models.BooleanField(default=False)
@@ -81,7 +83,5 @@ class Method(models.Model):
         return f'{self.title} {self.desc}, {self.cost}'
 
 
-#class Carrier(models.Model):
-#    api?
 
 
