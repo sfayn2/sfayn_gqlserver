@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User
 from utils import path_and_rename
+from decimal import Decimal
+from django.conf import settings
 
 
 # Create your models here.
@@ -67,7 +69,14 @@ class VariantItem(models.Model):
     sku = models.CharField(max_length=50, primary_key=True)
     product_variant = models.ForeignKey("product.Variant", on_delete=models.CASCADE, null=True, related_name="variant2item", blank=True) 
     product_sn = models.ForeignKey("product.Product", on_delete=models.CASCADE, null=True, related_name="product2variantitem") 
-    price = models.FloatField(null=True, blank=True, help_text="sale price, exclusive of tax")
+    price = models.DecimalField(
+            decimal_places=settings.DEFAULT_DECIMAL_PLACES, 
+            max_digits=settings.DEFAULT_MAX_DIGITS,
+            null=True, 
+            blank=True, 
+            help_text="sale price, exclusive of tax", 
+            default=Decimal("0.0")
+        )
     options = models.CharField(max_length=50, null=True, blank=True) # Red/Blue?
     img_upload = models.ImageField(upload_to=path_and_rename, null=True, blank=True, help_text="Primary img")
     img_url = models.CharField(max_length=300, null=True, blank=True, help_text="secondary img") 
