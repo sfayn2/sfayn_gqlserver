@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User
 from utils import path_and_rename
+from django.conf import settings
+from decimal import Decimal
 
 # Create your models here.
 class Stock(models.Model):
@@ -14,7 +16,14 @@ class Stock(models.Model):
     product_variant = models.ForeignKey('product.VariantItem', on_delete=models.CASCADE, related_name="prodvariant2stock")
     stock = models.IntegerField(null=True, blank=True, help_text="warehouse stocks ")
     low_stock = models.IntegerField(null=True, blank=True, help_text="warehouse low stock to track inventory? ")
-    price = models.FloatField(null=True, blank=True, help_text="warehouse pricing")
+    price = models.DecimalField(
+            decimal_places=settings.DEFAULT_DECIMAL_PLACES, 
+            max_digits=settings.DEFAULT_MAX_DIGITS,
+            null=True, 
+            blank=True, 
+            help_text="warehouse stock price", 
+            default=Decimal("0.0")
+        )
     status = models.IntegerField(null=True, choices=Status.choices) 
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user2stock")
     date_created = models.DateTimeField(auto_now_add=True) 

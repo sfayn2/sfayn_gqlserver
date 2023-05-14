@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.conf import settings
+from decimal import Decimal
 
 # Create your models here.
 class Zone(models.Model):
@@ -41,7 +43,14 @@ class Classification(models.Model):
     min_dimension = models.FloatField(null=True, blank=True, help_text="min package dimension")
     max_dimension = models.FloatField(null=True, blank=True, help_text="max package dimension, should per ordered items??")
     
-    cost = models.FloatField(null=True, blank=True, help_text="the cost if condition matched")
+    cost = models.DecimalField(
+            decimal_places=settings.DEFAULT_DECIMAL_PLACES, 
+            max_digits=settings.DEFAULT_MAX_DIGITS,
+            null=True, 
+            blank=True, 
+            help_text="cost based on weight limit or dimension limit", 
+            default=Decimal("0.0")
+        )
     class_type = models.IntegerField(null=True, choices=ClassType.choices, help_text="apply per order or per item?") 
     priority = models.IntegerField(null=True, blank=True, help_text="multiple classification need to have a priority") 
 
@@ -57,6 +66,8 @@ class Method(models.Model):
     #tax 1 to many?
     name = models.CharField(max_length=50, help_text="ex. Free shipping, Local pickup")
     note = models.CharField(max_length=150, help_text="ex. 2-5 days delivery", blank=True, null=True)
+
+    #classify to get the cost?
     classification = models.ManyToManyField('shipping.Classification', related_name="class2shipmethod", blank=True)
 
     #fulfillment provider or carrier?
@@ -67,7 +78,16 @@ class Method(models.Model):
         on_delete=models.CASCADE, 
         related_name="provider2method"
     )
-    cost = models.FloatField(null=True, blank=True, help_text="cost or overall cost?")
+
+    #TODO can just get from classification cost?
+    cost = models.DecimalField(
+            decimal_places=settings.DEFAULT_DECIMAL_PLACES, 
+            max_digits=settings.DEFAULT_MAX_DIGITS,
+            null=True, 
+            blank=True, 
+            help_text="ship method cost", 
+            default=Decimal("0.0")
+        )
     is_enable = models.BooleanField(default=False)
     created_by = models.ForeignKey(
         User, 

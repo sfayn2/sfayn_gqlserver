@@ -13,4 +13,4 @@ class StockAdmin(CommonAdmin):
     list_display = get_list_display(Stock, ("warehouse2stock",)) 
 
 
-admin.site.register(Stock, StockAdmin)
+#admin.site.register(Stock, StockAdmin)

@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User
 from utils import path_and_rename
+from django.conf import settings
+from decimal import Decimal
 
 # Create your models here.
 class OrderItem(models.Model):
@@ -21,7 +23,13 @@ class OrderItem(models.Model):
     )
     #Locked product info
     product_sn = models.CharField(max_length=25, null=True, blank=True)
-    product_price = models.FloatField(null=True, blank=True, help_text="undiscounted price")
+    product_price = models.DecimalField(
+            decimal_places=settings.DEFAULT_DECIMAL_PLACES, 
+            max_digits=settings.DEFAULT_MAX_DIGITS,
+            null=True, 
+            blank=True, 
+            help_text="undiscounted price", 
+        )
     product_options = models.CharField(max_length=50, null=True, blank=True) # Red/Blue?
     product_variant_name = models.CharField(max_length=50, null=True, blank=True) # COLOR?
     product_img_upload = models.ImageField(upload_to=path_and_rename, null=True, blank=True, help_text="Primary img")
@@ -32,9 +40,27 @@ class OrderItem(models.Model):
     #Locked product info
 
 
-    discounts = models.FloatField(null=True, blank=True, help_text="discounts per item") 
-    discounted_price = models.FloatField(null=True, blank=True, help_text="(product_price*order_quantity)-discounts_fee ") 
-    total = models.FloatField(null=True, blank=True, help_text="it can be the discounted price or product original price?") 
+    discounts_fee = models.DecimalField(
+            decimal_places=settings.DEFAULT_DECIMAL_PLACES, 
+            max_digits=settings.DEFAULT_MAX_DIGITS,
+            null=True, 
+            blank=True, 
+            help_text="discounts per item", 
+        )
+    discounted_price = models.DecimalField(
+            decimal_places=settings.DEFAULT_DECIMAL_PLACES, 
+            max_digits=settings.DEFAULT_MAX_DIGITS,
+            null=True, 
+            blank=True, 
+            help_text="(prince * qty) - dicount_fee", 
+        )
+    total = models.DecimalField(
+            decimal_places=settings.DEFAULT_DECIMAL_PLACES, 
+            max_digits=settings.DEFAULT_MAX_DIGITS,
+            null=True, 
+            blank=True, 
+            help_text="can be discounted price or item original price?", 
+        )
 
     created_by = models.ForeignKey(
         User,
@@ -86,20 +112,68 @@ class Order(models.Model):
     tax_country = models.CharField(max_length=50)
     #Locked tax info
 
-    subtotal = models.FloatField(null=True, blank=True, help_text="total items without order discounts and tax")
-    discounts = models.FloatField(null=True, blank=True, help_text="total discounts fee per order")
-    discounted_subtotal = models.FloatField(null=True, blank=True, help_text="discounted subtotal")
-    tax_rate = models.FloatField(null=True, blank=True, help_text="N% tax rate per order?", verbose_name="Rate(%)")
-    total_tax = models.FloatField(null=True, blank=True, help_text="tax amount")
-    shipping = models.FloatField(null=True, blank=True, help_text="shipping fee")
-    total = models.FloatField(null=True, blank=True, help_text="overall total") 
+    subtotal = models.DecimalField(
+            decimal_places=settings.DEFAULT_DECIMAL_PLACES, 
+            max_digits=settings.DEFAULT_MAX_DIGITS,
+            null=True, 
+            blank=True, 
+            help_text="total items w/o order discounts and tax", 
+        )
+    discounts_fee = models.DecimalField(
+            decimal_places=settings.DEFAULT_DECIMAL_PLACES, 
+            max_digits=settings.DEFAULT_MAX_DIGITS,
+            null=True, 
+            blank=True, 
+            help_text="total discounts fee per order", 
+        )
+    discounted_subtotal = models.DecimalField(
+            decimal_places=settings.DEFAULT_DECIMAL_PLACES, 
+            max_digits=settings.DEFAULT_MAX_DIGITS,
+            null=True, 
+            blank=True, 
+            help_text="subtotal minus discounts fee", 
+        )
+    tax_rate = models.DecimalField(
+            decimal_places=settings.DEFAULT_DECIMAL_PLACES, 
+            max_digits=settings.DEFAULT_MAX_DIGITS,
+            null=True, 
+            blank=True, 
+            help_text="N% tax rate per order", 
+        )
+    tax_amount = models.DecimalField(
+            decimal_places=settings.DEFAULT_DECIMAL_PLACES, 
+            max_digits=settings.DEFAULT_MAX_DIGITS,
+            null=True, 
+            blank=True, 
+            help_text="tax amount", 
+        )
+    shipping_fee = models.DecimalField(
+            decimal_places=settings.DEFAULT_DECIMAL_PLACES, 
+            max_digits=settings.DEFAULT_MAX_DIGITS,
+            null=True, 
+            blank=True, 
+            help_text="shipping fee", 
+        )
+    total = models.DecimalField(
+            decimal_places=settings.DEFAULT_DECIMAL_PLACES, 
+            max_digits=settings.DEFAULT_MAX_DIGITS,
+            null=True, 
+            blank=True, 
+            help_text="overall total", 
+        )
     currency = models.TextField(help_text="USD", blank=True)
     customer = models.ForeignKey(
         User, 
         on_delete=models.CASCADE, 
         related_name="customer2order"
     )
-    amount_paid = models.FloatField(null=True, blank=True, help_text="amount paid by customer") 
+    amount_paid = models.DecimalField(
+            decimal_places=settings.DEFAULT_DECIMAL_PLACES, 
+            max_digits=settings.DEFAULT_MAX_DIGITS,
+            null=True, 
+            blank=True, 
+            help_text="amount paid by customer", 
+        )
     customer_note = models.TextField(help_text="Customer notes to seller", blank=True)
     status = models.IntegerField(
         blank=True, 
@@ -165,7 +239,13 @@ class OrderFulfillment(models.Model):
     #Locked shipping method info
     shipping_method_name = models.CharField(null=True, blank=True, max_length=50, help_text="ex. Free shipping, Local pickup")
     shipping_method_note = models.CharField(null=True, blank=True, max_length=150, help_text="ex. 2-3 days delivery")
-    shipping_mehotd_cost = models.FloatField(null=True, blank=True, help_text="cost or overall cost?")
+    shipping_method_cost = models.DecimalField(
+            decimal_places=settings.DEFAULT_DECIMAL_PLACES, 
+            max_digits=settings.DEFAULT_MAX_DIGITS,
+            null=True, 
+            blank=True, 
+            help_text="overall total", 
+        )
     #Locked shipping method info
 
     shipping_address = models.ForeignKey(

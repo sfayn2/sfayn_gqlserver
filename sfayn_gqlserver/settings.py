@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'accounts',
     'payment',
     'tag',
+    'provider',
     'warehouse',
     'tax',
     'vendor',
@@ -55,8 +56,7 @@ INSTALLED_APPS = [
     'discount',
     'setting',
     'order',
-    'fulfillment',
-    'webhook'
+    'webhook',
 ]
 
 MIDDLEWARE = [
@@ -175,3 +175,6 @@ AUTHENTICATION_BACKENDS = [
 VIEW_SITE_URL = "/graphql"
 
 SITE_ID = 1
+
+DEFAULT_DECIMAL_PLACES = 3
+DEFAULT_MAX_DIGITS = 15
