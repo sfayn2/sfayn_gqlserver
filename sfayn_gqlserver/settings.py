@@ -54,7 +54,6 @@ INSTALLED_APPS = [
     'vendor',
     'shipping',
     'discount',
-    'setting',
     'order',
     'webhook',
 ]

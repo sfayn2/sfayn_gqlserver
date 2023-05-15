@@ -65,7 +65,9 @@ class Method(models.Model):
     id = models.AutoField(primary_key=True)
     #tax 1 to many?
     name = models.CharField(max_length=50, help_text="ex. Free shipping, Local pickup")
-    note = models.CharField(max_length=150, help_text="ex. 2-5 days delivery", blank=True, null=True)
+    desc = models.CharField(max_length=150, blank=True, null=True)
+    min_days = models.PositiveIntegerField(blank=True, null=True)
+    max_days = models.PositiveIntegerField(blank=True, null=True)
 
     #classify to get the cost?
     classification = models.ManyToManyField('shipping.Classification', related_name="class2shipmethod", blank=True)
