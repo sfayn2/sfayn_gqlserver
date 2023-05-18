@@ -9,12 +9,6 @@ class ZoneAdmin(CommonAdmin):
     search_fields = ("name", "country", "region")
     list_display_links = ("name",)
     list_display = get_list_display(Zone, ("shipping_method",))
-    list_display.append("get_shipping_methods")
-
-    def get_shipping_methods(self, obj):
-        return " | ".join([str(p) for p in obj.shipping_method.all()])
-
-    get_shipping_methods.short_description = 'All Shipping Methods'
 
 
 class MethodAdmin(CommonAdmin):
@@ -25,5 +19,5 @@ class MethodAdmin(CommonAdmin):
 
 
 
-admin.site.register(Zone, ZoneAdmin)
-admin.site.register(Method, MethodAdmin)
+#admin.site.register(Zone, ZoneAdmin)
+#admin.site.register(Method, MethodAdmin)
