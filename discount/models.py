@@ -7,34 +7,31 @@ from django.conf import settings
 
 # Create your models here.
 class Discount(models.Model):
-    minimum_quantity = models.IntegerField(null=True)
-    by_percentage = models.DecimalField(
-            decimal_places=settings.DEFAULT_DECIMAL_PLACES, 
-            max_digits=settings.DEFAULT_MAX_DIGITS,
-            null=True, 
-            blank=True, 
-            help_text="Discount by percentage", 
-        )
-    fix_amount = models.DecimalField(
-            decimal_places=settings.DEFAULT_DECIMAL_PLACES, 
-            max_digits=settings.DEFAULT_MAX_DIGITS,
-            null=True, 
-            blank=True, 
-            help_text="Discount by fix amount", 
-        )
-
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=25)
-    discount_type = models.TextField(
+
+    # should front end code to the handling of each rules?
+    discount_types = models.TextField(
             help_text="ex. [ {'name': 'Discount by Fix or Percentage', 'by_percentage': 12 }, { 'name': 'Buy N get N', 'buy_qty': 5, 'get_qty': 1 } ]",
             blank=True,
             null=True
     )
+
+    # offer discount types to selected vendor? 
     vendor = models.ManyToManyField('vendor.Vendor', blank=True, related_name="vendor2discount")
+
+    # offer to selected tag products?
     tag = models.ManyToManyField('tag.Tag', blank=True, related_name="tag2discount")
+
+    # offer to selected ship method?
     shipping_method = models.ManyToManyField('shipping.Method', blank=True, related_name="shipmethod2discount")
+
+    # offer to selected product variant?
     product_variant = models.ManyToManyField('product.VariantItem', blank=True, related_name="prodvariant2discount")
+
+    # offer to all selected category?
     category = models.ManyToManyField('product.Category', blank=True, related_name="category2discount")
+
     is_enable = models.BooleanField(default=False)
     created_by = models.ForeignKey(
         User,
