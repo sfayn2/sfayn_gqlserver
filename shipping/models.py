@@ -67,7 +67,7 @@ class Method(models.Model):
     category = models.ManyToManyField('product.Category', blank=True, related_name="category2method")
 
     #get the shipping cost based on classification
-    classification = models.TextField(
+    rates = models.TextField(
             help_text="ex. [{ 'name': '3 hours express', 'max_Weight_kg': 1, min_LWH_cm: 60, 'cost':  14 }, { 'name': 'Specific Delivery Slot', 'max_Weight_kg': 1, min_LWH_cm: 60, 'cost':  18 }, ]",
             blank=True,
             null=True
