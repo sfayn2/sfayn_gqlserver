@@ -48,7 +48,6 @@ INSTALLED_APPS = [
     'accounts',
     'payment',
     'tag',
-    'provider',
     'warehouse',
     'tax',
     'vendor',
