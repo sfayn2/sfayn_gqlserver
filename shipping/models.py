@@ -92,6 +92,28 @@ class Method(models.Model):
     def __str__(self):
         return f'{self.title} {self.desc}, {self.cost}'
 
+class Discount(models.Model):
+    name = models.CharField(max_length=25, primary_key=True)
 
+    # should front end code to the handling of each rules?
+    discount_types = models.TextField(
+            help_text="ex. [ {'name': 'Discount by Fix or Percentage', 'by_percentage': 12 }, { 'name': 'Free shipping', 'cost': 0 } ]",
+            blank=True,
+            null=True
+    )
 
+    # offer to selected ship method?
+    shipping_method = models.ManyToManyField('shipping.Method', blank=True, related_name="shipmethod2discount")
+
+    is_enable = models.BooleanField(default=False)
+    created_by = models.ForeignKey(
+        "auth.User",
+        on_delete=models.CASCADE, 
+        related_name="user2shipdiscount"
+    )
+    date_created = models.DateTimeField(auto_now_add=True) 
+    date_modified = models.DateTimeField(auto_now=True) 
+
+    def __str__(self):
+        return self.name
 
