@@ -1,5 +1,4 @@
 from django.db import models
-from django.contrib.auth.models import User
 from utils import path_and_rename
 from django.conf import settings
 from decimal import Decimal
@@ -12,7 +11,7 @@ class Provider(models.Model):
     postal = models.CharField(max_length=50, blank=True, null=True)
     country = models.CharField(max_length=50, blank=True, null=True)
     region = models.CharField(max_length=50, blank=True, null=True)
-    thumbnail_url = models.ImageField(upload_to=path_and_rename, null=True, blank=True, help_text="thumbnail url")
+    thumbnail_url = models.CharField(max_length=300, blank=True, null=True, help_text="thumbnail url")
     handling_fee = models.DecimalField(
             decimal_places=settings.DEFAULT_DECIMAL_PLACES, 
             max_digits=settings.DEFAULT_MAX_DIGITS,

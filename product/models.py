@@ -91,5 +91,22 @@ class VariantItem(models.Model):
         return f"{self.product_sn} - {self.product_sn.title} ({self.product_variant}: {self.options})"
 
 
-
-
+class Packaging(models.Model):
+    product_variant = models.ForeignKey(
+        'product.VariantItem', 
+        on_delete=models.CASCADE, 
+        related_name="prodvariant2packaging"
+    )
+    weight = models.FloatField(null=True, blank=True, help_text="product  weight")
+    package_length = models.FloatField(null=True, blank=True, help_text="package weight")
+    package_width = models.FloatField(null=True, blank=True, help_text="package width")
+    package_height = models.FloatField(null=True, blank=True, help_text="package height")
+    created_by = models.ForeignKey(
+        "auth.User", 
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE, 
+        related_name="user2packaging"
+    )
+    date_created = models.DateTimeField(auto_now_add=True) 
+    date_modified = models.DateTimeField(auto_now=True) 
