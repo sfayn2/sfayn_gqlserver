@@ -10,4 +10,4 @@ class DiscountAdmin(admin.ModelAdmin):
     list_display = ("id", "name", "discount_types", "is_enable")
     list_display_links = ("name", )
 
-admin.site.register(Discount, DiscountAdmin)
+#admin.site.register(Discount, DiscountAdmin)

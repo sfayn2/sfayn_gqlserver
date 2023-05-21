@@ -16,25 +16,26 @@ class Discount(models.Model):
             blank=True,
             null=True
     )
+    # removed external dependencies to self-contained to other modules? handle the composition of offers discount types in frontend??
 
-    # offer discount types to selected vendor? 
-    vendor = models.ManyToManyField('vendor.Vendor', blank=True, related_name="vendor2discount")
+    ## offer discount types to selected vendor? 
+    #vendor = models.ManyToManyField('vendor.Vendor', blank=True, related_name="vendor2discount")
 
-    # offer to selected tag products?
-    tag = models.ManyToManyField('tag.Tag', blank=True, related_name="tag2discount")
+    ## offer to selected tag products?
+    #tag = models.ManyToManyField('tag.Tag', blank=True, related_name="tag2discount")
 
-    # offer to selected ship method?
-    shipping_method = models.ManyToManyField('shipping.Method', blank=True, related_name="shipmethod2discount")
+    ## offer to selected ship method?
+    #shipping_method = models.ManyToManyField('shipping.Method', blank=True, related_name="shipmethod2discount")
 
-    # offer to selected product variant?
-    product_variant = models.ManyToManyField('product.VariantItem', blank=True, related_name="prodvariant2discount")
+    ## offer to selected product variant?
+    #product_variant = models.ManyToManyField('product.VariantItem', blank=True, related_name="prodvariant2discount")
 
-    # offer to all selected category?
-    category = models.ManyToManyField('product.Category', blank=True, related_name="category2discount")
+    ## offer to all selected category?
+    #category = models.ManyToManyField('product.Category', blank=True, related_name="category2discount")
 
     is_enable = models.BooleanField(default=False)
     created_by = models.ForeignKey(
-        User,
+        "auth.User",
         on_delete=models.CASCADE, 
         related_name="user2discount"
     )
