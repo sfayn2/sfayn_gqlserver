@@ -18,10 +18,10 @@ class Discount(models.Model):
     )
 
     # offer discount types to selected vendor? 
-    vendor = models.ManyToManyField('vendor.Vendor', blank=True, related_name="vendor2discount")
+    vendor = models.ManyToManyField('accounts.Vendor', blank=True, related_name="vendor2discount")
 
     # offer to selected tag products?
-    tag = models.ManyToManyField('tag.Tag', blank=True, related_name="tag2discount")
+    tag = models.ManyToManyField('product.Tag', blank=True, related_name="tag2discount")
 
     # offer to selected ship method?
     shipping_method = models.ManyToManyField('shipping.Method', blank=True, related_name="shipmethod2discount")
@@ -45,39 +45,4 @@ class Discount(models.Model):
         return self.name
 
 
-
-
-#class DiscountTypeVoucher(DiscountTypeAbstract):
-#    voucher = models.CharField(max_length=15, help_text="Need to enter the voucher to use")
-#    percent_offer = models.DecimalField(
-#            decimal_places=settings.DEFAULT_DECIMAL_PLACES, 
-#            max_digits=settings.DEFAULT_MAX_DIGITS,
-#            null=True, 
-#            blank=True, 
-#            help_text="N% offer", 
-#        )
-#    fix_offer = models.DecimalField(
-#            decimal_places=settings.DEFAULT_DECIMAL_PLACES, 
-#            max_digits=settings.DEFAULT_MAX_DIGITS,
-#            null=True, 
-#            blank=True, 
-#            help_text="fix amount offer", 
-#        )
-#    min_spend = models.DecimalField(
-#            decimal_places=settings.DEFAULT_DECIMAL_PLACES, 
-#            max_digits=settings.DEFAULT_MAX_DIGITS,
-#            null=True, 
-#            blank=True, 
-#            help_text="min amount spend", 
-#        )
-#    capped_at = models.DecimalField(
-#            decimal_places=settings.DEFAULT_DECIMAL_PLACES, 
-#            max_digits=settings.DEFAULT_MAX_DIGITS,
-#            null=True, 
-#            blank=True, 
-#            help_text="max discount price", 
-#        )
-#    free_shipping = models.BooleanField(default=False, help_text="select for free shipping")
-#    usage_limit = models.IntegerField(default=1, help_text="limited to number of use")
-#    img_upload = models.ImageField(upload_to=path_and_rename, null=True, blank=True, help_text="Voucher img")
 

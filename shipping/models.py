@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.conf import settings
 from decimal import Decimal
+from utils import path_and_rename
 
 # Create your models here.
 class Zone(models.Model):
@@ -24,25 +25,20 @@ class Zone(models.Model):
 
 
 
-class Packaging(models.Model):
-    product_variant = models.ForeignKey(
-        'product.VariantItem', 
-        on_delete=models.CASCADE, 
-        related_name="prodvariant2packaging"
-    )
-    weight = models.FloatField(null=True, blank=True, help_text="product  weight")
-    package_length = models.FloatField(null=True, blank=True, help_text="package weight")
-    package_width = models.FloatField(null=True, blank=True, help_text="package width")
-    package_height = models.FloatField(null=True, blank=True, help_text="package height")
-    created_by = models.ForeignKey(
-        User, 
-        null=True,
-        blank=True,
-        on_delete=models.CASCADE, 
-        related_name="user2packaging"
-    )
+
+class Carrier(models.Model):
+    id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=20) #can be outsource?
+    tracker_url = models.CharField(max_length=200, blank=True, null=True)
+    logo = models.ImageField(upload_to=path_and_rename, null=True, blank=True, help_text="company logo")
+    is_active = models.BooleanField(default=False)
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user2provider")
     date_created = models.DateTimeField(auto_now_add=True) 
     date_modified = models.DateTimeField(auto_now=True) 
+
+    def __str__(self):
+        return f"{self.name}"
+
 
 
 class Method(models.Model):
@@ -55,10 +51,10 @@ class Method(models.Model):
     shipping_zone = models.ManyToManyField('shipping.Zone', related_name="zone2method", blank=True)
 
     # offer shipping method only on the selected vendor?
-    vendor = models.ManyToManyField('vendor.Vendor', blank=True, related_name="vendor2method")
+    vendor = models.ManyToManyField('accounts.Vendor', blank=True, related_name="vendor2method")
 
     # offer shipping method only on the same tag?
-    tag = models.ManyToManyField('tag.Tag', blank=True, related_name="tag2method")
+    tag = models.ManyToManyField('product.Tag', blank=True, related_name="tag2method")
 
     # offer shipping method only on the selected items?
     product_variant = models.ManyToManyField('product.VariantItem', blank=True, related_name="prodvariant2method")
@@ -75,12 +71,12 @@ class Method(models.Model):
 
     #get the shipping cost based on provider calculate rate
     #fulfillment provider or carrier?
-    provider = models.ForeignKey(
-        'provider.Provider', 
+    carrier = models.ForeignKey(
+        'shipping.Carrier', 
         null=True,
         blank=True,
         on_delete=models.CASCADE, 
-        related_name="provider2method"
+        related_name="carrier2method"
     )
 
     is_enable = models.BooleanField(default=False)
