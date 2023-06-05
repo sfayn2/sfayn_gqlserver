@@ -13,5 +13,3 @@ class AbstractRepository(abc.ABC):
 
 
 
-class OrderingRepository(AbstractRepository):
-    pass
