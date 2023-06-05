@@ -2,5 +2,5 @@
 
 from order_aggregate.abstract_repository import AbstractRepository
 
-class OrderingRepository(AbstractRepository):
+class OrderRepository(AbstractRepository):
     pass
