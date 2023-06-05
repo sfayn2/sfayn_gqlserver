@@ -1,17 +1,17 @@
 
 import abc
-from ordering.domain import model
-
+from order_aggregate import order
 
 class AbstractRepository(abc.ABC):
     @abc.abstractmethod
-    def add(self, product: model.Product):
+    def add(self, order: order.Ordering):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def get(self, sku) -> model.Product:
+    def get(self, order_id) -> order.Ordering:
         raise NotImplementedError
 
 
-class OrderRepository(AbstractRepository):
+
+class OrderingRepository(AbstractRepository):
     pass
