@@ -1,3 +1,9 @@
+import abc
+from dataclasses import dataclass
 
-class OrderItem:
+class ValueObject(abc.ABC):
+    pass
+
+@dataclass
+class OrderItem(ValueObject):
     pass
