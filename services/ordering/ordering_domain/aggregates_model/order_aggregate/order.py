@@ -20,67 +20,68 @@ class OrderStatus(IntEnum):
     COMPLETED = 7
 
 
-class PendingPaymentException(Exception):
-    pass
-
-class NoSelectedItemsException(Exception):
-    pass
-
 class Order(abstract_domain_models.AggregateRoot):
 
     def __init__(self, 
-        entity_id: str, 
-        order_status: OrderStatus.WAITING_FOR_PAYMENT,
-        address: Address
+        entity_id: str = None, 
+        order_item: OrderItem,
+        address: Address,
+        tax_rate: Decimal,
         ):
 
-        self.entity_id = entity_id
-        self.order_status = order_status
-        self.address = address
+        self._entity_id = entity_id
+        self._order_status = order_status
+        self._tax_rate = tax_rate
+        self._subtotal = None
+        self._total = None 
 
-    def add_order_items(self, order_items: List[OrderItem]):
-        if not order_items:
-            raise NoSelectedItemsException(f'Unable to add order items {self.entity_id}')
-        order_item = OrderItem()
-        order_item.add(order_items)
-        return order_item
+        #Order Item
+        self._order_items = set()
 
-    def set_customer(self, customer, customer_note: str):
-        #optional?
-        #customer = customer_repo()
-        self.customer_note = customer_note
+        #Customer
+        self._address = address
+        self._customer_note = None
 
-    def set_tax_rate(self, rate: Decimal):
-        self.tax_rate = rate
+    def change_address(self, address: Address):
+        self._address  = address
 
-    def set_amount_paid(self):
-        pass
+    def change_shipping_method(self, shipping_method: str):
+        self._shipping_method = shipping_method
 
-    def set_order_status_paid(self, payment_status: int):
+    def add_customer_note(self, customer_note: str):
+        self._customer_note = customer_note
+
+    def add_order_item(self, item: OrderItem):
+        if not item:
+            raise "No selected item!"
+        self._order_items.add(order_items)
+        return self._order_items
+
+    def change_order_status(self, payment_status: int):
+        #TODO
         if self.order_status == OrderStatus.WAITING_FOR_PAYMENT and payment_status == 'PAID': #TODO enum?
             self.order_status = OrderStatus.PAID
         else:
-            raise PendingPaymentException(f"Pending customer payment for order ref: {self.entity_id}")
+            raise "Pending customer payment!"
 
-    def set_order_status_shipped(self):
-        pass
-
-    def set_order_status_cancelled(self):
-        pass
-
-    def set_order_status_completed(self):
-        pass
+    #use get method to protect data from external update? 
+    def get_tax_rate(self):
+        return self._tax_rate
     
     def get_tax_amount(self):
         #amt * (tax_rate / 100)
         pass
 
+    #aggregate?
     def get_subtotal(self):
-        pass
+        #calculate based on collection of order items
+        subtotal = 0.0
+        for item in self._order_items:
+            subtotal += (item.product_quantity * item.product_price) - item.discounts_fee
+        return subtotal
 
     def get_total(self):
-        pass
+        #TODO calculate based on collection of order items
+        total = 0.0
+        return total
 
-
-    def process_fulfillment_order(self):
-        pass

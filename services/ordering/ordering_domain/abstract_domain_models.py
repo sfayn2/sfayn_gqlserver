@@ -16,7 +16,6 @@ class Entity(abc.ABC):
         return hash(self.entity_id)
 
 
-@dataclass(frozen=True)
 class ValueObject(abc.ABC):
     pass
 
