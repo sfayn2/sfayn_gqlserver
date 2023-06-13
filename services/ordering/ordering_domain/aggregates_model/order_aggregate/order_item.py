@@ -1,6 +1,7 @@
 from decimal import Decimal
 from dataclasses import dataclass
 from ....ordering_domain import abstract_domain_models
+from .money import Money
 
 @dataclass(unsafe_hash=True)
 class OrderItem(abstract_domain_models.Entity):
@@ -8,12 +9,13 @@ class OrderItem(abstract_domain_models.Entity):
     _product_id: str
     _product_sn: str
     _product_title: str
+    _product_sku: str #TODO valueobject?
     _product_variant_id: str
     _product_variant_name: str
-    _product_price:  Decimal
+    _product_price:  Money
     _product_options: str
     _product_img_url = str
-    _discounts_fee: Decimal
+    _discounts_fee: Money
 
     def __post_init__(self):
         if self._order_quantity <= 0:
@@ -23,7 +25,7 @@ class OrderItem(abstract_domain_models.Entity):
             raise "Total amount order is lower than discounts"
 
 
-    def change_discount(self, discount_fee: Decimal):
+    def change_discount(self, discount_fee: Money):
         self._discount_fee  = discount_fee
 
     def add_order_quantity(self, order_quantity: int):
