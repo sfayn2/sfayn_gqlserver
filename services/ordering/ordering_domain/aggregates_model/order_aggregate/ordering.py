@@ -4,7 +4,7 @@ from enum import IntEnum
 from decimal import Decimal
 from typing import Optional, List, Set
 from ....ordering_domain import abstract_domain_models
-from .order_item import OrderItem
+from .line_item import OrderItem
 
 
 class OrderStatus(IntEnum):
@@ -18,7 +18,7 @@ class OrderStatus(IntEnum):
     COMPLETED = 7
 
 
-class Order(abstract_domain_models.AggregateRoot):
+class Ordering(abstract_domain_models.AggregateRoot):
 
     def __init__(self, 
         entity_id: str = None, 
@@ -49,14 +49,6 @@ class Order(abstract_domain_models.AggregateRoot):
     def get_order_items(self):
         return self._order_items
 
-    def add_order_fulfillment(self, item: OrderFulfillment):
-        if not self.get_order_items():
-            raise "No item to fulfill!"
-        self._order_fulfillments.add(item)
-
-    def get_order_fulfillments(self):
-        return self._order_fulfillments
-
     def place_order(self, buyer: Buyer):
 
         self._payment_status = buyer.process_payment(
@@ -66,9 +58,6 @@ class Order(abstract_domain_models.AggregateRoot):
             self.set_as_paid()
         else:
             self.set_as_waiting_for_payment()
-
-
-
 
 
     def set_as_waiting_for_payment(self):
