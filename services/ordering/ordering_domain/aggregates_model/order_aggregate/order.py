@@ -5,8 +5,6 @@ from decimal import Decimal
 from typing import Optional, List, Set
 from ....ordering_domain import abstract_domain_models
 from .order_item import OrderItem
-from .customer import Customer
-from .address import Address
 
 
 class OrderStatus(IntEnum):
@@ -24,38 +22,61 @@ class Order(abstract_domain_models.AggregateRoot):
 
     def __init__(self, 
         entity_id: str = None, 
-        order_item: OrderItem,
-        address: Address,
         tax_rate: Decimal,
         ):
 
         self._entity_id = entity_id
-        self._order_status = order_status
         self._tax_rate = tax_rate
-        self._subtotal = None
-        self._total = None 
 
         #Order Item
         self._order_items = set()
 
-        #Customer
-        self._address = address
-        self._customer_note = None
+        #Order Fulfillment
+        self._order_fulfillments = set()
 
-    def change_address(self, address: Address):
-        self._address  = address
+        #Buyer
+        self._buyer_note = None
+        self._payment_status = None
 
-    def change_shipping_method(self, shipping_method: str):
-        self._shipping_method = shipping_method
-
-    def add_customer_note(self, customer_note: str):
-        self._customer_note = customer_note
+    def add_buyer_note(self, buyer_note: str):
+        self._buyer_note = buyer_note
 
     def add_order_item(self, item: OrderItem):
         if not item:
-            raise "No selected item!"
+            raise "No item to add in order!"
         self._order_items.add(order_items)
+
+    def get_order_items(self):
         return self._order_items
+
+    def add_order_fulfillment(self, item: OrderFulfillment):
+        if not self.get_order_items():
+            raise "No item to fulfill!"
+        self._order_fulfillments.add(item)
+
+    def get_order_fulfillments(self):
+        return self._order_fulfillments
+
+    def place_order(self, buyer: Buyer):
+
+        self._payment_status = buyer.process_payment(
+            self.get_total()
+        )
+        if self._payment_status  == OrderStatus.PAID:
+            self.set_as_paid()
+        else:
+            self.set_as_waiting_for_payment()
+
+
+
+
+
+    def set_as_waiting_for_payment(self):
+        self._order_status = OrderStatus.WAITING_FOR_PAYMENT
+
+    def set_as_paid(self)
+        self._order_status = OrderStatus.PAID
+    
 
     def change_order_status(self, payment_status: int):
         #TODO
