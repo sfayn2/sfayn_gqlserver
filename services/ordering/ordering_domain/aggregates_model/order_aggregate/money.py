@@ -15,6 +15,19 @@ class Money(abstract_domain_models.ValueObject):
     currency: Currency
 
     def add(self, other: Decimal) -> Money:
-        if other < 0:
+        if other.value < 0:
             raise "Invalid amount!"
-        return Money(self.value + other, self.currency)
+
+        if self.currency != other.currency:
+            raise "Invalid currency!"
+
+        return Money(self.value + other.value, self.currency)
+
+    def multiply(self, other: Decimal) -> Money:
+        if other.value < 0:
+            raise "Invalid amount!"
+
+        if self.currency != other.currency:
+            raise "Invalid currency!"
+
+        return Money(self.value * other.value, self.currency)
