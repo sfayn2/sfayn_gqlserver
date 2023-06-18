@@ -4,7 +4,7 @@ from ....ordering_domain import abstract_domain_models
 from .money import Money
 
 @dataclass(unsafe_hash=True)
-class OrderItem(abstract_domain_models.Entity):
+class LineItem(abstract_domain_models.Entity):
     _product_id: str
     _sku: str #TODO valueobject?
     _quantity: int = 1

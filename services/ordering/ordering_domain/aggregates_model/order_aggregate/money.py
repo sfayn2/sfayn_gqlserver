@@ -1,4 +1,5 @@
 
+from typing import Self
 from dataclasses import dataclass
 from decimal import Decimal
 from enum import StrEnum
@@ -14,7 +15,7 @@ class Money(abstract_domain_models.ValueObject):
     value: Decimal
     currency: Currency
 
-    def add(self, other: Decimal) -> Money:
+    def add(self, other: Decimal) -> Self:
         if other.value < 0:
             raise "Invalid amount!"
 
@@ -23,7 +24,7 @@ class Money(abstract_domain_models.ValueObject):
 
         return Money(self.value + other.value, self.currency)
 
-    def multiply(self, other: Decimal) -> Money:
+    def multiply(self, other: Decimal) -> Self:
         if other.value < 0:
             raise "Invalid amount!"
 

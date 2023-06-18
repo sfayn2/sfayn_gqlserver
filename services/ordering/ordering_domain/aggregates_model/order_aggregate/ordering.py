@@ -4,7 +4,8 @@ from enum import IntEnum
 from decimal import Decimal
 from typing import Optional, List, Set
 from ....ordering_domain import abstract_domain_models
-from .line_item import OrderItem
+from .line_item import LineItem
+from ..buyer_aggregate.buyer import Buyer
 
 
 class OrderStatus(IntEnum):
@@ -20,59 +21,44 @@ class OrderStatus(IntEnum):
 
 class Ordering(abstract_domain_models.AggregateRoot):
 
-    def __init__(self, 
-        entity_id: str = None, 
-        tax_rate: Decimal,
-        ):
-
-        self._entity_id = entity_id
-        self._tax_rate = tax_rate
-
+    def __init__(self, buyer: Buyer):
         #Order Item
         self._order_items = set()
 
-        #Order Fulfillment
-        self._order_fulfillments = set()
-
-        #Buyer
-        self._buyer_note = None
-        self._payment_status = None
-
-    def add_buyer_note(self, buyer_note: str):
-        self._buyer_note = buyer_note
-
-    def add_order_item(self, item: OrderItem):
-        if not item:
-            raise "No item to add in order!"
-        self._order_items.add(order_items)
-
-    def get_order_items(self):
-        return self._order_items
-
-    def place_order(self, buyer: Buyer):
-
-        self._payment_status = buyer.process_payment(
-            self.get_total()
-        )
-        if self._payment_status  == OrderStatus.PAID:
-            self.set_as_paid()
+        if buyer:
+            self._buyer = buyer
         else:
-            self.set_as_waiting_for_payment()
+            raise "Unable to process order, missing buyer!"
 
+
+    def get_line_items(self):
+        return self._line_items
+
+    def add_line_items(self, line_items: List[LineItem]) -> None:
+        if not line_item:
+            raise "No item to add in order!"
+        for line_item in line_items:
+            self._line_items.add(line_item)
+
+
+    def set_entity_id(self, entity_id: str):
+        self._entity_id = entity_id
 
     def set_as_waiting_for_payment(self):
         self._order_status = OrderStatus.WAITING_FOR_PAYMENT
 
-    def set_as_paid(self)
+    def set_as_paid(self):
         self._order_status = OrderStatus.PAID
-    
 
-    def change_order_status(self, payment_status: int):
-        #TODO
-        if self.order_status == OrderStatus.WAITING_FOR_PAYMENT and payment_status == 'PAID': #TODO enum?
-            self.order_status = OrderStatus.PAID
+    def set_tax_rate(self, rate):
+        if rate:
+            self._tax_rate = rate
         else:
-            raise "Pending customer payment!"
+            self._tax_rate = None
+
+    def get_buyer(self):
+        return self._buyer
+
 
     #use get method to protect data from external update? 
     def get_tax_rate(self):
@@ -87,7 +73,7 @@ class Ordering(abstract_domain_models.AggregateRoot):
         #calculate based on collection of order items
         subtotal = 0.0
         for item in self._order_items:
-            subtotal += (item.product_quantity * item.product_price) - item.discounts_fee
+            subtotal += (item.quantity * item.price) - item.discounts_fee
         return subtotal
 
     def get_total(self):
