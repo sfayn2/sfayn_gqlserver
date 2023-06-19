@@ -1,6 +1,6 @@
 from ....ordering_domain import abstract_domain_models
 
-class Ordering(abstract_domain_models.AggregateRoot):
+class Buyer(abstract_domain_models.AggregateRoot):
 
     def __init__(self):
         pass

@@ -1,12 +1,6 @@
 from typing import List
 import decimal
-from ..ordering_domain.aggregates_model.order_aggregate import (
-    ordering,
-    money
-)
-from ..ordering_domain.aggregates_model.buyer_aggregate import (
-    buyer,
-)
+from ..ordering_domain import domain_services
 from ..infrastructure import unit_of_work
 
 
@@ -15,22 +9,18 @@ def place_order(
     buyer_id: int,
     buyer_note: str,
     uow: unit_of_work.DjangoUnitOfWork, 
-    line_items: List[ordering.LineItem]) -> None:
+    line_items: List) -> None:
 
     with uow:
-        buyer = buyer.Buyer()
-        buyer.set_entity_id(buyer_id)
-        buyer.set_buyer_note(buyer_note)
-
-        order = ordering.Ordering(
-            buyer
+        next_id = uow.ordering.get_next_id()
+        #line_items = OrderMap.to_domain ? OrderingDTO
+        order = domain_services.services.place_order(
+            next_id,
+            tax_rate,
+            buyer_id,
+            buyer_note,
+            line_items
         )
-        order.add_line_items(line_items)
-        order.set_entity_id(
-            uow.ordering.get_next_id()
-        )
-        order.set_tax_rate(tax_rate)
-        order.set_as_waiting_for_payment()
 
         uow.ordering.add(order)
         uow.commit()
