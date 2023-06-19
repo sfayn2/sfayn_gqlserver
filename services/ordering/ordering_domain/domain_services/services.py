@@ -11,10 +11,11 @@ from ..aggregates_model.buyer_aggregate.buyer import (
 
 def place_order(
         next_id: int,
-        tax_rate: decimal.Decimal,
+        tax_amount: decimal.Decimal,
         buyer_id: int,
         buyer_note: str,
-        line_items: List[LineItem]) -> None:
+        line_items: List[LineItem],
+        currency: str) -> None:
 
     buyer = Buyer(
             buyer_id, 
@@ -24,8 +25,9 @@ def place_order(
     order = Ordering(
                 next_id, 
                 buyer, 
-                tax_rate, 
-                line_items
+                tax_amount, 
+                line_items,
+                currency
                 )
 
     return order

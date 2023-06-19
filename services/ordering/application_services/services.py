@@ -5,21 +5,23 @@ from ..infrastructure import unit_of_work
 
 
 def place_order(
-    tax_rate: decimal.Decimal,
+    tax_amount: decimal.Decimal,
     buyer_id: int,
     buyer_note: str,
     uow: unit_of_work.DjangoUnitOfWork, 
-    line_items: List) -> None:
+    line_items: List,
+    currency) -> None:
 
     with uow:
         next_id = uow.ordering.get_next_id()
         #line_items = OrderMap.to_domain ? OrderingDTO
         order = domain_services.services.place_order(
             next_id,
-            tax_rate,
+            tax_amount,
             buyer_id,
             buyer_note,
-            line_items
+            line_items,
+            currency
         )
 
         uow.ordering.add(order)
