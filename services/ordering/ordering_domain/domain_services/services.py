@@ -16,16 +16,16 @@ def place_order(
         buyer_note: str,
         line_items: List[LineItem]) -> None:
 
-    buyer = Buyer()
-    buyer.set_entity_id(buyer_id)
-    buyer.set_buyer_note(buyer_note)
+    buyer = Buyer(
+            buyer_id, 
+            buyer_note
+        )
 
     order = Ordering(
-        buyer
-    )
-    order.add_line_items(line_items)
-    order.set_entity_id(
-        next_id
-    )
-    order.set_tax_rate(tax_rate)
-    order.set_as_waiting_for_payment()
+                next_id, 
+                buyer, 
+                tax_rate, 
+                line_items
+                )
+
+    return order

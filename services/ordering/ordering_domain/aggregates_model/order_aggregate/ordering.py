@@ -21,28 +21,37 @@ class OrderStatus(IntEnum):
 
 class Ordering(abstract_domain_models.AggregateRoot):
 
-    def __init__(self, buyer: Buyer):
-        #Order Item
-        self._order_items = set()
+    def __init__(self, 
+                 entity_id: str,
+                 tax_rate: Decimal,
+                 buyer: Buyer,
+                 line_items: List[LineItem],
+                 ):
+
+        self._entity_id = entity_id
+        self._tax_rate = tax_rate
 
         if buyer:
             self._buyer = buyer
         else:
             raise "Unable to process order, missing buyer!"
 
+        #Order Item
+        self._order_items = set()
+        for line_item in line_items:
+            self._line_items.add(line_item)
+
+        self.set_as_waiting_for_payment()        
+
 
     def get_line_items(self):
         return self._line_items
 
-    def add_line_items(self, line_items: List[LineItem]) -> None:
+    def add_line_item(self, line_item: LineItem) -> None:
         if not line_item:
             raise "No item to add in order!"
-        for line_item in line_items:
-            self._line_items.add(line_item)
+        self._line_items.add(line_item)
 
-
-    def set_entity_id(self, entity_id: str):
-        self._entity_id = entity_id
 
     def set_as_waiting_for_payment(self):
         self._order_status = OrderStatus.WAITING_FOR_PAYMENT
@@ -51,10 +60,9 @@ class Ordering(abstract_domain_models.AggregateRoot):
         self._order_status = OrderStatus.PAID
 
     def set_tax_rate(self, rate):
-        if rate:
-            self._tax_rate = rate
-        else:
-            self._tax_rate = None
+        if not rate:
+            raise "Invalid tax rate!"
+        self._tax_rate = rate
 
     def get_buyer(self):
         return self._buyer
