@@ -1,22 +1,9 @@
-
-import abc
-from enum import IntEnum
 from decimal import Decimal
 from typing import Optional, List, Set
 from ....ordering_domain import abstract_domain_models
-from .line_item import LineItem
 from ..buyer_aggregate.buyer import Buyer
-
-
-class OrderStatus(IntEnum):
-    WAITING_FOR_PAYMENT = 0
-    PAID = 1
-    PROCESSING = 2
-    PARTIALLY_SHIPPED_OUT = 3 #split shipment
-    SHIPPED_OUT = 4
-    REFUNDED = 5
-    CANCEL = 6
-    COMPLETED = 7
+from .line_item import LineItem
+from .order_status import OrderStatus
 
 
 class Ordering(abstract_domain_models.AggregateRoot):
