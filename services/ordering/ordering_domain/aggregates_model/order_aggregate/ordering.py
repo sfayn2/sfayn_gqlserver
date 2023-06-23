@@ -1,5 +1,5 @@
 from decimal import Decimal
-from typing import Optional, List, Set
+from typing import Optional, List
 from ....ordering_domain import abstract_domain_models
 from ..buyer_aggregate.buyer import Buyer
 from .line_item import LineItem
