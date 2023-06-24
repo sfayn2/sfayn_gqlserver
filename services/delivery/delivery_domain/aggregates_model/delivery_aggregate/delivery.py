@@ -18,11 +18,11 @@ class Delivery(abstract_domain_models.AggregateRoot):
         self._pickup_detail = pickup_detail
         self._delivery_status = DeliveryStatus.PENDING_ACCEPTANCE
 
-        def set_as_pick_up_in_progress(self):
-            self._delivery_status = DeliveryStatus.PICKUP_IN_PROGRESS
+    def set_as_pick_up_in_progress(self):
+        self._delivery_status = DeliveryStatus.PICKUP_IN_PROGRESS
 
-        def set_as_picked_up(self):
-            self._delivery_status = DeliveryStatus.ITEM_PICKED_UP
+    def set_as_picked_up(self):
+        self._delivery_status = DeliveryStatus.ITEM_PICKED_UP
             
 
 
