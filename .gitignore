@@ -1,6 +1,7 @@
 /db.sqlite3
 /env
 /env3.9
+/env3.11
 __pycache__/
 *.py[cod]
 **/__pycache__/

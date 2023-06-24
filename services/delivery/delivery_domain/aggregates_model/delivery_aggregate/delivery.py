@@ -1,20 +1,30 @@
+from typing import List
 from ....delivery_domain import abstract_domain_models
-from .delivery_package import DeliveryPackage
-from .package_pricing import PackagePricing
+from ._delivery_package import DeliveryPackage
+from ._pickup_detail import PickupDetail
+from ._delivery_status import DeliveryStatus
 
 class Delivery(abstract_domain_models.AggregateRoot):
 
     def __init__(self,
-                 delivery_package: DeliveryPackage,
-                 pickup_detail: str
+                 delivery_packages: List[DeliveryPackage],
+                 pickup_detail: PickupDetail
                 ):
 
         self._delivery_package = set()
-        self._package_pricing = set()
+        for delivery_package in delivery_packages:
+            self._delivery_package.add(delivery_package)
 
-    def add_package_pricing(self, package_pricing: PackagePricing):
-        self._package_pricing.add(package_pricing)
+        self._pickup_detail = pickup_detail
+        self._delivery_status = DeliveryStatus.PENDING_ACCEPTANCE
 
-    def get_package_pricings(self):
-        return self._package_pricing
+        def set_as_pick_up_in_progress(self):
+            self._delivery_status = DeliveryStatus.PICKUP_IN_PROGRESS
+
+        def set_as_picked_up(self):
+            self._delivery_status = DeliveryStatus.ITEM_PICKED_UP
+            
+
+
+
 

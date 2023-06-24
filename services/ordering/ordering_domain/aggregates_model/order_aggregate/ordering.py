@@ -27,7 +27,7 @@ class Ordering(abstract_domain_models.AggregateRoot):
             raise "Unable to process order, missing buyer!"
 
         #Order Item
-        self._order_items = set()
+        self._line_items = set()
         for line_item in line_items:
             self._line_items.add(line_item)
 
