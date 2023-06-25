@@ -3,12 +3,35 @@ from dataclasses import dataclass
 from ....ordering_domain import abstract_domain_models
 from .money import Money
 
+
+@dataclass(frozen=True)
+class DeliveryAddress(abstract_domain_models.ValueObject):
+    address:  str
+    postal:  int
+    country:  str
+    region:  str
+
+    def __post_init__(self):
+        if self.address is None:
+            raise "Invalid address value!"
+
+        if self.postal is None:
+            raise "Invalid postal value!"
+
+        if self.country is None:
+            raise "Invalid country value!"
+
+        if self.region is None:
+            raise "Invalid region value!"
+
+
 @dataclass(unsafe_hash=True)
 class LineItem(abstract_domain_models.Entity):
     _item_sku: str #TODO valueobject?
     _item_quantity: int = 1
     _item_price:  Money
     _item_discounts_fee: Money
+    _item_delivery_address: DeliveryAddress
 
     def __post_init__(self):
         if self._item_quantity <= 0:
