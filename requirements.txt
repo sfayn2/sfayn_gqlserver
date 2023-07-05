@@ -20,7 +20,7 @@ constantly==15.1.0
 cryptography==40.0.1
 curtsies==0.4.1
 cwcwidth==0.1.8
-Django==4.2
+Django==4.2.3
 django-cors-headers==3.14.0
 django-extensions==3.2.1
 django-filter==23.1
