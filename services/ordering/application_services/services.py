@@ -37,8 +37,10 @@ def fulfill_order(
     with uow:
 
         order = uow.ordering.get(order_id)
-        order.set_fulfillment_items()
+        res = domain_services.services.fulfill_order(
+            order
+        )
 
-        uow.ordering.sync_order(order)
+        uow.ordering.sync_order(res)
         uow.commit()
 

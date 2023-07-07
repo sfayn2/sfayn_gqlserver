@@ -11,7 +11,7 @@ from ..aggregates_model.buyer_aggregate.buyer import (
 def fulfill_order(
         order: Ordering
 ):
-    order.prepare_fulfillment_items()
+    order.set_fulfillment_items()
     return order
     
 
