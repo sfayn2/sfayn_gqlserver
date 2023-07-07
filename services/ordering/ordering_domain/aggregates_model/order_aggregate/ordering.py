@@ -27,11 +27,23 @@ class Ordering(abstract_domain_models.AggregateRoot):
             raise "Unable to process order, missing buyer!"
 
         #Order Item
-        self._line_items = set()
         for line_item in line_items:
-            self._line_items.add(line_item)
+            self.add_line_item(line_item)
 
         self.set_as_waiting_for_payment()        
+
+    
+    def as_dict(self):
+        return {
+            "discounts_fee": self.get_discounts_fee(),
+            "tax_amount": self.get_tax_amount(),
+            "sub_total": self.get_subtotal(),
+            "total": self.get_total(),
+            "currency": self.get_currency(),
+            "status": self.get_order_status(),
+            "buyer_id": self._buyer.get_buyer_id(),
+            "buyer_note": self._buyer.get_buyer_note(),
+        }
 
 
     def get_line_items(self):
@@ -45,18 +57,20 @@ class Ordering(abstract_domain_models.AggregateRoot):
             raise "No item to add in order!"
         self._line_items.add(line_item)
 
+    def set_fulfillment_items(self) -> None:
+        if not self._line_items:
+            raise "No item to fulfill!"
+        #TODO: create fulfilmment data
+        self._fulfillment_items = self.add_line_items
+
+    def get_fulfillment_items(self):
+        return self._fulfillment_items
 
     def set_as_waiting_for_payment(self):
         self._order_status = OrderStatus.WAITING_FOR_PAYMENT
 
     def set_as_paid(self):
         self._order_status = OrderStatus.PAID
-
-    def get_buyer_id(self):
-        return self._buyer.get_buyer_id()
-
-    def get_buyer_note(self):
-        return self._buyer.get_buyer_note()
 
     def get_tax_amount(self):
         return self._tax_amount

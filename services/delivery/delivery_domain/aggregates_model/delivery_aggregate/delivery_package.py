@@ -30,7 +30,6 @@ class DeliveryAddress(abstract_domain_models.ValueObject):
 @dataclass(unsafe_hash=True)
 class DeliveryPackage(abstract_domain_models.Entity):
     _delivery_address: DeliveryAddress
-    _delivery_type: int 
 
     _line_item_id: int
     _line_item_sku: str
@@ -43,4 +42,10 @@ class DeliveryPackage(abstract_domain_models.Entity):
 
         if not self._line_item_sku:
             raise "Invalid line item sku!"
+
+    def get_price(self, delivery_type: int):
+        for package_price in self.get_package_prices():
+        if package_price.get("deliviery_type") == delivery_type:
+            package_price.get("price")
+        return 
 

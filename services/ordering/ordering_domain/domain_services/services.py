@@ -2,11 +2,18 @@ import decimal
 from typing import List
 from ..aggregates_model.order_aggregate.ordering import (
       Ordering,
-      LineItem
+      LineItem,
 )
 from ..aggregates_model.buyer_aggregate.buyer import (
       Buyer
 )
+
+def fulfill_order(
+        order: Ordering
+):
+    order.prepare_fulfillment_items()
+    return order
+    
 
 
 def place_order(

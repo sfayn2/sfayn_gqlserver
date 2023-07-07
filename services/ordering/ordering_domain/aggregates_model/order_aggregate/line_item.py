@@ -39,7 +39,16 @@ class LineItem(abstract_domain_models.Entity):
 
         if (self._item_price * self._item_quantity) < self._item_discounts_fee:
             raise "Total amount order is lower than discounts"
-
+    
+    def as_dict(self):
+        return {
+            "order_quantity": self._item_quantity,
+            "product_variant":  self._item_sku,
+            "product_price": self._item_price,
+            "discounts_fee": self._item_discounts_fee,
+            "discounted_price": self.get_item_discounted_price(),
+            "total": self.get_item_total()
+        }
 
     def add_quantity(self, quantity: int):
         if quantity < 0:
@@ -47,25 +56,19 @@ class LineItem(abstract_domain_models.Entity):
 
         self._quantity += quantity
 
-    def get_item_quantity(self):
-        return self._item_quantity
+    def minus_quantity(self, quantity: int):
+        if quantity < 0 or quantity > self._quantity:
+            raise "Invalid quantity!"
 
-    def get_item_sku(self):
-        return self._item_sku
-
-    def get_item_price(self):
-        return self._item_price
-
-    def get_item_discounts_fee(self):
-        return self._item_discounts_fee
+        self._quantity -= quantity
 
     def get_item_discounted_price(self):
-        return (self.get_item_price() * self.get_item_quantity()) - self.get_item_discounts_fee
+        return (self._item_price * self._item_quantity) - self._item_discounts_fee
 
     def get_item_total(self):
-        if self.get_item_discounts_fee():
+        if self._item_discounts_fee:
             return self.get_item_discounted_price()
         else:
-            return (self.get_item_price() * self.get_item_quantity())
+            return (self._item_price * self._item_quantity)
 
 

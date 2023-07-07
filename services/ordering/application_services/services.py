@@ -28,3 +28,17 @@ def place_order(
         uow.commit()
 
     #send event to payment service? -> send delivery 
+
+def fulfill_order(
+    order_id: int,
+    uow: unit_of_work.DjangoUnitOfWork
+) -> None:
+
+    with uow:
+
+        order = uow.ordering.get(order_id)
+        order.set_fulfillment_items()
+
+        uow.ordering.sync_order(order)
+        uow.commit()
+
