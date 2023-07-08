@@ -30,8 +30,6 @@ class Ordering(abstract_domain_models.AggregateRoot):
         for line_item in line_items:
             self.add_line_item(line_item)
 
-        self.set_as_waiting_for_payment()        
-
     
     def as_dict(self):
         return {
@@ -67,6 +65,8 @@ class Ordering(abstract_domain_models.AggregateRoot):
         return self._fulfillment_items
 
     def set_as_waiting_for_payment(self):
+        #if not self._order_status is None or hasattr(self, "_order_status"):
+        #    raise "Not allowed to set order status as waiting for payment!"
         self._order_status = OrderStatus.WAITING_FOR_PAYMENT
 
     def set_as_paid(self):

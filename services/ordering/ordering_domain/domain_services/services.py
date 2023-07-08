@@ -21,15 +21,16 @@ def place_order(
         tax_amount: decimal.Decimal,
         buyer_id: int,
         buyer_note: str,
+
         line_items: List[LineItem],
         currency: str) -> None:
 
-    buyer = Buyer(
+      buyer = Buyer(
             buyer_id, 
             buyer_note
         )
 
-    order = Ordering(
+      order = Ordering(
                 next_id, 
                 buyer, 
                 tax_amount, 
@@ -37,4 +38,6 @@ def place_order(
                 currency
                 )
 
-    return order
+      order.set_as_waiting_for_payment()
+
+      return order
