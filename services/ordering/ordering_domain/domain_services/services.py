@@ -23,7 +23,8 @@ def place_order(
         buyer_note: str,
 
         line_items: List[LineItem],
-        currency: str) -> None:
+        currency: str,
+        payment_status: bool) -> None:
 
       buyer = Buyer(
             buyer_id, 
@@ -35,9 +36,9 @@ def place_order(
                 buyer, 
                 tax_amount, 
                 line_items,
-                currency
-                )
+                currency,
+                payment_status
+            )
 
-      order.set_as_waiting_for_payment()
 
       return order

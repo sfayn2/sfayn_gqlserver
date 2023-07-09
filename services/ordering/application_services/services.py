@@ -10,7 +10,8 @@ def place_order(
     buyer_note: str,
     uow: unit_of_work.DjangoUnitOfWork, 
     line_items: List,
-    currency) -> None:
+    currency,
+    payment_status: bool) -> None:
 
     with uow:
         next_id = uow.ordering.get_next_id()
@@ -21,13 +22,13 @@ def place_order(
             buyer_id,
             buyer_note,
             line_items,
-            currency
+            currency,
+            payment_status
         )
 
         uow.ordering.add(order)
         uow.commit()
 
-    #send event to payment service? -> send delivery 
 
 def fulfill_order(
     order_id: int,
@@ -41,6 +42,7 @@ def fulfill_order(
             order
         )
 
-        uow.ordering.sync_order(res)
         uow.commit()
+
+        #send event to delivery service? -> 
 

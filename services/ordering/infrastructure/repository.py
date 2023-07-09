@@ -18,10 +18,6 @@ class AbstractRepository(abc.ABC):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def sync_order(self, model: T):
-        raise NotImplementedError
-
-    @abc.abstractmethod
     def get(self, entity_id) -> T:
         raise NotImplementedError
 
@@ -45,9 +41,6 @@ class OrderingRepository(AbstractRepository):
                 order_id=self._order.get_entity_id(),
                 **line_item.as_dict()
             )
-
-    def sync_order(self, order: Ordering):
-        self._order = order
 
     def get_next_id(self):
         id = django_models.Order.objects.latest("id")
