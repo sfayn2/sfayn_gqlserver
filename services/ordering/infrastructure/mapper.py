@@ -36,7 +36,16 @@ def map_django_to_ordering_domain(entity_id):
 def add_ordering_from_domain(order: Ordering):
     django_models.Order.objects.get_or_create(
                 id=order.get_entity_id(),
-                default=order.as_dict()
+                default={
+                    "discounts_fee": order.get_discounts_fee(),
+                    "tax_amount": order.get_tax_amount(),
+                    "sub_total": order.get_subtotal(),
+                    "total": order.get_total(),
+                    "currency": order.get_currency(),
+                    "status": order.get_order_status(),
+                    "buyer_id": order._buyer.get_buyer_id(),
+                    "buyer_note": order._buyer.get_buyer_note(),
+                }
             )
 
     for line_item in order.get_line_items():

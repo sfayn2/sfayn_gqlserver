@@ -33,20 +33,6 @@ class Ordering(abstract_domain_models.AggregateRoot):
         for line_item in line_items:
             self.add_line_item(line_item)
 
-    
-    def as_dict(self):
-        return {
-            "discounts_fee": self.get_discounts_fee(),
-            "tax_amount": self.get_tax_amount(),
-            "sub_total": self.get_subtotal(),
-            "total": self.get_total(),
-            "currency": self.get_currency(),
-            "status": self.get_order_status(),
-            "buyer_id": self._buyer.get_buyer_id(),
-            "buyer_note": self._buyer.get_buyer_note(),
-        }
-
-
     def get_line_items(self):
         return self._line_items
 
