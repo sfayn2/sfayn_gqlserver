@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 from ..ordering_domain.aggregates_model.order_aggregate.ordering import (
     Ordering, 
 )
-from .mapper import ( 
+from .django_mapper import ( 
     map_django_to_ordering_domain, 
     add_ordering_from_domain,
     get_next_id
