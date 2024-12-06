@@ -28,7 +28,7 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['192.168.1.88']
+ALLOWED_HOSTS = ['localhost']
 CSRF_TRUSTED_ORIGINS = ['http://192.168.1.88:4200']
 
 
@@ -43,16 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sites',
     'graphene_django',
-    'corsheaders',
-    'product',
-    'accounts',
-    'payment',
-    'warehouse',
-    'tax',
-    'shipping',
-    'discount',
-    'order',
-    'webhook',
+    'product_catalog'
 ]
 
 MIDDLEWARE = [
@@ -162,9 +153,7 @@ CORS_ALLOW_METHODS = [
     'PUT',
 ]
 
-#for JWT Token
 AUTHENTICATION_BACKENDS = [
-    'graphql_jwt.backends.JSONWebTokenBackend',
     'django.contrib.auth.backends.ModelBackend',
 ]
 
