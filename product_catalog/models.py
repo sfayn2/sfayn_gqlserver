@@ -1,16 +1,12 @@
 from django.db import models
-from decimal import Decimal
 from django.conf import settings
 import uuid
+from decimal import Decimal
+from ddd.domain import enums
 from utils import path_and_rename
 
 # Create your models here.
 class Category(models.Model):
-
-    class LevelChoices(models.TextChoices):
-        LEVEL_1 = "level_1", "Level 1"
-        LEVEL_2 = "level_2", "Level 2"
-        LEVEL_3 = "level_3", "Level 3"
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False) #uuid for global unique id
     name = models.CharField(max_length=100)
@@ -22,7 +18,7 @@ class Category(models.Model):
         on_delete=models.CASCADE, 
         related_name="subcategories"
     )
-    level = models.CharField(blank=True, null=True, choices=LevelChoices, max_length=15) 
+    level = models.CharField(blank=True, null=True, choices=enums.CategoryLevel.choices, max_length=15) 
     created_by = models.CharField(max_length=50)
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True) 
@@ -35,19 +31,12 @@ class Category(models.Model):
 
 class Product(models.Model):
 
-    class ProductStatus(models.TextChoices):
-        DRAFT = "draft", "Draft"
-        PENDING = "pending_review", "Pending Review"
-        APPROVED = "approved", "Approved"
-        REJECTED = "rejected", "Rejected"
-        DEACTIVATED = "deactivated", "Deactivated"
-
     #we can add more attributes later
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False) #uuid for global unique id
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True) 
     category = models.ForeignKey("product_catalog.Category", on_delete=models.CASCADE, null=True, related_name="cat2product") 
-    status = models.CharField(max_length=25, blank=True, null=True, choices=ProductStatus, default=ProductStatus.DRAFT) 
+    status = models.CharField(max_length=25, blank=True, null=True, choices=enums.ProductStatus.choices, default=enums.ProductStatus.DRAFT) 
     created_by = models.CharField(max_length=50)
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True) 
