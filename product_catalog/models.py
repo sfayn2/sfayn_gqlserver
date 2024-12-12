@@ -77,8 +77,8 @@ class VariantItem(models.Model):
         return f"{self.product.name}  ({self.product_variant}: {self.options})"
 
 class Tag(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False) #uuid for global unique id
-    name = models.CharField(max_length=100, blank=True, null=True)
+    #id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False) #uuid for global unique id
+    name = models.CharField(max_length=100, primary_key=True)
     product_variant = models.ManyToManyField("product_catalog.VariantItem", related_name="prodvariant2tag", blank=True) 
     created_by = models.CharField(max_length=50)
     date_created = models.DateTimeField(auto_now_add=True)

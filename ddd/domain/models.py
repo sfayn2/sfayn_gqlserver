@@ -8,6 +8,7 @@ from ddd.domain import enums
 class InvalidStatusTransitionError(Exception):
     pass
 
+
 @dataclass
 class Category:
     _category_id: uuid.uuid4
@@ -26,6 +27,10 @@ class Category:
 class Variant:
     name: str
 
+@dataclass(frozen=True)
+class Tag:
+    name: str
+
 @dataclass
 class VariantItem:
     _variant_item_id: uuid.uuid4
@@ -34,6 +39,7 @@ class VariantItem:
     _value: str
     _price: Money
     _stock: int
+    _tags: List[Tag] = field(default_factory=list)
 
     def __post_init__(self):
         if self._variant_item_id is None:
@@ -47,6 +53,20 @@ class VariantItem:
 
         if self._stock is None:
             raise "Invalid stock!"
+
+    def add_tag(self, tag):
+        if tag in self._tags:
+            raise ValueError(f"Tag {tag} already exists")
+        self._tags.append(tag)
+
+    def remove_tag(self, tag):
+        if tag not in self._tags:
+            raise ValueError(f"Tag {tag} not found")
+        self._tags.remove(tag)
+
+    def get_tags(self):
+        return self._tags
+
 
 
 @dataclass
