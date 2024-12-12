@@ -1,7 +1,7 @@
 from dataclasses import dataclass
-from enum import StrEnum
+from enum import Enum
 
-class Currency(StrEnum):
+class Currency(Enum):
     USD = "USD"
     SGD = "SGD"
 

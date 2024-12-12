@@ -1,78 +1,114 @@
 import uuid
 from abc import ABC
 from dataclasses import dataclass, field
-from domain.value_objects import Money
+from ddd.domain.value_objects import Money
 from typing import List, Optional
-from domain import enums
+from ddd.domain import enums
+
+class InvalidStatusTransitionError(Exception):
+    pass
 
 @dataclass
 class Category:
-    id: uuid.uuid4
-    name: str
-    parent: Optional['Category'] = None
+    _category_id: uuid.uuid4
+    _name: str
+    _parent: Optional['Category'] = None
+
+    def set_name(self, new_name: str):
+        if self._name is None:
+            raise "Invalid category name!"
+        self._name = new_name
+
+    def get_name(self):
+        return self._name
 
 @dataclass(frozen=True)
-class VariantItem:
-    id: uuid.uuid4
-    option: str
-    value: str
-    price: Money
-    stock: int
+class Variant:
+    name: str
 
 @dataclass
-class ProductVariant:
-    id: uuid.uuid4
-    product_id: uuid.uuid4
-    name: str
-    items: List[VariantItem] = field(default_factory=list)
+class VariantItem:
+    _variant_item_id: uuid.uuid4
+    _product_variant: Variant
+    _option: str
+    _value: str
+    _price: Money
+    _stock: int
+
+    def __post_init__(self):
+        if self._variant_item_id is None:
+            raise "Invalid variant item id!"
+
+        if self._option is None:
+            raise "Invalid option!"
+
+        if self._value is None:
+            raise "Invalid value!"
+
+        if self._stock is None:
+            raise "Invalid stock!"
 
 
 @dataclass
 class ProductCatalog:
-    id: uuid.uuid4
-    name: str
-    description: str
-    status: enums.ProductStatus = enums.ProductStatus.DRAFT
-    variants: List[ProductVariant] = field(default_factory=list)
-    categories: List[Category]
+    _id: uuid.uuid4
+    _name: str
+    _description: str
+    _status: enums.ProductStatus = enums.ProductStatus.DRAFT
+    _variant_items: List[VariantItem] = field(default_factory=list)
+    _categories: List[Category] = field(default_factory=list)
 
-    def add_variant(self, variant: ProductVariant) -> None:
-        self.variants.append(variant)
-
-    def remove_variant(self, variant_id: uuid.uuid4) -> None:
-        self.variants = [v for v in self.variants if v.id != variant_id]
+    VALID_STATUS_TRANSITIONS = {
+        enums.ProductStatus.DRAFT : [enums.ProductStatus.PENDING_REVIEW],
+        enums.ProductStatus.PENDING_REVIEW : [enums.ProductStatus.APPROVED, enums.ProductStatus.REJECTED],
+        enums.ProductStatus.APPROVED : [enums.ProductStatus.DEACTIVATED],
+    }
 
     def add_category(self, category: Category) -> None:
-        if category not in self.categories:
-            self.categories.append(category)
+        if category not in self._categories:
+            self._categories.append(category)
 
     def remove_category(self, category_id: uuid.uuid4) -> None:
-        self.categories = [c for c in self.categories if c.id != category_id]
+        self._categories = [c for c in self._categories if c.id != category_id]
 
-    def change_status(self, new_status: enums.ProductStatus):
-        """ change the status of the product """
-        if new_status not in enums.ProductStatus:
-            raise ValueError(f"Invalid status: {new_status}")
-        self.status = new_status
+    def get_categories(self):
+        return self._categories
+
+    def update_details(self, name: str, description: str) -> None:
+        if not self.name:
+            raise ValueError("Product name cannot be empty")
+        self._name = name
+        self._description = description
+    
+    def update_status(self, new_status: enums.ProductStatus):
+        if new_status not in self.VALID_STATUS_TRANSITIONS[self._status]:
+            raise InvalidStatusTransitionError(f"Cannot transition from {self._status} to {new_status}")
+        self._status = new_status
+
+    def get_product_status(self):
+        return self._status
 
     def activate(self) -> None:
-        if not self.status == enums.ProductStatus.PENDING_REVIEW:
-            raise ValueError("Product must be in {enums.ProductStatus.PENDING_REVIEW}")
-        self.change_status(enums.ProductStatus.APPROVED)
+        self.update_status(enums.ProductStatus.APPROVED)
 
     def deactivate(self) -> None:
-        if not self.status == enums.ProductStatus.APPROVED:
-            raise ValueError("Product must be in {enums.ProductStatus.APPROVED}")
-        self.change_status(enums.ProductStatus.APPROVED)
+        self.update_status(enums.ProductStatus.DEACTIVATED)
 
     def reject(self) -> None:
-        if not self.status == enums.ProductStatus.PENDING_REVIEW:
-            raise ValueError("Product must be in {enums.ProductStatus.PENDING_REVIEW}")
-        self.change_status(enums.ProductStatus.REJECTED)
+        self.update_status(enums.ProductStatus.REJECTED)
 
     def pending_review(self) -> None:
-        if not self.status == enums.ProductStatus.DRAFT:
-            raise ValueError("Product must be in {enums.ProductStatus.DRAFT}")
-        self.change_status(enums.ProductStatus.DRAFT)
+        self.update_status(enums.ProductStatus.PENDING_REVIEW)
 
+    def add_variant_items(self, variant_item: VariantItem) -> None:
+        if not variant_item:
+            raise "No variant item to add in product catalog!"
+
+        if variant_item not in self._variant_items:
+            self._variant_items.append(variant_item)
+
+    def remove_variant_items(self, variant_id: uuid.uuid4) -> None:
+        self._variant_items = [v for v in self.variants if v.id != variant_id]
     
+    def get_variant_items(self):
+        return self._variant_items
