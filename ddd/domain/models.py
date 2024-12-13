@@ -34,22 +34,27 @@ class Tag:
 @dataclass
 class VariantItem:
     _variant_item_id: uuid.uuid4
-    _product_variant: Variant
+    _sku: str
+    _name: Variant
     _option: str
-    _value: str
     _price: Money
     _stock: int
-    _tags: List[Tag] = field(default_factory=list)
+    _default: bool
+    _is_active: bool
+    _tags: List[Tag] = field(default_factory=list, init=False)
 
     def __post_init__(self):
         if self._variant_item_id is None:
             raise "Invalid variant item id!"
+        
+        if self._sku is None:
+            raise "Invalid sku!"
+
+        if self._name is None:
+            raise "Invalid option!"
 
         if self._option is None:
             raise "Invalid option!"
-
-        if self._value is None:
-            raise "Invalid value!"
 
         if self._stock is None:
             raise "Invalid stock!"
@@ -76,7 +81,8 @@ class ProductCatalog:
     _description: str
     _status: enums.ProductStatus = enums.ProductStatus.DRAFT
     _variant_items: List[VariantItem] = field(default_factory=list)
-    _categories: List[Category] = field(default_factory=list)
+    #_category: Category
+    _category: uuid.uuid4
 
     VALID_STATUS_TRANSITIONS = {
         enums.ProductStatus.DRAFT : [enums.ProductStatus.PENDING_REVIEW],
@@ -84,15 +90,18 @@ class ProductCatalog:
         enums.ProductStatus.APPROVED : [enums.ProductStatus.DEACTIVATED],
     }
 
-    def add_category(self, category: Category) -> None:
-        if category not in self._categories:
-            self._categories.append(category)
+    def update_category(self, category_id: uuid.uuid4):
+        self._category = category_id
 
-    def remove_category(self, category_id: uuid.uuid4) -> None:
-        self._categories = [c for c in self._categories if c.id != category_id]
+    #def add_category(self, category: Category) -> None:
+    #    if category not in self._categories:
+    #        self._categories.append(category)
 
-    def get_categories(self):
-        return self._categories
+    #def remove_category(self, category_id: uuid.uuid4) -> None:
+    #    self._categories = [c for c in self._categories if c.id != category_id]
+
+    #def get_categories(self):
+    #    return self._categories
 
     def update_details(self, name: str, description: str) -> None:
         if not self.name:

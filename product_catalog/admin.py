@@ -3,7 +3,6 @@ from .models import (
     Product,
     Category,
     VariantItem,
-    Variant,
     Tag
 )
 
@@ -19,7 +18,7 @@ class CommonAdmin(admin.ModelAdmin):
     readonly_fields = ["created_by"]
     def save_model(self, request, obj, form, change):
         if not obj.created_by:
-            obj.created_by = request.user
+            obj.created_by = request.user.username
         super().save_model(request, obj, form, change)
 
     def has_change_permission(self, request, obj=None):
@@ -79,15 +78,11 @@ class TagAdmin(CommonAdmin):
     filter_horizontal = ('product_variant',)
     search_fields = ("name",)
     list_display_links = ("name",)
-    list_display = get_list_display(Category, ("subcategories", "cat2product", "img_upload", "parent", "level"))
+    list_display = get_list_display(Category, ("subcategories", "cat2product", "img_upload", "parent", "level", "id"))
 
-class VariantAdmin(admin.ModelAdmin):
-    pass
 
 
 
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Product, ProductAdmin)
-admin.site.register(VariantItem, VariantItemAdmin)
-admin.site.register(Variant, VariantAdmin)
 admin.site.register(Tag, TagAdmin)

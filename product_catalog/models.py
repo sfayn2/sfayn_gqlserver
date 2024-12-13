@@ -10,7 +10,6 @@ class Category(models.Model):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False) #uuid for global unique id
     name = models.CharField(max_length=100)
-    img_upload = models.ImageField(upload_to=path_and_rename, null=True, blank=True, help_text="Primary img")
     parent = models.ForeignKey(
         'self', 
         blank=True, 
@@ -44,40 +43,29 @@ class Product(models.Model):
     def __str__(self):
         return self.name
 
-class Variant(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False) #uuid for global unique id
-    name = models.CharField(max_length=100, blank=True, null=True)
-    date_created = models.DateTimeField(auto_now_add=True)
-    date_modified = models.DateTimeField(auto_now=True) 
-
-    def __str__(self):
-        return self.name
-
 class VariantItem(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False) #uuid for global unique id
     sku = models.CharField(max_length=50)
     product = models.ForeignKey("product_catalog.Product", on_delete=models.CASCADE, null=True, related_name="product2variantitem") 
-    product_variant = models.ForeignKey("product_catalog.Variant", on_delete=models.CASCADE, null=True, related_name="variant2item", blank=True) 
+    name = models.CharField(max_length=100, blank=True, null=True)
+    options = models.CharField(max_length=50, null=True, blank=True) # Red/Blue?
     price = models.DecimalField(
             decimal_places=settings.DEFAULT_DECIMAL_PLACES, 
             max_digits=settings.DEFAULT_MAX_DIGITS,
             null=True, 
             blank=True, 
-            help_text="sale price, exclusive of tax", 
+            help_text="default price, exclusive of tax", 
             default=Decimal("0.0")
         )
-    options = models.CharField(max_length=50, null=True, blank=True) # Red/Blue?
+    stock = models.PositiveIntegerField()
     img_upload = models.ImageField(upload_to=path_and_rename, null=True, blank=True, help_text="Primary img")
     default = models.BooleanField(default=False, help_text="default to display in product details page of similar product")
     is_active = models.BooleanField(default=True)
-    date_created = models.DateTimeField(auto_now_add=True)
-    date_modified = models.DateTimeField(auto_now=True) 
 
     def __str__(self):
-        return f"{self.product.name}  ({self.product_variant}: {self.options})"
+        return f"{self.product.name}  ({self.name}: {self.options})"
 
 class Tag(models.Model):
-    #id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False) #uuid for global unique id
     name = models.CharField(max_length=100, primary_key=True)
     product_variant = models.ManyToManyField("product_catalog.VariantItem", related_name="prodvariant2tag", blank=True) 
     created_by = models.CharField(max_length=50)
