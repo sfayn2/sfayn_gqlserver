@@ -8,6 +8,7 @@ T = TypeVar("T")
 
 class AbstractUnitOfWork(ABC):
     product: repositories.ProductRepository
+    category: repositories.CategoryRepository
 
     def __enter__(self) -> T:
         return self
@@ -29,21 +30,20 @@ class DjangoUnitOfWork(AbstractUnitOfWork):
     #to trigger this
     def __enter__(self):
         self.product = django_repository.DjangoProductRepository()
+        self.category = django_repository.DjangoCategoryRepository()
+
         self.atomic = transaction.atomic()
         self.atomic.__enter__()
-        #transaction.set_autocommit(False)
         return super().__enter__()
 
     def __exit__(self, *args):
 
         self.atomic.__exit__(*args)
         super().__exit__(*args)
-        #transaction.set_autocommit(True)
 
     def commit(self):
+        #do nothing since transaction.atomic() auto handle it
         pass
-        #transaction.commit()
 
     def rollback(self):
         self.atomic.__exit__(Exception, Exception(), None)
-        #transaction.rollback()

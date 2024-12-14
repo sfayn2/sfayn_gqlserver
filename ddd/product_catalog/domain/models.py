@@ -9,20 +9,73 @@ from ddd.product_catalog.domain import enums
 class InvalidStatusTransitionError(Exception):
     pass
 
-
+#Aggregate Root
 @dataclass
 class Category:
-    _category_id: uuid.uuid4
+    _id: uuid.uuid4
     _name: str
-    _parent: Optional['Category'] = None
+    _level: enums.CategoryLevel
+    _parent_id: Optional[int] = None
+    _created_by: str
+    _subcategories: List[uuid.uuid4] = field(default_factory=list)
+    _date_created: datetime = field(default_factory=datetime.now)
+    _date_modified: Optional[datetime] = None
 
-    def set_name(self, new_name: str):
-        if self._name is None:
-            raise "Invalid category name!"
+    def __post_init__(self):
+        if self._level not in enums.CategoryLevel:
+            raise ValueError(f"Invalid level: {self._level}")
+
+        if self._parent_id is None and self._level != enums.CategoryLevel.LEVEL_1.name:
+            raise ValueError(f"Only {enums.CategoryLevel.LEVEL_1.name} categories can have no parent.")
+
+    def update_modified_date(self):
+        self._date_modified = datetime.now()
+
+    def add_subcategory(self, subcategory_id: uuid.uuid4, subcategory_lvl: enums.CategoryLevel) -> None:
+        #TODO: not clean using split?
+        lvl_num = self._level.split("_")[1]
+        subcat_lvl_num = subcategory_lvl.name.split("_")[1]
+        if lvl_num + 1 != subcat_lvl_num:
+            raise ValueError(f"Subcategory level must be ${lvl_num + 1}.")
+
+        if subcategory_id in self._subcategories:
+            raise ValueError(f"Subcategory {subcategory_id} already exists.")
+
+        self._subcategories.append(subcategory_id)
+        self.update_modified_date()
+
+    def remove_category(self, subcategory_id: uuid.uuid4) -> None:
+        self._subcategories = [c for c in self._subcategories if c != subcategory_id]
+
+    def rename(self, new_name: str):
+        if not new_name.strip():
+            raise ValueError("Category name cannot be empty.")
         self._name = new_name
+        self.update_modified_date()
+
+    def update_level(self, new_level: enums.CategoryLevel):
+        if new_level.name not in [c.name for c in enums.CategoryLevel]:
+            raise ValueError(f"Invalid level: {self._level}")
+        self._level = new_level.name
+        self.update_modified_date()
+
+    def get_parent_id(self):
+        return self._parent_id
 
     def get_name(self):
         return self._name
+
+    def get_level(self):
+        return self._level
+
+    def get_created_by(self):
+        return self._created_by
+
+    def get_date_created(self):
+        return self._date_created
+
+    def get_date_modified(self):
+        return self._date_modified
 
 @dataclass(frozen=True)
 class Variant:
@@ -101,6 +154,7 @@ class VariantItem:
         return self._is_active
 
 
+#Aggregate Root
 @dataclass
 class Product:
     _id: uuid.uuid4
@@ -124,17 +178,6 @@ class Product:
     def update_category(self, category_id: uuid.uuid4):
         self._category = category_id
         self.update_modified_date()
-
-
-    #def add_category(self, category: Category) -> None:
-    #    if category not in self._categories:
-    #        self._categories.append(category)
-
-    #def remove_category(self, category_id: uuid.uuid4) -> None:
-    #    self._categories = [c for c in self._categories if c.id != category_id]
-
-    #def get_categories(self):
-    #    return self._categories
 
     def update_modified_date(self):
         self._date_modified = datetime.now()
