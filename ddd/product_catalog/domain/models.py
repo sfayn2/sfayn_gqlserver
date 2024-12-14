@@ -2,6 +2,7 @@ import uuid
 from abc import ABC
 from dataclasses import dataclass, field
 from typing import List, Optional
+from datetime import datetime
 from ddd.product_catalog.domain.value_objects import Money
 from ddd.product_catalog.domain import enums
 
@@ -33,18 +34,20 @@ class Tag:
 
 @dataclass
 class VariantItem:
-    _variant_item_id: uuid.uuid4
+    _id: uuid.uuid4
     _sku: str
     _name: Variant
-    _option: str
+    _options: str
     _price: Money
     _stock: int
     _default: bool
     _is_active: bool
-    _tags: List[Tag] = field(default_factory=list, init=False)
+
+    #TODO: should be separate ?
+    _tags: List[Tag] = field(default_factory=list)
 
     def __post_init__(self):
-        if self._variant_item_id is None:
+        if self._id is None:
             raise "Invalid variant item id!"
         
         if self._sku is None:
@@ -53,7 +56,7 @@ class VariantItem:
         if self._name is None:
             raise "Invalid option!"
 
-        if self._option is None:
+        if self._options is None:
             raise "Invalid option!"
 
         if self._stock is None:
@@ -75,23 +78,31 @@ class VariantItem:
 
 
 @dataclass
-class ProductCatalog:
+class Product:
     _id: uuid.uuid4
     _name: str
     _description: str
-    _status: enums.ProductStatus = enums.ProductStatus.DRAFT
-    _variant_items: List[VariantItem] = field(default_factory=list)
-    #_category: Category
     _category: uuid.uuid4
+    _created_by: str
+    _status: enums.ProductStatus = enums.ProductStatus.DRAFT.name
+    _variant_items: List[VariantItem] = field(default_factory=list)
+    _date_created: datetime = field(default_factory=datetime.now)
+    _date_modified: Optional[datetime] = None
+
 
     VALID_STATUS_TRANSITIONS = {
-        enums.ProductStatus.DRAFT : [enums.ProductStatus.PENDING_REVIEW],
-        enums.ProductStatus.PENDING_REVIEW : [enums.ProductStatus.APPROVED, enums.ProductStatus.REJECTED],
-        enums.ProductStatus.APPROVED : [enums.ProductStatus.DEACTIVATED],
+        enums.ProductStatus.DRAFT.name : [enums.ProductStatus.PENDING_REVIEW.name],
+        enums.ProductStatus.PENDING_REVIEW.name : [enums.ProductStatus.APPROVED.name, enums.ProductStatus.REJECTED.name],
+        enums.ProductStatus.APPROVED.name : [enums.ProductStatus.DEACTIVATED.name],
+        enums.ProductStatus.DEACTIVATED.name : [enums.ProductStatus.PENDING_REVIEW.name, enums.ProductStatus.DRAFT.name],
     }
 
     def update_category(self, category_id: uuid.uuid4):
         self._category = category_id
+        self.update_modified_date()
+
+    def get_category(self):
+        return self._category
 
     #def add_category(self, category: Category) -> None:
     #    if category not in self._categories:
@@ -103,31 +114,36 @@ class ProductCatalog:
     #def get_categories(self):
     #    return self._categories
 
+    def update_modified_date(self):
+        self._date_modified = datetime.now()
+
     def update_details(self, name: str, description: str) -> None:
         if not self.name:
             raise ValueError("Product name cannot be empty")
         self._name = name
         self._description = description
+        self.update_modified_date()
     
     def update_status(self, new_status: enums.ProductStatus):
         if new_status not in self.VALID_STATUS_TRANSITIONS[self._status]:
             raise InvalidStatusTransitionError(f"Cannot transition from {self._status} to {new_status}")
         self._status = new_status
+        self.update_modified_date()
 
     def get_product_status(self):
         return self._status
 
     def activate(self) -> None:
-        self.update_status(enums.ProductStatus.APPROVED)
+        self.update_status(enums.ProductStatus.APPROVED.name)
 
     def deactivate(self) -> None:
-        self.update_status(enums.ProductStatus.DEACTIVATED)
+        self.update_status(enums.ProductStatus.DEACTIVATED.name)
 
     def reject(self) -> None:
-        self.update_status(enums.ProductStatus.REJECTED)
+        self.update_status(enums.ProductStatus.REJECTED.name)
 
     def pending_review(self) -> None:
-        self.update_status(enums.ProductStatus.PENDING_REVIEW)
+        self.update_status(enums.ProductStatus.PENDING_REVIEW.name)
 
     def add_variant_items(self, variant_item: VariantItem) -> None:
         if not variant_item:
@@ -141,3 +157,12 @@ class ProductCatalog:
     
     def get_variant_items(self):
         return self._variant_items
+
+    def get_id(self):
+        return self._id
+
+    def get_name(self):
+        return self._name
+
+    def get_desc(self):
+        return self._description

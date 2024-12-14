@@ -10,3 +10,10 @@ class ProductCreated(DomainEvent):
     name: str
     price: float
     category: str
+
+@dataclass
+class ProductActivated(DomainEvent):
+    product_id: str
+    name: str
+    description: str
+    category: str

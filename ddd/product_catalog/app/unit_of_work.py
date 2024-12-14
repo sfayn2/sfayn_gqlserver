@@ -25,17 +25,25 @@ class AbstractUnitOfWork(ABC):
 
 
 class DjangoUnitOfWork(AbstractUnitOfWork):
+    #make sure to call uow within block statement
+    #to trigger this
     def __enter__(self):
-        self.product = django_repository.DjangoProductRepository
-        transaction.set_autocommit(False)
+        self.product = django_repository.DjangoProductRepository()
+        self.atomic = transaction.atomic()
+        self.atomic.__enter__()
+        #transaction.set_autocommit(False)
         return super().__enter__()
 
     def __exit__(self, *args):
+
+        self.atomic.__exit__(*args)
         super().__exit__(*args)
-        transaction.set_autocommit(True)
+        #transaction.set_autocommit(True)
 
     def commit(self):
-        transaction.commit()
+        pass
+        #transaction.commit()
 
     def rollback(self):
-        transaction.rollback()
+        self.atomic.__exit__(Exception, Exception(), None)
+        #transaction.rollback()

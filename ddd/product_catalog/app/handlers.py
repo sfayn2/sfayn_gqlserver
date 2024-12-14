@@ -1,24 +1,30 @@
+from uuid import uuid4
 from ddd.product_catalog.domain import commands
 from ddd.product_catalog.app import unit_of_work
 from ddd.product_catalog.domain import events
-from uuid import uuid4
 
 
-def change_status_command(command: commands.ChangeStatusCommand, uow: unit_of_work.DjangoUnitOfWork):
-    print('handle change status')
+def handle_product_activate(command: commands.ActivateProductCommand, uow: unit_of_work.DjangoUnitOfWork):
+    with uow:
+        #domain_product = uow.product.get(product_id="e3bf4346-864a-4875-8ef3-ed3909f49e48")
+        domain_product = uow.product.get(product_id=command.product_id)
+        domain_product.activate()
 
-def handle_create_product(command: commands.CreateProductCommand, uow: unit_of_work.DjangoUnitOfWork):
-    # handle the command to create a product
-    product_id = str(uuid4())
-    print("Create product handler here")
-    event = events.ProductCreated(product_id, command.name, command.price, command.category)
+        event = events.ProductActivated(
+            product_id=domain_product.get_id(),
+            name=domain_product.get_name(), 
+            description=domain_product.get_desc(),
+            category=domain_product.get_category()
+        )
 
-    return event
+        uow.product.save(domain_product)
+        uow.commit()
 
-def log_product_created(event: events.ProductCreated, uow: unit_of_work.DjangoUnitOfWork):
-    # handle the event by logging the product created
-    print(f"Product Created: {event.product_id} - {event.name} ({event.price} {event.category})")
+        print("Product activated ")
 
-def log_product_created2(event: events.ProductCreated, uow: unit_of_work.DjangoUnitOfWork):
-    # handle the event by logging the product created
-    print(f"Product Created2: {event.product_id} - {event.name} ({event.price} {event.category})")
+        return event
+
+
+def log_activated_product(event: events.ProductActivated, uow: unit_of_work.DjangoUnitOfWork):
+    # handle the event by logging the product activated
+    print(f"Product Activated: {event.product_id} - {event.name} ({event.description} {event.category})")

@@ -1,12 +1,16 @@
 from ddd.product_catalog.app import unit_of_work, handlers
 from ddd.product_catalog.domain import commands, events
 
-COMMAND_HANDLERS = {}
+COMMAND_HANDLERS = {
+    commands.ActivateProductCommand: handlers.handle_product_activate
+}
 
-EVENT_HANDLERS = {}
+EVENT_HANDLERS = {
+    events.ProductActivated : [handlers.log_activated_product]
+}
 
 class MessageBus:
-    def handle(self, message, uow: unit_of_work.UnitOfWork):
+    def handle(self, message, uow: unit_of_work.DjangoUnitOfWork):
         """ dispatch message to appropriate handler(s) """
         if isinstance(message, commands.Command):
             handler = COMMAND_HANDLERS.get(type(message))
