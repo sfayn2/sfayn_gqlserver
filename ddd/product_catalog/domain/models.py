@@ -62,19 +62,43 @@ class VariantItem:
         if self._stock is None:
             raise "Invalid stock!"
 
-    def add_tag(self, tag):
-        if tag in self._tags:
-            raise ValueError(f"Tag {tag} already exists")
-        self._tags.append(tag)
+    #TODO: tag has its own lifecyle?
+    #def add_tag(self, tag):
+    #    if tag in self._tags:
+    #        raise ValueError(f"Tag {tag} already exists")
+    #    self._tags.append(tag)
 
-    def remove_tag(self, tag):
-        if tag not in self._tags:
-            raise ValueError(f"Tag {tag} not found")
-        self._tags.remove(tag)
+    #def remove_tag(self, tag):
+    #    if tag not in self._tags:
+    #        raise ValueError(f"Tag {tag} not found")
+    #    self._tags.remove(tag)
 
-    def get_tags(self):
-        return self._tags
+    #def get_tags(self):
+    #    return self._tags
 
+    def get_id(self):
+        return self._id
+
+    def get_sku(self):
+        return self._sku
+
+    def get_name(self):
+        return self._name
+
+    def get_options(self):
+        return self._options
+
+    def get_price(self):
+        return self._price
+
+    def get_stock(self):
+        return self._stock
+
+    def get_default(self):
+        return self._default
+
+    def is_active(self):
+        return self._is_active
 
 
 @dataclass
@@ -101,8 +125,6 @@ class Product:
         self._category = category_id
         self.update_modified_date()
 
-    def get_category(self):
-        return self._category
 
     #def add_category(self, category: Category) -> None:
     #    if category not in self._categories:
@@ -129,9 +151,6 @@ class Product:
             raise InvalidStatusTransitionError(f"Cannot transition from {self._status} to {new_status}")
         self._status = new_status
         self.update_modified_date()
-
-    def get_product_status(self):
-        return self._status
 
     def activate(self) -> None:
         self.update_status(enums.ProductStatus.APPROVED.name)
@@ -166,3 +185,15 @@ class Product:
 
     def get_desc(self):
         return self._description
+
+    def get_status(self):
+        return self._status
+
+    def get_created_by(self):
+        return self._created_by
+
+    def get_date_created(self):
+        return self._date_created
+
+    def get_category(self):
+        return self._category
