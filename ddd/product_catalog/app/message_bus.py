@@ -1,5 +1,5 @@
-from app import unit_of_work, handlers
-from domain import commands, events
+from ddd.product_catalog.app import unit_of_work, handlers
+from ddd.product_catalog.domain import commands, events
 
 COMMAND_HANDLERS = {}
 

@@ -1,7 +1,7 @@
-from ddd.domain import repositories, models
+from ddd.product_catalog.domain import repositories, models
 from product_catalog import models as django_models
 
-class DjangoProductRepository(repositories.ProductCatalogRepository):
+class DjangoProductRepository(repositories.ProductRepository):
     def get(self, product_id):
         product_model = django_models.Product.objects.get(id=product_id)
         variants = [

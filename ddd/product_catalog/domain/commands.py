@@ -1,7 +1,7 @@
+import uuid
 from abc import ABC
 from dataclasses import dataclass
-from domain import enums
-import uuid
+from ddd.product_catalog.domain import enums
 
 class Command(ABC):
     pass

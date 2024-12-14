@@ -1,9 +1,9 @@
 import uuid
 from abc import ABC
 from dataclasses import dataclass, field
-from ddd.domain.value_objects import Money
 from typing import List, Optional
-from ddd.domain import enums
+from ddd.product_catalog.domain.value_objects import Money
+from ddd.product_catalog.domain import enums
 
 class InvalidStatusTransitionError(Exception):
     pass

@@ -1,13 +1,13 @@
 from abc import ABC, abstractmethod
 from typing import TypeVar
 from django.db import transaction
-from domain import repositories
-from infrastructure import django_repository
+from ddd.product_catalog.domain import repositories
+from ddd.product_catalog.infrastructure import django_repository
 
 T = TypeVar("T")
 
 class AbstractUnitOfWork(ABC):
-    product_catalog: repositories.ProductCatalogRepository
+    product: repositories.ProductRepository
 
     def __enter__(self) -> T:
         return self
@@ -26,7 +26,7 @@ class AbstractUnitOfWork(ABC):
 
 class DjangoUnitOfWork(AbstractUnitOfWork):
     def __enter__(self):
-        self.product_catalog = django_repository.DjangoProductRepository
+        self.product = django_repository.DjangoProductRepository
         transaction.set_autocommit(False)
         return super().__enter__()
 

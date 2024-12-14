@@ -2,7 +2,7 @@ from django.db import models
 from django.conf import settings
 import uuid
 from decimal import Decimal
-from ddd.domain import enums
+from ddd.product_catalog.domain import enums
 from utils import path_and_rename
 
 # Create your models here.

@@ -1,7 +1,8 @@
-from domain import commands
-from app import unit_of_work
-from domain import events
+from ddd.product_catalog.domain import commands
+from ddd.product_catalog.app import unit_of_work
+from ddd.product_catalog.domain import events
 from uuid import uuid4
+
 
 def change_status_command(command: commands.ChangeStatusCommand, uow: unit_of_work.DjangoUnitOfWork):
     print('handle change status')
