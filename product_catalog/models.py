@@ -28,6 +28,35 @@ class Category(models.Model):
         else:
             return f"{self.name} (level: {self.level})"
 
+    def to_domain(self):
+        category = domain_models.Category(
+            _id=self.id,
+            _name=self.name,
+            _level=self.level,
+            _parent_id=self.parent,
+            _created_by=self.created_by,
+            _date_created=self.date_created,
+            _date_modified=self.date_modified
+        ) 
+        
+        return category 
+
+    @staticmethod
+    def from_domain(category):
+        category_model = Category.objects.update_or_create(
+            id=category.get_id(), 
+            defaults={ 
+                "id":category.id,
+                "name":category.name,
+                "level":category.level,
+                "parent_id":category.parent,
+                "created_by":category.created_by,
+                "date_created": category.date_created,
+                "date_modified":category.date_modified
+            }
+        )
+
+
 class Product(models.Model):
 
     #we can add more attributes later
