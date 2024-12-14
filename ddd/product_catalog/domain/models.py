@@ -195,5 +195,8 @@ class Product:
     def get_date_created(self):
         return self._date_created
 
+    def get_date_modified(self):
+        return self._date_modified
+
     def get_category(self):
         return self._category

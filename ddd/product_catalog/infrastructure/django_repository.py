@@ -37,26 +37,26 @@ class DjangoProductRepository(repositories.ProductRepository):
     
     def save(self, product: models.Product): 
         product_model = django_models.Product.objects.update_or_create( id=product._id, defaults={ "name": product._name,
-                "description": product._description,
-                "category_id": product._category,
-                "status": product._status,
-                "created_by": product._created_by,
-                "date_created": product._date_created,
-                "date_modified": product._date_modified
+                "description": product.get_desc(),
+                "category_id": product.get_category(),
+                "status": product.get_status(),
+                "created_by": product.get_created_by(),
+                "date_created": product.get_date_created(),
+                "date_modified": product.get_date_modified()
             }
         )
         #TODO create to_domain, from_domain
         for variant in product.get_variant_items():
             variant_model = django_models.VariantItem.objects.update_or_create(
-                id=variant._id,
+                id=variant.get_id(),
                 defaults={
-                    "sku": variant._sku,
-                    "name": variant._name,
-                    "options": variant._options,
-                    "price": variant._price,
-                    "stock": variant._stock,
-                    "default": variant._default,
-                    "is_active": variant._is_active,
+                    "sku": variant.get_sku(),
+                    "name": variant.get_name(),
+                    "options": variant.get_options(),
+                    "price": variant.get_price(),
+                    "stock": variant.get_stock(),
+                    "default": variant.get_default(),
+                    "is_active": variant.is_active(),
                 }
 
             )
