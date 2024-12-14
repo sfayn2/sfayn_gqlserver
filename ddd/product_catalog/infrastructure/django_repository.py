@@ -36,7 +36,10 @@ class DjangoProductRepository(repositories.ProductRepository):
         return product 
     
     def save(self, product: models.Product): 
-        product_model = django_models.Product.objects.update_or_create( id=product._id, defaults={ "name": product._name,
+        product_model = django_models.Product.objects.update_or_create(
+            id=product.get_id(), 
+            defaults={ 
+                "name": product.get_name(),
                 "description": product.get_desc(),
                 "category_id": product.get_category(),
                 "status": product.get_status(),
