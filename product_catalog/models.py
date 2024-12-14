@@ -2,7 +2,7 @@ from django.db import models
 from django.conf import settings
 import uuid
 from decimal import Decimal
-from ddd.product_catalog.domain import enums
+from ddd.product_catalog.domain import enums, models as domain_models
 from utils import path_and_rename
 
 # Create your models here.
@@ -43,6 +43,56 @@ class Product(models.Model):
     def __str__(self):
         return self.name
 
+    def to_domain(self):
+        variants = [
+            domain_models.VariantItem(
+                _id=variant.id,
+                _sku=variant.sku,
+                _name=variant.name,
+                _options=variant.options,
+                _price=variant.price,
+                _stock=variant.stock,
+                _default=variant.default,
+                _is_active=variant.is_active,
+                _tags=list(variant.prodvariant2tag.values_list('name', flat=True))
+            )
+            for variant in self.product2variantitem.all()
+        ]
+
+        product = domain_models.Product(
+            _id=self.id,
+            _name=self.name,
+            _description=self.description,
+            _status=self.status,
+            _variant_items=variants,
+            _category=self.category.id,
+            _created_by=self.created_by, 
+            _date_created=self.date_created, 
+            _date_modified=self.date_modified
+        ) 
+        
+        
+        return product 
+
+    @staticmethod
+    def from_domain(product):
+        product_model = Product.objects.update_or_create(
+            id=product.get_id(), 
+            defaults={ 
+                "name": product.get_name(),
+                "description": product.get_desc(),
+                "category_id": product.get_category(),
+                "status": product.get_status(),
+                "created_by": product.get_created_by(),
+                "date_created": product.get_date_created(),
+                "date_modified": product.get_date_modified()
+            }
+        )
+
+        for variant in product.get_variant_items():
+            VariantItem.from_domain(variant)
+
+
 class VariantItem(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False) #uuid for global unique id
     sku = models.CharField(max_length=50)
@@ -64,6 +114,24 @@ class VariantItem(models.Model):
 
     def __str__(self):
         return f"{self.product.name}  ({self.name}: {self.options})"
+
+    @staticmethod
+    def from_domain(variant):
+        variant_model = VariantItem.objects.update_or_create(
+            id=variant.get_id(),
+            defaults={
+                "sku": variant.get_sku(),
+                "name": variant.get_name(),
+                "options": variant.get_options(),
+                "price": variant.get_price(),
+                "stock": variant.get_stock(),
+                "default": variant.get_default(),
+                "is_active": variant.is_active(),
+            }
+
+        )
+
+        return variant_model
 
 class Tag(models.Model):
     name = models.CharField(max_length=100, primary_key=True)
