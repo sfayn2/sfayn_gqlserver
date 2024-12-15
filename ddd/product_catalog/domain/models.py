@@ -79,9 +79,9 @@ class Category:
         return self._date_modified
 
 
-@dataclass(frozen=True)
-class Tag:
-    name: str
+#@dataclass(frozen=True)
+#class Tag:
+#    name: str
 
 @dataclass
 class VariantItem:
@@ -141,7 +141,7 @@ class Product:
     _description: str
     _category: uuid.uuid4
     _vendor_name: Optional[str] = None
-    _tags: List[Tag] = field(default_factory=list)
+    _tags: List[str] = field(default_factory=list)
     _status: enums.ProductStatus = enums.ProductStatus.DRAFT.name
     _variant_items: List[VariantItem] = field(default_factory=list)
     _date_created: datetime = field(default_factory=datetime.now)
@@ -197,12 +197,12 @@ class Product:
     def remove_variant_items(self, variant_id: uuid.uuid4) -> None:
         self._variant_items = [v for v in self.variants if v.id != variant_id]
 
-    def add_tag(self, tag):
+    def add_tag(self, tag: str):
         if tag in self._tags:
             raise ValueError(f"Tag {tag} already exists")
         self._tags.append(tag)
 
-    def remove_tag(self, tag):
+    def remove_tag(self, tag: str):
         if tag not in self._tags:
             raise ValueError(f"Tag {tag} not found")
         self._tags.remove(tag)

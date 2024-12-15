@@ -108,7 +108,7 @@ class Product(models.Model):
 
     @staticmethod
     def from_domain(product):
-        product_model = Product.objects.update_or_create(
+        product_model, created = Product.objects.update_or_create(
             id=product.get_id(), 
             defaults={ 
                 "name": product.get_name(),
@@ -120,6 +120,8 @@ class Product(models.Model):
                 "date_modified": product.get_date_modified()
             }
         )
+
+        product_model.tag.set(product.get_tags())
 
         for variant in product.get_variant_items():
             VariantItem.from_domain(variant)
