@@ -94,9 +94,6 @@ class VariantItem:
     _default: bool
     _is_active: bool
 
-    #TODO: should be separate ?
-    _tags: List[Tag] = field(default_factory=list)
-
     def __post_init__(self):
         if self._id is None:
             raise ValueError("Variant item id cannot be empty")
@@ -110,20 +107,6 @@ class VariantItem:
         if self._options is None:
             raise ValueError("Variant item options cannot be empty")
 
-
-    #TODO: tag has its own lifecyle?
-    #def add_tag(self, tag):
-    #    if tag in self._tags:
-    #        raise ValueError(f"Tag {tag} already exists")
-    #    self._tags.append(tag)
-
-    #def remove_tag(self, tag):
-    #    if tag not in self._tags:
-    #        raise ValueError(f"Tag {tag} not found")
-    #    self._tags.remove(tag)
-
-    #def get_tags(self):
-    #    return self._tags
 
     def get_id(self):
         return self._id
@@ -158,6 +141,7 @@ class Product:
     _description: str
     _category: uuid.uuid4
     _created_by: str
+    _tags: List[Tag] = field(default_factory=list)
     _status: enums.ProductStatus = enums.ProductStatus.DRAFT.name
     _variant_items: List[VariantItem] = field(default_factory=list)
     _date_created: datetime = field(default_factory=datetime.now)
@@ -212,6 +196,19 @@ class Product:
 
     def remove_variant_items(self, variant_id: uuid.uuid4) -> None:
         self._variant_items = [v for v in self.variants if v.id != variant_id]
+
+    def add_tag(self, tag):
+        if tag in self._tags:
+            raise ValueError(f"Tag {tag} already exists")
+        self._tags.append(tag)
+
+    def remove_tag(self, tag):
+        if tag not in self._tags:
+            raise ValueError(f"Tag {tag} not found")
+        self._tags.remove(tag)
+
+    def get_tags(self):
+        return self._tags
     
     def get_variant_items(self):
         return self._variant_items
