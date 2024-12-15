@@ -14,6 +14,9 @@ class Money:
             raise TypeError("Amount must be a decimal.")
         if not isinstance(self._currency, str):
             raise TypeError("Currency must be a string.")
+        if self._amount <= Decimal(0):
+            raise ValueError(f"Amount must be non zero.")
+
         if len(self._currency) != 3:
             raise ValueError("Currency must be a valid 3 character ISO code.")
 
