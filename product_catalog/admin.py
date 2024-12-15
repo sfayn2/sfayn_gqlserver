@@ -15,14 +15,16 @@ def get_list_display(model=None, exclude_fields=None):
 
 
 class CommonAdmin(admin.ModelAdmin):
-    readonly_fields = ["created_by"]
+    #manually provide ur group?
+    #readonly_fields = ["created_by"]
     def save_model(self, request, obj, form, change):
-        if not obj.created_by:
-            obj.created_by = request.user.username
+        #if not obj.created_by:
+        #    obj.created_by = request.user.username
         super().save_model(request, obj, form, change)
 
     def has_change_permission(self, request, obj=None):
-        if obj and not request.user.username == obj.created_by:
+        #if not belong to same group
+        if obj and not request.user.groups.filter(name=obj.created_by).exists():
             return False
         return True
 
@@ -36,49 +38,18 @@ class CommonAdmin(admin.ModelAdmin):
 class VariantItemInline(admin.TabularInline):
         model = VariantItem
 
-class TagInline(admin.TabularInline):
-        model = Tag
-
 class ProductAdmin(CommonAdmin):
-    readonly_fields = ["created_by"]
     inlines = (VariantItemInline,)
-    list_display = get_list_display(Product, ("product2variantitem",))
-    search_fields = ("name",)
-    list_display_links = ("name",)
+    filter_horizontal = ('tag',)
 
 
 
 class CategoryAdmin(CommonAdmin):
-    search_fields = ("name",)
-    list_display_links = ("name",)
-    list_display = get_list_display(Category, ("subcategories", "cat2product"))
-
-    @admin.display(empty_value="Not applicable")
-    def parent_name(self, obj):
-        try:
-            return obj.parent.name
-        except:
-            return obj.parent
+    pass
 
 
-class VariantItemAdmin(admin.ModelAdmin):
-    search_fields = ("sku", "product__name")
-    list_display_links = ("product__name",)
-    list_display = ["id", "sku", "product__name", "get_variant_name", "options", "price", "default", "is_active", "date_created", "date_modified"]
-
-    def get_variant_name(self, obj):
-        return obj.product_variant.name
-
-    get_variant_name.short_description = "Variant Name" 
-
-
-
-class TagAdmin(CommonAdmin):
-    readonly_fields = ["created_by"]
-    filter_horizontal = ('product_variant',)
-    search_fields = ("name",)
-    list_display_links = ("name",)
-    list_display = get_list_display(Category, ("subcategories", "cat2product", "img_upload", "parent", "level", "id"))
+class TagAdmin(admin.ModelAdmin):
+    pass
 
 
 

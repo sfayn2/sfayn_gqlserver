@@ -15,8 +15,8 @@ class Category:
     _id: uuid.uuid4
     _name: str
     _level: enums.CategoryLevel
-    _parent_id: Optional[int] = None
     _created_by: str
+    _parent_id: Optional[int] = None
     _subcategories: List[uuid.uuid4] = field(default_factory=list)
     _date_created: datetime = field(default_factory=datetime.now)
     _date_modified: Optional[datetime] = None

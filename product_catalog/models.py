@@ -18,15 +18,15 @@ class Category(models.Model):
         related_name="subcategories"
     )
     level = models.CharField(blank=True, null=True, choices=enums.CategoryLevel.choices, max_length=15) 
-    created_by = models.CharField(max_length=50)
+    created_by = models.CharField(max_length=50, help_text="Group name/Vendor")
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True) 
 
+    class Meta:
+        unique_together = ("name", "created_by") #prevent duplicate category per group (or vendor)
+
     def __str__(self):
-        if self.parent:
-            return f"{self.name} - {self.parent} (level: {self.level})"
-        else:
-            return f"{self.name} (level: {self.level})"
+        return f"{self.name} (created by {self.created_by})"
 
     def to_domain(self):
         category = domain_models.Category(
@@ -64,13 +64,17 @@ class Product(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True) 
     category = models.ForeignKey("product_catalog.Category", on_delete=models.CASCADE, null=True, related_name="cat2product") 
+    tag = models.ManyToManyField("product_catalog.Tag", related_name="tag2product", blank=True) 
     status = models.CharField(max_length=25, blank=True, null=True, choices=enums.ProductStatus.choices, default=enums.ProductStatus.DRAFT) 
-    created_by = models.CharField(max_length=50)
+    created_by = models.CharField(max_length=50, help_text="Group name/Vendor")
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True) 
 
+    class Meta:
+        unique_together = ("name", "created_by") #prevent duplicate product per group (or vendor)
+
     def __str__(self):
-        return self.name
+        return f"{self.name} (created by {self.created_by})"
 
     def to_domain(self):
         variants = [
@@ -164,10 +168,6 @@ class VariantItem(models.Model):
 
 class Tag(models.Model):
     name = models.CharField(max_length=100, primary_key=True)
-    product_variant = models.ManyToManyField("product_catalog.VariantItem", related_name="prodvariant2tag", blank=True) 
-    created_by = models.CharField(max_length=50)
-    date_created = models.DateTimeField(auto_now_add=True)
-    date_modified = models.DateTimeField(auto_now=True) 
 
     def __str__(self):
         return self.name
