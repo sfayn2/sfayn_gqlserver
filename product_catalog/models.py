@@ -17,7 +17,7 @@ class Category(models.Model):
         on_delete=models.CASCADE, 
         related_name="subcategories"
     )
-    level = models.CharField(blank=True, null=True, choices=enums.CategoryLevel.choices, max_length=15) 
+    level = models.CharField(choices=enums.CategoryLevel.choices, max_length=15) 
     vendor_name = models.CharField(max_length=50, blank=True, null=True, help_text="Vendor name associated w this product. Leave blank for public availability")
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True) 

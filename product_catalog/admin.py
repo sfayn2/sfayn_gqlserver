@@ -24,7 +24,7 @@ class CommonAdmin(admin.ModelAdmin):
 
     def has_change_permission(self, request, obj=None):
         #if not belong to same group
-        if obj and not request.user.groups.filter(name=obj.created_by).exists():
+        if obj and obj.vendor_name and not request.user.groups.filter(name=obj.vendor_name).exists():
             return False
         return True
 
