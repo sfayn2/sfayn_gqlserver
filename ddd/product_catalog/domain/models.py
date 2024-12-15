@@ -3,7 +3,7 @@ from abc import ABC
 from dataclasses import dataclass, field
 from typing import List, Optional
 from datetime import datetime
-from ddd.product_catalog.domain.value_objects import Money
+from ddd.product_catalog.domain.value_objects import Money, Stock
 from ddd.product_catalog.domain import enums
 
 class InvalidStatusTransitionError(Exception):
@@ -31,21 +31,22 @@ class Category:
     def update_modified_date(self):
         self._date_modified = datetime.now()
 
-    def add_subcategory(self, subcategory_id: uuid.uuid4, subcategory_lvl: enums.CategoryLevel) -> None:
-        #TODO: not clean using split?
-        lvl_num = self._level.split("_")[1]
-        subcat_lvl_num = subcategory_lvl.name.split("_")[1]
-        if lvl_num + 1 != subcat_lvl_num:
-            raise ValueError(f"Subcategory level must be ${lvl_num + 1}.")
+    #TODO: to add back when really need?
+    #def add_subcategory(self, subcategory_id: uuid.uuid4, subcategory_lvl: enums.CategoryLevel) -> None:
+    #    #TODO: not clean using split?
+    #    lvl_num = self._level.split("_")[1]
+    #    subcat_lvl_num = subcategory_lvl.name.split("_")[1]
+    #    if lvl_num + 1 != subcat_lvl_num:
+    #        raise ValueError(f"Subcategory level must be ${lvl_num + 1}.")
 
-        if subcategory_id in self._subcategories:
-            raise ValueError(f"Subcategory {subcategory_id} already exists.")
+    #    if subcategory_id in self._subcategories:
+    #        raise ValueError(f"Subcategory {subcategory_id} already exists.")
 
-        self._subcategories.append(subcategory_id)
-        self.update_modified_date()
+    #    self._subcategories.append(subcategory_id)
+    #    self.update_modified_date()
 
-    def remove_category(self, subcategory_id: uuid.uuid4) -> None:
-        self._subcategories = [c for c in self._subcategories if c != subcategory_id]
+    #def remove_category(self, subcategory_id: uuid.uuid4) -> None:
+    #    self._subcategories = [c for c in self._subcategories if c != subcategory_id]
 
     def rename(self, new_name: str):
         if not new_name.strip():
@@ -77,9 +78,6 @@ class Category:
     def get_date_modified(self):
         return self._date_modified
 
-@dataclass(frozen=True)
-class Variant:
-    name: str
 
 @dataclass(frozen=True)
 class Tag:
@@ -89,10 +87,10 @@ class Tag:
 class VariantItem:
     _id: uuid.uuid4
     _sku: str
-    _name: Variant
+    _name: str
     _options: str
     _price: Money
-    _stock: int
+    _stock: Stock
     _default: bool
     _is_active: bool
 
@@ -101,19 +99,17 @@ class VariantItem:
 
     def __post_init__(self):
         if self._id is None:
-            raise "Invalid variant item id!"
+            raise ValueError("Variant item id cannot be empty")
         
         if self._sku is None:
-            raise "Invalid sku!"
+            raise ValueError("Variant item sku cannot be empty")
 
         if self._name is None:
-            raise "Invalid option!"
+            raise ValueError("Variant item name cannot be empty")
 
         if self._options is None:
-            raise "Invalid option!"
+            raise ValueError("Variant item options cannot be empty")
 
-        if self._stock is None:
-            raise "Invalid stock!"
 
     #TODO: tag has its own lifecyle?
     #def add_tag(self, tag):
@@ -142,10 +138,10 @@ class VariantItem:
         return self._options
 
     def get_price(self):
-        return self._price
+        return self._price.get_amount()
 
     def get_stock(self):
-        return self._stock
+        return self._stock.get_quantity()
 
     def get_default(self):
         return self._default
