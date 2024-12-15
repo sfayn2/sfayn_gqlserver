@@ -18,7 +18,7 @@ class Category(models.Model):
         related_name="subcategories"
     )
     level = models.CharField(blank=True, null=True, choices=enums.CategoryLevel.choices, max_length=15) 
-    vendor_name = models.CharField(max_length=50, help_text="Vendor name associated w this product. Leave blank for public availability")
+    vendor_name = models.CharField(max_length=50, blank=True, null=True, help_text="Vendor name associated w this product. Leave blank for public availability")
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True) 
 
@@ -66,7 +66,7 @@ class Product(models.Model):
     category = models.ForeignKey("product_catalog.Category", on_delete=models.CASCADE, null=True, related_name="cat2product") 
     tag = models.ManyToManyField("product_catalog.Tag", related_name="tag2product", blank=True) 
     status = models.CharField(max_length=25, blank=True, null=True, choices=enums.ProductStatus.choices, default=enums.ProductStatus.DRAFT) 
-    vendor_name = models.CharField(max_length=50, help_text="Vendor name associated w this product. Leave blank for public availability")
+    vendor_name = models.CharField(max_length=50, null=True, blank=True, help_text="Vendor name associated w this product. Leave blank for public availability")
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True) 
 
