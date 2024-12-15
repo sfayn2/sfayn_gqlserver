@@ -2,7 +2,7 @@ from django.db import models
 from django.conf import settings
 import uuid
 from decimal import Decimal
-from ddd.product_catalog.domain import enums, models as domain_models
+from ddd.product_catalog.domain import enums, models as domain_models, value_objects
 from utils import path_and_rename
 
 # Create your models here.
@@ -83,15 +83,13 @@ class Product(models.Model):
                 _sku=variant.sku,
                 _name=variant.name,
                 _options=variant.options,
-                _price=variant.price,
-                _stock=variant.stock,
+                _price=value_objects.Money(variant.price, "SGD"),
+                _stock=value_objects.Stock(variant.stock),
                 _default=variant.default,
                 _is_active=variant.is_active,
-                _tags=list(variant.prodvariant2tag.values_list('name', flat=True))
             )
             for variant in self.product2variantitem.all()
         ]
-
         product = domain_models.Product(
             _id=self.id,
             _name=self.name,
@@ -101,7 +99,8 @@ class Product(models.Model):
             _category=self.category.id,
             _created_by=self.created_by, 
             _date_created=self.date_created, 
-            _date_modified=self.date_modified
+            _date_modified=self.date_modified,
+            _tags=list(self.tag.values_list('name', flat=True))
         ) 
         
         

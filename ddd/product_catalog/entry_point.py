@@ -10,7 +10,7 @@ def test_product_created():
 def test_activate_product():
     uow = unit_of_work.DjangoUnitOfWork()
     cmd = commands.ActivateProductCommand(
-        product_id="e3bf4346-864a-4875-8ef3-ed3909f49e48"
+        product_id="56d562a7-d017-42bb-9da2-45effd5584cd"
     )
 
     message_bus.handle(cmd, uow)
