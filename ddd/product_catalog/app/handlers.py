@@ -8,7 +8,8 @@ def handle_product_activate(command: commands.ActivateProductCommand, uow: unit_
     with uow:
         #domain_product = uow.product.get(product_id="e3bf4346-864a-4875-8ef3-ed3909f49e48")
         domain_product = uow.product.get(product_id=command.product_id)
-        domain_product.activate()
+        print(domain_product)
+        #domain_product.activate()
 
         event = events.ProductActivated(
             product_id=domain_product.get_id(),

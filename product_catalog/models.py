@@ -18,15 +18,15 @@ class Category(models.Model):
         related_name="subcategories"
     )
     level = models.CharField(blank=True, null=True, choices=enums.CategoryLevel.choices, max_length=15) 
-    created_by = models.CharField(max_length=50, help_text="Group name/Vendor")
+    vendor_name = models.CharField(max_length=50, help_text="Vendor name associated w this product. Leave blank for public availability")
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True) 
 
     class Meta:
-        unique_together = ("name", "created_by") #prevent duplicate category per group (or vendor)
+        unique_together = ("name", "vendor_name") #prevent duplicate category per vendor
 
     def __str__(self):
-        return f"{self.name} (created by {self.created_by})"
+        return f"{self.name} (Vendor name: {self.vendor_name})"
 
     def to_domain(self):
         category = domain_models.Category(
@@ -34,7 +34,7 @@ class Category(models.Model):
             _name=self.name,
             _level=self.level,
             _parent_id=self.parent,
-            _created_by=self.created_by,
+            _vendor_name=self.vendor_name,
             _date_created=self.date_created,
             _date_modified=self.date_modified
         ) 
@@ -50,7 +50,7 @@ class Category(models.Model):
                 "name":category.name,
                 "level":category.level,
                 "parent_id":category.parent,
-                "created_by":category.created_by,
+                "vendor_name":category.vendor_name,
                 "date_created": category.date_created,
                 "date_modified":category.date_modified
             }
@@ -66,15 +66,15 @@ class Product(models.Model):
     category = models.ForeignKey("product_catalog.Category", on_delete=models.CASCADE, null=True, related_name="cat2product") 
     tag = models.ManyToManyField("product_catalog.Tag", related_name="tag2product", blank=True) 
     status = models.CharField(max_length=25, blank=True, null=True, choices=enums.ProductStatus.choices, default=enums.ProductStatus.DRAFT) 
-    created_by = models.CharField(max_length=50, help_text="Group name/Vendor")
+    vendor_name = models.CharField(max_length=50, help_text="Vendor name associated w this product. Leave blank for public availability")
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True) 
 
     class Meta:
-        unique_together = ("name", "created_by") #prevent duplicate product per group (or vendor)
+        unique_together = ("name", "vendor_name") #prevent duplicate product per vendor
 
     def __str__(self):
-        return f"{self.name} (created by {self.created_by})"
+        return f"{self.name} (Vendor name: {self.vendor_name})"
 
     def to_domain(self):
         variants = [
@@ -97,7 +97,7 @@ class Product(models.Model):
             _status=self.status,
             _variant_items=variants,
             _category=self.category.id,
-            _created_by=self.created_by, 
+            _vendor_name=self.vendor_name, 
             _date_created=self.date_created, 
             _date_modified=self.date_modified,
             _tags=list(self.tag.values_list('name', flat=True))
@@ -115,7 +115,7 @@ class Product(models.Model):
                 "description": product.get_desc(),
                 "category_id": product.get_category(),
                 "status": product.get_status(),
-                "created_by": product.get_created_by(),
+                "vendor_name": product.get_vendor_name(),
                 "date_created": product.get_date_created(),
                 "date_modified": product.get_date_modified()
             }

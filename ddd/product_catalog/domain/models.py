@@ -15,7 +15,7 @@ class Category:
     _id: uuid.uuid4
     _name: str
     _level: enums.CategoryLevel
-    _created_by: str
+    _vendor_name: str
     _parent_id: Optional[int] = None
     _subcategories: List[uuid.uuid4] = field(default_factory=list)
     _date_created: datetime = field(default_factory=datetime.now)
@@ -69,8 +69,8 @@ class Category:
     def get_level(self):
         return self._level
 
-    def get_created_by(self):
-        return self._created_by
+    def get_vendor_name(self):
+        return self._vendor_name
 
     def get_date_created(self):
         return self._date_created
@@ -140,7 +140,7 @@ class Product:
     _name: str
     _description: str
     _category: uuid.uuid4
-    _created_by: str
+    _vendor_name: str
     _tags: List[Tag] = field(default_factory=list)
     _status: enums.ProductStatus = enums.ProductStatus.DRAFT.name
     _variant_items: List[VariantItem] = field(default_factory=list)
@@ -225,8 +225,8 @@ class Product:
     def get_status(self):
         return self._status
 
-    def get_created_by(self):
-        return self._created_by
+    def get_vendor_name(self):
+        return self._vendor_name
 
     def get_date_created(self):
         return self._date_created
