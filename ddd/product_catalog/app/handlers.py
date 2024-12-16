@@ -1,4 +1,5 @@
-from uuid import uuid4
+import uuid
+from decimal import Decimal
 from ddd.product_catalog.domain import commands, models
 from ddd.product_catalog.app import unit_of_work
 from ddd.product_catalog.domain import events
@@ -8,6 +9,18 @@ def handle_product_activate(command: commands.ActivateProductCommand, uow: unit_
     with uow:
         domain_product = uow.product.get(product_id=command.product_id)
         domain_product.activate()
+        #new_sku = models.VariantItem(
+        #    _id=uuid.uuid4(),
+        #    _sku="TH-0022-XL",
+        #    _name="SIZE",
+        #    _options="XL",
+        #    _price=models.Money(Decimal(1), "SGD"),
+        #    _stock=models.Stock(1),
+        #    _default=False,
+        #    _is_active=True
+        #)
+        #domain_product.add_variants(new_sku)
+        #domain_product.deactivate_sku("TH-0022-XL")
 
         event = events.ProductActivated(
             product_id=domain_product.get_id(),

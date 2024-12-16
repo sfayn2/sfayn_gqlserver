@@ -106,7 +106,12 @@ class VariantItem:
 
         if self._options is None:
             raise ValueError("Variant item options cannot be empty")
+    
+    def deactivate(self):
+        self._is_active = False
 
+    def activate(self):
+        self._is_active = True
 
     def get_id(self):
         return self._id
@@ -187,15 +192,22 @@ class Product:
     def pending_review(self) -> None:
         self.update_status(enums.ProductStatus.PENDING_REVIEW.name)
 
-    def add_variant_items(self, variant_item: VariantItem) -> None:
+    def add_variants(self, variant_item: VariantItem) -> None:
         if not variant_item:
             raise "No variant item to add in product catalog!"
 
         if variant_item not in self._variant_items:
             self._variant_items.append(variant_item)
 
-    def remove_variant_items(self, variant_id: uuid.uuid4) -> None:
-        self._variant_items = [v for v in self.variants if v.id != variant_id]
+    def deactivate_sku(self, sku: str) -> None:
+        for v in self._variant_items:
+            if v.get_sku() == sku:
+                v.deactivate()
+
+    def activate_sku(self, sku: str) -> None:
+        for v in self._variant_items:
+            if v.get_sku() == sku:
+                v.activate()
 
     def add_tag(self, tag: str):
         if tag in self._tags:

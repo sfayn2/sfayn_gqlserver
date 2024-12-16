@@ -124,7 +124,7 @@ class Product(models.Model):
         product_model.tag.set(product.get_tags())
 
         for variant in product.get_variant_items():
-            VariantItem.from_domain(variant)
+            VariantItem.from_domain(variant, product_model.id)
 
 
 class VariantItem(models.Model):
@@ -150,8 +150,8 @@ class VariantItem(models.Model):
         return f"{self.product.name}  ({self.name}: {self.options})"
 
     @staticmethod
-    def from_domain(variant):
-        variant_model = VariantItem.objects.update_or_create(
+    def from_domain(variant, product_id):
+        variant_model, created = VariantItem.objects.update_or_create(
             id=variant.get_id(),
             defaults={
                 "sku": variant.get_sku(),
@@ -161,9 +161,11 @@ class VariantItem(models.Model):
                 "stock": variant.get_stock(),
                 "default": variant.get_default(),
                 "is_active": variant.is_active(),
+                "product_id": product_id
             }
 
         )
+
 
         return variant_model
 
