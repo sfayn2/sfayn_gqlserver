@@ -7,6 +7,9 @@
 * Focus on designing your own frontend Store Template
 * Django Admin to create your own Shop data (ex. Shop, Products, Order, Customer, etc.)
 
+## Work in Progress
+This Project is currently under active development. Major changes are ongoing.
+
 
 
 
