@@ -22,7 +22,7 @@ class Category:
     _date_modified: Optional[datetime] = None
 
     def __post_init__(self):
-        if self._level not in enums.CategoryLevel:
+        if self._level not in [c.name for c in enums.CategoryLevel]:
             raise ValueError(f"Invalid level: {self._level}")
 
         if self._parent_id is None and self._level != enums.CategoryLevel.LEVEL_1.name:
@@ -55,10 +55,22 @@ class Category:
         self.update_modified_date()
 
     def update_level(self, new_level: enums.CategoryLevel):
-        if new_level.name not in [c.name for c in enums.CategoryLevel]:
+        if new_level not in [c.name for c in enums.CategoryLevel]:
             raise ValueError(f"Invalid level: {self._level}")
-        self._level = new_level.name
+        self._level = new_level
         self.update_modified_date()
+
+    def set_to_level_1(self):
+        self.update_level("LEVEL_1")
+
+    def set_to_level_2(self):
+        self.update_level("LEVEL_2")
+    
+    def set_to_level_3(self):
+        self.update_level("LEVEL_3")
+
+    def get_id(self):
+        return self._id
 
     def get_parent_id(self):
         return self._parent_id

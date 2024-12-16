@@ -3,7 +3,8 @@ from ddd.product_catalog.app import unit_of_work, handlers
 from ddd.product_catalog.domain import commands, events
 
 COMMAND_HANDLERS = {
-    commands.ActivateProductCommand: handlers.handle_product_activate
+    commands.ActivateProductCommand: handlers.handle_product_activate,
+    commands.CreateCategoryCommand: handlers.handle_create_category,
 }
 
 EVENT_HANDLERS = {

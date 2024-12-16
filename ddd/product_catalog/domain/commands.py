@@ -1,6 +1,8 @@
 import uuid
 from abc import ABC
 from dataclasses import dataclass
+from typing import Union
+from datetime import datetime
 from ddd.product_catalog.domain import enums
 
 class Command(ABC):
@@ -21,3 +23,12 @@ class ChangeStatusCommand(Command):
 @dataclass
 class ActivateProductCommand(Command):
     product_id: uuid.uuid4
+
+@dataclass
+class CreateCategoryCommand(Command):
+    id: uuid.uuid4
+    name: str
+    level: str
+    parent_id: Union[uuid.uuid4, None] 
+    vendor_name: str
+    date_created: datetime

@@ -4,6 +4,21 @@ from ddd.product_catalog.domain import commands, models
 from ddd.product_catalog.app import unit_of_work
 from ddd.product_catalog.domain import events
 
+def handle_create_category(command: commands.CreateCategoryCommand, uow: unit_of_work.DjangoUnitOfWork):
+    with uow:
+        #domain_category = uow.category.get(category_id="c8f7c5b546b14e279c86b04a28058d37")
+        #domain_category.rename('ABC')
+        #domain_category.set_to_level_2()
+        domain_category = models.Category(
+                _id=command.id,
+                _name=command.name,
+                _level=command.level,
+                _parent_id=command.parent_id,
+                _vendor_name=command.vendor_name,
+                _date_created=command.date_created
+            )
+        uow.category.save(domain_category)
+        uow.commit()
 
 def handle_product_activate(command: commands.ActivateProductCommand, uow: unit_of_work.DjangoUnitOfWork):
     with uow:

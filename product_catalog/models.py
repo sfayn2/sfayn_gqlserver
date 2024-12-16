@@ -46,13 +46,12 @@ class Category(models.Model):
         category_model = Category.objects.update_or_create(
             id=category.get_id(), 
             defaults={ 
-                "id":category.id,
-                "name":category.name,
-                "level":category.level,
-                "parent_id":category.parent,
-                "vendor_name":category.vendor_name,
-                "date_created": category.date_created,
-                "date_modified":category.date_modified
+                "name":category.get_name(),
+                "level":category.get_level(),
+                "parent_id":category.get_parent_id(),
+                "vendor_name":category.get_vendor_name(),
+                "date_created": category.get_date_created(),
+                "date_modified":category.get_date_modified()
             }
         )
 
