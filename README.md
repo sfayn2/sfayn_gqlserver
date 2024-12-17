@@ -10,10 +10,7 @@
 ## Work in Progress
 This Project is currently under active development. Major changes are ongoing.
 
-
-
-
-![image](https://user-images.githubusercontent.com/3206118/137609211-6e4a7123-e34f-434b-9655-9d46eda3e9c2.png)
+![image](https://github.com/user-attachments/assets/a3aec50a-18bf-429a-b44e-8db93fd797d4)
 
 
 ## Demo
