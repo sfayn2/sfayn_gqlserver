@@ -138,9 +138,6 @@ MEDIA_URL = 'media/'
 #GRAPHENE
 GRAPHENE = {
     "SCHEMA": "sfayn_gqlserver.schema.schema",
-    'MIDDLEWARE': [
-            'graphql_jwt.middleware.JSONWebTokenMiddleware',
-        ],
 }
 
 #CORS
