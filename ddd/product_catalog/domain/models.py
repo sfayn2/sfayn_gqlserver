@@ -4,7 +4,8 @@ from dataclasses import dataclass, field
 from typing import List, Optional
 from datetime import datetime
 from ddd.product_catalog.domain.value_objects import Money, Stock
-from ddd.product_catalog.domain import enums
+from ddd.product_catalog.domain import vendor_policies
+from ddd.product_catalog.domain import enums, exceptions
 
 class InvalidStatusTransitionError(Exception):
     pass
@@ -165,16 +166,20 @@ class Product:
     _date_modified: Optional[datetime] = None
 
 
-    VALID_STATUS_TRANSITIONS = {
-        enums.ProductStatus.DRAFT.name : [enums.ProductStatus.PENDING_REVIEW.name],
-        enums.ProductStatus.PENDING_REVIEW.name : [enums.ProductStatus.APPROVED.name, enums.ProductStatus.REJECTED.name],
-        enums.ProductStatus.APPROVED.name : [enums.ProductStatus.DEACTIVATED.name],
-        enums.ProductStatus.DEACTIVATED.name : [enums.ProductStatus.PENDING_REVIEW.name, enums.ProductStatus.DRAFT.name],
-    }
+    #VALID_STATUS_TRANSITIONS = {
+    #    enums.ProductStatus.DRAFT.name : [enums.ProductStatus.PENDING_REVIEW.name],
+    #    enums.ProductStatus.PENDING_REVIEW.name : [enums.ProductStatus.APPROVED.name, enums.ProductStatus.REJECTED.name],
+    #    enums.ProductStatus.APPROVED.name : [enums.ProductStatus.DEACTIVATED.name],
+    #    enums.ProductStatus.DEACTIVATED.name : [enums.ProductStatus.PENDING_REVIEW.name, enums.ProductStatus.DRAFT.name],
+    #}
+
+    def __post_init__(self):
+        self._vendor_policy = vendor_policies.get_policy(vendor_type=self._vendor_type)
 
     def update_category(self, category_id: uuid.uuid4):
-        self._category = category_id
-        self.update_modified_date()
+        if self._vendor_policy.validate(self):
+            self._category = category_id
+            self.update_modified_date()
 
     def update_modified_date(self):
         self._date_modified = datetime.now()
@@ -186,23 +191,24 @@ class Product:
         self._description = description
         self.update_modified_date()
     
-    def update_status(self, new_status: enums.ProductStatus):
-        if new_status not in self.VALID_STATUS_TRANSITIONS[self._status]:
-            raise InvalidStatusTransitionError(f"Cannot transition from {self._status} to {new_status}")
+    def change_state(self, new_status: enums.ProductStatus):
+        if new_status not in self._vendor_policy.get_allowed_transition():
+            raise exceptions.InvalidStatusTransitionError(f"Cannot transition from {self._status} to {new_status}")
         self._status = new_status
         self.update_modified_date()
 
-    def activate(self) -> None:
-        self.update_status(enums.ProductStatus.APPROVED.name)
+    def approve(self) -> None:
+        if self._vendor_policy.can_approve(self._role):
+            self.change_state(enums.ProductStatus.APPROVED.name)
 
-    def deactivate(self) -> None:
-        self.update_status(enums.ProductStatus.DEACTIVATED.name)
+    #def deactivate(self) -> None:
+    #    self.update_status(enums.ProductStatus.DEACTIVATED.name)
 
-    def reject(self) -> None:
-        self.update_status(enums.ProductStatus.REJECTED.name)
+    #def reject(self) -> None:
+    #    self.update_status(enums.ProductStatus.REJECTED.name)
 
-    def pending_review(self) -> None:
-        self.update_status(enums.ProductStatus.PENDING_REVIEW.name)
+    #def pending_review(self) -> None:
+    #    self.update_status(enums.ProductStatus.PENDING_REVIEW.name)
 
     def add_variants(self, variant_item: VariantItem) -> None:
         if not variant_item:

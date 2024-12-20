@@ -164,4 +164,7 @@ DEFAULT_WEIGHT_UNIT = "kg"
 DEFAULT_DIMENSIONS_UNIT = "lbs"
 DEFAULT_CURRENCY = "SGD"
 
-PRODUCT_AUTO_APPROVAL = True
+
+# change if require to change policy?
+# FUTURE:can use django permission to select vendor policy?
+PRODUCT_CATALOG_VENDOR_POLICY = "Standard"

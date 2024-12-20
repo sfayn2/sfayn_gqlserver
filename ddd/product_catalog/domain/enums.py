@@ -8,6 +8,7 @@ class ProductCategory(Enum):
 
 class ProductStatus(Enum):
     DRAFT = "Draft"
+    PUBLISHED = "Published"
     PENDING_REVIEW = "Pending Review"
     APPROVED = "Approved"
     REJECTED = "Rejected"
