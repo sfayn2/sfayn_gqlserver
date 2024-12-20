@@ -1,9 +1,9 @@
+import uuid
 from django.db import models
 from django.conf import settings
-import uuid
+from django.contrib.auth.models import Group
 from decimal import Decimal
 from ddd.product_catalog.domain import enums, models as domain_models, value_objects
-from utils import path_and_rename
 
 # Create your models here.
 class Category(models.Model):
@@ -18,15 +18,15 @@ class Category(models.Model):
         related_name="subcategories"
     )
     level = models.CharField(choices=enums.CategoryLevel.choices, max_length=15) 
-    vendor_name = models.CharField(max_length=50, blank=True, null=True, help_text="Vendor name associated w this product. Leave blank for public availability")
+    vendor = models.ForeignKey(Group, on_delete=models.CASCADE, related_name="vendor2category", help_text="Vendor name associated w this category")
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True) 
 
     class Meta:
-        unique_together = ("name", "vendor_name") #prevent duplicate category per vendor
+        unique_together = ("name", "vendor") #prevent duplicate category per vendor
 
     def __str__(self):
-        return f"{self.name} (Vendor name: {self.vendor_name})"
+        return f"{self.name} (Vendor name: {self.vendor.name})"
 
     def to_domain(self):
         category = domain_models.Category(
@@ -57,30 +57,28 @@ class Category(models.Model):
 
 
 class Product(models.Model):
-
-    #we can add more attributes later
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False) #uuid for global unique id
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True) 
     category = models.ForeignKey("product_catalog.Category", on_delete=models.CASCADE, null=True, related_name="cat2product") 
     tag = models.ManyToManyField("product_catalog.Tag", related_name="tag2product", blank=True) 
     status = models.CharField(max_length=25, blank=True, null=True, choices=enums.ProductStatus.choices, default=enums.ProductStatus.DRAFT) 
-    vendor_name = models.CharField(max_length=50, null=True, blank=True, help_text="Vendor name associated w this product. Leave blank for public availability")
+    vendor = models.ForeignKey(Group, on_delete=models.CASCADE, related_name="vendor2product", help_text="Vendor name associated w this product")
+    attributes = models.JSONField(blank=True, null=True, help_text='ex. {"Brand": "X", "Warranty": "1 year"}') # anticipated to have frequent changes on attributes, decided to use JSONField
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True) 
 
     class Meta:
-        unique_together = ("name", "vendor_name") #prevent duplicate product per vendor
+        unique_together = ("name", "vendor") #prevent duplicate product per vendor
 
     def __str__(self):
-        return f"{self.name} (Vendor name: {self.vendor_name})"
+        return f"{self.name} (Vendor name: {self.vendor.name})"
 
     def to_domain(self):
         variants = [
             domain_models.VariantItem(
                 _id=variant.id,
                 _sku=variant.sku,
-                _name=variant.name,
                 _options=variant.options,
                 _price=value_objects.Money(variant.price, "SGD"),
                 _stock=value_objects.Stock(variant.stock),
@@ -96,7 +94,7 @@ class Product(models.Model):
             _status=self.status,
             _variant_items=variants,
             _category=self.category.id,
-            _vendor_name=self.vendor_name, 
+            _vendor=self.vendor_id, 
             _date_created=self.date_created, 
             _date_modified=self.date_modified,
             _tags=list(self.tag.values_list('name', flat=True))
@@ -114,7 +112,7 @@ class Product(models.Model):
                 "description": product.get_desc(),
                 "category_id": product.get_category(),
                 "status": product.get_status(),
-                "vendor_name": product.get_vendor_name(),
+                "vendor_id": product.get_vendor(),
                 "date_created": product.get_date_created(),
                 "date_modified": product.get_date_modified()
             }
@@ -130,23 +128,19 @@ class VariantItem(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False) #uuid for global unique id
     sku = models.CharField(max_length=50)
     product = models.ForeignKey("product_catalog.Product", on_delete=models.CASCADE, null=True, related_name="product2variantitem") 
-    name = models.CharField(max_length=100, blank=True, null=True)
-    options = models.CharField(max_length=50, null=True, blank=True) # Red/Blue?
+    options = models.JSONField(help_text='ex. {"Size": "M", "Color": "RED"}') # anticipated to have complex tables to support multi dimension variants, decided to use JSONField
     price = models.DecimalField(
             decimal_places=settings.DEFAULT_DECIMAL_PLACES, 
             max_digits=settings.DEFAULT_MAX_DIGITS,
-            null=True, 
-            blank=True, 
             help_text="default price, exclusive of tax", 
             default=Decimal("0.0")
         )
     stock = models.PositiveIntegerField()
-    img_upload = models.ImageField(upload_to=path_and_rename, null=True, blank=True, help_text="Primary img")
     default = models.BooleanField(default=False, help_text="default to display in product details page of similar product")
     is_active = models.BooleanField(default=True)
 
     def __str__(self):
-        return f"{self.product.name}  ({self.name}: {self.options})"
+        return f"{self.product.name}  ({self.options})"
 
     @staticmethod
     def from_domain(variant, product_id):
@@ -154,7 +148,6 @@ class VariantItem(models.Model):
             id=variant.get_id(),
             defaults={
                 "sku": variant.get_sku(),
-                "name": variant.get_name(),
                 "options": variant.get_options(),
                 "price": variant.get_price(),
                 "stock": variant.get_stock(),
@@ -173,3 +166,11 @@ class Tag(models.Model):
 
     def __str__(self):
         return self.name
+
+class Image(models.Model):
+    variant = models.ForeignKey("product_catalog.VariantItem", on_delete=models.CASCADE, null=True, related_name="variant2images") 
+    img_upload = models.ImageField(null=True, blank=True, help_text="variants img")
+    order = models.PositiveIntegerField(default=1) # for ordering images
+
+    def __str__(self):
+        return f"{self.variant} {self.img_upload.url}"

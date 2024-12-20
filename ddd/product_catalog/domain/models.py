@@ -100,7 +100,6 @@ class Category:
 class VariantItem:
     _id: uuid.uuid4
     _sku: str
-    _name: str
     _options: str
     _price: Money
     _stock: Stock
@@ -114,9 +113,7 @@ class VariantItem:
         if self._sku is None:
             raise ValueError("Variant item sku cannot be empty")
 
-        if self._name is None:
-            raise ValueError("Variant item name cannot be empty")
-
+        #TODO: this accepts JSON now
         if self._options is None:
             raise ValueError("Variant item options cannot be empty")
     
@@ -131,9 +128,6 @@ class VariantItem:
 
     def get_sku(self):
         return self._sku
-
-    def get_name(self):
-        return self._name
 
     def get_options(self):
         return self._options
@@ -158,7 +152,8 @@ class Product:
     _name: str
     _description: str
     _category: uuid.uuid4
-    _vendor_name: Optional[str] = None
+    _vendor: int
+    _vendor_policy: str
     _tags: List[str] = field(default_factory=list)
     _status: enums.ProductStatus = enums.ProductStatus.DRAFT.name
     _variant_items: List[VariantItem] = field(default_factory=list)
@@ -173,8 +168,8 @@ class Product:
     #    enums.ProductStatus.DEACTIVATED.name : [enums.ProductStatus.PENDING_REVIEW.name, enums.ProductStatus.DRAFT.name],
     #}
 
-    def __post_init__(self):
-        self._vendor_policy = vendor_policies.get_policy(vendor_type=self._vendor_type)
+    def set_vendor_policy(self, vendor_policy):
+        self._vendor_policy = vendor_policy
 
     def update_category(self, category_id: uuid.uuid4):
         if self._vendor_policy.validate(self):
@@ -255,8 +250,8 @@ class Product:
     def get_status(self):
         return self._status
 
-    def get_vendor_name(self):
-        return self._vendor_name
+    def get_vendor(self):
+        return self._vendor
 
     def get_date_created(self):
         return self._date_created

@@ -3,7 +3,8 @@ from .models import (
     Product,
     Category,
     VariantItem,
-    Tag
+    Tag,
+    Image
 )
 
 def get_list_display(model=None, exclude_fields=None):
@@ -24,9 +25,8 @@ class CommonAdmin(admin.ModelAdmin):
 
     def has_change_permission(self, request, obj=None):
         #if not belong to same group
-        if obj and obj.vendor_name and not request.user.groups.filter(name=obj.vendor_name).exists():
-            return False
-        return True
+        if obj and obj.vendor_id and not request.user.groups.filter(name=obj.vendor_id).exists():
+           return True
 
     def has_delete_permission(self, request, obj=None):
         return False # disable hard delete
@@ -48,12 +48,19 @@ class CategoryAdmin(CommonAdmin):
     pass
 
 
+class VariantItemAdmin(admin.ModelAdmin):
+    pass
+
 class TagAdmin(admin.ModelAdmin):
     pass
 
+class ImageAdmin(admin.ModelAdmin):
+    pass
 
 
 
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Product, ProductAdmin)
+admin.site.register(VariantItem, VariantItemAdmin)
 admin.site.register(Tag, TagAdmin)
+admin.site.register(Image, ImageAdmin)
