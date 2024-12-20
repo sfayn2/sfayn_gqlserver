@@ -60,7 +60,7 @@ class Product(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False) #uuid for global unique id
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True) 
-    category = models.ForeignKey("product_catalog.Category", on_delete=models.CASCADE, null=True, related_name="cat2product") 
+    category = models.ManyToManyField("product_catalog.Category", blank=True, related_name="cat2product") 
     tag = models.ManyToManyField("product_catalog.Tag", related_name="tag2product", blank=True) 
     status = models.CharField(max_length=25, blank=True, null=True, choices=enums.ProductStatus.choices, default=enums.ProductStatus.DRAFT) 
     vendor = models.ForeignKey(Group, on_delete=models.CASCADE, related_name="vendor2product", help_text="Vendor name associated w this product")

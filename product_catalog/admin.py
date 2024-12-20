@@ -40,7 +40,7 @@ class VariantItemInline(admin.TabularInline):
 
 class ProductAdmin(CommonAdmin):
     inlines = (VariantItemInline,)
-    filter_horizontal = ('tag',)
+    filter_horizontal = ('tag', 'category')
 
 
 
