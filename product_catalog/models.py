@@ -81,7 +81,7 @@ class Product(models.Model):
     def __str__(self):
         return f"{self.name} (Vendor name: {self.vendor.name})"
 
-    def to_domain(self, vendor_policy):
+    def to_domain(self):
         variants = [
             domain_models.VariantItem(
                 _id=variant.id,
@@ -102,7 +102,6 @@ class Product(models.Model):
             _variant_items=variants,
             _category=self.category.id,
             _vendor=self.vendor_id, 
-            _vendor_policy=vendor_policy,
             _date_created=self.date_created, 
             _date_modified=self.date_modified,
             _tags=list(self.tag.values_list('name', flat=True))

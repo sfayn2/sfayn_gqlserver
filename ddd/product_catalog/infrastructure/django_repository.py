@@ -4,11 +4,11 @@ from product_catalog import models as django_models
 
 class DjangoProductRepository(repositories.ProductRepository):
     def get(self, product_id):
-        vendor_policy = vendor_policy.get_policy(product_id)
-        product = django_models.Product.objects.get(id=product_id).to_domain(
-            vendor_policy
-            )
-        return product
+        product = django_models.Product.objects.get(id=product_id)
+        _vendor_policy = vendor_policy.get_policy(product.vendor_id)
+        return product.to_domain().set_vendor_policy(
+            _vendor_policy
+        )
     
     def save(self, product: models.Product): 
         product_model = django_models.Product.from_domain(product)
