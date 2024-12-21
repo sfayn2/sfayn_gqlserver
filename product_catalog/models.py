@@ -71,10 +71,17 @@ class Product(models.Model):
     class Meta:
         unique_together = ("name", "vendor") #prevent duplicate product per vendor
 
+        #TODO: lets do this  in Vendor model?
+        permissions = [
+            ("vendor_standard_policy", "Can use vendor standard policy"),
+            ("vendor_standard_v2_policy", "Can use vendor standard version2 policy"),
+            ("vendor_standard_v3_policy", "Can use vendor standard version3 policy"),
+        ]
+
     def __str__(self):
         return f"{self.name} (Vendor name: {self.vendor.name})"
 
-    def to_domain(self):
+    def to_domain(self, vendor_policy):
         variants = [
             domain_models.VariantItem(
                 _id=variant.id,
@@ -95,6 +102,7 @@ class Product(models.Model):
             _variant_items=variants,
             _category=self.category.id,
             _vendor=self.vendor_id, 
+            _vendor_policy=vendor_policy,
             _date_created=self.date_created, 
             _date_modified=self.date_modified,
             _tags=list(self.tag.values_list('name', flat=True))
@@ -174,3 +182,4 @@ class Image(models.Model):
 
     def __str__(self):
         return f"{self.variant} {self.img_upload.url}"
+

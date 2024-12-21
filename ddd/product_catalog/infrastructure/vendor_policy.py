@@ -1,4 +1,5 @@
 from ddd.product_catalog.domain import vendor_policies, enums, models
+from django.contrib.auth.models import Group
 from django.conf import settings
 
 class StandardVendorPolicy(vendor_policies.VendorPolicy):
@@ -47,14 +48,23 @@ class StandardVendorPolicyV2(StandardVendorPolicy):
 class StandardVendorPolicyV3(StandardVendorPolicy):
     def validate_category(self, product):
         if product.categories[0].parent is None:
-            raise ValueError("Custom vendors require a nested categories")
+            raise ValueError("Standard Vendor policy version 3 requires a nested categories")
 
-#get from django settings?
+# permission cn do multi vendor policy?
 POLICIES = {
-    "Standard": StandardVendorPolicy(),
-    "StandardV2": StandardVendorPolicyV2(),
-    "StandardV3": StandardVendorPolicyV3()
+    "vendor_standard_policy": StandardVendorPolicy,
+    "vendor_standard_v2_policy": StandardVendorPolicyV2,
+    "vendor_standard_v2_policy": StandardVendorPolicyV3
 }
 
-def get_policy():
-    return POLICIES.get(settings.PRODUCT_CATALOG_VENDOR_POLICY, StandardVendorPolicy())
+def get_policy(vendor_id: int):
+
+    #START <multi vendor policy>
+    vendor_grp = Group.objects.filter(id=vendor_id)
+    for perm, policy_impl in POLICIES.items():
+        if vendor_grp.filter(permissions__codename=perm).exists():
+            return policy_impl()
+
+    #default   
+    return StandardVendorPolicy()
+    #END <multi vendor policy>
