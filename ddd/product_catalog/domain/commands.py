@@ -21,7 +21,7 @@ class ChangeStatusCommand(Command):
     new_status: enums.ProductStatus
 
 @dataclass
-class ActivateProductCommand(Command):
+class ApproveProductCommand(Command):
     product_id: uuid.uuid4
 
 @dataclass

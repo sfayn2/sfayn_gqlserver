@@ -54,7 +54,7 @@ class StandardVendorPolicyV3(StandardVendorPolicy):
 POLICIES = {
     "vendor_standard_policy": StandardVendorPolicy,
     "vendor_standard_v2_policy": StandardVendorPolicyV2,
-    "vendor_standard_v2_policy": StandardVendorPolicyV3
+    "vendor_standard_v3_policy": StandardVendorPolicyV3
 }
 
 def get_policy(vendor_id: int):

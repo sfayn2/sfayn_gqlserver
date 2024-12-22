@@ -3,12 +3,12 @@ from ddd.product_catalog.app import unit_of_work, handlers
 from ddd.product_catalog.domain import commands, events
 
 COMMAND_HANDLERS = {
-    commands.ActivateProductCommand: handlers.handle_product_activate,
+    commands.ApproveProductCommand: handlers.handle_product_approval,
     commands.CreateCategoryCommand: handlers.handle_create_category,
 }
 
 EVENT_HANDLERS = {
-    events.ProductActivated : [handlers.log_activated_product]
+    events.ProductApproved : [handlers.log_approved_product]
 }
 
 def handle(message: Union[commands.Command, events.DomainEvent], uow: unit_of_work.DjangoUnitOfWork):

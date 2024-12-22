@@ -12,7 +12,7 @@ class ProductCreated(DomainEvent):
     category: str
 
 @dataclass
-class ProductActivated(DomainEvent):
+class ProductApproved(DomainEvent):
     product_id: str
     name: str
     description: str

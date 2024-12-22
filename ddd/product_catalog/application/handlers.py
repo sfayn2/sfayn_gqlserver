@@ -3,6 +3,7 @@ from decimal import Decimal
 from ddd.product_catalog.domain import commands, models
 from ddd.product_catalog.app import unit_of_work
 from ddd.product_catalog.domain import events
+from ddd.product_catalog.infrastructure import vendor_policy
 
 def handle_create_category(command: commands.CreateCategoryCommand, uow: unit_of_work.DjangoUnitOfWork):
     with uow:
@@ -20,10 +21,12 @@ def handle_create_category(command: commands.CreateCategoryCommand, uow: unit_of
         uow.category.save(domain_category)
         uow.commit()
 
-def handle_product_activate(command: commands.ActivateProductCommand, uow: unit_of_work.DjangoUnitOfWork):
+def handle_product_approval(command: commands.ApproveProductCommand, uow: unit_of_work.DjangoUnitOfWork):
     with uow:
-        domain_product = uow.product.get(product_id=command.product_id)
-        domain_product.activate()
+        domain_product = uow.product.get(product_id=command.product_id, user=command.user)
+        _vendor_policy = vendor_policy.get_policy(vendor_id=domain_product.get_vendor())
+        domain_product.set_vendor_policy(_vendor_policy)
+        domain_product.approve()
         #new_sku = models.VariantItem(
         #    _id=uuid.uuid4(),
         #    _sku="TH-0022-XL",
@@ -37,7 +40,7 @@ def handle_product_activate(command: commands.ActivateProductCommand, uow: unit_
         #domain_product.add_variants(new_sku)
         #domain_product.deactivate_sku("TH-0022-XL")
 
-        event = events.ProductActivated(
+        event = events.ProductApproved(
             product_id=domain_product.get_id(),
             name=domain_product.get_name(), 
             description=domain_product.get_desc(),
@@ -47,11 +50,11 @@ def handle_product_activate(command: commands.ActivateProductCommand, uow: unit_
         uow.product.save(domain_product)
         uow.commit()
 
-        print("Active product")
+        print("Handle product approval")
 
         return event
 
 
-def log_activated_product(event: events.ProductActivated, uow: unit_of_work.DjangoUnitOfWork):
-    # handle the event by logging the product activated
-    print(f"Product Activated: {event.product_id} - {event.name} ({event.description} {event.category})")
+def log_approved_product(event: events.ProductApproved, uow: unit_of_work.DjangoUnitOfWork):
+    # handle the event by logging the product approved
+    print(f"Approved product: {event.product_id} - {event.name} ({event.description} {event.category})")
