@@ -153,7 +153,7 @@ class Product:
     _description: str
     _category: uuid.uuid4
     _vendor: int
-    _vendor_policy: str
+    _vendor_policy: Optional[vendor_policies.VendorPolicy] = None
     _tags: List[str] = field(default_factory=list)
     _status: enums.ProductStatus = enums.ProductStatus.DRAFT.name
     _variant_items: List[VariantItem] = field(default_factory=list)
