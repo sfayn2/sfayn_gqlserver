@@ -169,6 +169,8 @@ class Product:
     #}
 
     def set_vendor_policy(self, vendor_policy):
+        if self._vendor_policy:
+            raise ValueError("Vendor policy already set.")
         self._vendor_policy = vendor_policy
 
     def update_category(self, category_id: uuid.uuid4):

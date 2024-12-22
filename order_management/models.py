@@ -14,6 +14,9 @@ class Order(models.Model):
         default="PENDING"
     ) 
 
+    customer_id = models.CharField(max_length=255)
+    customer_email = models.EmailField(max_length=255, blank=True, null=True)
+
     shipping_method = models.CharField(max_length=50, null=True, blank=True, help_text="i.e. Free Shipping, Local Pickup")
     shipping_note = models.CharField(max_length=150, null=True, blank=True, help_text="i.e. 2-3 days delivery")
     shipping_cost = models.DecimalField(
@@ -25,9 +28,9 @@ class Order(models.Model):
     )
 
     shipping_address = models.TextField(blank=True, help_text="Delivery address")
+    shipping_city = models.CharField(max_length=50)
     shipping_postal = models.CharField(max_length=50)
     shipping_country = models.CharField(max_length=50)
-    shipping_region = models.CharField(max_length=50)
 
     total_amount = models.DecimalField(
         decimal_places=settings.DEFAULT_DECIMAL_PLACES, 
@@ -36,11 +39,6 @@ class Order(models.Model):
         blank=True, 
         help_text="", 
     )
-    created_by = models.CharField(
-        max_length=50, 
-        null=True, 
-        blank=True, 
-        help_text="always system user?")
     date_created = models.DateTimeField(auto_now_add=True) 
     date_modified = models.DateTimeField(auto_now=True) 
 
@@ -59,9 +57,7 @@ class OrderLine(models.Model):
     )
 
     product_sku = models.CharField(max_length=50)
-    product_variant = models.CharField(max_length=50, null=True, blank=True) # COLOR?
-    product_option = models.CharField(max_length=50, null=True, blank=True) # Red/Blue?
-    product_img = models.ImageField(null=True, blank=True, help_text="Primary img")
+    options = models.JSONField(help_text='ex. {"Size": "M", "Color": "RED"}') # anticipated to have complex tables to support multi dimension variants, decided to use JSONField
     product_price = models.DecimalField(max_digits=10, decimal_places=2)
     order_quantity = models.PositiveIntegerField(null=True)
     total_price = models.DecimalField(
@@ -76,40 +72,41 @@ class OrderLine(models.Model):
     def __str__(self):
         return f"Item {self.product_variant} ({self.quantity})"
 
-class Shipping(models.Model):
-    order = models.OneToOneField(Order, related_name="shipping", on_delete=models.CASCADE)
-    provider_name = models.CharField(max_length=255, null=True, blank=True)
-    tracking_number = models.CharField(max_length=255, null=True, blank=True)
-    status = models.CharField(
-        max_length=25, 
-        blank=True, 
-        null=True, 
-        choices=[('pending', 'Pending'), ('shipped', 'Shipped')], 
-        default="PENDING"
-    ) 
-
-    def __str__(self):
-        return f"Shipping for Order: {self.order}"
-
-class Payment(models.Model):
-    order = models.OneToOneField(Order, related_name="payment", on_delete=models.CASCADE)
-    payment_method = models.CharField(max_length=255, null=True, blank=True)
-    status = models.CharField(
-        max_length=25, 
-        blank=True, 
-        null=True, 
-        choices=[('pending', 'Pending'), ('completed', 'Completed')], 
-        default="PENDING"
-    ) 
-    transaction_id = models.CharField(max_length=255, null=True, blank=True)
-    amount_paid = models.DecimalField(
-        decimal_places=settings.DEFAULT_DECIMAL_PLACES, 
-        max_digits=settings.DEFAULT_MAX_DIGITS,
-        null=True, 
-        blank=True, 
-        help_text="", 
-    )
-
-    def __str__(self):
-        return f"Payment for Order: {self.order}"
-
+#TODO: lets do later?
+#class Shipping(models.Model):
+#    order = models.OneToOneField(Order, related_name="shipping", on_delete=models.CASCADE)
+#    provider_name = models.CharField(max_length=255, null=True, blank=True)
+#    tracking_number = models.CharField(max_length=255, null=True, blank=True)
+#    status = models.CharField(
+#        max_length=25, 
+#        blank=True, 
+#        null=True, 
+#        choices=[('pending', 'Pending'), ('shipped', 'Shipped')], 
+#        default="PENDING"
+#    ) 
+#
+#    def __str__(self):
+#        return f"Shipping for Order: {self.order}"
+#
+#class Payment(models.Model):
+#    order = models.OneToOneField(Order, related_name="payment", on_delete=models.CASCADE)
+#    payment_method = models.CharField(max_length=255, null=True, blank=True)
+#    status = models.CharField(
+#        max_length=25, 
+#        blank=True, 
+#        null=True, 
+#        choices=[('pending', 'Pending'), ('completed', 'Completed')], 
+#        default="PENDING"
+#    ) 
+#    amount_paid = models.DecimalField(
+#        decimal_places=settings.DEFAULT_DECIMAL_PLACES, 
+#        max_digits=settings.DEFAULT_MAX_DIGITS,
+#        null=True, 
+#        blank=True, 
+#        help_text="", 
+#    )
+#
+#    def __str__(self):
+#        return f"Payment for Order: {self.order}"
+#
+#
