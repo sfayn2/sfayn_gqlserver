@@ -49,10 +49,30 @@ class OrderLine:
     _options: str
     _product_price: Money
     _order_quantity: int
-    _total_price = Money
+    _discounts_fee: Money
+    #_total_price = Money
 
     def get_total_price(self) -> Money:
-        return self._total_price.multiply(self._order_quantity)
+        if self._discounts_fee:
+            return self.get_discounted_price()
+        else:
+            return (self._product_price * self._order_quantity)
+
+    def add(self, quantity: int):
+        if quantity < 0:
+            raise ValueError("Value must be greater than current quantity.")
+
+        self._order_quantity += quantity
+
+    def subtract(self, quantity: int):
+        if quantity < 0 or quantity > self._order_quantity:
+            raise ValueError("Value must be less than or equal to the current quantity.")
+
+        self._order_quantity -= quantity
+
+    def get_discounted_price(self):
+        return (self._product_price * self._order_quantity) - self._discounts_fee
+
 
 
 @dataclass(frozen=True)

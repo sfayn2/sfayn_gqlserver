@@ -12,3 +12,7 @@ class OrderStatus(Enum):
     @classmethod
     def choices(cls):
         return tuple((i.name, i.value) for i in cls)
+
+class ShippingMethod(Enum):
+    STANDARD = "Standard"
+    EXPRESS = "Exppress"
