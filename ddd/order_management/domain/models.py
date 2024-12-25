@@ -1,5 +1,7 @@
+from __future__ import annotations
 from datetime import datetime
-from typing import List, Optional
+from decimal import Decimal
+from typing import List, Optional, Tuple
 from dataclasses import dataclass, field
 from order_management.domain import value_objects, enums, exceptions
 
@@ -17,6 +19,7 @@ class Order:
     _shipping_cost: value_objects.Money
     _shipping_reference: str
     _total_amount: value_objects.Money
+    _shipping_policy: Optional[str] = None #TODO should not be str
     _payments: List[value_objects.Payment] = field(default_factory=list)
     _date_created: datetime = field(default_factory=datetime.now)
     _date_modified: Optional[datetime] = None
@@ -92,6 +95,23 @@ class Order:
         self._payments.append(payment)
         if self.is_fully_paid:
             self._status = enums.OrderStatus.PAID.name
+
+    def set_shipping_policy(self, shipping_policy):
+        if self._shipping_policy:
+            raise ValueError("Vendor Shipping policy already set.")
+        self._shipping_policy = shipping_policy
+
+    def get_total_weight(self) -> Decimal:
+        return sum(item.get_total_weight() for item in self.get_line_items())
+
+    def get_combined_dimensions(self) -> Tuple[int, int, int]:
+        total_length = sum(item.get_dimensions()[0] for item in self.get_line_items())
+        max_width = max(item.get_dimensions()[1] for item in self.get_line_items())
+        max_height = max(item.get_dimensions()[2] for item in self.get_line_items())
+        return total_length, max_width, max_height
+
+    def get_shipping_options(self, order: Order) -> List[dict]:
+        return self._shipping_policy.get_shipping_options(order)
 
     def get_line_items(self):
         return self._order_lines

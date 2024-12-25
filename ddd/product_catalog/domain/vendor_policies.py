@@ -1,5 +1,5 @@
-from abc import ABC, abstractmethod
 from __future__ import annotations
+from abc import ABC, abstractmethod
 from ddd.product_catalog.domain import enums, exceptions, models
 
 class VendorPolicy(ABC):

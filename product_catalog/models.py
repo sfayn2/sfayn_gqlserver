@@ -64,7 +64,12 @@ class Product(models.Model):
     tag = models.ManyToManyField("product_catalog.Tag", related_name="tag2product", blank=True) 
     status = models.CharField(max_length=25, blank=True, null=True, choices=enums.ProductStatus.choices, default=enums.ProductStatus.DRAFT) 
     vendor = models.ForeignKey(Group, on_delete=models.CASCADE, related_name="vendor2product", help_text="Vendor name associated w this product")
-    attributes = models.JSONField(blank=True, null=True, help_text='ex. {"Brand": "X", "Warranty": "1 year"}') # anticipated to have frequent changes on attributes, decided to use JSONField
+    brand = models.CharField(max_length=100, null=True, blank=True)
+    package_weight = models.CharField(max_length=100, null=True, blank=True, help_text="value can be estimated package weight or based on historic data?")
+    package_length = models.CharField(max_length=100, null=True, blank=True, help_text="value can be estimated package weight or based on historic data?")
+    package_width = models.CharField(max_length=100, null=True, blank=True, help_text="value can be estimated package weight or based on historic data?")
+    package_height = models.CharField(max_length=100, null=True, blank=True, help_text="value can be estimated package weight or based on historic data?")
+    attributes = models.JSONField(blank=True, null=True, help_text='ex. {"other": "X", "Warranty": "1 year"}') # anticipated to have frequent changes on attributes, decided to use JSONField
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True) 
 

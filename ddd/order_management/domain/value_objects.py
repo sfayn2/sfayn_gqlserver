@@ -1,6 +1,6 @@
 from __future__ import annotations
 from dataclasses import dataclass
-from typing import Union
+from typing import Union, Tuple
 from decimal import Decimal
 
 @dataclass(frozen=True)
@@ -50,6 +50,7 @@ class OrderLine:
     _product_price: Money
     _order_quantity: int
     _discounts_fee: Money
+    package: Package
     #_total_price = Money
 
     def get_total_price(self) -> Money:
@@ -73,6 +74,13 @@ class OrderLine:
     def get_discounted_price(self):
         return (self._product_price * self._order_quantity) - self._discounts_fee
 
+    def get_total_weight(self) -> Decimal:
+        return self._weight * self._order_quantity
+
+    #def total_volume(self) -> int:
+    #    length, width, height = self.package.get_dimensions()
+    #    return length*width*height*self._order_quantity
+
 
 
 @dataclass(frozen=True)
@@ -82,6 +90,19 @@ class Address:
     _postal: int
     _country: str
 
+    def is_international(self, origin_country: str) -> bool:
+        return self._country != origin_country
+
+class Package:
+    _weight: Decimal #in kg
+    _dimensions: Tuple[int, int, int] # (length, width, height) in cm
+
+    def get_weight(self):
+        return self._weight
+
+    def get_dimensions(self):
+        return self._dimensions
+
 @dataclass(frozen=True)
 class Payment:
     _method: str
@@ -89,4 +110,6 @@ class Payment:
 
     def get_amount(self):
         return self._amount
+
+
 
