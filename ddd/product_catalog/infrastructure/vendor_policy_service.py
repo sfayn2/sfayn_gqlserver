@@ -7,7 +7,6 @@ class VendorPolicyService:
     POLICIES = {
         "vendor_standard_policy": vendor_policies.StandardVendorPolicy,
         "vendor_standard_v2_policy": vendor_policies.StandardVendorPolicyV2,
-        "vendor_standard_v3_policy": vendor_policies.StandardVendorPolicyV3
     }
 
     def get_policy(self, vendor_id: int):
