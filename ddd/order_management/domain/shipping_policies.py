@@ -5,7 +5,7 @@ from ddd.order_management.domain import enums, exceptions, models, value_objects
 from decimal import Decimal
 
 class ShippingOption(ABC):
-    def __init__(self, name: str, delivery_time: str, base_cost: Decimal):
+    def __init__(self, name: enums.ShippingMethod, delivery_time: str, base_cost: Decimal):
         self.name = name
         self.delivery_time = delivery_time
         self.base_cost = base_cost
@@ -60,22 +60,22 @@ class DefaultShippingPolicy(ShippingPolicy):
     def __init__(self):
         self.shipping_options = [
             ShippingOption(
-                name="Standard",
+                name=enums.ShippingMethod.STANDARD,
                 delivery_time="3-5 business days",
                 base_cost=Decimal("5.00")
             ),
             ShippingOption(
-                name="Express",
+                name=enums.ShippingMethod.EXPRESS,
                 delivery_time="1-2 business days",
                 base_cost=Decimal("15.00")
             ),
             ShippingOption(
-                name="Same-Day Delivery",
+                name=enums.ShippingMethod.SAME_DAY,
                 delivery_time="same day",
                 base_cost=Decimal("25.00")
             ),
             Vendor1ShippingOption(
-                name="Vendor Flat Rate",
+                name=enums.ShippingMethod.FLAT_RATE,
                 delivery_time="4-6 business days",
                 base_cost=Decimal("10.00"),
                 flat_rate=Decimal("2.00")

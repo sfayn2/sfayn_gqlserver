@@ -12,3 +12,19 @@ class OrderStatus(Enum):
     @classmethod
     def choices(cls):
         return tuple((i.name, i.value) for i in cls)
+
+class ShippingMethod(Enum):
+    STANDARD = "Standard"
+    EXPRESS = "Express"
+    SAME_DAY = "Same Day Delivery"
+    FLAT_RATE = "Flat Rate"
+
+class OfferType(Enum):
+    DISCOUNT = "Discount"
+    BUNDLE = "Bundle"
+    FREE_GIFT = "Free Gift"
+    FREE_SHIPPING = "Free Shipping"
+
+class DiscountType(Enum):
+    PERCENTAGE = "Percentage"
+    FIXED_AMOUNT = "Fixed Amount"

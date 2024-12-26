@@ -44,8 +44,9 @@ class Money:
         return self._amount
 
 @dataclass(frozen=True)
-class OrderLine:
+class LineItem:
     _product_sku: str
+    _product_name: str
     _options: str
     _product_price: Money
     _order_quantity: int
@@ -71,6 +72,9 @@ class OrderLine:
 
         self._order_quantity -= quantity
 
+    def set_discounts_fee(self, amount: Money):
+        self._discounts_fee = amount
+
     def get_discounted_price(self):
         return (self._product_price * self._order_quantity) - self._discounts_fee
 
@@ -80,6 +84,12 @@ class OrderLine:
     #def total_volume(self) -> int:
     #    length, width, height = self.package.get_dimensions()
     #    return length*width*height*self._order_quantity
+
+    def get_product_name(self):
+        return self._product_name
+
+    def get_order_quantity(self):
+        return self._order_quantity
 
 
 
