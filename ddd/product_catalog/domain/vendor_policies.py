@@ -11,7 +11,7 @@ class VendorPolicy(ABC):
     def can_approve(self, role):
         raise NotImplementedError("Subclasses must implement this method")
 
-class StandardVendorPolicy(VendorPolicy):
+class DefaultVendorPolicy(VendorPolicy):
 
     VALID_STATUS_TRANSITIONS = {
         enums.ProductStatus.DRAFT.name : [enums.ProductStatus.PUBLISHED.name],
@@ -23,16 +23,4 @@ class StandardVendorPolicy(VendorPolicy):
     def can_approve(self, role):
         return True
 
-
-class StandardVendorPolicyV2(StandardVendorPolicy):
-
-    VALID_STATUS_TRANSITIONS = {
-        enums.ProductStatus.DRAFT.name : [enums.ProductStatus.PUBLISHED.name],
-    }
-
-    def get_allowed_transition(self, new_status: enums.ProductStatus):
-        return self.VALID_STATUS_TRANSITIONS.get(new_status.name)
-
-    def can_approve(self, role):
-        return True
 

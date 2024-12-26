@@ -58,7 +58,7 @@ class FreeShippingOffer(BaseOffer):
         return None
 
 
-class StandardOfferPolicy(OfferPolicy):
+class DefaultOfferPolicy(OfferPolicy):
     def __init__(self):
         self.offers = [
             DiscountOffer(

@@ -5,8 +5,7 @@ from django.conf import settings
 class VendorPolicyService:
     # permission cn do multi vendor policy?  # should this be in domain layer??
     POLICIES = {
-        "vendor_standard_policy": vendor_policies.StandardVendorPolicy,
-        "vendor_standard_v2_policy": vendor_policies.StandardVendorPolicyV2,
+        "vendor_default_policy": vendor_policies.DefaultVendorPolicy
     }
 
     def get_policy(self, vendor_id: int):
@@ -18,5 +17,5 @@ class VendorPolicyService:
                 return policy_impl()
 
         #default   
-        return vendor_policies.StandardVendorPolicy()
+        return vendor_policies.DefaultVendorPolicy()
         #END <multi vendor policy>

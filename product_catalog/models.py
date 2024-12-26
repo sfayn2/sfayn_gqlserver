@@ -78,9 +78,7 @@ class Product(models.Model):
 
         #TODO: lets do this  in Vendor model?
         permissions = [
-            ("vendor_standard_policy", "Can use vendor standard policy"),
-            ("vendor_standard_v2_policy", "Can use vendor standard version2 policy"),
-            ("vendor_standard_v3_policy", "Can use vendor standard version3 policy"),
+            ("vendor_default_policy", "Can use vendor default policy"),
         ]
 
     def __str__(self):
