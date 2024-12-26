@@ -5,7 +5,7 @@ from typing import Tuple, List
 from ddd.order_management.domain import enums, exceptions, models, value_objects
 from decimal import Decimal
 
-class OfferOption(ABC):
+class BaseOffer(ABC):
     def __init__(self, offer_type: enums.OfferType, description: str):
         self.offer_type = offer_type
         self.description = description
@@ -19,7 +19,7 @@ class OfferPolicy(ABC):
     def get_offers(self, order: models.Order):
         raise NotImplementedError("Subclasses must implement this method")
 
-class DiscountOfferOption(OfferOption):
+class DiscountOffer(BaseOffer):
     def __init__(self, offer_type: enums.OfferType, description: str, discount_type: enums.DiscountType, discount_value: Decimal, eligible_products: List[str]):
         super().__init__(offer_type, description)
         self.discount_type = discount_type 
@@ -34,7 +34,7 @@ class DiscountOfferOption(OfferOption):
                 total_discount += item.get_total_price() * (self.discount_value / 100)
         return total_discount
 
-class FreeGiftOfferOption(OfferOption):
+class FreeGiftOffer(BaseOffer):
     def __init__(self, offer_type: enums.OfferType, description: str, min_quantity: int, gift_product_ids: List[str]):
         super().__init__(offer_type, description)
         self.min_quantity = min_quantity 
@@ -47,7 +47,7 @@ class FreeGiftOfferOption(OfferOption):
                 free_gifts.append({"product_id": prod, "quantity": 1})
         return free_gifts
     
-class FreeShippingOfferOption(OfferOption):
+class FreeShippingOffer(BaseOffer):
     def __init__(self, offer_type: enums.OfferType, description: str, min_order_total: int):
         super().__init__(offer_type, description)
         self.min_order_total = min_order_total 
@@ -61,20 +61,20 @@ class FreeShippingOfferOption(OfferOption):
 class StandardOfferPolicy(OfferPolicy):
     def __init__(self):
         self.offers = [
-            DiscountOfferOption(
+            DiscountOffer(
                 offer_type=enums.OfferType.DISCOUNT,
                 description="10% off Lacoste Product",
                 discount_type=enums.DiscountType.PERCENTAGE,
                 discount_value=Decimal("10"),
                 eligible_products=["Lacoste"]
             ),
-            FreeGiftOfferOption(
+            FreeGiftOffer(
                 offer_type=enums.OfferType.FREE_GIFT,
                 description="Free gift for 2+ items",
                 min_quantity=2,
                 gift_product_ids=["Prod1", "Prod2"]
             ),
-            FreeShippingOfferOption(
+            FreeShippingOffer(
                 offer_type=enums.OfferType.FREE_SHIPPING,
                 description="Free shipping for orders above $150",
                 min_order_total=150
