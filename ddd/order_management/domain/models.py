@@ -4,7 +4,7 @@ from decimal import Decimal
 from typing import List, Optional, Tuple
 from dataclasses import dataclass, field
 from order_management.domain import value_objects, enums, exceptions
-from order_management.domain.services import tax_service
+from order_management.domain.services import tax_service, shipping_option_policies, offer_policies
 
 
 @dataclass
@@ -21,8 +21,6 @@ class Order:
     _total_amount: value_objects.Money
     _total_tax: Decimal
     _coupon_codes: Optional[List[str]] = field(default_factory=list, init=False)
-    _shipping_policy: Optional[str] = field(default_factory=None, init=False) #TODO should not be str
-    _offer_policy: Optional[str] = field(default_factory=None, init=False) #TODO should not be str
     _payments: List[value_objects.Payment] = field(default_factory=list)
     _date_created: datetime = field(default_factory=datetime.now)
     _date_modified: Optional[datetime] = None
@@ -49,13 +47,8 @@ class Order:
             raise "No item to add in order!"
         self.line_items.add(line_item)
 
-    def set_offer_policy(self, offer_policy):
-        if self._offer_policy:
-            raise ValueError("Offer policy already set.")
-        self._offer_policy = offer_policy
-
-    def checkout(self):
-        discounts_amount, free_gifts, free_shipping = self._offer_policy.get_offers()
+    def checkout(self, offer_policy: offer_policies.OfferPolicy):
+        discounts_amount, free_gifts, free_shipping = offer_policy.get_offers()
         #TODO: free gifts need to insert in line items?
 
     def place(self):
@@ -124,11 +117,6 @@ class Order:
         #right now validation is handled in offer policy
         self._coupon_codes.append(coupon_code)
 
-    def set_shipping_policy(self, shipping_policy):
-        if self._shipping_policy:
-            raise ValueError("Vendor Shipping policy already set.")
-        self._shipping_policy = shipping_policy
-
     def get_total_amount(self):
         return sum(line.total_price for line in self.line_items)
 
@@ -144,8 +132,8 @@ class Order:
         max_height = max(item.get_dimensions()[2] for item in self.get_line_items())
         return total_length, max_width, max_height
 
-    def get_shipping_options(self, order: Order) -> List[dict]:
-        return self._shipping_policy.get_shipping_options(order)
+    def get_shipping_options(self, order: Order, shipping_option_policy: shipping_option_policies.ShippingOptionPolicy) -> List[dict]:
+        return shipping_option_policy.get_shipping_options(order)
 
     def get_line_items(self):
         return self.line_items
