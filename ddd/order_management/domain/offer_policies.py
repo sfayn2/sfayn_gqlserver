@@ -1,4 +1,5 @@
 from __future__ import annotations
+from datetime import datetime
 from dataclasses import dataclass
 from abc import ABC, abstractmethod
 from typing import Tuple, List
@@ -69,16 +70,17 @@ class FreeShippingOffer(BaseOffer):
         return None
 
 class DiscountCouponOffer(BaseOffer):
-    def __init__(self, offer_type: enums.OfferType, description: str, coupon_code: str, min_order_total: Decimal, requires_coupon: bool):
+    def __init__(self, offer_type: enums.OfferType, description: str, coupon_code: str, min_order_total: Decimal, requires_coupon: bool, expiry_date: DateTime):
         super().__init__(offer_type, description)
         self.coupon_code = coupon_code
         self.min_order_total = min_order_total
+        self.expiry_date = expiry_date
         self.requires_coupon = requires_coupon
 
-    #apply on order
     def apply_offer(self, order: models.Order):
         total_discount = 0
-        if self.requires_coupon:
+        #TODO to simplify, hard coded the expiration date. future plan to move expirate_date, usage_limit to db?
+        if self.requires_coupon and self.expiry_date >= datetime.date():
             if self.coupon_code in order.get_customer_coupons():
                 return 0  #coupon does not match
 
@@ -106,6 +108,7 @@ class DefaultOfferPolicy(OfferPolicy):
                 discount_value=Decimal("10"),
                 eligible_products=["Lacoste"],
                 coupon_code="WELCOME25",
+                expiry_date="12/31/2024",
                 requires_coupon=True
             ),
             FreeGiftOffer(
