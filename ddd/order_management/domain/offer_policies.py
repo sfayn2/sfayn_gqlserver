@@ -35,16 +35,27 @@ class DiscountOffer(BaseOffer):
         return total_discount
 
 class FreeGiftOffer(BaseOffer):
-    def __init__(self, offer_type: enums.OfferType, description: str, min_quantity: int, gift_product_ids: List[str]):
+    def __init__(self, offer_type: enums.OfferType, description: str, min_quantity: int, gift_products: List[dict]):
         super().__init__(offer_type, description)
         self.min_quantity = min_quantity 
-        self.gift_products_ids = gift_product_ids
+        self.gift_products = gift_products
 
     def apply_offer(self, order: models.Order):
         free_gifts = []
         if sum(item.get_order_quantity() for item in order.get_line_items()) >= self.min_quantity:
-            for prod in self.gift_products_ids:
-                free_gifts.append({"product_id": prod, "quantity": 1})
+            for free_product in self.gift_products:
+                free_gifts.append(free_product)
+
+                # add free product gifts
+                order.add_line_item(
+                    value_objects.LineItem(
+                        _product_sku=free_product.get('sku'),
+                        _product_price=value_objects.Money(0, "SGD"),
+                        _order_quantity=free_product.get('quantity'),
+                        is_free_gift=True
+                    )
+                )
+
         return free_gifts
     
 class FreeShippingOffer(BaseOffer):
@@ -72,7 +83,7 @@ class DefaultOfferPolicy(OfferPolicy):
                 offer_type=enums.OfferType.FREE_GIFT,
                 description="Free gift for 2+ items",
                 min_quantity=2,
-                gift_product_ids=["Prod1", "Prod2"]
+                gift_products=[{"sku": "123", "quantity": 1}]
             ),
             FreeShippingOffer(
                 offer_type=enums.OfferType.FREE_SHIPPING,
