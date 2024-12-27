@@ -51,6 +51,7 @@ class LineItem:
     _product_price: Money
     _order_quantity: int
     is_free_gift: bool = False
+    is_taxable: bool = True
     package: Package
     #_discounts_fee: Money
     #_total_price = Money
@@ -118,6 +119,14 @@ class Payment:
 
     def get_amount(self):
         return self._amount
+
+#right now only for Gues customer
+@dataclass(frozen=True)    
+class Customer:
+    _full_name: str
+    _email: str
+
+
 
 
 

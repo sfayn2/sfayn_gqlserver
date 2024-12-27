@@ -4,14 +4,14 @@ from decimal import Decimal
 from typing import List, Optional, Tuple
 from dataclasses import dataclass, field
 from order_management.domain import value_objects, enums, exceptions
+from order_management.domain.services import tax_service
 
 
 @dataclass
 class Order:
     _order_id: str
-    _customer_full_name: str
-    _customer_email: str
-    _address: value_objects.Address
+    customer: value_objects.Customer
+    destination: value_objects.Address
     line_items: List[value_objects.LineItem]
     _status: enums.OrderStatus = enums.OrderStatus.DRAFT.name
     _shipping_method: enums.ShippingMethod = enums.ShippingMethod.STANDARD.name
@@ -19,6 +19,7 @@ class Order:
     _shipping_cost: value_objects.Money
     _shipping_reference: str
     _total_amount: value_objects.Money
+    _total_tax: Decimal
     _coupon_codes: Optional[List[str]] = field(default_factory=list, init=False)
     _shipping_policy: Optional[str] = field(default_factory=None, init=False) #TODO should not be str
     _offer_policy: Optional[str] = field(default_factory=None, init=False) #TODO should not be str
@@ -91,6 +92,18 @@ class Order:
         self._status = enums.OrderStatus.COMPLETED.name
         self.update_modified_date()
 
+    def calculate_tax(self, tax_service: tax_service.TaxService):
+        total_tax = 0.0
+        for product in self.get_line_items():
+            total_tax += tax_service.calculate_tax(
+                product,
+                product.get_order_quantity,
+                self.customer,
+                self.destination
+            )
+        self._total_tax = total_tax
+
+
     @property
     def is_fully_paid(self):
         return self.get_total_paid >= self.get_total_amount()
@@ -139,6 +152,9 @@ class Order:
 
     def get_customer_coupons(self):
         return self._coupon_codes
+
+    def get_total_tax(self):
+        return self._total_tax
 
     
 

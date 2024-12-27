@@ -64,6 +64,7 @@ class OrderLine(models.Model):
     product_sku = models.CharField(max_length=50)
     product_name = models.CharField(max_length=255)
     is_free_gift = models.BooleanField(default=False)
+    is_taxable = models.BooleanField(default=True)
     options = models.JSONField(help_text='ex. {"Size": "M", "Color": "RED"}') # anticipated to have complex tables to support multi dimension variants, decided to use JSONField
     product_price = models.DecimalField(max_digits=10, decimal_places=2)
     order_quantity = models.PositiveIntegerField(null=True)

@@ -1,4 +1,4 @@
-from ddd.order_management.domain import shipping_option_policies
+from ddd.order_management.domain.services import shipping_option_policies
 from django.contrib.auth.models import Group
 from django.conf import settings
 
