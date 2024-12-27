@@ -14,9 +14,6 @@ class Order:
     destination: value_objects.Address
     line_items: List[value_objects.LineItem]
     _status: enums.OrderStatus = enums.OrderStatus.DRAFT.name
-    _shipping_method: enums.ShippingMethod = enums.ShippingMethod.STANDARD.name
-    _shipping_note: str
-    _shipping_cost: value_objects.Money
     _shipping_reference: str
     _total_amount: value_objects.Money
     _total_tax: Decimal
