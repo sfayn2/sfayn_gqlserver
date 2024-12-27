@@ -16,6 +16,7 @@ class Order(models.Model):
 
     customer_full_name = models.CharField(max_length=255)
     customer_email = models.EmailField(max_length=255, blank=True, null=True)
+    customer_coupons = models.CharField(max_length=100, help_text="Customer entered coupons, just provide a list i.e WELCOME01,FREESHIP01")
     delivery_address = models.TextField(blank=True, help_text="Delivery address")
     delivery_city = models.CharField(max_length=50)
     delivery_postal = models.CharField(max_length=50)

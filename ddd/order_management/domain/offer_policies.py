@@ -68,6 +68,26 @@ class FreeShippingOffer(BaseOffer):
             return 0 #shipping cost waived?
         return None
 
+class DiscountCouponOffer(BaseOffer):
+    def __init__(self, offer_type: enums.OfferType, description: str, coupon_code: str, min_order_total: Decimal, requires_coupon: bool):
+        super().__init__(offer_type, description)
+        self.coupon_code = coupon_code
+        self.min_order_total = min_order_total
+        self.requires_coupon = requires_coupon
+
+    #apply on order
+    def apply_offer(self, order: models.Order):
+        total_discount = 0
+        if self.requires_coupon:
+            if self.coupon_code in order.get_customer_coupons():
+                return 0  #coupon does not match
+
+            for item in order.get_line_items():
+                if item.get_product_name() in self.eligible_products:
+                    total_discount += item.get_total_price() * (self.discount_value / 100)
+        return total_discount
+
+
 
 class DefaultOfferPolicy(OfferPolicy):
     def __init__(self):
@@ -78,6 +98,15 @@ class DefaultOfferPolicy(OfferPolicy):
                 discount_type=enums.DiscountType.PERCENTAGE,
                 discount_value=Decimal("10"),
                 eligible_products=["Lacoste"]
+            ),
+            DiscountCouponOffer(
+                offer_type=enums.OfferType.DISCOUNT,
+                description="10% off w WELCOME25",
+                discount_type=enums.DiscountType.PERCENTAGE,
+                discount_value=Decimal("10"),
+                eligible_products=["Lacoste"],
+                coupon_code="WELCOME25",
+                requires_coupon=True
             ),
             FreeGiftOffer(
                 offer_type=enums.OfferType.FREE_GIFT,

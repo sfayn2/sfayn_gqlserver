@@ -19,8 +19,9 @@ class Order:
     _shipping_cost: value_objects.Money
     _shipping_reference: str
     _total_amount: value_objects.Money
-    _shipping_policy: Optional[str] = None #TODO should not be str
-    _offer_policy: Optional[str] = None #TODO should not be str
+    _coupon_codes: Optional[List[str]] = field(default_factory=list, init=False)
+    _shipping_policy: Optional[str] = field(default_factory=None, init=False) #TODO should not be str
+    _offer_policy: Optional[str] = field(default_factory=None, init=False) #TODO should not be str
     _payments: List[value_objects.Payment] = field(default_factory=list)
     _date_created: datetime = field(default_factory=datetime.now)
     _date_modified: Optional[datetime] = None
@@ -91,12 +92,6 @@ class Order:
         self._status = enums.OrderStatus.COMPLETED.name
         self.update_modified_date()
 
-    def get_total_amount(self):
-        return sum(line.total_price for line in self.line_items)
-
-    def get_total_paid(self):
-        return sum(payment.get_amount() for payment in self.payments)
-
     @property
     def is_fully_paid(self):
         return self.get_total_paid >= self.get_total_amount()
@@ -106,10 +101,24 @@ class Order:
         if self.is_fully_paid:
             self._status = enums.OrderStatus.PAID.name
 
+    def apply_coupon(self, coupon_code: str, coupon_service):
+        #TODO: need to validate coupon_code if not expired ?? expired_date & usage_limit
+        coupon = coupon_service.validate(coupon_code)
+        if coupon:
+            self._coupon_codes.append(coupon_code)
+        else:
+            raise ValueError("Invalid or expired coupon code")
+
     def set_shipping_policy(self, shipping_policy):
         if self._shipping_policy:
             raise ValueError("Vendor Shipping policy already set.")
         self._shipping_policy = shipping_policy
+
+    def get_total_amount(self):
+        return sum(line.total_price for line in self.line_items)
+
+    def get_total_paid(self):
+        return sum(payment.get_amount() for payment in self.payments)
 
     def get_total_weight(self) -> Decimal:
         return sum(item.get_total_weight() for item in self.get_line_items())
@@ -125,6 +134,9 @@ class Order:
 
     def get_line_items(self):
         return self.line_items
+
+    def get_customer_coupons(self):
+        return self._coupon_codes
 
     
 
