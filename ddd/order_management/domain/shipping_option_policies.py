@@ -41,7 +41,7 @@ class Vendor1ShippingOption(ShippingOption):
         """
         return self.base_cost + (self.flat_rate * order.get_total_weight())
 
-class ShippingPolicy(ABC):
+class ShippingOptionPolicy(ABC):
 
     @abstractmethod
     def get_shipping_options(self, order: models.Order) -> List[dict]:
@@ -56,7 +56,7 @@ class ShippingPolicy(ABC):
                 })
         return options
 
-class DefaultShippingPolicy(ShippingPolicy):
+class DefaultShippingOptionPolicy(ShippingOptionPolicy):
     def __init__(self):
         self.shipping_options = [
             ShippingOption(

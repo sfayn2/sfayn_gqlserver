@@ -44,7 +44,7 @@ class Order(models.Model):
 
     class Meta:
         permissions = [
-            ("default_shipping_policy", "Can use default shipping policy"),
+            ("default_shipping_option_policy", "Can use default shipping option policy"),
         ]
 
     def __str__(self):
