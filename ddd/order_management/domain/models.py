@@ -26,21 +26,22 @@ class Order:
     _date_created: datetime = field(default_factory=datetime.now)
     _date_modified: Optional[datetime] = None
 
-    #VALID_STATUS_TRANSITIONS = {
-    #    enums.OrderStatus.DRAFT.name : [enums.OrderStatus.PENDING.name],
-    #    enums.OrderStatus.PENDING.name : [enums.OrderStatus.CONFIRMED.name],
-    #    enums.OrderStatus.CONFIRMED.name : [enums.OrderStatus.SHIPPED.name, enums.OrderStatus.CANCELLED.name],
-    #    enums.OrderStatus.SHIPPED.name : [enums.OrderStatus.COMPLETED.name, enums.OrderStatus.CANCELLED.name],
-    #}
+    VALID_STATUS_TRANSITIONS = {
+        enums.OrderStatus.DRAFT.name : [enums.OrderStatus.PENDING.name],
+        enums.OrderStatus.PENDING.name : [enums.OrderStatus.CONFIRMED.name],
+        enums.OrderStatus.CONFIRMED.name : [enums.OrderStatus.SHIPPED.name, enums.OrderStatus.CANCELLED.name],
+        enums.OrderStatus.SHIPPED.name : [enums.OrderStatus.COMPLETED.name, enums.OrderStatus.CANCELLED.name],
+        enums.OrderStatus.COMPLETED.name : []
+    }
 
     def update_modified_date(self):
         self._date_modified = datetime.now()
 
-    #def change_state(self, new_status: enums.OrderStatus):
-    #    if new_status not in self.VALID_STATUS_TRANSITIONS[self._status]:
-    #        raise exceptions.InvalidStatusTransitionError(f"Cannot transition from {self._status} to {new_status}")
-    #    self._status = new_status
-    #    self.update_modified_date()
+    def change_state(self, new_status: enums.OrderStatus):
+        if new_status not in self.VALID_STATUS_TRANSITIONS[self._status]:
+            raise exceptions.InvalidStatusTransitionError(f"Cannot transition from {self._status} to {new_status}")
+        self._status = new_status
+        self.update_modified_date()
 
     def add_line_item(self, line_item: value_objects.OrderLine) -> None:
         if not line_item:
@@ -69,8 +70,6 @@ class Order:
             raise exceptions.InvalidOrderOperation("Only pending orders can be confirmed.")
         if not self._payment or self._payment.get_amount() < self.get_total_amount():
             raise exceptions.InvalidOrderOperation("Order cannot be confirmed without a full payment.")
-        if not self._shipping_reference:
-            raise exceptions.InvalidOrderOperation("Shipping reference is missing.")
         self._status = enums.OrderStatus.CONFIRMED.name
         self.update_modified_date()
 

@@ -76,10 +76,6 @@ class Product(models.Model):
     class Meta:
         unique_together = ("name", "vendor") #prevent duplicate product per vendor
 
-        #TODO: lets do this  in Vendor model?
-        permissions = [
-            ("vendor_default_policy", "Can use vendor default policy"),
-        ]
 
     def __str__(self):
         return f"{self.name} (Vendor name: {self.vendor.name})"

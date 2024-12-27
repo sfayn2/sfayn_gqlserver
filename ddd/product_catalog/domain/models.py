@@ -153,30 +153,22 @@ class Product:
     _description: str
     _category: uuid.uuid4
     _vendor: int
-    _vendor_policy: Optional[vendor_policies.VendorPolicy] = None
     _tags: List[str] = field(default_factory=list)
     _status: enums.ProductStatus = enums.ProductStatus.DRAFT.name
-    _variant_items: List[VariantItem] = field(default_factory=list)
+    variants: List[VariantItem] = field(default_factory=list)
     _date_created: datetime = field(default_factory=datetime.now)
     _date_modified: Optional[datetime] = None
 
-
-    #VALID_STATUS_TRANSITIONS = {
-    #    enums.ProductStatus.DRAFT.name : [enums.ProductStatus.PENDING_REVIEW.name],
-    #    enums.ProductStatus.PENDING_REVIEW.name : [enums.ProductStatus.APPROVED.name, enums.ProductStatus.REJECTED.name],
-    #    enums.ProductStatus.APPROVED.name : [enums.ProductStatus.DEACTIVATED.name],
-    #    enums.ProductStatus.DEACTIVATED.name : [enums.ProductStatus.PENDING_REVIEW.name, enums.ProductStatus.DRAFT.name],
-    #}
-
-    def set_vendor_policy(self, vendor_policy):
-        if self._vendor_policy:
-            raise ValueError("Vendor policy already set.")
-        self._vendor_policy = vendor_policy
+    VALID_STATUS_TRANSITIONS = {
+        enums.ProductStatus.DRAFT.name : [enums.ProductStatus.PENDING_REVIEW.name],
+        enums.ProductStatus.PENDING_REVIEW.name : [enums.ProductStatus.APPROVED.name, enums.ProductStatus.REJECTED.name],
+        enums.ProductStatus.APPROVED.name : [enums.ProductStatus.DEACTIVATED.name],
+        enums.ProductStatus.DEACTIVATED.name : [enums.ProductStatus.PENDING_REVIEW.name, enums.ProductStatus.DRAFT.name],
+    }
 
     def update_category(self, category_id: uuid.uuid4):
-        if self._vendor_policy.validate(self):
-            self._category = category_id
-            self.update_modified_date()
+        self._category = category_id
+        self.update_modified_date()
 
     def update_modified_date(self):
         self._date_modified = datetime.now()
@@ -189,38 +181,37 @@ class Product:
         self.update_modified_date()
     
     def change_state(self, new_status: enums.ProductStatus):
-        if new_status not in self._vendor_policy.get_allowed_transition():
+        if new_status not in self.VALID_STATUS_TRANSITIONS[self._status]:
             raise exceptions.InvalidStatusTransitionError(f"Cannot transition from {self._status} to {new_status}")
         self._status = new_status
         self.update_modified_date()
 
     def approve(self) -> None:
-        if self._vendor_policy.can_approve(self._role):
-            self.change_state(enums.ProductStatus.APPROVED.name)
+        self.change_state(enums.ProductStatus.APPROVED.name)
 
-    #def deactivate(self) -> None:
-    #    self.update_status(enums.ProductStatus.DEACTIVATED.name)
+    def deactivate(self) -> None:
+        self.change_state(enums.ProductStatus.DEACTIVATED.name)
 
-    #def reject(self) -> None:
-    #    self.update_status(enums.ProductStatus.REJECTED.name)
+    def reject(self) -> None:
+        self.change_state(enums.ProductStatus.REJECTED.name)
 
-    #def pending_review(self) -> None:
-    #    self.update_status(enums.ProductStatus.PENDING_REVIEW.name)
+    def pending_review(self) -> None:
+        self.change_state(enums.ProductStatus.PENDING_REVIEW.name)
 
     def add_variants(self, variant_item: VariantItem) -> None:
         if not variant_item:
             raise "No variant item to add in product catalog!"
 
-        if variant_item not in self._variant_items:
-            self._variant_items.append(variant_item)
+        if variant_item not in self.variants:
+            self.variants.append(variant_item)
 
     def deactivate_sku(self, sku: str) -> None:
-        for v in self._variant_items:
+        for v in self.variants:
             if v.get_sku() == sku:
                 v.deactivate()
 
     def activate_sku(self, sku: str) -> None:
-        for v in self._variant_items:
+        for v in self.variants:
             if v.get_sku() == sku:
                 v.activate()
 
@@ -238,7 +229,7 @@ class Product:
         return self._tags
     
     def get_variant_items(self):
-        return self._variant_items
+        return self.variants
 
     def get_id(self):
         return self._id

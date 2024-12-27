@@ -42,6 +42,11 @@ class Order(models.Model):
     date_created = models.DateTimeField(auto_now_add=True) 
     date_modified = models.DateTimeField(auto_now=True) 
 
+    class Meta:
+        permissions = [
+            ("default_shipping_policy", "Can use default shipping policy"),
+        ]
+
     def __str__(self):
         return f"{self.order_id} - {self.shipping_address} ( {self.status} )"
 
