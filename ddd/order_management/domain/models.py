@@ -17,6 +17,7 @@ class Order:
     _shipping_reference: str
     _total_amount: value_objects.Money
     _total_tax: Decimal
+    _currency: str
     _coupon_codes: Optional[List[str]] = field(default_factory=list, init=False)
     _payments: List[value_objects.Payment] = field(default_factory=list)
     _date_created: datetime = field(default_factory=datetime.now)
@@ -59,7 +60,7 @@ class Order:
     def confirm(self):
         if self.status != enums.OrderStatus.PENDING.name:
             raise exceptions.InvalidOrderOperation("Only pending orders can be confirmed.")
-        if not self._payment or self._payment.get_amount() < self.get_total_amount():
+        if not self._payment or self._payment.get_amount() < self.get_total_amount().get_amount():
             raise exceptions.InvalidOrderOperation("Order cannot be confirmed without a full payment.")
         self._status = enums.OrderStatus.CONFIRMED.name
         self.update_modified_date()
@@ -87,7 +88,7 @@ class Order:
 
     @property
     def is_fully_paid(self):
-        return self.get_total_paid >= self.get_total_amount()
+        return self.get_total_paid.get_amount() >= self.get_total_amount().get_amount()
     
     def apply_payment(self, payment: value_objects.Payment):
         self._payments.append(payment)
@@ -98,11 +99,17 @@ class Order:
         #right now validation is handled in offer policy
         self._coupon_codes.append(coupon_code)
 
-    def get_total_amount(self):
-        return sum(line.total_price for line in self.line_items)
+    def get_total_amount(self) -> value_objects.Money:
+        return value_objects.Money(
+            _amount=sum(line.total_price for line in self.line_items),
+            _currency=self.get_currency()
+        )
 
-    def get_total_paid(self):
-        return sum(payment.get_amount() for payment in self.payments)
+    def get_total_paid(self) -> value_objects.Money:
+        return value_objects.Money(
+            _amount=sum(payment.get_amount() for payment in self.payments),
+            _currency=self.get_currency()
+        )
 
     def get_total_weight(self) -> Decimal:
         return sum(item.get_total_weight() for item in self.get_line_items())
@@ -124,6 +131,9 @@ class Order:
 
     def get_total_tax(self):
         return self._total_tax
+
+    def get_currency(self):
+        return self._currency
 
     
 

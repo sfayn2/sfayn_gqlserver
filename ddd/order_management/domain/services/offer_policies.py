@@ -2,7 +2,7 @@ from __future__ import annotations
 from datetime import datetime
 from dataclasses import dataclass
 from abc import ABC, abstractmethod
-from typing import Tuple, List
+from typing import Tuple, List, Dict, Union
 from ddd.order_management.domain import enums, exceptions, models, value_objects
 from decimal import Decimal
 
@@ -28,12 +28,20 @@ class DiscountOffer(BaseOffer):
         self.eligible_products = eligible_products
 
     #apply on order
-    def apply_offer(self, order: models.Order):
+    def apply_offer(self, order: models.Order) -> value_objects.Money:
         total_discount = 0
+        currency = order.get_currency()
         for item in order.get_line_items():
             if item.get_product_name() in self.eligible_products:
                 total_discount += item.get_total_price() * (self.discount_value / 100)
-        return total_discount
+                item.set_discounts_fee(value_objects.Money(
+                    _amount=total_discount,
+                    _currency=currency
+                ))
+        return value_objects.Money(
+            _amount=total_discount,
+            _currency=currency
+        )
 
 class FreeGiftOffer(BaseOffer):
     def __init__(self, offer_type: enums.OfferType, description: str, min_quantity: int, gift_products: List[dict]):
@@ -43,6 +51,7 @@ class FreeGiftOffer(BaseOffer):
 
     def apply_offer(self, order: models.Order):
         free_gifts = []
+        currency = order.get_currency()
         if sum(item.get_order_quantity() for item in order.get_line_items()) >= self.min_quantity:
             for free_product in self.gift_products:
                 free_gifts.append(free_product)
@@ -51,7 +60,7 @@ class FreeGiftOffer(BaseOffer):
                 order.add_line_item(
                     value_objects.LineItem(
                         _product_sku=free_product.get('sku'),
-                        _product_price=value_objects.Money(0, "SGD"),
+                        _product_price=value_objects.Money(0, currency),
                         _order_quantity=free_product.get('quantity'),
                         is_free_gift=True
                     )
@@ -65,7 +74,7 @@ class FreeShippingOffer(BaseOffer):
         self.min_order_total = min_order_total 
 
     def apply_offer(self, order: models.Order):
-        if order.get_total_amount >= self.min_order_total:
+        if order.get_total_amount.get_amount() >= self.min_order_total:
             return 0 #shipping cost waived?
         return None
 
@@ -77,17 +86,29 @@ class DiscountCouponOffer(BaseOffer):
         self.expiry_date = expiry_date
         self.requires_coupon = requires_coupon
 
-    def apply_offer(self, order: models.Order):
+    def apply_offer(self, order: models.Order) -> value_objects.Money:
         total_discount = 0
+        currency = order.get_currency()
         #TODO to simplify, hard coded the expiration date. future plan to move expirate_date, usage_limit to db?
         if self.requires_coupon and self.expiry_date >= datetime.date():
             if self.coupon_code in order.get_customer_coupons():
-                return 0  #coupon does not match
+                #coupon does not match
+                return value_objects.Money(
+                    _amount=0,
+                    _currency=currency
+                )
 
             for item in order.get_line_items():
                 if item.get_product_name() in self.eligible_products:
                     total_discount += item.get_total_price() * (self.discount_value / 100)
-        return total_discount
+                    item.set_discounts_fee(value_objects.Money(
+                        _amount=total_discount,
+                        _currency=currency
+                    ))
+        return value_objects.Money(
+            _amount=total_discount,
+            _currency=currency
+        )
 
 
 

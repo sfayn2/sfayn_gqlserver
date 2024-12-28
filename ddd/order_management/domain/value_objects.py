@@ -53,15 +53,11 @@ class LineItem:
     is_free_gift: bool = False
     is_taxable: bool = True
     package: Package
-    #_discounts_fee: Money
-    #_total_price = Money
+    _discounts_fee: Money
 
-    def get_total_price(self) -> Money:
-        #if self._discounts_fee:
-        #    return self.get_discounted_price()
-        #else:
-        #    return (self._product_price * self._order_quantity)
-        return (self._product_price * self._order_quantity)
+    #below not applicable? getter is enough?
+    #_discounted_price: Money
+    #_total_price = Money -> not applicable?
 
     def add(self, quantity: int):
         if quantity < 0:
@@ -75,8 +71,15 @@ class LineItem:
 
         self._order_quantity -= quantity
 
-    #def set_discounts_fee(self, amount: Money):
-    #    self._discounts_fee = amount
+    def set_discounts_fee(self, amount: Money):
+        self._discounts_fee = amount
+
+    def get_total_price(self) -> Money:
+        #if self._discounts_fee:
+        #    return self.get_discounted_price()
+        #else:
+        #    return (self._product_price * self._order_quantity)
+        return (self._product_price * self._order_quantity)
 
     #def get_discounted_price(self):
     #    return (self._product_price * self._order_quantity) - self._discounts_fee

@@ -1,21 +1,24 @@
 from django.db import models
 from django.conf import settings
+from ddd.order_management.domain import enums, models as domain_models, value_objects
 
 # Create your models here.
 
 class Order(models.Model):
-    order_id = models.CharField(max_length=255, primary_key=True)
+    order_id = models.CharField(max_length=100, primary_key=True, help_text="ORD-1234")
 
     order_status = models.CharField(
         max_length=25, 
         blank=True, 
         null=True, 
-        choices=(), 
-        default="PENDING"
+        choices=enums.OrderStatus.choices, 
+        default=enums.OrderStatus.DRAFT
     ) 
 
-    customer_full_name = models.CharField(max_length=255)
+    customer_first_name = models.CharField(max_length=255)
+    customer_last_name = models.CharField(max_length=255)
     customer_email = models.EmailField(max_length=255, blank=True, null=True)
+    customer_note = models.TextField(help_text="Customer notes to seller", blank=True)
     customer_coupons = models.CharField(max_length=100, help_text="Customer entered coupons, just provide a list i.e WELCOME01,FREESHIP01")
 
     delivery_address = models.TextField(blank=True, help_text="Delivery address")
@@ -23,6 +26,21 @@ class Order(models.Model):
     delivery_postal = models.CharField(max_length=50, blank=True, null=True, help_text="some countries dont use this (e.g Ireland?)")
     delivery_country = models.CharField(max_length=50)
     delivery_state = models.CharField(max_length=10, blank=True, null=True, help_text="Mandatory in countries like US, Canada, India but irrelevant in small countries")
+
+    subtotal = models.DecimalField(
+            decimal_places=settings.DEFAULT_DECIMAL_PLACES, 
+            max_digits=settings.DEFAULT_MAX_DIGITS,
+            null=True, 
+            blank=True, 
+            help_text="total items w/o order discounts and tax", 
+    )
+    total_discounts_fee = models.DecimalField(
+            decimal_places=settings.DEFAULT_DECIMAL_PLACES, 
+            max_digits=settings.DEFAULT_MAX_DIGITS,
+            null=True, 
+            blank=True, 
+            help_text="total discounts fee per order", 
+    )
 
     shipping_method = models.CharField(max_length=50, null=True, blank=True, help_text="i.e. Free Shipping, Local Pickup")
     shipping_note = models.CharField(max_length=150, null=True, blank=True, help_text="i.e. 2-3 days delivery")
@@ -34,13 +52,32 @@ class Order(models.Model):
         help_text="", 
     )
 
+
+    tax_desc = models.CharField(max_length=20, help_text="GST 9%, VAT, ?")
+    tax_rate = models.DecimalField(
+            decimal_places=settings.DEFAULT_DECIMAL_PLACES, 
+            max_digits=settings.DEFAULT_MAX_DIGITS,
+            null=True, 
+            blank=True, 
+            help_text="N% tax rate per order", 
+        )
+    tax_amount = models.DecimalField(
+            decimal_places=settings.DEFAULT_DECIMAL_PLACES, 
+            max_digits=settings.DEFAULT_MAX_DIGITS,
+            null=True, 
+            blank=True, 
+            help_text="tax amount", 
+        )
+
     total_amount = models.DecimalField(
         decimal_places=settings.DEFAULT_DECIMAL_PLACES, 
         max_digits=settings.DEFAULT_MAX_DIGITS,
         null=True, 
         blank=True, 
-        help_text="", 
+        help_text="overall total", 
     )
+
+    currency = models.CharField(max_length=100, help_text="Currency for calculation requirements & validation. e.g. SGD", default=settings.DEFAULT_CURRENCY)
     date_created = models.DateTimeField(auto_now_add=True) 
     date_modified = models.DateTimeField(auto_now=True) 
 
@@ -76,14 +113,20 @@ class OrderLine(models.Model):
     package_length = models.CharField(max_length=100, null=True, blank=True, help_text="value should be coming from product itself or to fill in later once it goes to warehouse fulfillment? ")
     package_width = models.CharField(max_length=100, null=True, blank=True, help_text="value should be coming from product itself or to fill in later once it goes to warehouse fulfillment?")
     package_height = models.CharField(max_length=100, null=True, blank=True, help_text="value should be coming from product itself or to fill in later once it goes to warehouse fulfillment?")
+    discounts_fee = models.DecimalField(
+            decimal_places=settings.DEFAULT_DECIMAL_PLACES, 
+            max_digits=settings.DEFAULT_MAX_DIGITS,
+            null=True, 
+            blank=True, 
+            help_text="discounts per line item; right now only used for record keeping.", 
+        )
     total_price = models.DecimalField(
         decimal_places=settings.DEFAULT_DECIMAL_PLACES, 
         max_digits=settings.DEFAULT_MAX_DIGITS,
         null=True, 
         blank=True, 
-        help_text="", 
+        help_text="Total price w/o discounts; to apply discount per Order", 
     )
-
 
     def __str__(self):
         return f"Item {self.product_variant} ({self.quantity})"

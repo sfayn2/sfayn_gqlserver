@@ -18,11 +18,15 @@ class ShippingOption(ABC):
         return True
 
     @abstractmethod
-    def calculate_cost(self, order: models.Order) -> Decimal:
+    def calculate_cost(self, order: models.Order) -> value_objects.Money:
         """
             Calculate the cost of shipping based on weight and dimensions
         """
-        return self.base_cost
+        currency = order.get_currency()
+        return value_objects.Money(
+            _amount=self.base_cost,
+            _currency=currency
+        )
 
 class Vendor1ShippingOption(ShippingOption):
     def __init__(self, name: str, delivery_time: str, base_cost: Decimal, flat_rate: Decimal):
@@ -35,11 +39,15 @@ class Vendor1ShippingOption(ShippingOption):
         """
         return order.get_total_weight() <= Decimal(30)
 
-    def calculate_cost(self, order: models.Order) -> Decimal:
+    def calculate_cost(self, order: models.Order) -> value_objects.Money:
         """
             Base cost + flat rate per kg
         """
-        return self.base_cost + (self.flat_rate * order.get_total_weight())
+        currency = order.get_currency()
+        return value_objects.Money(
+            _amount=self.base_cost + (self.flat_rate * order.get_total_weight()),
+            _currency=currency
+        )
 
 class ShippingOptionPolicy(ABC):
 
