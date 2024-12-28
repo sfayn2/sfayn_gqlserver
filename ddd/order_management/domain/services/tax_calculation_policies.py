@@ -11,7 +11,10 @@ class SGTaxCalculationPolicy(TaxCalculationPolicy):
     GST_RATE = 0.09
 
     def calculate_tax(self, order: models.Order):
-        return {"type": "GST", "total_tax":order.get_total_amount * self.GST_RATE }
+        return {
+            "desc": f"GST ({self.GST_RATE * 100} %)", 
+            "total_tax":order.get_total_amount * self.GST_RATE 
+        }
 
 class USTaxCalculationPolicy(TaxCalculationPolicy):
     STATE_TAX_RATES = {
@@ -23,4 +26,7 @@ class USTaxCalculationPolicy(TaxCalculationPolicy):
     def calculate_tax(self, order: models.Order):
         state = order.destination.get_state()
         state_tax_rate = self.STATE_TAX_RATES.get(state, 0)
-        return {"type": "STATE TAX", "total_tax":order.get_total_amount * state_tax_rate }
+        return {
+            "desc": f"{state} State Tax ({state_tax_rate * 100} %)", 
+            "total_tax":order.get_total_amount * state_tax_rate 
+        }
