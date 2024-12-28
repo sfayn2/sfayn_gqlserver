@@ -4,7 +4,7 @@ from decimal import Decimal
 from typing import List, Optional, Tuple
 from dataclasses import dataclass, field
 from order_management.domain import value_objects, enums, exceptions
-from order_management.domain.services import tax_service, shipping_option_policies, offer_policies
+from order_management.domain.services import tax_calculation_policies, shipping_option_policies, offer_policies
 
 
 @dataclass
@@ -82,17 +82,8 @@ class Order:
         self._status = enums.OrderStatus.COMPLETED.name
         self.update_modified_date()
 
-    def calculate_tax(self, tax_service: tax_service.TaxService):
-        total_tax = 0.0
-        for product in self.get_line_items():
-            total_tax += tax_service.calculate_tax(
-                product,
-                product.get_order_quantity,
-                self.customer,
-                self.destination
-            )
-        self._total_tax = total_tax
-
+    def calculate_tax(self, tax_service: tax_calculation_policies.TaxCalculationPolicy):
+        self._total_tax = tax_service.calculate_tax(self)
 
     @property
     def is_fully_paid(self):

@@ -98,9 +98,14 @@ class Address:
     _city: str
     _postal: int
     _country: str
+    _state: str
+    # make use of country to country code converter if require?
 
     def is_international(self, origin_country: str) -> bool:
         return self._country != origin_country
+
+    def get_state(self):
+        return self._state
 
 class Package:
     _weight: Decimal #in kg

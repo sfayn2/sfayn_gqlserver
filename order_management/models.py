@@ -17,10 +17,12 @@ class Order(models.Model):
     customer_full_name = models.CharField(max_length=255)
     customer_email = models.EmailField(max_length=255, blank=True, null=True)
     customer_coupons = models.CharField(max_length=100, help_text="Customer entered coupons, just provide a list i.e WELCOME01,FREESHIP01")
+
     delivery_address = models.TextField(blank=True, help_text="Delivery address")
-    delivery_city = models.CharField(max_length=50)
-    delivery_postal = models.CharField(max_length=50)
+    delivery_city = models.CharField(max_length=50, blank=True, null=True, help_text="Optional for other countries (e.g. Singapore)")
+    delivery_postal = models.CharField(max_length=50, blank=True, null=True, help_text="some countries dont use this (e.g Ireland?)")
     delivery_country = models.CharField(max_length=50)
+    delivery_state = models.CharField(max_length=10, blank=True, null=True, help_text="Mandatory in countries like US, Canada, India but irrelevant in small countries")
 
     shipping_method = models.CharField(max_length=50, null=True, blank=True, help_text="i.e. Free Shipping, Local Pickup")
     shipping_note = models.CharField(max_length=150, null=True, blank=True, help_text="i.e. 2-3 days delivery")
@@ -64,6 +66,7 @@ class OrderLine(models.Model):
 
     product_sku = models.CharField(max_length=50)
     product_name = models.CharField(max_length=255)
+    product_category = models.CharField(max_length=100, help_text="some countries uses category to calculate tax")
     is_free_gift = models.BooleanField(default=False)
     is_taxable = models.BooleanField(default=True)
     options = models.JSONField(help_text='ex. {"Size": "M", "Color": "RED"}') # anticipated to have complex tables to support multi dimension variants, decided to use JSONField
