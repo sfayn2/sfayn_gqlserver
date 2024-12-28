@@ -107,6 +107,9 @@ class Address:
     def get_state(self):
         return self._state
 
+    def get_country(self):
+        return self._country
+
 class Package:
     _weight: Decimal #in kg
     _dimensions: Tuple[int, int, int] # (length, width, height) in cm

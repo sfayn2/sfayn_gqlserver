@@ -95,13 +95,6 @@ class Order:
             self._status = enums.OrderStatus.PAID.name
 
     def apply_coupon(self, coupon_code: str):
-        #TODO: need to validate coupon_code if not expired ?? expired_date & usage_limit
-        #coupon = coupon_service.validate(coupon_code)
-        #if coupon:
-        #    self._coupon_codes.append(coupon_code)
-        #else:
-        #    raise ValueError("Invalid or expired coupon code")
-
         #right now validation is handled in offer policy
         self._coupon_codes.append(coupon_code)
 

@@ -28,3 +28,8 @@ class OfferType(Enum):
 class DiscountType(Enum):
     PERCENTAGE = "Percentage"
     FIXED_AMOUNT = "Fixed Amount"
+
+class PaymentMethod(Enum):
+    PAYPAL = "Paypal"
+    STRIPE = "Stripe"
+    COD = "Cash On Delivery"

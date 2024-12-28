@@ -30,3 +30,13 @@ class USTaxCalculationPolicy(TaxCalculationPolicy):
             "desc": f"{state} State Tax ({state_tax_rate * 100} %)", 
             "total_tax":order.get_total_amount * state_tax_rate 
         }
+
+class TaxCalculationPolicyFactory:
+    def get_tax_policy(order: models.Order):
+        country = order.destination.get_country().lower()
+        if country == "singapore":
+            return SGTaxCalculationPolicy()
+        elif country == "united states":
+            return USTaxCalculationPolicy()
+        else:
+            return ValueError(f"Tax calculation for {country} not supported.")

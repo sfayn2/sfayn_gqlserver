@@ -1,13 +1,13 @@
 import requests
 from dataclasses import dataclass
 from ddd.order_management.domain.services import tax_calculation_policies
+from ddd.order_management.domain import models
 
 @dataclass
 class TaxService:
-    def get_tax_calculation(country):
-        if country.lower() == "singapore":
-            return tax_calculation_policies.SGTaxCalculationPolicy()
-        elif country.lower() == "united states":
-            return tax_calculation_policies.USTaxCalculationPolicy()
-        else:
-            return ValueError(f"Tax calculation for {country} not supported.")
+    def __init__(self, tax_calculation_factory: tax_calculation_policies.TaxCalculationPolicyFactory):
+        self.tax_calculation_factory = tax_calculation_factory
+
+    def calculate_tax(self, order: models.Order):
+        tax_policy = self.tax_calculation_factory.get_tax_policy(order)
+        return tax_policy.calculate_tax(order)
