@@ -83,7 +83,7 @@ class Order:
         self.update_modified_date()
 
     def calculate_tax(self, tax_service: tax_calculation_policies.TaxCalculationPolicy):
-        self._total_tax = tax_service.calculate_tax(self)
+        self._total_tax = tax_service.calculate_tax(self).get("total_tax", 0)
 
     @property
     def is_fully_paid(self):
