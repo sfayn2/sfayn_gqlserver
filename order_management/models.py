@@ -18,7 +18,6 @@ class Order(models.Model):
     customer_first_name = models.CharField(max_length=255)
     customer_last_name = models.CharField(max_length=255)
     customer_email = models.EmailField(max_length=255, blank=True, null=True)
-    customer_note = models.TextField(help_text="Customer notes to seller", blank=True)
     customer_coupons = models.CharField(max_length=100, help_text="Customer entered coupons, just provide a list i.e WELCOME01,FREESHIP01")
 
     delivery_address = models.TextField(blank=True, help_text="Delivery address")
@@ -54,13 +53,6 @@ class Order(models.Model):
 
 
     tax_desc = models.CharField(max_length=20, help_text="GST 9%, VAT, ?")
-    tax_rate = models.DecimalField(
-            decimal_places=settings.DEFAULT_DECIMAL_PLACES, 
-            max_digits=settings.DEFAULT_MAX_DIGITS,
-            null=True, 
-            blank=True, 
-            help_text="N% tax rate per order", 
-        )
     tax_amount = models.DecimalField(
             decimal_places=settings.DEFAULT_DECIMAL_PLACES, 
             max_digits=settings.DEFAULT_MAX_DIGITS,

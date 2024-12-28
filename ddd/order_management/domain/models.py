@@ -16,7 +16,8 @@ class Order:
     _status: enums.OrderStatus = enums.OrderStatus.DRAFT.name
     _shipping_reference: str
     _total_amount: value_objects.Money
-    _total_tax: Decimal
+    _total_tax: value_objects.Money
+    _tax_desc: str
     _currency: str
     _coupon_codes: Optional[List[str]] = field(default_factory=list, init=False)
     _payments: List[value_objects.Payment] = field(default_factory=list)
@@ -83,8 +84,13 @@ class Order:
         self._status = enums.OrderStatus.COMPLETED.name
         self.update_modified_date()
 
-    def calculate_tax(self, tax_service: tax_calculation_policies.TaxCalculationPolicy):
-        self._total_tax = tax_service.calculate_tax(self).get("total_tax", 0)
+    def calculate_tax(self, tax_service: tax_calculation_policies.TaxCalculationPolicy) -> value_objects.Money:
+        total_tax, tax_desc = tax_service.calculate_tax(self)
+        self._total_tax = value_objects.Money(
+            _amount=total_tax,
+            _currency=self.get_currency()
+        )
+        self._tax_desc = tax_desc
 
     @property
     def is_fully_paid(self):

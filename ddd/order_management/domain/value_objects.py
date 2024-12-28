@@ -134,7 +134,8 @@ class Payment:
 #right now only for Gues customer
 @dataclass(frozen=True)    
 class Customer:
-    _full_name: str
+    _first_name: str
+    _last_name: str
     _email: str
 
 
