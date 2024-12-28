@@ -14,10 +14,14 @@ class Order:
     destination: value_objects.Address
     line_items: List[value_objects.LineItem]
     _status: enums.OrderStatus = enums.OrderStatus.DRAFT.name
+    _shipping_method: enums.PaymentMethod
+    _shipping_note: str
+    _shipping_cost: value_objects.Money
     _shipping_reference: str
-    _total_amount: value_objects.Money
-    _total_tax: value_objects.Money
+    _discounts_fee: value_objects.Money
     _tax_desc: str
+    _total_tax: value_objects.Money
+    _total_amount: value_objects.Money
     _currency: str
     _coupon_codes: Optional[List[str]] = field(default_factory=list, init=False)
     _payments: List[value_objects.Payment] = field(default_factory=list)
@@ -84,7 +88,13 @@ class Order:
         self._status = enums.OrderStatus.COMPLETED.name
         self.update_modified_date()
 
+    def add_shipping_tracking_reference(self, shipping_reference: str):
+        self._shipping_reference = shipping_reference
+
     def calculate_tax(self, tax_service: tax_calculation_policies.TaxCalculationPolicy) -> value_objects.Money:
+        if self._total_tax and self._tax_desc:
+            raise ValueError("Tax rate already set.")
+
         total_tax, tax_desc = tax_service.calculate_tax(self)
         self._total_tax = value_objects.Money(
             _amount=total_tax,
@@ -94,7 +104,7 @@ class Order:
 
     @property
     def is_fully_paid(self):
-        return self.get_total_paid.get_amount() >= self.get_total_amount().get_amount()
+        return self.get_total_paid() >= self.get_total_amount()
     
     def apply_payment(self, payment: value_objects.Payment):
         self._payments.append(payment)
@@ -104,6 +114,18 @@ class Order:
     def apply_coupon(self, coupon_code: str):
         #right now validation is handled in offer policy
         self._coupon_codes.append(coupon_code)
+    
+    def select_shipping_option(self, shipping_option: enums.ShippingMethod, shipping_options ):
+        for ship_opt in shipping_options:
+            if ship_opt.name == shipping_option:
+                self._shipping_method = ship_opt.name
+                self._shipping_note = ship_opt.delivery_time
+                self._shipping_cost = ship_opt.cost
+                return
+        raise ValueError(f"Shipping option not supported: {shipping_option}")
+
+    def get_shipping_options(self, order: Order, shipping_option_policy: shipping_option_policies.ShippingOptionPolicy) -> List[dict]:
+        return shipping_option_policy.get_shipping_options(order)
 
     def get_total_amount(self) -> value_objects.Money:
         return value_objects.Money(
@@ -126,8 +148,8 @@ class Order:
         max_height = max(item.get_dimensions()[2] for item in self.get_line_items())
         return total_length, max_width, max_height
 
-    def get_shipping_options(self, order: Order, shipping_option_policy: shipping_option_policies.ShippingOptionPolicy) -> List[dict]:
-        return shipping_option_policy.get_shipping_options(order)
+    def get_shipping_options(self):
+        return self._shipping_options
 
     def get_line_items(self):
         return self.line_items

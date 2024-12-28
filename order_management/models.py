@@ -41,7 +41,7 @@ class Order(models.Model):
             help_text="total discounts fee per order", 
     )
 
-    shipping_method = models.CharField(max_length=50, null=True, blank=True, help_text="i.e. Free Shipping, Local Pickup")
+    shipping_method = models.CharField(max_length=50, null=True, blank=True, help_text="i.e. Free Shipping, Local Pickup", choices=enums.ShippingMethod.choices)
     shipping_note = models.CharField(max_length=150, null=True, blank=True, help_text="i.e. 2-3 days delivery")
     shipping_cost = models.DecimalField(
         decimal_places=settings.DEFAULT_DECIMAL_PLACES, 
@@ -67,6 +67,14 @@ class Order(models.Model):
         null=True, 
         blank=True, 
         help_text="overall total", 
+    )
+
+    total_paid = models.DecimalField(
+            decimal_places=settings.DEFAULT_DECIMAL_PLACES, 
+            max_digits=settings.DEFAULT_MAX_DIGITS,
+            null=True, 
+            blank=True, 
+            help_text="amount paid by customer", 
     )
 
     currency = models.CharField(max_length=100, help_text="Currency for calculation requirements & validation. e.g. SGD", default=settings.DEFAULT_CURRENCY)
@@ -122,3 +130,33 @@ class OrderLine(models.Model):
 
     def __str__(self):
         return f"Item {self.product_variant} ({self.quantity})"
+
+class Payment(models.Model):
+    id = models.AutoField(primary_key=True)
+    order = models.ForeignKey(
+        "order.Order", 
+        on_delete=models.CASCADE,
+        related_name="order2payments", 
+        null=True, 
+        blank=True
+    )
+    payment_method = models.CharField(max_length=50, null=True, blank=True)
+    amount = models.DecimalField(
+        decimal_places=settings.DEFAULT_DECIMAL_PLACES, 
+        max_digits=settings.DEFAULT_MAX_DIGITS,
+        null=True, 
+        blank=True, 
+        help_text="amount paid in this transaction", 
+    )
+    transaction_id = models.CharField(
+        max_length=25, 
+        blank=True, 
+        null=True, 
+    ) 
+    status = models.CharField(
+        max_length=25, 
+        blank=True, 
+        null=True, 
+    ) 
+    date_created = models.DateTimeField(auto_now_add=True) 
+    date_modified = models.DateTimeField(auto_now=True) 

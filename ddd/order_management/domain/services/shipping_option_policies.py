@@ -60,7 +60,7 @@ class ShippingOptionPolicy(ABC):
                 options.append({
                     "name": option.name,
                     "delivery_time": option.delivery_time,
-                    "cost": float(cost)
+                    "cost": cost
                 })
         return options
 
