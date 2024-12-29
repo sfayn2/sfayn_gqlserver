@@ -2,6 +2,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Union, Tuple
 from decimal import Decimal
+from ddd.order_management.domain import enums
 
 @dataclass(frozen=True)
 class Money:
@@ -138,7 +139,13 @@ class Customer:
     _last_name: str
     _email: str
 
+@dataclass(frozen=True)
+class ShippingDetails:
+    method: enums.ShippingMethod
+    delivery_time: str
+    cost: Money
 
-
-
-
+    def __post_init__(self):
+        if not self.method.strip():
+            raise ValueError("Shipping method is required.")
+    

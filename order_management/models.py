@@ -42,7 +42,7 @@ class Order(models.Model):
     )
 
     shipping_method = models.CharField(max_length=50, null=True, blank=True, help_text="i.e. Free Shipping, Local Pickup", choices=enums.ShippingMethod.choices)
-    shipping_note = models.CharField(max_length=150, null=True, blank=True, help_text="i.e. 2-3 days delivery")
+    shipping_delivery_time = models.CharField(max_length=150, null=True, blank=True, help_text="i.e. 2-3 days delivery")
     shipping_cost = models.DecimalField(
         decimal_places=settings.DEFAULT_DECIMAL_PLACES, 
         max_digits=settings.DEFAULT_MAX_DIGITS,

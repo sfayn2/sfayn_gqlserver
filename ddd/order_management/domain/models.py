@@ -13,10 +13,8 @@ class Order:
     customer: value_objects.Customer
     destination: value_objects.Address
     line_items: List[value_objects.LineItem]
+    shipping_details: value_objects.ShippingDetails
     _status: enums.OrderStatus = enums.OrderStatus.DRAFT.name
-    _shipping_method: enums.PaymentMethod
-    _shipping_note: str
-    _shipping_cost: value_objects.Money
     _shipping_reference: str
     _discounts_fee: value_objects.Money
     _tax_desc: str
@@ -57,7 +55,7 @@ class Order:
     def place(self):
         if not self.line_items:
             raise exceptions.InvalidOrderOperation("Order must have at least one line item.")
-        if not self._shipping_method:
+        if not self.shipping_details:
             raise exceptions.InvalidOrderOperation("Order must have a selected Shipping method")
         self._status = enums.OrderStatus.PENDING.name
         self.update_modified_date()
@@ -118,9 +116,11 @@ class Order:
     def select_shipping_option(self, shipping_option: enums.ShippingMethod, shipping_options ):
         for ship_opt in shipping_options:
             if ship_opt.name == shipping_option:
-                self._shipping_method = ship_opt.name
-                self._shipping_note = ship_opt.delivery_time
-                self._shipping_cost = ship_opt.cost
+                self.shipping_details = value_objects.ShippingDetails(
+                    method=ship_opt.name,
+                    delivery_time=ship_opt.delivery_time,
+                    cost=ship_opt.cost
+                )
                 return
         raise ValueError(f"Shipping option not supported: {shipping_option}")
 
@@ -147,9 +147,6 @@ class Order:
         max_width = max(item.get_dimensions()[1] for item in self.get_line_items())
         max_height = max(item.get_dimensions()[2] for item in self.get_line_items())
         return total_length, max_width, max_height
-
-    def get_shipping_options(self):
-        return self._shipping_options
 
     def get_line_items(self):
         return self.line_items
