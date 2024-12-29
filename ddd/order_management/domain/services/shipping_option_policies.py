@@ -24,8 +24,8 @@ class ShippingOption(ABC):
         """
         currency = order.get_currency()
         return value_objects.Money(
-            _amount=self.base_cost,
-            _currency=currency
+            amount=self.base_cost,
+            currency=currency
         )
 
 class Vendor1ShippingOption(ShippingOption):
@@ -45,8 +45,8 @@ class Vendor1ShippingOption(ShippingOption):
         """
         currency = order.get_currency()
         return value_objects.Money(
-            _amount=self.base_cost + (self.flat_rate * order.get_total_weight()),
-            _currency=currency
+            amount=self.base_cost + (self.flat_rate * order.get_total_weight()),
+            currency=currency
         )
 
 class ShippingOptionPolicy(ABC):

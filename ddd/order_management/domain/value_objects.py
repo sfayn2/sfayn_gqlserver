@@ -6,43 +6,36 @@ from ddd.order_management.domain import enums
 
 @dataclass(frozen=True)
 class Money:
-    _amount: Decimal
-    _currency: str
+    amount: Decimal
+    currency: str
 
     def __post_init__(self):
-        if not isinstance(self._amount, Decimal):
+        if not isinstance(self.amount, Decimal):
             raise TypeError("Amount must be a decimal.")
-        if not isinstance(self._currency, str):
+        if not isinstance(self.currency, str):
             raise TypeError("Currency must be a string.")
-        if self._amount <= Decimal(0):
+        if self.amount <= Decimal(0):
             raise ValueError(f"Amount must be non zero.")
 
-        if len(self._currency) != 3:
+        if len(self.currency) != 3:
             raise ValueError("Currency must be a valid 3 character ISO code.")
 
     def add(self, other: Money) -> Money:
-        if self._currency != other.currency:
+        if self.currency != other.currency:
             raise ValueError("Cannot add money with different currencies")
-        return Money(amount=self._amount + other.amount, currency=self._currency)
+        return Money(amount=self.amount + other.amount, currency=self.currency)
 
     def subtract(self, other: Money) -> Money:
-        if self._currency != other.currency:
+        if self.currency != other.currency:
             raise ValueError("Cannot subtract money with different currencies")
-        return Money(amount=self._amount - other.amount, currency=self._currency)
+        return Money(amount=self.amount - other.amount, currency=self.currency)
 
     def multiply(self, multiplier: Union[int, Decimal]) -> Money:
-        return Money(amount=self._amount * Decimal(multiplier), currency=self._currency)
+        return Money(amount=self.amount * Decimal(multiplier), currency=self.currency)
 
     def divide(self, divisor: Union[int, Decimal]) -> Money:
-        return Money(amount=self._amount / Decimal(divisor), currency=self._currency)
+        return Money(amount=self.amount / Decimal(divisor), currency=self.currency)
 
-    def __eq__(self, other: object) -> bool:
-        if not isinstance(other, Money):
-            return NotImplemented
-        return self._amount == other.amount and self._currency == other.currency
-    
-    def get_amount(self):
-        return self._amount
 
 @dataclass(frozen=True)
 class LineItem:
@@ -126,11 +119,9 @@ class Package:
 
 @dataclass(frozen=True)
 class Payment:
-    _method: str
-    _amount: Money
+    method: str
+    paid_amount: Money
 
-    def get_amount(self):
-        return self._amount
 
 #right now only for Gues customer
 @dataclass(frozen=True)    

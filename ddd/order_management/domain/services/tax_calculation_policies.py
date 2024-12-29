@@ -15,8 +15,8 @@ class SGTaxCalculationPolicy(TaxCalculationPolicy):
         return {
             "desc": f"GST ({self.GST_RATE * 100} %)", 
             "total_tax": value_objects.Money(
-                    _amount=order.get_total_amount * self.GST_RATE,
-                    _currency=currency
+                    amount=order.get_total_amount * self.GST_RATE,
+                    currency=currency
                 )
         }
 
@@ -34,8 +34,8 @@ class USTaxCalculationPolicy(TaxCalculationPolicy):
         return {
             "desc": f"{state} State Tax ({state_tax_rate * 100} %)", 
             "total_tax": value_objects.Money(
-                    _amount=order.get_total_amount * state_tax_rate,
-                    _currency=currency
+                    amount=order.get_total_amount * state_tax_rate,
+                    currency=currency
                 )
         }
 

@@ -35,12 +35,12 @@ class DiscountOffer(BaseOffer):
             if item.get_product_name() in self.eligible_products:
                 total_discount += item.get_total_price() * (self.discount_value / 100)
                 item.set_discounts_fee(value_objects.Money(
-                    _amount=total_discount,
-                    _currency=currency
+                    amount=total_discount,
+                    currency=currency
                 ))
         return value_objects.Money(
-            _amount=total_discount,
-            _currency=currency
+            amount=total_discount,
+            currency=currency
         )
 
 class FreeGiftOffer(BaseOffer):
@@ -74,7 +74,7 @@ class FreeShippingOffer(BaseOffer):
         self.min_order_total = min_order_total 
 
     def apply_offer(self, order: models.Order):
-        if order.get_total_amount.get_amount() >= self.min_order_total:
+        if order.get_total_amount().amount >= self.min_order_total:
             return 0 #shipping cost waived?
         return None
 
@@ -94,20 +94,20 @@ class DiscountCouponOffer(BaseOffer):
             if self.coupon_code in order.get_customer_coupons():
                 #coupon does not match
                 return value_objects.Money(
-                    _amount=0,
-                    _currency=currency
+                    amount=0,
+                    currency=currency
                 )
 
             for item in order.get_line_items():
                 if item.get_product_name() in self.eligible_products:
                     total_discount += item.get_total_price() * (self.discount_value / 100)
                     item.set_discounts_fee(value_objects.Money(
-                        _amount=total_discount,
-                        _currency=currency
+                        amount=total_discount,
+                        currency=currency
                     ))
         return value_objects.Money(
-            _amount=total_discount,
-            _currency=currency
+            amount=total_discount,
+            currency=currency
         )
 
 

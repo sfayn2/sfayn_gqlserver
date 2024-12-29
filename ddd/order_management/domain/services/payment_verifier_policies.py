@@ -21,8 +21,8 @@ class PayPalPaymentVerifierPolicy(PaymentVerifierPolicy):
                 return {"status": "failed", "message": "Payment verification failed"}
 
             actual_amount = value_objects.Money(
-                _amount=transaction["transaction_amount"]["value"],
-                _currency=transaction["transaction_amount"]["currency_code"]
+                amount=transaction["transaction_amount"]["value"],
+                currency=transaction["transaction_amount"]["currency_code"]
             ) 
 
             if actual_amount != expected_amount:
@@ -42,8 +42,8 @@ class StripePaymentVerifierPolicy(PaymentVerifierPolicy):
             return {"status": "failed", "message": "Payment verification failed"}
 
         actual_amount = value_objects.Money(
-            _amount=payment_intent["amount"] / 100,
-            _currency=payment_intent["currency"].upper()
+            amount=payment_intent["amount"] / 100,
+            currency=payment_intent["currency"].upper()
         ) 
 
         #actual_amount = float(payment_intent["amount"]) / 100 #strip amount are in cents??
