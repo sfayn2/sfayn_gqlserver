@@ -8,6 +8,5 @@ class TaxService:
     def __init__(self, tax_calculation_factory: tax_calculation_policies.TaxCalculationPolicyFactory):
         self.tax_calculation_factory = tax_calculation_factory
 
-    def calculate_tax(self, order: models.Order):
-        tax_policy = self.tax_calculation_factory.get_tax_policy(order)
-        return tax_policy.calculate_tax(order)
+    def get_tax_policy(self, country: str):
+        return self.tax_calculation_factory.get_tax_policy(country)

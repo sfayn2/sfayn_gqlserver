@@ -139,4 +139,9 @@ class ShippingDetails:
     def __post_init__(self):
         if not self.method.strip():
             raise ValueError("Shipping method is required.")
+
+@dataclass(frozen=True)
+class TaxDetails:
+    desc: str
+    tax_amount: Money
     

@@ -14,12 +14,10 @@ class Order:
     destination: value_objects.Address
     line_items: List[value_objects.LineItem]
     shipping_details: value_objects.ShippingDetails
+    tax_details: value_objects.TaxDetails
     _status: enums.OrderStatus = enums.OrderStatus.DRAFT.name
     _shipping_reference: str
     _discounts_fee: value_objects.Money
-    _tax_desc: str
-    _total_tax: value_objects.Money
-    #_total_amount: value_objects.Money
     _currency: str
     _coupon_codes: Optional[List[str]] = field(default_factory=list, init=False)
     _payments: List[value_objects.Payment] = field(default_factory=list)
@@ -89,16 +87,19 @@ class Order:
     def add_shipping_tracking_reference(self, shipping_reference: str):
         self._shipping_reference = shipping_reference
 
-    def calculate_tax(self, tax_service: tax_calculation_policies.TaxCalculationPolicy) -> value_objects.Money:
-        if self._total_tax and self._tax_desc:
-            raise ValueError("Tax rate already set.")
+    def update_tax_details(self, tax_details: value_objects.TaxDetails):
+        self.tax_details = tax_details
 
-        total_tax, tax_desc = tax_service.calculate_tax(self)
-        self._total_tax = value_objects.Money(
-            amount=total_tax,
-            currency=self.get_currency()
+    def calculate_tax(self, tax_service: tax_calculation_policies.TaxCalculationPolicy) -> value_objects.Money:
+        if self.tax_details:
+            raise ValueError("Tax amount already calculated.")
+
+        tax_amount, tax_desc = tax_service.calculate_tax(self)
+        self.update_tax_details(value_objects.TaxDetails(
+                desc=tax_desc,
+                tax_amount=tax_amount
+            )
         )
-        self._tax_desc = tax_desc
 
     @property
     def is_fully_paid(self):
@@ -153,9 +154,6 @@ class Order:
 
     def get_customer_coupons(self):
         return self._coupon_codes
-
-    def get_total_tax(self):
-        return self._total_tax
 
     def get_currency(self):
         return self._currency

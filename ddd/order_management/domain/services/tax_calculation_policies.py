@@ -11,13 +11,9 @@ class SGTaxCalculationPolicy(TaxCalculationPolicy):
     GST_RATE = 0.09
 
     def calculate_tax(self, order: models.Order):
-        currency = order.get_currency()
         return {
             "desc": f"GST ({self.GST_RATE * 100} %)", 
-            "total_tax": value_objects.Money(
-                    amount=order.get_total_amount * self.GST_RATE,
-                    currency=currency
-                )
+            "total_tax": order.get_total_amount() * self.GST_RATE
         }
 
 class USTaxCalculationPolicy(TaxCalculationPolicy):
@@ -30,18 +26,14 @@ class USTaxCalculationPolicy(TaxCalculationPolicy):
     def calculate_tax(self, order: models.Order):
         state = order.destination.get_state()
         state_tax_rate = self.STATE_TAX_RATES.get(state, 0)
-        currency = order.get_currency()
         return {
             "desc": f"{state} State Tax ({state_tax_rate * 100} %)", 
-            "total_tax": value_objects.Money(
-                    amount=order.get_total_amount * state_tax_rate,
-                    currency=currency
-                )
+            "total_tax": order.get_total_amount() * state_tax_rate
         }
 
 class TaxCalculationPolicyFactory:
-    def get_tax_policy(order: models.Order):
-        country = order.destination.get_country().lower()
+    def get_tax_policy(country: str):
+        #country = order.destination.get_country().lower()
         if country == "singapore":
             return SGTaxCalculationPolicy()
         elif country == "united states":
