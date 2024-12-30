@@ -69,6 +69,16 @@ class Order(models.Model):
         help_text="overall total", 
     )
 
+    offer_details = models.TextField(help_text="e.g Free Shipping Applied;Discount Applied: $20.00")
+
+    final_amount = models.DecimalField(
+        decimal_places=settings.DEFAULT_DECIMAL_PLACES, 
+        max_digits=settings.DEFAULT_MAX_DIGITS,
+        null=True, 
+        blank=True, 
+        help_text="overall total - discounts + ship cost + tax, etc. ?", 
+    )
+
     total_paid = models.DecimalField(
             decimal_places=settings.DEFAULT_DECIMAL_PLACES, 
             max_digits=settings.DEFAULT_MAX_DIGITS,

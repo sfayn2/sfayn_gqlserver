@@ -37,57 +37,6 @@ class Money:
         return Money(amount=self.amount / Decimal(divisor), currency=self.currency)
 
 
-@dataclass(frozen=True)
-class LineItem:
-    _product_sku: str
-    _product_name: str
-    _options: str
-    _product_price: Money
-    _order_quantity: int
-    is_free_gift: bool = False
-    is_taxable: bool = True
-    package: Package
-    _discounts_fee: Money
-
-    #below not applicable? getter is enough?
-    #_discounted_price: Money
-    #_total_price = Money -> not applicable?
-
-    def add(self, quantity: int):
-        if quantity < 0:
-            raise ValueError("Value must be greater than current quantity.")
-
-        self._order_quantity += quantity
-
-    def subtract(self, quantity: int):
-        if quantity < 0 or quantity > self._order_quantity:
-            raise ValueError("Value must be less than or equal to the current quantity.")
-
-        self._order_quantity -= quantity
-
-    def set_discounts_fee(self, amount: Money):
-        self._discounts_fee = amount
-
-    def get_total_price(self) -> Money:
-        #if self._discounts_fee:
-        #    return self.get_discounted_price()
-        #else:
-        #    return (self._product_price * self._order_quantity)
-        return (self._product_price * self._order_quantity)
-
-    #def get_discounted_price(self):
-    #    return (self._product_price * self._order_quantity) - self._discounts_fee
-
-    def get_total_weight(self) -> Decimal:
-        return self._weight * self._order_quantity
-
-    def get_product_name(self):
-        return self._product_name
-
-    def get_order_quantity(self):
-        return self._order_quantity
-
-
 
 @dataclass(frozen=True)
 class Address:

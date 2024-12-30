@@ -16,9 +16,16 @@ class BaseOffer(ABC):
         raise NotImplementedError("Subclasses must implement this method")
 
 class OfferPolicy(ABC):
+
     @abstractmethod
-    def get_offers(self, order: models.Order):
-        raise NotImplementedError("Subclasses must implement this method")
+    def apply_all_offers(self, order: models.Order):
+        applied_offers = []
+        for offer in self.offers:
+            applied_offers.append(
+                offer().apply_offer(order)
+            )
+
+        return "\n".join(applied_offers)
 
 class DiscountOffer(BaseOffer):
     def __init__(self, offer_type: enums.OfferType, description: str, discount_type: enums.DiscountType, discount_value: Decimal, eligible_products: List[str]):
@@ -30,18 +37,26 @@ class DiscountOffer(BaseOffer):
     #apply on order
     def apply_offer(self, order: models.Order) -> value_objects.Money:
         total_discount = 0
+        is_applied = False
         currency = order.get_currency()
-        for item in order.get_line_items():
+        discounted_items = []
+        for item in order.line_items:
             if item.get_product_name() in self.eligible_products:
                 total_discount += item.get_total_price() * (self.discount_value / 100)
-                item.set_discounts_fee(value_objects.Money(
-                    amount=total_discount,
-                    currency=currency
-                ))
-        return value_objects.Money(
-            amount=total_discount,
-            currency=currency
-        )
+                is_applied = True
+                discounted_items.append(item.get_product_name())
+                #item.set_discounts_fee(value_objects.Money(
+                #    amount=total_discount,
+                #    currency=currency
+                #))
+        if is_applied:
+            order.update_total_discounts_fee(
+                    value_objects.Money(
+                        amount=total_discount,
+                        currency=currency
+                    )
+                )
+            return f"{self.description} applied ( {','.join(discounted_items)} )"
 
 class FreeGiftOffer(BaseOffer):
     def __init__(self, offer_type: enums.OfferType, description: str, min_quantity: int, gift_products: List[dict]):
@@ -52,7 +67,8 @@ class FreeGiftOffer(BaseOffer):
     def apply_offer(self, order: models.Order):
         free_gifts = []
         currency = order.get_currency()
-        if sum(item.get_order_quantity() for item in order.get_line_items()) >= self.min_quantity:
+        is_applied = False
+        if sum(item.order_quantity for item in order.line_items) >= self.min_quantity:
             for free_product in self.gift_products:
                 free_gifts.append(free_product)
 
@@ -62,11 +78,13 @@ class FreeGiftOffer(BaseOffer):
                         _product_sku=free_product.get('sku'),
                         _product_price=value_objects.Money(0, currency),
                         _order_quantity=free_product.get('quantity'),
-                        is_free_gift=True
+                        _is_free_gift=True
                     )
                 )
+                is_applied = True
 
-        return free_gifts
+        if is_applied:
+            return f"{self.description} applied ( {','.join(free_gifts)} )"
     
 class FreeShippingOffer(BaseOffer):
     def __init__(self, offer_type: enums.OfferType, description: str, min_order_total: int):
@@ -74,9 +92,26 @@ class FreeShippingOffer(BaseOffer):
         self.min_order_total = min_order_total 
 
     def apply_offer(self, order: models.Order):
+        is_applied = False
+        currency = order.get_currency()
         if order.get_total_amount().amount >= self.min_order_total:
-            return 0 #shipping cost waived?
-        return None
+            _shipping_cost = value_objects.Money(
+                amount=0,
+                currency=currency
+            )
+
+            #shipping cost waived?
+            order.update_shipping_details(value_objects.ShippingDetails(
+                    method=order.shipping_details.method,
+                    delivery_time=order.shipping_details.delivery_time,
+                    cost=_shipping_cost
+                )
+            )
+
+            is_applied = True
+
+        if is_applied:
+            return f"{self.description} applied"
 
 class DiscountCouponOffer(BaseOffer):
     def __init__(self, offer_type: enums.OfferType, description: str, coupon_code: str, min_order_total: Decimal, requires_coupon: bool, expiry_date: DateTime):
@@ -88,27 +123,28 @@ class DiscountCouponOffer(BaseOffer):
 
     def apply_offer(self, order: models.Order) -> value_objects.Money:
         total_discount = 0
+        discounted_items = []
         currency = order.get_currency()
+        is_applied = False
         #TODO to simplify, hard coded the expiration date. future plan to move expirate_date, usage_limit to db?
         if self.requires_coupon and self.expiry_date >= datetime.date():
             if self.coupon_code in order.get_customer_coupons():
-                #coupon does not match
-                return value_objects.Money(
-                    amount=0,
-                    currency=currency
-                )
+                return
 
-            for item in order.get_line_items():
+            for item in order.line_items:
                 if item.get_product_name() in self.eligible_products:
                     total_discount += item.get_total_price() * (self.discount_value / 100)
-                    item.set_discounts_fee(value_objects.Money(
-                        amount=total_discount,
-                        currency=currency
-                    ))
-        return value_objects.Money(
-            amount=total_discount,
-            currency=currency
-        )
+                    discounted_items.append(item.get_product_name())
+                    is_applied = True
+
+            if is_applied:
+                order.update_total_discounts_fee(
+                        value_objects.Money(
+                            amount=total_discount,
+                            currency=currency
+                        )
+                    )
+                return f"{self.description} applied ( {','.join(discounted_items)} )"
 
 
 
@@ -145,23 +181,6 @@ class DefaultOfferPolicy(OfferPolicy):
             )
         ]
 
-    def get_offers(self, order: models.Order):
-        total_discount = 0
-        free_gifts = []
-        free_shipping = None
-        for offer in self.offers:
-            if offer.offer_type == enums.OfferType.DISCOUNT:
-                total_discount += offer().apply_offer(order)
-            elif offer.offer_type == enums.OfferType.FREE_GIFT:
-                free_gifts.extend(offer().apply_offer(order))
-            elif offer.offer_type == enums.OfferType.FREE_SHIPPING and free_shipping == None:
-                free_shipping = offer().apply_offer(order)
-
-        return {
-            "total_discount": total_discount,
-            "free_gifts": free_gifts,
-            "free_shipping": free_shipping
-        }
 
 
 

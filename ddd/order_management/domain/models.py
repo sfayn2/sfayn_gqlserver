@@ -6,18 +6,58 @@ from dataclasses import dataclass, field
 from order_management.domain import value_objects, enums, exceptions
 from order_management.domain.services import tax_calculation_policies, shipping_option_policies, offer_policies
 
+@dataclass
+class LineItem:
+    _product_sku: str
+    _product_name: str
+    _options: str
+    _product_price: value_objects.Money
+    _order_quantity: int
+    _is_free_gift: bool = False
+    _is_taxable: bool = True
+    _package: value_objects.Package
+
+    def add(self, quantity: int):
+        if quantity < 0:
+            raise ValueError("Value must be greater than current quantity.")
+
+        self._order_quantity += quantity
+
+    def subtract(self, quantity: int):
+        if quantity < 0 or quantity > self._order_quantity:
+            raise ValueError("Value must be less than or equal to the current quantity.")
+
+        self._order_quantity -= quantity
+
+    def get_total_price(self) -> value_objects.Money:
+        return (self._product_price * self._order_quantity)
+
+    def get_total_weight(self) -> Decimal:
+        return self._weight * self._order_quantity
+
+    def get_product_name(self):
+        return self._product_name
+
+    def get_order_quantity(self):
+        return self._order_quantity
+
+
 
 @dataclass
 class Order:
     _order_id: str
     customer: value_objects.Customer
     destination: value_objects.Address
-    line_items: List[value_objects.LineItem]
+    line_items: List[LineItem]
     shipping_details: value_objects.ShippingDetails
     tax_details: value_objects.TaxDetails
     _status: enums.OrderStatus = enums.OrderStatus.DRAFT.name
+    _total_discounts_fee: value_objects.Money
+    _offer_details: str
+    _total_amount: value_objects.Money
+    _final_amount: value_objects.Money
+    _total_paid: value_objects.Money
     _shipping_reference: str
-    _discounts_fee: value_objects.Money
     _currency: str
     _coupon_codes: Optional[List[str]] = field(default_factory=list, init=False)
     _payments: List[value_objects.Payment] = field(default_factory=list)
@@ -114,49 +154,68 @@ class Order:
         #right now validation is handled in offer policy
         self._coupon_codes.append(coupon_code)
     
+    def update_shipping_details(self, shipping_details: value_objects.ShippingDetails):
+        self.shipping_details = shipping_details
+    
     def select_shipping_option(self, shipping_option: enums.ShippingMethod, shipping_options ):
         for ship_opt in shipping_options:
             if ship_opt.name == shipping_option:
-                self.shipping_details = value_objects.ShippingDetails(
-                    method=ship_opt.name,
-                    delivery_time=ship_opt.delivery_time,
-                    cost=ship_opt.cost
+                self.update_shipping_details(value_objects.ShippingDetails(
+                        method=ship_opt.name,
+                        delivery_time=ship_opt.delivery_time,
+                        cost=ship_opt.cost
+                    )
                 )
                 return
         raise ValueError(f"Shipping option not supported: {shipping_option}")
+
+    def update_total_amount(self):
+        self._total_amount = value_objects.Money(
+            amount=sum(line.total_price for line in self.line_items),
+            currency=self.get_currency()
+        )
+
+    def update_total_paid(self):
+        self._total_paid = value_objects.Money(
+            amount=sum(payment.paid_amount for payment in self.payments),
+            currency=self.get_currency()
+        )
+
+    def update_total_discounts_fee(self, total_discounts: value_objects.Money):
+        self._total_discounts_fee = total_discounts
+
+    def calculate_final_amount(self, offer_policy: offer_policies.OfferPolicy):
+        self._offer_details = offer_policy.apply_all_offers()
+
+        self._final_amount = (
+                self.get_total_amount() - self.get_total_discounts_fee()
+            ) + self.tax_details.tax_amount
+
 
     def get_shipping_options(self, order: Order, shipping_option_policy: shipping_option_policies.ShippingOptionPolicy) -> List[dict]:
         return shipping_option_policy.get_shipping_options(order)
 
     def get_total_amount(self) -> value_objects.Money:
-        return value_objects.Money(
-            amount=sum(line.total_price for line in self.line_items),
-            currency=self.get_currency()
-        )
+        return self._total_amount
 
     def get_total_paid(self) -> value_objects.Money:
-        return value_objects.Money(
-            amount=sum(payment.get_amount() for payment in self.payments),
-            currency=self.get_currency()
-        )
+        return self._total_paid
+
+    def get_total_discounts_fee(self) -> value_objects.Money:
+        return self._total_discounts_fee
 
     def get_total_weight(self) -> Decimal:
-        return sum(item.get_total_weight() for item in self.get_line_items())
+        return sum(item.get_total_weight() for item in self.line_items)
 
     def get_combined_dimensions(self) -> Tuple[int, int, int]:
-        total_length = sum(item.get_dimensions()[0] for item in self.get_line_items())
-        max_width = max(item.get_dimensions()[1] for item in self.get_line_items())
-        max_height = max(item.get_dimensions()[2] for item in self.get_line_items())
+        total_length = sum(item.get_dimensions()[0] for item in self.line_items)
+        max_width = max(item.get_dimensions()[1] for item in self.line_items)
+        max_height = max(item.get_dimensions()[2] for item in self.line_items)
         return total_length, max_width, max_height
-
-    def get_line_items(self):
-        return self.line_items
 
     def get_customer_coupons(self):
         return self._coupon_codes
 
     def get_currency(self):
         return self._currency
-
-    
 
