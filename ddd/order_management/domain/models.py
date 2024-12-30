@@ -56,7 +56,7 @@ class Order:
     _offer_details: str
     _total_amount: value_objects.Money
     _final_amount: value_objects.Money
-    _total_paid: value_objects.Money
+    _total_payments: value_objects.Money
     _shipping_reference: str
     _currency: str
     _coupon_codes: Optional[List[str]] = field(default_factory=list, init=False)
@@ -143,7 +143,7 @@ class Order:
 
     @property
     def is_fully_paid(self):
-        return self.get_total_paid() >= self.get_total_amount()
+        return self.get_total_payments() >= self.get_total_amount()
     
     def apply_payment(self, payment: value_objects.Payment):
         self._payments.append(payment)
@@ -169,14 +169,14 @@ class Order:
                 return
         raise ValueError(f"Shipping option not supported: {shipping_option}")
 
-    def update_total_amount(self):
+    def calculate_total_amount(self):
         self._total_amount = value_objects.Money(
             amount=sum(line.total_price for line in self.line_items),
             currency=self.get_currency()
         )
 
-    def update_total_paid(self):
-        self._total_paid = value_objects.Money(
+    def calculate_total_payments(self):
+        self._total_payments = value_objects.Money(
             amount=sum(payment.paid_amount for payment in self.payments),
             currency=self.get_currency()
         )
@@ -198,8 +198,8 @@ class Order:
     def get_total_amount(self) -> value_objects.Money:
         return self._total_amount
 
-    def get_total_paid(self) -> value_objects.Money:
-        return self._total_paid
+    def get_total_payments(self) -> value_objects.Money:
+        return self._total_payments
 
     def get_total_discounts_fee(self) -> value_objects.Money:
         return self._total_discounts_fee
