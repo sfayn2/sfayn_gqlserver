@@ -112,12 +112,6 @@ class FreeShippingOfferHandler(OfferHandler):
             return f"{self.description} applied"
 
 class DiscountCouponOfferHandler(OfferHandler):
-    def __init__(self, offer_type: enums.OfferType, description: str, coupon_code: str, min_order_total: Decimal, requires_coupon: bool, expiry_date: DateTime):
-        super().__init__(offer_type, description)
-        self.coupon_code = coupon_code
-        self.min_order_total = min_order_total
-        self.expiry_date = expiry_date
-        self.requires_coupon = requires_coupon
 
     def apply_offer(self, order: models.Order) -> value_objects.Money:
         total_discount = 0

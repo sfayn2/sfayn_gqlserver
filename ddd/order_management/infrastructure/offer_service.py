@@ -44,9 +44,7 @@ class OfferService(offer_handler.OfferHandlerMain):
                 offer_type=enums.OfferType.FREE_SHIPPING,
                 description="Free shipping for orders above $150",
                 condition={
-                    "minimum_order_total": 150,
-                    "start_date": "12/31/2024",
-                    "end_date": "12/31/2025",
+                    "minimum_order_total": 150
                 },
                 start_date="12/31/2024",
                 end_date="12/31/2025"
