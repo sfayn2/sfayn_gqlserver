@@ -185,9 +185,7 @@ class Order:
         self._total_discounts_fee = total_discounts
 
     def calculate_final_amount(self):
-        self.apply_offers()
-        self.apply_taxes()
-
+        #make sure to call apply_offers & apply_taxes
         self._final_amount = (
                 self.get_total_amount() - self.get_total_discounts_fee()
             ) + self.tax_details.tax_amount + self.shipping_details.cost
