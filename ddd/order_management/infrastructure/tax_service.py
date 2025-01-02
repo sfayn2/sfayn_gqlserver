@@ -2,7 +2,7 @@ from ddd.order_management.domain.services import tax_handler
 from ddd.order_management.domain import models, value_objects
 from decimal import Decimal
 
-class TaxService:
+class TaxService(tax_handler.TaxHandlerMain):
 
     def __init__(self):
         self.tax_handlers = [
