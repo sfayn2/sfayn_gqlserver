@@ -54,7 +54,7 @@ class Order:
     _status: enums.OrderStatus = enums.OrderStatus.DRAFT.name
     _total_discounts_fee: value_objects.Money
     _offer_details: List[str]
-    _tax_details: str
+    _tax_details: List[str]
     _tax_amount: value_objects.Money
     _total_amount: value_objects.Money
     _final_amount: value_objects.Money
@@ -63,8 +63,6 @@ class Order:
     _currency: str
     _coupon_codes: Optional[List[str]] = field(default_factory=list, init=False)
     _payments: List[value_objects.Payment] = field(default_factory=list)
-
-    _shipping_options: List[shipping_option_handler.ShippingOptionHandler] = field(default_factory=list, init=True)
 
     _date_created: datetime = field(default_factory=datetime.now)
     _date_modified: Optional[datetime] = None
@@ -194,12 +192,8 @@ class Order:
                 self.get_total_amount() - self.get_total_discounts_fee()
             ) + self.tax_details.tax_amount + self.shipping_details.cost
 
-    def determine_available_shipping_options(self, shipping_option_service) -> List[dict]:
-        # only eligible shipping options + calculate cost?
-        self._shipping_options = shipping_option_service.get_shipping_options(self)
-
-    def get_available_shipping_options(self) -> List[dict]:
-        return self._shipping_options
+    def get_shipping_options(self, shipping_option_service: shipping_option_handler.ShippingOptionHandlerMain) -> List[dict]:
+        return shipping_option_service.get_shipping_options(self)
 
     def get_total_amount(self) -> value_objects.Money:
         return self._total_amount
