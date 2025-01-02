@@ -4,7 +4,7 @@ from typing import Tuple, List
 from ddd.order_management.domain import enums, exceptions, models, value_objects
 from decimal import Decimal
 
-class ShippingOption(ABC):
+class ShippingOptionHandler(ABC):
     def __init__(self, name: enums.ShippingMethod, delivery_time: str, base_cost: Decimal):
         self.name = name
         self.delivery_time = delivery_time
@@ -28,7 +28,7 @@ class ShippingOption(ABC):
             currency=currency
         )
 
-class Vendor1ShippingOption(ShippingOption):
+class ShippingOption1Handler(ShippingOptionHandler):
     def __init__(self, name: str, delivery_time: str, base_cost: Decimal, flat_rate: Decimal):
         super().__init__(name, delivery_time, base_cost)
         self.flat_rate = flat_rate
@@ -49,45 +49,8 @@ class Vendor1ShippingOption(ShippingOption):
             currency=currency
         )
 
-class ShippingOptionPolicy(ABC):
+class ShippingOptionHandlerMain(ABC):
 
     @abstractmethod
     def get_shipping_options(self, order: models.Order) -> List[dict]:
-        options = []
-        for option in self.shipping_options:
-            if option.is_eligible(order):
-                cost = option.calculate_cost(order)
-                options.append({
-                    "name": option.name,
-                    "delivery_time": option.delivery_time,
-                    "cost": cost
-                })
-        return options
-
-class DefaultShippingOptionPolicy(ShippingOptionPolicy):
-    def __init__(self):
-        self.shipping_options = [
-            ShippingOption(
-                name=enums.ShippingMethod.STANDARD,
-                delivery_time="3-5 business days",
-                base_cost=Decimal("5.00")
-            ),
-            ShippingOption(
-                name=enums.ShippingMethod.EXPRESS,
-                delivery_time="1-2 business days",
-                base_cost=Decimal("15.00")
-            ),
-            ShippingOption(
-                name=enums.ShippingMethod.SAME_DAY,
-                delivery_time="same day",
-                base_cost=Decimal("25.00")
-            ),
-            Vendor1ShippingOption(
-                name=enums.ShippingMethod.FLAT_RATE,
-                delivery_time="4-6 business days",
-                base_cost=Decimal("10.00"),
-                flat_rate=Decimal("2.00")
-            )
-        ]
-
-
+        raise NotImplementedError("Subclasses must implement this method")

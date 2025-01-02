@@ -69,7 +69,11 @@ class Order(models.Model):
         help_text="overall total", 
     )
 
-    offer_details = models.TextField(help_text="e.g Free Shipping Applied;Discount Applied: $20.00")
+    offer_details = models.JSONField(
+        blank=True, 
+        null=True, 
+        help_text='e.g. ["Free Shipping applied", "Discount applied: $20.00"]'
+        ) 
 
     final_amount = models.DecimalField(
         decimal_places=settings.DEFAULT_DECIMAL_PLACES, 

@@ -4,7 +4,6 @@ from dataclasses import dataclass, field
 from typing import List, Optional
 from datetime import datetime
 from ddd.product_catalog.domain.value_objects import Money, Stock
-from ddd.product_catalog.domain import vendor_policies
 from ddd.product_catalog.domain import enums, exceptions
 
 class InvalidStatusTransitionError(Exception):

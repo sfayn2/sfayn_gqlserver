@@ -1,5 +1,6 @@
 import requests
-from ddd.order_management.domain.services import payment_verifier_policies
+from ddd.order_management.domain.services import payment_verifier_handler
+from ddd.order_management.domain import enums
 
 class StripeClient:
     def __init__(self, api_key):
@@ -56,9 +57,24 @@ class PayPayClient:
             raise Exception(f"Failed to search transaction {response.text}")
 
 class PaymentService:
-    def __init__(self, verifier_factory: payment_verifier_policies.PaymentVerifierFactory):
-        self.verifier_factory = verifier_factory
+    def __init__(self, client: dict):
+        self.client = client
     
-    def verify_payment(self, transaction_id: str, payment_method):
-        verifier = self.verifier_factory.get_verifier(payment_method)
-        return verifier.verify_payment(transaction_id)
+    def verify_payment(self, transaction_id: str, payment_method: enums.PaymentMethod):
+        if payment_method == enums.PaymentMethod.PAYPAL:
+            handler = payment_verifier_handler.PayPalPaymentVerifierHandler(
+                paypal_client=self.client
+            )
+        elif payment_method == enums.PaymentMethod.STRIPE:
+            handler = payment_verifier_handler.StripePaymentVerifierHandler(
+                stripe_client=self.client
+            )
+        elif payment_method == enums.PaymentMethod.COD:
+            handler = payment_verifier_handler.CashOnDeliveryPaymentVerifierHandler()
+        else:
+            raise ValueError(f"Unsupported payment method: {payment_method.value}")
+
+        return handler.verify_payment(
+            transaction_id=transaction_id,
+            payment_method=payment_method
+        )

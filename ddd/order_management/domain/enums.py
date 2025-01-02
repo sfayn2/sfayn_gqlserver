@@ -24,7 +24,8 @@ class ShippingMethod(Enum):
         return tuple((i.name, i.value) for i in cls)
 
 class OfferType(Enum):
-    DISCOUNT = "Discount"
+    PERCENTAGE_DISCOUNT = "Percentage Discount"
+    FIXED_DISCOUNT = "Fixed Discount"
     BUNDLE = "Bundle"
     FREE_GIFT = "Free Gift"
     FREE_SHIPPING = "Free Shipping"

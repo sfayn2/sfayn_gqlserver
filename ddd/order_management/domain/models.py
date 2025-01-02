@@ -3,8 +3,9 @@ from datetime import datetime
 from decimal import Decimal
 from typing import List, Optional, Tuple
 from dataclasses import dataclass, field
+from ddd.order_management.domain.services import offer_handler, shipping_option_handler
 from order_management.domain import value_objects, enums, exceptions
-from order_management.domain.services import tax_calculation_policies, shipping_option_policies, offer_policies
+from order_management.domain.services import  (tax_handler, offer_handler)
 
 @dataclass
 class LineItem:
@@ -50,10 +51,11 @@ class Order:
     destination: value_objects.Address
     line_items: List[LineItem]
     shipping_details: value_objects.ShippingDetails
-    tax_details: value_objects.TaxDetails
     _status: enums.OrderStatus = enums.OrderStatus.DRAFT.name
     _total_discounts_fee: value_objects.Money
-    _offer_details: str
+    _offer_details: List[str]
+    _tax_details: str
+    _tax_amount: value_objects.Money
     _total_amount: value_objects.Money
     _final_amount: value_objects.Money
     _total_payments: value_objects.Money
@@ -61,6 +63,9 @@ class Order:
     _currency: str
     _coupon_codes: Optional[List[str]] = field(default_factory=list, init=False)
     _payments: List[value_objects.Payment] = field(default_factory=list)
+
+    _shipping_options: List[shipping_option_handler.ShippingOptionHandler] = field(default_factory=list, init=True)
+
     _date_created: datetime = field(default_factory=datetime.now)
     _date_modified: Optional[datetime] = None
 
@@ -85,10 +90,6 @@ class Order:
         if not line_item:
             raise "No item to add in order!"
         self.line_items.add(line_item)
-
-    def checkout(self, offer_policy: offer_policies.OfferPolicy):
-        discounts_amount, free_gifts, free_shipping = offer_policy.get_offers()
-        #TODO: free gifts need to insert in line items?
 
     def place(self):
         if not self.line_items:
@@ -127,19 +128,20 @@ class Order:
     def add_shipping_tracking_reference(self, shipping_reference: str):
         self._shipping_reference = shipping_reference
 
-    def update_tax_details(self, tax_details: value_objects.TaxDetails):
-        self.tax_details = tax_details
+    def update_tax_amount(self, amount: value_objects.Money):
+        self._tax_amount = amount
+    
+    def update_offer_details(self, offer_details: List[str]):
+        self._offer_details = offer_details
 
-    def calculate_tax(self, tax_service: tax_calculation_policies.TaxCalculationPolicy) -> value_objects.Money:
-        if self.tax_details:
-            raise ValueError("Tax amount already calculated.")
+    def update_tax_details(self, tax_details: List[str]):
+        self._tax_details = tax_details
 
-        tax_amount, tax_desc = tax_service.calculate_tax(self)
-        self.update_tax_details(value_objects.TaxDetails(
-                desc=tax_desc,
-                tax_amount=tax_amount
-            )
-        )
+    def apply_offers(self, offer_service: offer_handler.OfferHandlerMain):
+        offer_service.apply_offers(self)
+
+    def apply_taxes(self, tax_service: tax_handler.TaxHandlerMain):
+        tax_service.apply_taxes(self)
 
     @property
     def is_fully_paid(self):
@@ -184,16 +186,20 @@ class Order:
     def update_total_discounts_fee(self, total_discounts: value_objects.Money):
         self._total_discounts_fee = total_discounts
 
-    def calculate_final_amount(self, offer_policy: offer_policies.OfferPolicy):
-        self._offer_details = offer_policy.apply_all_offers()
+    def calculate_final_amount(self):
+        self.apply_offers()
+        self.apply_taxes()
 
         self._final_amount = (
                 self.get_total_amount() - self.get_total_discounts_fee()
-            ) + self.tax_details.tax_amount
+            ) + self.tax_details.tax_amount + self.shipping_details.cost
 
+    def determine_available_shipping_options(self, shipping_option_service) -> List[dict]:
+        # only eligible shipping options + calculate cost?
+        self._shipping_options = shipping_option_service.get_shipping_options(self)
 
-    def get_shipping_options(self, order: Order, shipping_option_policy: shipping_option_policies.ShippingOptionPolicy) -> List[dict]:
-        return shipping_option_policy.get_shipping_options(order)
+    def get_available_shipping_options(self) -> List[dict]:
+        return self._shipping_options
 
     def get_total_amount(self) -> value_objects.Money:
         return self._total_amount
@@ -218,4 +224,7 @@ class Order:
 
     def get_currency(self):
         return self._currency
+
+    def get_tax_amount(self):
+        return self._tax_amount
 
