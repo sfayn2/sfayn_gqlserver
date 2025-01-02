@@ -8,7 +8,7 @@ class OfferService(offer_handler.OfferHandlerMain):
     def __init__(self):
         #To get from Vendor management config?
         self.offer_handlers = [
-            offer_handler.DiscountOfferHandler(
+            offer_handler.PercentageDiscountHandler(
                 offer_type=enums.OfferType.PERCENTAGE_DISCOUNT,
                 description="10% off Lacoste Product",
                 discount_value=Decimal("10"),
@@ -18,8 +18,8 @@ class OfferService(offer_handler.OfferHandlerMain):
                 start_date="12/31/2024",
                 end_date="12/31/2025"
             ),
-            offer_handler.DiscountCouponOfferHandler(
-                offer_type=enums.OfferType.PERCENTAGE_DISCOUNT,
+            offer_handler.PercentageDiscountCouponOfferHandler(
+                offer_type=enums.OfferType.COUPON_DISCOUNT,
                 description="10% off w WELCOME25",
                 discount_value=Decimal("10"),
                 condition={

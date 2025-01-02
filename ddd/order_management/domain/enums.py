@@ -26,6 +26,7 @@ class ShippingMethod(Enum):
 class OfferType(Enum):
     PERCENTAGE_DISCOUNT = "Percentage Discount"
     FIXED_DISCOUNT = "Fixed Discount"
+    COUPON_DISCOUNT = "Coupon Percentage Discount"
     BUNDLE = "Bundle"
     FREE_GIFT = "Free Gift"
     FREE_SHIPPING = "Free Shipping"
