@@ -3,9 +3,9 @@ from datetime import datetime
 from decimal import Decimal
 from typing import List, Optional, Tuple
 from dataclasses import dataclass, field
-from ddd.order_management.domain.services import offer_handler, shipping_option_handler
+from ddd.order_management.domain.services import offer_handler_service, offer_handler_service, shipping_option_handler
 from order_management.domain import value_objects, enums, exceptions
-from order_management.domain.services import  (tax_handler, offer_handler)
+from order_management.domain.services import  (tax_handler)
 
 @dataclass
 class LineItem:
@@ -64,6 +64,8 @@ class Order:
     _coupon_codes: Optional[List[str]] = field(default_factory=list, init=False)
     _payments: List[value_objects.Payment] = field(default_factory=list)
 
+    _applied_offers: List[offer_handler_service.OfferHandler] = field(default_factory=list, init=False)
+
     _date_created: datetime = field(default_factory=datetime.now)
     _date_modified: Optional[datetime] = None
 
@@ -86,8 +88,15 @@ class Order:
 
     def add_line_item(self, line_item: value_objects.OrderLine) -> None:
         if not line_item:
-            raise "No item to add in order!"
+            raise ValueError("Please provide line item to add.")
         self.line_items.add(line_item)
+        self.calculate_final_amount()
+
+    def remove_line_item(self, line_item: value_objects.OrderLine) -> None:
+        if not line_item:
+            raise ValueError("Please provide line item to remove.")
+        self.line_items.remove(line_item)
+        self.calculate_final_amount()
 
     def place(self):
         if not self.line_items:
@@ -135,7 +144,7 @@ class Order:
     def update_tax_details(self, tax_details: List[str]):
         self._tax_details = tax_details
 
-    def apply_offers(self, offer_service: offer_handler.OfferHandlerMain):
+    def apply_offers(self, offer_service: offer_handler_service.OfferHandlerService):
         offer_service.apply_offers(self)
 
     def apply_taxes(self, tax_service: tax_handler.TaxHandlerMain):
@@ -150,9 +159,19 @@ class Order:
         if self.is_fully_paid:
             self._status = enums.OrderStatus.PAID.name
 
-    def apply_coupon(self, coupon_code: str):
-        #right now validation is handled in offer policy
+    def apply_coupon(self, coupon_code: str, offer_service: offer_handler_service.OfferHandlerService):
         self._coupon_codes.append(coupon_code)
+        offer_service.apply_offers(self)
+
+        #always recalculate?
+        self.calculate_final_amount()
+
+    def remove_coupon(self, coupon_code: str, offer_service: offer_handler_service.OfferHandlerService):
+        self._coupon_codes.remove(coupon_code)
+        offer_service.apply_offers(self)
+
+        #always recalculate?
+        self.calculate_final_amount()
     
     def update_shipping_details(self, shipping_details: value_objects.ShippingDetails):
         self.shipping_details = shipping_details
@@ -185,6 +204,7 @@ class Order:
         self._total_discounts_fee = total_discounts
 
     def calculate_final_amount(self):
+        self.calculate_total_amount()
         #make sure to call apply_offers & apply_taxes
         self._final_amount = (
                 self.get_total_amount() - self.get_total_discounts_fee()
