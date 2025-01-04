@@ -90,13 +90,15 @@ class Order:
         if not line_item:
             raise ValueError("Please provide line item to add.")
         self.line_items.add(line_item)
-        self.calculate_final_amount()
+
+        #order.add_line_item(line_item)
+        #order.apply_offers()
+        #order.calculate_final_amount()
 
     def remove_line_item(self, line_item: value_objects.OrderLine) -> None:
         if not line_item:
             raise ValueError("Please provide line item to remove.")
         self.line_items.remove(line_item)
-        self.calculate_final_amount()
 
     def place(self):
         if not self.line_items:
@@ -145,6 +147,7 @@ class Order:
         self._tax_details = tax_details
 
     def apply_offers(self, offer_service: offer_handler_service.OfferHandlerService):
+        self.reset_values()
         offer_service.apply_offers(self)
 
     def apply_taxes(self, tax_service: tax_handler.TaxHandlerMain):
@@ -161,17 +164,9 @@ class Order:
 
     def apply_coupon(self, coupon_code: str, offer_service: offer_handler_service.OfferHandlerService):
         self._coupon_codes.append(coupon_code)
-        offer_service.apply_offers(self)
-
-        #always recalculate?
-        self.calculate_final_amount()
 
     def remove_coupon(self, coupon_code: str, offer_service: offer_handler_service.OfferHandlerService):
         self._coupon_codes.remove(coupon_code)
-        offer_service.apply_offers(self)
-
-        #always recalculate?
-        self.calculate_final_amount()
     
     def update_shipping_details(self, shipping_details: value_objects.ShippingDetails):
         self.shipping_details = shipping_details
@@ -182,7 +177,8 @@ class Order:
                 self.update_shipping_details(value_objects.ShippingDetails(
                         method=ship_opt.name,
                         delivery_time=ship_opt.delivery_time,
-                        cost=ship_opt.cost
+                        cost=ship_opt.cost,
+                        orig_cost=ship_opt.cost
                     )
                 )
                 return
@@ -203,12 +199,28 @@ class Order:
     def update_total_discounts_fee(self, total_discounts: value_objects.Money):
         self._total_discounts_fee = total_discounts
 
-    def calculate_final_amount(self):
+    def reset_values(self):
+        #reset offers free shipping + discounts + free gifts
+
+        #make to have a fresh reset everytime
+        self.update_shipping_details(
+                self.shipping_details.reset_cost()
+            )
+
+        #recalculate total amount
         self.calculate_total_amount()
+
+        #reset discounts
+        self.update_total_discounts_fee(
+                self.get_total_discounts_fee.reset_amount()
+            )
+
+    def calculate_final_amount(self):
         #make sure to call apply_offers & apply_taxes
         self._final_amount = (
                 self.get_total_amount() - self.get_total_discounts_fee()
             ) + self.tax_details.tax_amount + self.shipping_details.cost
+
 
     def get_shipping_options(self, shipping_option_service: shipping_option_handler.ShippingOptionHandlerMain) -> List[dict]:
         return shipping_option_service.get_shipping_options(self)

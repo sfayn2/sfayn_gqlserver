@@ -80,28 +80,21 @@ class FreeGiftOfferHandler(OfferHandler):
     
 class FreeShippingOfferHandler(OfferHandler):
 
-    def apply_offer(self, order: models.Order) -> str:
-        is_applied = False
+    def apply_offer(self, order: models.Order):
         currency = order.get_currency()
         minimum_order_total = self.conditions.get("minimum_order_total")
         if minimum_order_total and (order.get_total_amount().amount >= minimum_order_total):
-            _shipping_cost = value_objects.Money(
+            zero_shipping_cost = value_objects.Money(
                 amount=0,
                 currency=currency
             )
-
-            #shipping cost waived?
-            order.update_shipping_details(value_objects.ShippingDetails(
-                    method=order.shipping_details.method,
-                    delivery_time=order.shipping_details.delivery_time,
-                    cost=_shipping_cost
+            order.update_shipping_details(
+                    order.shipping_details.update_cost(zero_shipping_cost)
                 )
-            )
 
-            is_applied = True
-
-        if is_applied:
             return f"{self.description} applied"
+
+
 
 class PercentageDiscountCouponOfferHandler(OfferHandler):
 
@@ -109,7 +102,6 @@ class PercentageDiscountCouponOfferHandler(OfferHandler):
         total_discount = 0
         discounted_items = []
         currency = order.get_currency()
-        is_applied = False
         eligible_products = self.conditions.get("eligible_products")
         start_date = self.conditions.get("start_date")
         end_date = self.conditions.get("end_date")
@@ -122,16 +114,15 @@ class PercentageDiscountCouponOfferHandler(OfferHandler):
                     if eligible_products and item.get_product_name() in eligible_products:
                         total_discount += item.get_total_price() * (self.discount_value / 100)
                         discounted_items.append(item.get_product_name())
-                        is_applied = True
 
-                if is_applied:
-                    order.update_total_discounts_fee(
-                            value_objects.Money(
-                                amount=total_discount,
-                                currency=currency
+                        order.update_total_discounts_fee(
+                                value_objects.Money(
+                                    amount=total_discount,
+                                    currency=currency
+                                )
                             )
-                        )
-                    return f"{self.description} applied ( {','.join(discounted_items)} )"
+                        return f"{self.description} applied ( {','.join(discounted_items)} )"
+
 
 # when adding new offer need to map the handler
 OFFERS_HANDLER = {
@@ -157,6 +148,7 @@ class OfferHandlerService:
         order.update_offer_details(offer_details)
 
     def _fetch_valid_offers(self, vendor_name: str):
+        #The assumption is all Offers are auto applied (except those w Coupons)
         vendor_offers = self.vendor_repository.get_offers(vendor_name)
         valid_offers = []
 
@@ -183,7 +175,7 @@ class OfferHandlerService:
                         )
                 )
 
-                if offer.get("stackable", None) == False:
+                if offer.get("stackable") == False:
                     #make sure offers already ordered based on highest priority, so checking stackable is enough
                     return valid_offers
 

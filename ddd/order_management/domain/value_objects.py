@@ -36,6 +36,9 @@ class Money:
     def divide(self, divisor: Union[int, Decimal]) -> Money:
         return Money(amount=self.amount / Decimal(divisor), currency=self.currency)
 
+    def reset_amount(self) -> Money:
+        return Money(amount=Decimal("0"), currency=self.currency)
+
 
 
 @dataclass(frozen=True)
@@ -84,9 +87,26 @@ class ShippingDetails:
     method: enums.ShippingMethod
     delivery_time: str
     cost: Money
+    orig_cost: Money
 
     def __post_init__(self):
         if not self.method.strip():
             raise ValueError("Shipping method is required.")
+        
+    #make use of order.update_shipping_details to take effect
+    def reset_cost(self):
+        return ShippingDetails(method=self.method, 
+                               delivery_time=self.delivery_time, 
+                               cost=self.orig_cost, 
+                               orig_cost=self.orig_cost
+                            )
+
+    #make use of order.update_shipping_details to take effect
+    def update_cost(self, new_cost: Money):
+        return ShippingDetails(method=self.method, 
+                               delivery_time=self.delivery_time, 
+                               cost=new_cost, 
+                               orig_cost=self.orig_cost
+                            )
 
     
