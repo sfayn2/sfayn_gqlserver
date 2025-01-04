@@ -5,7 +5,7 @@ from typing import List, Optional, Tuple
 from dataclasses import dataclass, field
 from ddd.order_management.domain.services import offer_handler_service, offer_handler_service, shipping_option_handler
 from order_management.domain import value_objects, enums, exceptions
-from order_management.domain.services import  (tax_handler)
+from ddd.order_management.domain.services import  (tax_handler_service)
 
 @dataclass
 class LineItem:
@@ -147,10 +147,9 @@ class Order:
         self._tax_details = tax_details
 
     def apply_offers(self, offer_service: offer_handler_service.OfferHandlerService):
-        self.reset_values()
         offer_service.apply_offers(self)
 
-    def apply_taxes(self, tax_service: tax_handler.TaxHandlerMain):
+    def apply_taxes(self, tax_service: tax_handler_service.TaxHandlerService):
         tax_service.apply_taxes(self)
 
     @property
@@ -201,16 +200,10 @@ class Order:
 
     def reset_values(self):
         #reset offers free shipping + discounts + free gifts
-
-        #make to have a fresh reset everytime
         self.update_shipping_details(
                 self.shipping_details.reset_cost()
             )
-
-        #recalculate total amount
         self.calculate_total_amount()
-
-        #reset discounts
         self.update_total_discounts_fee(
                 self.get_total_discounts_fee.reset_amount()
             )

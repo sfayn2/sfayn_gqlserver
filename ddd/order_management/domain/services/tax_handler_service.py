@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import Optional
+from decimal import Decimal
 from ddd.order_management.domain import value_objects, models
 
 class TaxHandler(ABC):
@@ -51,9 +52,29 @@ class USStateTaxHandler(TaxHandler):
 
             return f"{state} State Tax ({state_tax_rate*100} %) : {order.get_tax_amount()}"
 
-class TaxHandlerMain(ABC):
+TAX_HANDLERS = [
+    SingaporeTaxHandler(),
+    USStateTaxHandler()
+]
 
-    @abstractmethod
-    def apply_taxes(self):
-        raise NotImplementedError("Subclasses must implement this method")
+class TaxHandlerService:
+
+    def apply_taxes(self, order: models.Order):
+        tax_details = []
+        currency = order.get_currency()
+
+        #Reset tax amount
+        order.update_tax_amount(
+            value_objects.Money(
+                amount=Decimal("0.0"),
+                currency=currency
+            )
+        )
+
+        for tax_handler in TAX_HANDLERS:
+            tax_details.append(
+                tax_handler.apply_tax(order)
+            )
+
+        order.update_tax_details(tax_details)
 
