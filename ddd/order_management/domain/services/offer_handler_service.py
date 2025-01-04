@@ -11,13 +11,15 @@ class OfferHandler(ABC):
     def __init__(self, offer_type: enums.OfferType, description: str, 
                  conditions: dict, start_date: datetime, end_date: datetime, 
                  discount_value: Union[int, Decimal], required_coupon: bool, 
-                 coupon_code: str, stackable: bool, priority: int):
+                 coupon_code: str):
         self.offer_type = offer_type
         self.description = description
         self.conditions = conditions
         self.start_date = start_date
         self.end_date = end_date
         self.discount_value = discount_value
+        self.required_coupon = required_coupon
+        self.coupon_code = coupon_code
 
     @abstractmethod
     def apply_offer(self, order: models.Order) -> str:
@@ -157,26 +159,33 @@ class OfferHandlerService:
     def _fetch_valid_offers(self, vendor_name: str):
         vendor_offers = self.vendor_repository.get_offers(vendor_name)
         valid_offers = []
-        for offer in vendor_offers:
+
+        #sorted by "priority" in descending order
+        sorted_vendor_offers = sorted(vendor_offers, key=lambda x: x["priority"], reverse=True)
+
+        for offer in sorted_vendor_offers:
 
             #handler function
             offer_handler_class = OFFERS_HANDLER.get(offer.get("offer_type"))
 
             if offer_handler_class:
+
                 valid_offers.append(
                     offer_handler_class(
-                        offer_type=enums.OfferType[offer.get("offer_type")],
-                        description=offer.get("name"),
-                        discount_value=offer.get("discount_value"),
-                        condition=json.loads(offer.get("conditions")),
-                        required_coupon=offer.get("required_coupon"),
-                        coupon_code=json.loads(offer.get("coupon_code")),
-                        stackable=offer.get("stackable"),
-                        priority=offer.get("priority"),
-                        start_date=offer.get("start_date"),
-                        end_date=offer.get("end_date")
-                    )
+                            offer_type=enums.OfferType[offer.get("offer_type")],
+                            description=offer.get("name"),
+                            discount_value=offer.get("discount_value"),
+                            condition=json.loads(offer.get("conditions")),
+                            required_coupon=offer.get("required_coupon"),
+                            coupon_code=json.loads(offer.get("coupon_code")),
+                            start_date=offer.get("start_date"),
+                            end_date=offer.get("end_date")
+                        )
                 )
+
+                if offer.get("stackable", None) == False:
+                    #make sure offers already ordered based on highest priority, so checking stackable is enough
+                    return valid_offers
 
         return valid_offers
 
