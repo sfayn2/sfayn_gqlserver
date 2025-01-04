@@ -30,34 +30,30 @@ class PercentageDiscountHandler(OfferHandler):
     #apply on order
     def apply_offer(self, order: models.Order) -> str:
         total_discount = 0
-        is_applied = False
         currency = order.get_currency()
         discounted_items = []
         eligible_products = self.conditions.get("eligible_products")
         for item in order.line_items:
             if eligible_products and (item.get_product_name() in eligible_products):
                 total_discount += item.get_total_price() * (self.discount_value / 100)
-                is_applied = True
                 discounted_items.append(item.get_product_name())
                 #item.set_discounts_fee(value_objects.Money(
                 #    amount=total_discount,
                 #    currency=currency
                 #))
-        if is_applied:
-            order.update_total_discounts_fee(
-                    value_objects.Money(
-                        amount=total_discount,
-                        currency=currency
+                order.update_total_discounts_fee(
+                        value_objects.Money(
+                            amount=total_discount,
+                            currency=currency
+                        )
                     )
-                )
-            return f"{self.description} applied ( {','.join(discounted_items)} )"
+                return f"{self.description} applied ( {','.join(discounted_items)} )"
 
 class FreeGiftOfferHandler(OfferHandler):
 
     def apply_offer(self, order: models.Order) -> str:
         free_gifts = []
         currency = order.get_currency()
-        is_applied = False
         minimum_quantity = self.conditions.get("minimum_quantity")
         gift_products = self.conditions.get("gift_products")
         if minimum_quantity and (sum(item.order_quantity for item in order.line_items) >= minimum_quantity):
@@ -73,10 +69,7 @@ class FreeGiftOfferHandler(OfferHandler):
                         _is_free_gift=True
                     )
                 )
-                is_applied = True
-
-        if is_applied:
-            return f"{self.description} applied ( {','.join(free_gifts)} )"
+                return f"{self.description} applied ( {','.join(free_gifts)} )"
     
 class FreeShippingOfferHandler(OfferHandler):
 
@@ -108,20 +101,22 @@ class PercentageDiscountCouponOfferHandler(OfferHandler):
         requires_coupon = self.conditions.get("requires_coupon")
         coupon_code = self.conditions.get("coupon_code")
 
-        if requires_coupon == True and (datetime.now() >= start_date and datetime.now() <= end_date):
-            if coupon_code in order.get_customer_coupons():
-                for item in order.line_items:
-                    if eligible_products and item.get_product_name() in eligible_products:
-                        total_discount += item.get_total_price() * (self.discount_value / 100)
-                        discounted_items.append(item.get_product_name())
+        if (requires_coupon == True
+            and (datetime.now() >= start_date and datetime.now() <= end_date)
+            and coupon_code in order.get_customer_coupons()
+        ):
+            for item in order.line_items:
+                if eligible_products and item.get_product_name() in eligible_products:
+                    total_discount += item.get_total_price() * (self.discount_value / 100)
+                    discounted_items.append(item.get_product_name())
 
-                        order.update_total_discounts_fee(
-                                value_objects.Money(
-                                    amount=total_discount,
-                                    currency=currency
-                                )
+                    order.update_total_discounts_fee(
+                            value_objects.Money(
+                                amount=total_discount,
+                                currency=currency
                             )
-                        return f"{self.description} applied ( {','.join(discounted_items)} )"
+                        )
+                    return f"{self.description} applied ( {','.join(discounted_items)} )"
 
 
 # when adding new offer need to map the handler

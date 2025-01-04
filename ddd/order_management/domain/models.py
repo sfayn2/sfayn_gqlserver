@@ -3,7 +3,7 @@ from datetime import datetime
 from decimal import Decimal
 from typing import List, Optional, Tuple
 from dataclasses import dataclass, field
-from ddd.order_management.domain.services import offer_handler_service, offer_handler_service, shipping_option_handler
+from ddd.order_management.domain.services import offer_handler_service, offer_handler_service, shipping_option_service
 from order_management.domain import value_objects, enums, exceptions
 from ddd.order_management.domain.services import  (tax_handler_service)
 
@@ -207,6 +207,7 @@ class Order:
         self.update_total_discounts_fee(
                 self.get_total_discounts_fee.reset_amount()
             )
+        #TODO: reset free gifts??
 
     def calculate_final_amount(self):
         #make sure to call apply_offers & apply_taxes
@@ -215,7 +216,7 @@ class Order:
             ) + self.tax_details.tax_amount + self.shipping_details.cost
 
 
-    def get_shipping_options(self, shipping_option_service: shipping_option_handler.ShippingOptionHandlerMain) -> List[dict]:
+    def get_shipping_options(self, shipping_option_service: shipping_option_service.ShippingOptionHandlerMain) -> List[dict]:
         return shipping_option_service.get_shipping_options(self)
 
     def get_total_amount(self) -> value_objects.Money:
