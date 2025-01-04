@@ -139,7 +139,7 @@ OFFERS_HANDLER = {
     enums.OfferType.FREE_SHIPPING: FreeShippingOfferHandler
 }
 
-class OfferHandlerService(ABC):        
+class OfferHandlerService:        
 
     def __init__(self, vendor_repository: repositories.VendorRepository):
         self.vendor_repository = vendor_repository
