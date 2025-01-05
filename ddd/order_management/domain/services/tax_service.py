@@ -3,15 +3,15 @@ from typing import Optional
 from decimal import Decimal
 from ddd.order_management.domain import value_objects, models
 
-class TaxHandler(ABC):
-    def apply_tax(self, order: models.Order):
+class TaxStrategy(ABC):
+    def apply(self, order: models.Order):
         raise NotImplementedError("Subclasses must implement this method")
 
 #Singapore Tax
-class SingaporeTaxHandler(TaxHandler):
+class SingaporeTaxStrategy(TaxStrategy):
     GST_RATE = 0.09
 
-    def apply_tax(self, order: models.Order):
+    def apply(self, order: models.Order):
         if order.destination.get_country().lower() == "singapore":
             current_tax = order.get_tax_amount()
             tax_amount = order.get_total_amount().add(
@@ -27,14 +27,14 @@ class SingaporeTaxHandler(TaxHandler):
 
             return f"GST ({self.GST_RATE*100} %) : {order.get_tax_amount()}"
 
-class USStateTaxHandler(TaxHandler):
+class USStateTaxStrategy(TaxStrategy):
     STATE_TAX_RATES = {
         "CA": 0.075,
         "NY": 0.04,
         "TX": 0.0625
     }
 
-    def apply_tax(self, order: models.Order):
+    def apply(self, order: models.Order):
         if order.destination.get_country().lower() == "united states":
             state = order.destination.get_state()
             state_tax_rate = self.STATE_TAX_RATES.get(state, 0)
@@ -52,12 +52,12 @@ class USStateTaxHandler(TaxHandler):
 
             return f"{state} State Tax ({state_tax_rate*100} %) : {order.get_tax_amount()}"
 
-TAX_HANDLERS = [
-    SingaporeTaxHandler(),
-    USStateTaxHandler()
+TAX_STRATEGIES = [
+    SingaporeTaxStrategy(),
+    USStateTaxStrategy()
 ]
 
-class TaxHandlerService:
+class TaxStrategyService:
 
     def apply_taxes(self, order: models.Order):
         tax_details = []
@@ -71,9 +71,9 @@ class TaxHandlerService:
             )
         )
 
-        for tax_handler in TAX_HANDLERS:
+        for tax_strategy in TAX_STRATEGIES:
             tax_details.append(
-                tax_handler.apply_tax(order)
+                tax_strategy.apply(order)
             )
 
         order.update_tax_details(tax_details)

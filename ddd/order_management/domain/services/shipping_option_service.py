@@ -5,7 +5,7 @@ from typing import Tuple, List
 from ddd.order_management.domain import enums, exceptions, models, value_objects, repositories
 from decimal import Decimal
 
-class ShippingOptionHandler(ABC):
+class ShippingOptionStrategy(ABC):
     def __init__(self, name: enums.ShippingMethod, delivery_time: str, base_cost: Decimal, flat_rate: Decimal, conditions: dict):
         self.name = name
         self.delivery_time = delivery_time
@@ -31,10 +31,7 @@ class ShippingOptionHandler(ABC):
             currency=currency
         )
 
-class ShippingOption1Handler(ShippingOptionHandler):
-    def __init__(self, name: str, delivery_time: str, base_cost: Decimal, flat_rate: Decimal):
-        super().__init__(name, delivery_time, base_cost)
-        self.flat_rate = flat_rate
+class ShippingOption1Strategy(ShippingOptionStrategy):
 
     def is_eligible(self, order: models.Order) -> bool:
         """
@@ -53,7 +50,7 @@ class ShippingOption1Handler(ShippingOptionHandler):
         )
 
 
-class ShippingOptionHandlerService:
+class ShippingOptionStrategyService:
 
     def __init__(self, vendor_repository: repositories.VendorRepository):
         self.vendor_repository = vendor_repository
@@ -76,7 +73,7 @@ class ShippingOptionHandlerService:
 
         for shipping_option in vendor_shipping_options:
             valid_shipping_options.append(
-                ShippingOptionHandler(
+                ShippingOptionStrategy(
                     name=shipping_option.name,
                     delivery_time=shipping_option.delivery_time,
                     conditions=json.loads(shipping_option.conditions),
@@ -88,22 +85,22 @@ class ShippingOptionHandlerService:
         return valid_shipping_options
 
         #self.shipping_options = [
-        #    shipping_option_service.ShippingOptionHandler(
+        #    shipping_option_service.ShippingOptionStrategy(
         #        name=enums.ShippingMethod.STANDARD,
         #        delivery_time="3-5 business days",
         #        base_cost=Decimal("5.00")
         #    ),
-        #    shipping_option_service.ShippingOptionHandler(
+        #    shipping_option_service.ShippingOptionStrategy(
         #        name=enums.ShippingMethod.EXPRESS,
         #        delivery_time="1-2 business days",
         #        base_cost=Decimal("15.00")
         #    ),
-        #    shipping_option_service.ShippingOptionHandler(
+        #    shipping_option_service.ShippingOptionStrategy(
         #        name=enums.ShippingMethod.SAME_DAY,
         #        delivery_time="same day",
         #        base_cost=Decimal("25.00")
         #    ),
-        #    shipping_option_service.ShippingOptionHandler(
+        #    shipping_option_service.ShippingOptionStrategy(
         #        name=enums.ShippingMethod.FLAT_RATE,
         #        delivery_time="4-6 business days",
         #        base_cost=Decimal("10.00"),

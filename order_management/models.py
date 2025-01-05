@@ -146,15 +146,19 @@ class OrderLine(models.Model):
         return f"Item {self.product_variant} ({self.quantity})"
 
 class Payment(models.Model):
+    PAYMENT_STATUS = (
+        ("SUCCESS", "Success"),
+        ("FAILED", "Failed")
+    )
     id = models.AutoField(primary_key=True)
     order = models.ForeignKey(
         "order.Order", 
         on_delete=models.CASCADE,
-        related_name="order2payments", 
+        related_name="payments", 
         null=True, 
         blank=True
     )
-    payment_method = models.CharField(max_length=50, null=True, blank=True)
+    payment_method = models.CharField(max_length=50, null=True, blank=True, choices=enums.PaymentMethod.choices)
     amount = models.DecimalField(
         decimal_places=settings.DEFAULT_DECIMAL_PLACES, 
         max_digits=settings.DEFAULT_MAX_DIGITS,
@@ -171,6 +175,7 @@ class Payment(models.Model):
         max_length=25, 
         blank=True, 
         null=True, 
+        choices=PAYMENT_STATUS
     ) 
     date_created = models.DateTimeField(auto_now_add=True) 
     date_modified = models.DateTimeField(auto_now=True) 

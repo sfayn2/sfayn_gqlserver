@@ -7,7 +7,7 @@ from typing import Tuple, List, Dict, Union
 from ddd.order_management.domain import enums, exceptions, models, value_objects, repositories
 from decimal import Decimal
 
-class OfferHandler(ABC):
+class OfferStrategy(ABC):
     def __init__(self, offer_type: enums.OfferType, description: str, 
                  conditions: dict, start_date: datetime, end_date: datetime, 
                  discount_value: Union[int, Decimal], required_coupon: bool, 
@@ -22,13 +22,13 @@ class OfferHandler(ABC):
         self.coupon_code = coupon_code
 
     @abstractmethod
-    def apply_offer(self, order: models.Order) -> str:
+    def apply(self, order: models.Order):
         raise NotImplementedError("Subclasses must implement this method")
 
-class PercentageDiscountHandler(OfferHandler):
+class PercentageDiscountStrategy(OfferStrategy):
 
     #apply on order
-    def apply_offer(self, order: models.Order) -> str:
+    def apply(self, order: models.Order):
         total_discount = 0
         currency = order.get_currency()
         discounted_items = []
@@ -49,9 +49,9 @@ class PercentageDiscountHandler(OfferHandler):
                     )
                 return f"{self.description} applied ( {','.join(discounted_items)} )"
 
-class FreeGiftOfferHandler(OfferHandler):
+class FreeGiftOfferStrategy(OfferStrategy):
 
-    def apply_offer(self, order: models.Order) -> str:
+    def apply(self, order: models.Order):
         free_gifts = []
         currency = order.get_currency()
         minimum_quantity = self.conditions.get("minimum_quantity")
@@ -71,9 +71,9 @@ class FreeGiftOfferHandler(OfferHandler):
                 )
                 return f"{self.description} applied ( {','.join(free_gifts)} )"
     
-class FreeShippingOfferHandler(OfferHandler):
+class FreeShippingOfferStrategy(OfferStrategy):
 
-    def apply_offer(self, order: models.Order):
+    def apply(self, order: models.Order):
         currency = order.get_currency()
         minimum_order_total = self.conditions.get("minimum_order_total")
         if minimum_order_total and (order.get_total_amount().amount >= minimum_order_total):
@@ -89,9 +89,9 @@ class FreeShippingOfferHandler(OfferHandler):
 
 
 
-class PercentageDiscountCouponOfferHandler(OfferHandler):
+class PercentageDiscountCouponOfferStrategy(OfferStrategy):
 
-    def apply_offer(self, order: models.Order) -> value_objects.Money:
+    def apply(self, order: models.Order):
         total_discount = 0
         discounted_items = []
         currency = order.get_currency()
@@ -119,15 +119,15 @@ class PercentageDiscountCouponOfferHandler(OfferHandler):
                     return f"{self.description} applied ( {','.join(discounted_items)} )"
 
 
-# when adding new offer need to map the handler
-OFFERS_HANDLER = {
-    enums.OfferType.PERCENTAGE_DISCOUNT.name: PercentageDiscountHandler,
-    enums.OfferType.FREE_GIFT.name: FreeGiftOfferHandler,
-    enums.OfferType.COUPON_DISCOUNT: PercentageDiscountCouponOfferHandler,
-    enums.OfferType.FREE_SHIPPING: FreeShippingOfferHandler
+# when adding new offer need to map the strategy
+OFFER_STRATEGIES = {
+    enums.OfferType.PERCENTAGE_DISCOUNT.name: PercentageDiscountStrategy,
+    enums.OfferType.FREE_GIFT.name: FreeGiftOfferStrategy,
+    enums.OfferType.COUPON_DISCOUNT.name: PercentageDiscountCouponOfferStrategy,
+    enums.OfferType.FREE_SHIPPING.name: FreeShippingOfferStrategy
 }
 
-class OfferHandlerService:        
+class OfferStrategyService:        
 
     def __init__(self, vendor_repository: repositories.VendorRepository):
         self.vendor_repository = vendor_repository
@@ -135,9 +135,9 @@ class OfferHandlerService:
     def apply_offers(self, order: models.Order):
         available_offers = self._fetch_valid_offers(order.vendor)
         offer_details = []
-        for offer_handler in available_offers:
+        for strategy in available_offers:
             offer_details.append(
-                offer_handler.apply_offer(order)
+                strategy.apply(order)
             )
 
         order.update_offer_details(offer_details)
@@ -152,13 +152,13 @@ class OfferHandlerService:
 
         for offer in sorted_vendor_offers:
 
-            #handler function
-            offer_handler_class = OFFERS_HANDLER.get(offer.get("offer_type"))
+            #strategy function
+            offer_strategy_class = OFFER_STRATEGIES.get(offer.get("offer_type"))
 
-            if offer_handler_class:
+            if offer_strategy_class:
 
                 valid_offers.append(
-                    offer_handler_class(
+                    offer_strategy_class(
                             offer_type=enums.OfferType[offer.get("offer_type")],
                             description=offer.get("name"),
                             discount_value=offer.get("discount_value"),

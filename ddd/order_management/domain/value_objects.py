@@ -73,6 +73,14 @@ class Package:
 class Payment:
     method: str
     paid_amount: Money
+    transaction_id: str
+    status: str
+
+    def verify_payment(self, payment_service):
+        return Payment(method=self.method, 
+                paid_amount=self.paid_amount, 
+                transaction_id=self.transaction_id,
+                status=payment_service.status)
 
 
 #right now only for Gues customer
