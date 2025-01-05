@@ -14,6 +14,11 @@ class Order(models.Model):
         choices=enums.OrderStatus.choices, 
         default=enums.OrderStatus.DRAFT
     ) 
+    cancellation_reason = models.CharField(max_length=255, blank=True, null=True, help_text="both entity like vendor or customer can cancel the order?")
+    return_reason = models.CharField(max_length=255, blank=True, null=True)
+
+    #refund need?
+    refund_reason = models.CharField(max_length=255, blank=True, null=True)
 
     customer_first_name = models.CharField(max_length=255)
     customer_last_name = models.CharField(max_length=255)
@@ -147,7 +152,9 @@ class OrderLine(models.Model):
 
 class Payment(models.Model):
     PAYMENT_STATUS = (
+        ("PENDING", "Pending"),
         ("SUCCESS", "Success"),
+        ("REFUNDED", "Refunded"),
         ("FAILED", "Failed")
     )
     id = models.AutoField(primary_key=True)

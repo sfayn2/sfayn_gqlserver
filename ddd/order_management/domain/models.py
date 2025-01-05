@@ -54,6 +54,7 @@ class Order:
     line_items: List[LineItem]
     shipping_details: value_objects.ShippingDetails
     _status: enums.OrderStatus = enums.OrderStatus.DRAFT.name
+    _cancellation_reason: str
     _total_discounts_fee: value_objects.Money
     _offer_details: List[str]
     _tax_details: List[str]
@@ -104,28 +105,36 @@ class Order:
     def confirm_order(self):
         if self.status != enums.OrderStatus.PENDING.name:
             raise exceptions.InvalidOrderOperation("Only pending orders can be confirmed.")
-
-
         self._status = enums.OrderStatus.CONFIRMED.name
         self.update_modified_date()
 
     def mark_as_shipped(self):
         if self._status != enums.OrderStatus.CONFIRMED.name:
-            raise exceptions.InvalidOrderOperation("Only confirm order can be ship.")
+            raise exceptions.InvalidOrderOperation("Only confirm order can mark as shipped.")
         self._status = enums.OrderStatus.SHIPPED.name
         self.update_modified_date()
 
-    def cancel_order(self):
-        if self._status in (enums.OrderStatus.COMPLETED.name, enums.OrderStatus.CANCELLED.name):
-            raise exceptions.InvalidOrderOperation("Cannot cancel a completed or already cancelled order")
+    def cancel_order(self, cancellation_reason: str):
+        if not self._status in (enums.OrderStatus.PENDING.name, enums.OrderStatus.CONFIRMED.name):
+            raise exceptions.InvalidOrderOperation("Cannot cancel a completed or already cancelled order or shipped order")
         self._status = enums.OrderStatus.CANCELLED.name
+        self._cancellation_reason = cancellation_reason
         self.update_modified_date()
     
     def mark_as_completed(self):
         if self._status != enums.OrderStatus.SHIPPED.name:
-            raise exceptions.InvalidOrderOperation("Only shipped order can be completed")
+            raise exceptions.InvalidOrderOperation("Only shipped order can mark as completed.")
+
+        if self.is_fully_paid:
+            raise exceptions.InvalidOrderOperation("Cannot mark as completed with outstanding payments.")
+
         self._status = enums.OrderStatus.COMPLETED.name
         self.update_modified_date()
+
+    def refund(self):
+        #TODO reverse or refund transaction for 2rd party payment servie?
+        #To have payment status for SUCCESS , PENDING, FAILED, REFUNDED?
+        pass
 
     def add_shipping_tracking_reference(self, shipping_reference: str):
         self._shipping_reference = shipping_reference
@@ -140,6 +149,8 @@ class Order:
         self._tax_details = tax_details
 
     def apply_offers(self, offer_service: offer_service.OfferStrategyService):
+        if not self.shipping_details:
+            raise exceptions.InvalidOrderOperation("Only when shipping option is selected.")
         offer_service.apply_offers(self)
 
     def apply_taxes(self, tax_service: tax_service.TaxStrategyService):

@@ -3,7 +3,6 @@ from enum import Enum
 class OrderStatus(Enum):
     DRAFT = "Draft"
     PENDING = "Pending"
-    PAID = "Paid"
     CONFIRMED = "Confirmed"
     SHIPPED = "Shipped"
     CANCELLED = "Cancelled"
@@ -30,10 +29,6 @@ class OfferType(Enum):
     BUNDLE = "Bundle"
     FREE_GIFT = "Free Gift"
     FREE_SHIPPING = "Free Shipping"
-
-class DiscountType(Enum):
-    PERCENTAGE = "Percentage"
-    FIXED_AMOUNT = "Fixed Amount"
 
 class PaymentMethod(Enum):
     PAYPAL = "Paypal"
