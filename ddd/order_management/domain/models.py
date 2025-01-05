@@ -3,8 +3,11 @@ from datetime import datetime
 from decimal import Decimal
 from typing import List, Optional, Tuple
 from dataclasses import dataclass, field
-from ddd.order_management.domain.services import offer_service, shipping_option_service, tax_service
-from order_management.domain import value_objects, enums, exceptions
+from ddd.order_management.domain import value_objects, enums, exceptions
+from ddd.order_management.domain.services import (
+    offer_service, payment_service, shipping_option_service, tax_service
+)
+
 
 @dataclass
 class LineItem:
@@ -142,8 +145,8 @@ class Order:
     def is_fully_paid(self):
         return self.get_total_payments() >= self.get_final_amount()
     
-    def apply_payment(self, payment: value_objects.Payment):
-        if payment.verify_payment():
+    def apply_payment(self, payment: value_objects.Payment, payment_service: payment_service.PaymentService):
+        if payment.verify_payment(payment_service):
             self._payments.append(payment)
             self.confirm_order()
             #if self.is_fully_paid:

@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from typing import Union, Tuple
 from decimal import Decimal
 from ddd.order_management.domain import enums
+from ddd.order_management.domain.services import payment_service
 
 @dataclass(frozen=True)
 class Money:
@@ -76,11 +77,12 @@ class Payment:
     transaction_id: str
     status: str
 
-    def verify_payment(self, payment_service):
+    def verify_payment(self, payment_service: payment_service.PaymentService ):
+        status, msg = payment_service.verify_payment(self.transaction_id, self.paid_amount)
         return Payment(method=self.method, 
                 paid_amount=self.paid_amount, 
                 transaction_id=self.transaction_id,
-                status=payment_service.status)
+                status=status)
 
 
 #right now only for Gues customer
