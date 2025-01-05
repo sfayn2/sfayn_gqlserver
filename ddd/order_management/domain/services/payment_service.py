@@ -52,16 +52,6 @@ class StripePaymentVerifierStrategy(PaymentVerifierStrategy):
             return False, f"Amount mismatch: expected {expected_amount}"
         
         return True, "Payment verified successfully"
-    
-class CashOnDeliveryPaymentVerifierStrategy(PaymentVerifierStrategy):
-    def __init__(self, cod_gateway_repository: repositories.PaymentGatewayRepository):
-        self.cod_gateway_repository = cod_gateway_repository
-
-    def verify_payment(self, transaction_id: str, expected_amount: value_objects.Money) -> Tuple[bool, str]:
-        #TODO? N/A?
-        print(f"Verifying Cash on Delivery for transaction {transaction_id}")
-        return True, "Payment verified successfully"
-
 
 class PaymentService:
     def __init__(self, payment_gateway_repository: repositories.PaymentGatewayRepository, payment_method: enums.PaymentMethod):
@@ -76,10 +66,6 @@ class PaymentService:
         elif self.payment_method == enums.PaymentMethod.STRIPE:
             strategy = StripePaymentVerifierStrategy(
                 stripe_gateway_repository=self.payment_gateway_repository
-            )
-        elif self.payment_method == enums.PaymentMethod.COD:
-            strategy = CashOnDeliveryPaymentVerifierStrategy(
-                cod_gateway_repository=self.cod_gateway_repository
             )
         else:
             raise ValueError(f"Unsupported payment method: {self.payment_method.value}")

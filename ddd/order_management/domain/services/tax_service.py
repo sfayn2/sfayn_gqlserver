@@ -12,7 +12,7 @@ class SingaporeTaxStrategy(TaxStrategy):
     GST_RATE = 0.09
 
     def apply(self, order: models.Order):
-        if order.destination.get_country().lower() == "singapore":
+        if order.destination.country.lower() == "singapore":
             current_tax = order.get_tax_amount()
             tax_amount = order.get_total_amount().add(
                     order.shipping_details.cost
@@ -35,8 +35,8 @@ class USStateTaxStrategy(TaxStrategy):
     }
 
     def apply(self, order: models.Order):
-        if order.destination.get_country().lower() == "united states":
-            state = order.destination.get_state()
+        if order.destination.country.lower() == "united states":
+            state = order.destination.state
             state_tax_rate = self.STATE_TAX_RATES.get(state, 0)
             current_tax = order.get_tax_amount()
             tax_amount = order.get_total_amount().add(

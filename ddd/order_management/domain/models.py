@@ -64,7 +64,7 @@ class Order:
     _shipping_reference: str
     _currency: str
     _coupon_codes: Optional[List[str]] = field(default_factory=list, init=False)
-    _payments: List[value_objects.Payment] = field(default_factory=list)
+    _payments: List[value_objects.Payment] = field(default_factory=list, init=False)
 
     _date_created: datetime = field(default_factory=datetime.now)
     _date_modified: Optional[datetime] = None
@@ -86,6 +86,13 @@ class Order:
             raise ValueError("Please provide line item to remove.")
         self.line_items.remove(line_item)
 
+    def update_line_item_details(self, line_item: value_objects.OrderLine):
+        #use to update specific item quantity or other item info
+        if not line_item:
+            raise ValueError("Please provide line item to update details.")
+        self.line_items.remove(line_item)
+        self.line_items.add(line_item)
+
     def place_order(self):
         if not self.line_items:
             raise exceptions.InvalidOrderOperation("Order must have at least one line item.")
@@ -98,9 +105,6 @@ class Order:
         if self.status != enums.OrderStatus.PENDING.name:
             raise exceptions.InvalidOrderOperation("Only pending orders can be confirmed.")
 
-        #TODO: how to handle COD?
-        if not self.is_fully_paid:
-            raise exceptions.InvalidOrderOperation("Order cannot be confirmed without a full payment.")
 
         self._status = enums.OrderStatus.CONFIRMED.name
         self.update_modified_date()
@@ -146,18 +150,21 @@ class Order:
         return self.get_total_payments() >= self.get_final_amount()
     
     def apply_payment(self, payment: value_objects.Payment, payment_service: payment_service.PaymentService):
-        if payment.verify_payment(payment_service):
-            self._payments.append(payment)
+        if payment.method == enums.PaymentMethod.COD:
             self.confirm_order()
-            #if self.is_fully_paid:
-            #    self._status = enums.OrderStatus.PAID.name
+        elif payment.verify_payment(payment_service):
+            self._payments.append(payment)
+            self.calculate_total_payments()
+            if not self.is_fully_paid:
+                raise exceptions.InvalidOrderOperation("Order cannot be confirmed without a full payment.")
+            self.confirm_order()
         else:
-            raise ValueError("Unable to apply payment.")
+            raise exceptions.InvalidOrderOperation("Unable to apply payment.")
 
-    def apply_coupon(self, coupon_code: str, offer_service: offer_service.OfferStrategyService):
+    def apply_coupon(self, coupon_code: str):
         self._coupon_codes.append(coupon_code)
 
-    def remove_coupon(self, coupon_code: str, offer_service: offer_service.OfferStrategyService):
+    def remove_coupon(self, coupon_code: str):
         self._coupon_codes.remove(coupon_code)
     
     def update_shipping_details(self, shipping_details: value_objects.ShippingDetails):

@@ -44,21 +44,16 @@ class Money:
 
 @dataclass(frozen=True)
 class Address:
-    _address: str
-    _city: str
-    _postal: int
-    _country: str
-    _state: str
+    address: str
+    city: str
+    postal: int
+    country: str
+    state: str
     # make use of country to country code converter if require?
 
     def is_international(self, origin_country: str) -> bool:
-        return self._country != origin_country
+        return self.country != origin_country
 
-    def get_state(self):
-        return self._state
-
-    def get_country(self):
-        return self._country
 
 class Package:
     _weight: Decimal #in kg
@@ -88,9 +83,9 @@ class Payment:
 #right now only for Gues customer
 @dataclass(frozen=True)    
 class Customer:
-    _first_name: str
-    _last_name: str
-    _email: str
+    first_name: str
+    last_name: str
+    email: str
 
 @dataclass(frozen=True)
 class ShippingDetails:
