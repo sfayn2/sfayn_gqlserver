@@ -25,6 +25,19 @@ class OfferStrategy(ABC):
     def apply(self, order: models.Order):
         raise NotImplementedError("Subclasses must implement this method")
 
+    def validate_coupon(self, order: models.Order):
+        #reuse if the offer is based on coupon
+        return (self.requires_coupon == True
+            and (datetime.now() >= self.start_date and datetime.now() <= self.end_date)
+            and self.coupon_code in order.get_customer_coupons()
+        )
+
+    def validate_minimum_quantity(self, order:models.Order):
+        return self.minimum_quantity and (sum(item.order_quantity for item in order.line_items) >= self.minimum_quantity)
+
+    def validate_minimum_order_total(self, order:models.Order):
+        return self.minimum_order_total and (order.get_total_amount().amount >= self.minimum_order_total)
+
 class PercentageDiscountStrategy(OfferStrategy):
 
     #apply on order
@@ -54,9 +67,8 @@ class FreeGiftOfferStrategy(OfferStrategy):
     def apply(self, order: models.Order):
         free_gifts = []
         currency = order.get_currency()
-        minimum_quantity = self.conditions.get("minimum_quantity")
         gift_products = self.conditions.get("gift_products")
-        if minimum_quantity and (sum(item.order_quantity for item in order.line_items) >= minimum_quantity):
+        if self.validate_minimum_quantity(order):
             for free_product in gift_products:
                 free_gifts.append(free_product)
 
@@ -75,8 +87,7 @@ class FreeShippingOfferStrategy(OfferStrategy):
 
     def apply(self, order: models.Order):
         currency = order.get_currency()
-        minimum_order_total = self.conditions.get("minimum_order_total")
-        if minimum_order_total and (order.get_total_amount().amount >= minimum_order_total):
+        if self.validate_minimum_order_total(order):
             zero_shipping_cost = value_objects.Money(
                 amount=0,
                 currency=currency
@@ -96,15 +107,8 @@ class PercentageDiscountCouponOfferStrategy(OfferStrategy):
         discounted_items = []
         currency = order.get_currency()
         eligible_products = self.conditions.get("eligible_products")
-        start_date = self.conditions.get("start_date")
-        end_date = self.conditions.get("end_date")
-        requires_coupon = self.conditions.get("requires_coupon")
-        coupon_code = self.conditions.get("coupon_code")
 
-        if (requires_coupon == True
-            and (datetime.now() >= start_date and datetime.now() <= end_date)
-            and coupon_code in order.get_customer_coupons()
-        ):
+        if self.validate_coupon(order):
             for item in order.line_items:
                 if eligible_products and item.get_product_name() in eligible_products:
                     total_discount += item.get_total_price() * (self.discount_value / 100)
