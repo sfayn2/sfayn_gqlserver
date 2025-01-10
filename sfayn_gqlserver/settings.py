@@ -43,7 +43,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sites',
     'graphene_django',
-    'product_catalog'
+    'product_catalog',
+    'order_management',
+    'vendor_management'
 ]
 
 MIDDLEWARE = [

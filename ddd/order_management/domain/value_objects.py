@@ -3,7 +3,6 @@ from dataclasses import dataclass
 from typing import Union, Tuple
 from decimal import Decimal
 from ddd.order_management.domain import enums
-from ddd.order_management.domain.services import payment_service
 
 @dataclass(frozen=True)
 class Money:
@@ -55,15 +54,11 @@ class Address:
         return self.country != origin_country
 
 
+@dataclass(frozen=True)
 class Package:
-    _weight: Decimal #in kg
-    _dimensions: Tuple[int, int, int] # (length, width, height) in cm
+    weight: Decimal #in kg
+    dimensions: Tuple[int, int, int] # (length, width, height) in cm
 
-    def get_weight(self):
-        return self._weight
-
-    def get_dimensions(self):
-        return self._dimensions
 
 @dataclass(frozen=True)
 class PaymentDetails:
@@ -74,7 +69,7 @@ class PaymentDetails:
 
 #right now only for Gues customer
 @dataclass(frozen=True)    
-class Customer:
+class CustomerDetails:
     first_name: str
     last_name: str
     email: str

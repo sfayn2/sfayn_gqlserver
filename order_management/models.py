@@ -1,4 +1,6 @@
 from django.db import models
+import uuid
+import json
 from django.conf import settings
 from ddd.order_management.domain import enums, models as domain_models, value_objects
 
@@ -15,36 +17,21 @@ class Order(models.Model):
         default=enums.OrderStatus.DRAFT
     ) 
     cancellation_reason = models.CharField(max_length=255, blank=True, null=True, help_text="both entity like vendor or customer can cancel the order?")
-    return_reason = models.CharField(max_length=255, blank=True, null=True)
-
-    #refund need?
-    refund_reason = models.CharField(max_length=255, blank=True, null=True)
 
     customer_first_name = models.CharField(max_length=255)
     customer_last_name = models.CharField(max_length=255)
     customer_email = models.EmailField(max_length=255, blank=True, null=True)
-    customer_coupons = models.CharField(max_length=100, help_text="Customer entered coupons, just provide a list i.e WELCOME01,FREESHIP01")
+    customer_coupons = models.JSONField(
+        blank=True, 
+        null=True, 
+        help_text="e.g. ['WELCOME25', 'FREESHIP']"
+        ) 
 
     delivery_address = models.TextField(blank=True, help_text="Delivery address")
     delivery_city = models.CharField(max_length=50, blank=True, null=True, help_text="Optional for other countries (e.g. Singapore)")
     delivery_postal = models.CharField(max_length=50, blank=True, null=True, help_text="some countries dont use this (e.g Ireland?)")
     delivery_country = models.CharField(max_length=50)
     delivery_state = models.CharField(max_length=10, blank=True, null=True, help_text="Mandatory in countries like US, Canada, India but irrelevant in small countries")
-
-    subtotal = models.DecimalField(
-            decimal_places=settings.DEFAULT_DECIMAL_PLACES, 
-            max_digits=settings.DEFAULT_MAX_DIGITS,
-            null=True, 
-            blank=True, 
-            help_text="total items w/o order discounts and tax", 
-    )
-    total_discounts_fee = models.DecimalField(
-            decimal_places=settings.DEFAULT_DECIMAL_PLACES, 
-            max_digits=settings.DEFAULT_MAX_DIGITS,
-            null=True, 
-            blank=True, 
-            help_text="total discounts fee per order", 
-    )
 
     shipping_method = models.CharField(max_length=50, null=True, blank=True, help_text="i.e. Free Shipping, Local Pickup", choices=enums.ShippingMethod.choices)
     shipping_delivery_time = models.CharField(max_length=150, null=True, blank=True, help_text="i.e. 2-3 days delivery")
@@ -55,9 +42,14 @@ class Order(models.Model):
         blank=True, 
         help_text="", 
     )
+    shipping_tracking_reference = models.CharField(max_length=50, null=True, blank=True, help_text="")
 
 
-    tax_desc = models.CharField(max_length=20, help_text="GST 9%, VAT, ?")
+    tax_details = models.JSONField(
+        blank=True, 
+        null=True, 
+        help_text='e.g. ["GST (9%)", "Local State (2%)"]'
+        ) 
     tax_amount = models.DecimalField(
             decimal_places=settings.DEFAULT_DECIMAL_PLACES, 
             max_digits=settings.DEFAULT_MAX_DIGITS,
@@ -65,6 +57,15 @@ class Order(models.Model):
             blank=True, 
             help_text="tax amount", 
         )
+
+    total_discounts_fee = models.DecimalField(
+            decimal_places=settings.DEFAULT_DECIMAL_PLACES, 
+            max_digits=settings.DEFAULT_MAX_DIGITS,
+            null=True, 
+            blank=True, 
+            help_text="total discounts fee per order", 
+    )
+
 
     total_amount = models.DecimalField(
         decimal_places=settings.DEFAULT_DECIMAL_PLACES, 
@@ -107,22 +108,133 @@ class Order(models.Model):
     date_created = models.DateTimeField(auto_now_add=True) 
     date_modified = models.DateTimeField(auto_now=True) 
 
-    class Meta:
-        permissions = [
-            ("default_shipping_option_policy", "Can use default shipping option policy"),
-            ("default_offer_policy", "Can use default offer/coupon policy"),
-        ]
 
     def __str__(self):
         return f"{self.order_id} - {self.shipping_address} ( {self.status} )"
 
+    def to_domain(self):
+        line_items = [
+            domain_models.LineItem(
+                _id=uuid.uuid4,
+                _product_sku=order_line.product_sku,
+                _product_name=order_line.product_name,
+                _product_category=order_line.product_category,
+                _options=json.loads(order_line.options),
+                _product_price=value_objects.Money(
+                    amount=order_line.product_price,
+                    currency=self.currency),
+                _order_quantity=order_line.order_quantity,
+                _is_free_gift=order_line.is_free_gift,
+                _is_taxable=order_line.is_taxable,
+                package=value_objects.Package(
+                    weight=order_line.weight,
+                    dimensions=(order_line.length, order_line.width, order_line.height)
+                )
+            )
+            for order_line in self.line_items.all()
+        ]
+
+        order = domain_models.Order(
+            _order_id=self.order_id,
+            destination=value_objects.Address(
+                address=self.delivery_address,
+                city=self.delivery_city,
+                postal=self.delivery_postal,
+                state=self.delivery_state,
+                country=self.delivery_country
+            ),
+            line_items=line_items,
+            customer_details=value_objects.CustomerDetails(
+                first_name=self.customer_first_name,
+                last_name=self.customer_last_name,
+                email=self.customer_email
+            ),
+            shipping_details=value_objects.ShippingDetails(
+                method=self.shipping_method,
+                delivery_time=self.shipping_delivery_time,
+                cost=self.shipping_cost
+            ),
+            payment_details=value_objects.PaymentDetails(
+                method=self.payment_method,
+                paid_amount=value_objects.Money(
+                    amount=self.payment_amount,
+                    currency=self.currency
+                    ),
+                transaction_id=self.payment_reference
+            ),
+            _status=self.order_status,
+            _cancellation_reason=self.cancellation_reason,
+            _total_discounts_fee=value_objects.Money(
+                amount=self.total_discounts_fee,
+                currency=self.currency
+            ),
+            _offer_details=self.offer_details,
+            _tax_details=self.tax_details,
+            _tax_amount=self.tax_amount,
+            _total_amount=value_objects.Money(
+                amount=self.total_amount,
+                currency=self.currency
+            ),
+            _final_amount=value_objects.Money(
+                amount=self.final_amount,
+                currency=self.currency
+            ),
+            _shipping_reference=self.shipping_tracking_reference,
+            _currency=self.currency,
+            _coupon_codes=self.customer_coupons,
+            _date_created=self.date_created,
+            _date_modified=self.date_modified
+        ) 
+        
+        
+        return order 
+
+    @staticmethod
+    def from_domain(order):
+        order_model, created = Order.objects.update_or_create(
+            id=order.get_order_id(), 
+            defaults={ 
+                "order_status": order.get_status(),
+                "cancellation_reason": order.get_cancellation_reason(),
+                "customer_first_name": order.customer_details.first_name,
+                "customer_last_name": order.customer_details.last_name,
+                "customer_email": order.customer_details.email,
+                "customer_coupons": order.get_customer_coupons(),
+                "delivery_address": order.destination.address,
+                "delivery_city": order.destination.city,
+                "delivery_postal": order.destination.postal,
+                "delivery_country": order.destination.country,
+                "delivery_state": order.destination.state,
+                "total_discounts_fee": order.get_total_discounts_fee().amount,
+                "shipping_method": order.shipping_details.method,
+                "shipping_delivery_time": order.shipping_details.delivery_time,
+                "shipping_cost": order.shipping_details.cost,
+                "tax_details": order.get_tax_details(),
+                "tax_amount": order.get_tax_amount().amount,
+                "total_amount": order.get_total_amount().amount,
+                "offer_details": order.get_offer_details(),
+                "final_amount": order.get_final_amount(),
+                "payment_method": order.payment_details.method,
+                "payment_reference": order.payment_details.transaction_id,
+                "payment_amount": order.payment_details.paid_amount,
+                "currency": order.get_currency(),
+                "date_created": order.get_date_created(),
+                "date_modified": order.get_date_modified()
+            }
+        )
+
+        for line_item in order.line_items:
+            OrderLine.from_domain(line_item, order.get_order_id())
+
+
+
 
 class OrderLine(models.Model):
-    id = models.AutoField(primary_key=True)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False) #uuid for global unique id
     order = models.ForeignKey(
-        "order.Order", 
+        "order_management.Order", 
         on_delete=models.CASCADE,
-        related_name="order2orderitem", 
+        related_name="line_items", 
         null=True, 
         blank=True
     )
@@ -139,13 +251,6 @@ class OrderLine(models.Model):
     package_length = models.CharField(max_length=100, null=True, blank=True, help_text="value should be coming from product itself or to fill in later once it goes to warehouse fulfillment? ")
     package_width = models.CharField(max_length=100, null=True, blank=True, help_text="value should be coming from product itself or to fill in later once it goes to warehouse fulfillment?")
     package_height = models.CharField(max_length=100, null=True, blank=True, help_text="value should be coming from product itself or to fill in later once it goes to warehouse fulfillment?")
-    discounts_fee = models.DecimalField(
-            decimal_places=settings.DEFAULT_DECIMAL_PLACES, 
-            max_digits=settings.DEFAULT_MAX_DIGITS,
-            null=True, 
-            blank=True, 
-            help_text="discounts per line item; right now only used for record keeping.", 
-        )
     total_price = models.DecimalField(
         decimal_places=settings.DEFAULT_DECIMAL_PLACES, 
         max_digits=settings.DEFAULT_MAX_DIGITS,
@@ -155,4 +260,31 @@ class OrderLine(models.Model):
     )
 
     def __str__(self):
-        return f"Item {self.product_variant} ({self.quantity})"
+        return f"Item {self.options} ({self.quantity})"
+
+    @staticmethod
+    def from_domain(line_item, order_id):
+        orderline_model, created = OrderLine.objects.update_or_create(
+            id=line_item.get_id(),
+            defaults={
+                "product_sku": line_item.get_product_sku(),
+                "product_name": line_item.get_product_name(),
+                "product_category": line_item.get_product_category(),
+                "is_free_gift": line_item.is_free_gift,
+                "is_taxable": line_item.is_taxable,
+                "options": line_item.get_options,
+                "product_price": line_item.get_product_price(),
+                "order_quantity": line_item.get_order_quantity(),
+                "package_weight": line_item.package.weight,
+                "package_length": line_item.package.dimensions[0],
+                "package_width": line_item.package.dimensions[1],
+                "package_height": line_item.package.dimensions[2],
+                "total_price": line_item.get_total_price(),
+                "order_id": order_id
+            }
+
+        )
+
+
+        return orderline_model
+

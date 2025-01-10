@@ -1,24 +1,26 @@
 from __future__ import annotations
+import uuid
 from datetime import datetime
 from decimal import Decimal
 from typing import List, Optional, Tuple
 from dataclasses import dataclass, field
 from ddd.order_management.domain import value_objects, enums, exceptions
-from ddd.order_management.domain.services import (
-    offer_service, payment_service, shipping_option_service, tax_service
-)
-
 
 @dataclass
 class LineItem:
+    _id: uuid.uuid4
     _product_sku: str
     _product_name: str
-    _options: str
+    _product_category: str
+    _options: dict
     _product_price: value_objects.Money
     _order_quantity: int
+    package: value_objects.Package
     _is_free_gift: bool = False
     _is_taxable: bool = True
-    _package: value_objects.Package
+
+    def set_options(self, options):
+        self._options = options
 
     def add(self, quantity: int):
         if quantity < 0:
@@ -41,30 +43,53 @@ class LineItem:
     def get_product_name(self):
         return self._product_name
 
+    def get_product_category(self):
+        return self._product_category
+
     def get_order_quantity(self):
         return self._order_quantity
+
+    def get_product_sku(self):
+        return self._product_sku
+
+    def get_id(self):
+        return self._id
+
+    def get_options(self):
+        return self._options
+
+    def get_product_price(self):
+        return self._product_price
+
+    @property
+    def is_free_gift(self):
+        return self._is_free_gift
+
+    @property
+    def is_taxable(self):
+        return self._is_taxable
 
 
 
 @dataclass
 class Order:
     _order_id: str
-    customer: value_objects.Customer
     destination: value_objects.Address
     line_items: List[LineItem]
+    customer_details: value_objects.CustomerDetails
     shipping_details: value_objects.ShippingDetails
     payment_details: value_objects.PaymentDetails
-    _status: enums.OrderStatus = enums.OrderStatus.DRAFT.name
     _cancellation_reason: str
     _total_discounts_fee: value_objects.Money
     _offer_details: List[str]
     _tax_details: List[str]
-    _tax_amount: value_objects.Money
+    _tax_amount: Optional[value_objects.Money]
     _total_amount: value_objects.Money
     _final_amount: value_objects.Money
-    _shipping_reference: str
+    _shipping_reference: Optional[str]
     _currency: str
     _coupon_codes: Optional[List[str]] = field(default_factory=list, init=False)
+    _status: enums.OrderStatus = enums.OrderStatus.DRAFT.name
 
     _date_created: datetime = field(default_factory=datetime.now)
     _date_modified: Optional[datetime] = None
@@ -108,6 +133,9 @@ class Order:
 
     def update_payment_details(self, payment_details: value_objects.PaymentDetails):
         self.payment_details = payment_details
+
+    def update_customer_details(self, customer_details: value_objects.CustomerDetails):
+        self.customer_details = customer_details
 
     def mark_as_shipped(self):
         if self._status != enums.OrderStatus.CONFIRMED.name:
@@ -210,24 +238,35 @@ class Order:
         return sum(item.get_total_weight() for item in self.line_items)
 
     def get_combined_dimensions(self) -> Tuple[int, int, int]:
-        total_length = sum(item.get_dimensions()[0] for item in self.line_items)
-        max_width = max(item.get_dimensions()[1] for item in self.line_items)
-        max_height = max(item.get_dimensions()[2] for item in self.line_items)
+        total_length = sum(item.package.dimensions[0] for item in self.line_items)
+        max_width = max(item.package.dimensions[1] for item in self.line_items)
+        max_height = max(item.package.dimensions[2] for item in self.line_items)
         return total_length, max_width, max_height
 
-    def get_customer_coupons(self):
+    def get_customer_coupons(self) -> List[str]:
         return self._coupon_codes
 
-    def get_currency(self):
+    def get_currency(self) -> str:
         return self._currency
 
-    def get_tax_amount(self):
+    def get_tax_details(self) -> str:
+        return self._tax_details
+
+    def get_tax_amount(self) -> value_objects.Money:
         return self._tax_amount
 
-    def get_final_amount(self):
+    def get_final_amount(self) -> value_objects.Money:
         return self._final_amount
 
-    def get_order_id(self):
+    def get_order_id(self) -> str:
         return self._order_id
+
+    def get_date_created(self) -> datetime:
+        return self._date_created
+
+    def get_date_modified(self) -> datetime:
+        return self._date_modified
+
+
 
 

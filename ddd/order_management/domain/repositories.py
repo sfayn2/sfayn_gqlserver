@@ -1,5 +1,15 @@
 import uuid
 from abc import ABC, abstractmethod
+from ddd.order_management.domain import models
+
+class OrderRepository(ABC):
+    @abstractmethod
+    def save(self, order: models.Order):
+        raise NotImplementedError("Subclasses must implement this method")
+
+    @abstractmethod
+    def get(self, order_id: str) -> models.Order:
+        raise NotImplementedError("Subclasses must implement this method")
 
 class VendorRepository(ABC):
 
