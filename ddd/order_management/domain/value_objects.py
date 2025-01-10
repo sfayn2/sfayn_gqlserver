@@ -66,18 +66,10 @@ class Package:
         return self._dimensions
 
 @dataclass(frozen=True)
-class Payment:
+class PaymentDetails:
     method: str
     paid_amount: Money
     transaction_id: str
-    status: str
-
-    def verify_payment(self, payment_service: payment_service.PaymentService ):
-        status, msg = payment_service.verify_payment(self.transaction_id, self.paid_amount)
-        return Payment(method=self.method, 
-                paid_amount=self.paid_amount, 
-                transaction_id=self.transaction_id,
-                status=status)
 
 
 #right now only for Gues customer

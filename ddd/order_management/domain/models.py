@@ -53,6 +53,7 @@ class Order:
     destination: value_objects.Address
     line_items: List[LineItem]
     shipping_details: value_objects.ShippingDetails
+    payment_details: value_objects.PaymentDetails
     _status: enums.OrderStatus = enums.OrderStatus.DRAFT.name
     _cancellation_reason: str
     _total_discounts_fee: value_objects.Money
@@ -61,11 +62,9 @@ class Order:
     _tax_amount: value_objects.Money
     _total_amount: value_objects.Money
     _final_amount: value_objects.Money
-    _total_payments: value_objects.Money
     _shipping_reference: str
     _currency: str
     _coupon_codes: Optional[List[str]] = field(default_factory=list, init=False)
-    _payments: List[value_objects.Payment] = field(default_factory=list, init=False)
 
     _date_created: datetime = field(default_factory=datetime.now)
     _date_modified: Optional[datetime] = None
@@ -77,10 +76,6 @@ class Order:
         if not line_item:
             raise ValueError("Please provide line item to add.")
         self.line_items.add(line_item)
-
-        #order.add_line_item(line_item)
-        #order.apply_offers()
-        #order.calculate_final_amount()
 
     def remove_line_item(self, line_item: value_objects.OrderLine) -> None:
         if not line_item:
@@ -102,11 +97,17 @@ class Order:
         self._status = enums.OrderStatus.PENDING.name
         self.update_modified_date()
 
-    def confirm_order(self):
+    def confirm_order(self, payment_verified: bool):
         if self.status != enums.OrderStatus.PENDING.name:
             raise exceptions.InvalidOrderOperation("Only pending orders can be confirmed.")
+        if not payment_verified:
+            raise exceptions.InvalidOrderOperation("Order cannot be confirmed without verified payment.")
+
         self._status = enums.OrderStatus.CONFIRMED.name
         self.update_modified_date()
+
+    def update_payment_details(self, payment_details: value_objects.PaymentDetails):
+        self.payment_details = payment_details
 
     def mark_as_shipped(self):
         if self._status != enums.OrderStatus.CONFIRMED.name:
@@ -125,16 +126,11 @@ class Order:
         if self._status != enums.OrderStatus.SHIPPED.name:
             raise exceptions.InvalidOrderOperation("Only shipped order can mark as completed.")
 
-        if self.is_fully_paid:
+        if self.payment_details.method == enums.PaymentMethod.COD and not self.payment_details:
             raise exceptions.InvalidOrderOperation("Cannot mark as completed with outstanding payments.")
 
         self._status = enums.OrderStatus.COMPLETED.name
         self.update_modified_date()
-
-    def refund(self):
-        #TODO reverse or refund transaction for 2rd party payment servie?
-        #To have payment status for SUCCESS , PENDING, FAILED, REFUNDED?
-        pass
 
     def add_shipping_tracking_reference(self, shipping_reference: str):
         self._shipping_reference = shipping_reference
@@ -148,29 +144,13 @@ class Order:
     def update_tax_details(self, tax_details: List[str]):
         self._tax_details = tax_details
 
-    def apply_offers(self, offer_service: offer_service.OfferStrategyService):
-        if not self.shipping_details:
-            raise exceptions.InvalidOrderOperation("Only when shipping option is selected.")
-        offer_service.apply_offers(self)
+    #def apply_offers(self, offer_service: offer_service.OfferStrategyService):
+    #    if not self.shipping_details:
+    #        raise exceptions.InvalidOrderOperation("Only when shipping option is selected.")
+    #    offer_service.apply_offers(self)
 
-    def apply_taxes(self, tax_service: tax_service.TaxStrategyService):
-        tax_service.apply_taxes(self)
-
-    @property
-    def is_fully_paid(self):
-        return self.get_total_payments() >= self.get_final_amount()
-    
-    def apply_payment(self, payment: value_objects.Payment, payment_service: payment_service.PaymentService):
-        if payment.method == enums.PaymentMethod.COD:
-            self.confirm_order()
-        elif payment.verify_payment(payment_service):
-            self._payments.append(payment)
-            self.calculate_total_payments()
-            if not self.is_fully_paid:
-                raise exceptions.InvalidOrderOperation("Order cannot be confirmed without a full payment.")
-            self.confirm_order()
-        else:
-            raise exceptions.InvalidOrderOperation("Unable to apply payment.")
+    #def apply_taxes(self, tax_service: tax_service.TaxStrategyService):
+    #    tax_service.apply_taxes(self)
 
     def apply_coupon(self, coupon_code: str):
         self._coupon_codes.append(coupon_code)
@@ -181,7 +161,7 @@ class Order:
     def update_shipping_details(self, shipping_details: value_objects.ShippingDetails):
         self.shipping_details = shipping_details
     
-    def select_shipping_option(self, shipping_option: enums.ShippingMethod, shipping_options ):
+    def select_shipping_option(self, shipping_option: enums.ShippingMethod, shipping_options: List[dict]):
         for ship_opt in shipping_options:
             if ship_opt.name == shipping_option:
                 self.update_shipping_details(value_objects.ShippingDetails(
@@ -197,12 +177,6 @@ class Order:
     def calculate_total_amount(self):
         self._total_amount = value_objects.Money(
             amount=sum(line.total_price for line in self.line_items),
-            currency=self.get_currency()
-        )
-
-    def calculate_total_payments(self):
-        self._total_payments = value_objects.Money(
-            amount=sum(payment.paid_amount for payment in self.payments),
             currency=self.get_currency()
         )
 
@@ -226,15 +200,8 @@ class Order:
                 self.get_total_amount() - self.get_total_discounts_fee()
             ) + self.tax_details.tax_amount + self.shipping_details.cost
 
-
-    def get_shipping_options(self, shipping_option_service: shipping_option_service.ShippingOptionStrategy) -> List[dict]:
-        return shipping_option_service.get_shipping_options(self)
-
     def get_total_amount(self) -> value_objects.Money:
         return self._total_amount
-
-    def get_total_payments(self) -> value_objects.Money:
-        return self._total_payments
 
     def get_total_discounts_fee(self) -> value_objects.Money:
         return self._total_discounts_fee
@@ -259,4 +226,8 @@ class Order:
 
     def get_final_amount(self):
         return self._final_amount
+
+    def get_order_id(self):
+        return self._order_id
+
 

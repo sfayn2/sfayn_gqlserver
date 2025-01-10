@@ -88,7 +88,14 @@ class Order(models.Model):
         help_text="overall total - discounts + ship cost + tax, etc. ?", 
     )
 
-    total_paid = models.DecimalField(
+    payment_method = models.CharField(max_length=50, null=True, blank=True, choices=enums.PaymentMethod.choices)
+    payment_reference = models.CharField(
+        max_length=25, 
+        blank=True, 
+        null=True, 
+        help_text="payment transaction id"
+    ) 
+    payment_amount = models.DecimalField(
             decimal_places=settings.DEFAULT_DECIMAL_PLACES, 
             max_digits=settings.DEFAULT_MAX_DIGITS,
             null=True, 
@@ -149,40 +156,3 @@ class OrderLine(models.Model):
 
     def __str__(self):
         return f"Item {self.product_variant} ({self.quantity})"
-
-class Payment(models.Model):
-    PAYMENT_STATUS = (
-        ("PENDING", "Pending"),
-        ("SUCCESS", "Success"),
-        ("REFUNDED", "Refunded"),
-        ("FAILED", "Failed")
-    )
-    id = models.AutoField(primary_key=True)
-    order = models.ForeignKey(
-        "order.Order", 
-        on_delete=models.CASCADE,
-        related_name="payments", 
-        null=True, 
-        blank=True
-    )
-    payment_method = models.CharField(max_length=50, null=True, blank=True, choices=enums.PaymentMethod.choices)
-    amount = models.DecimalField(
-        decimal_places=settings.DEFAULT_DECIMAL_PLACES, 
-        max_digits=settings.DEFAULT_MAX_DIGITS,
-        null=True, 
-        blank=True, 
-        help_text="amount paid in this transaction", 
-    )
-    transaction_id = models.CharField(
-        max_length=25, 
-        blank=True, 
-        null=True, 
-    ) 
-    status = models.CharField(
-        max_length=25, 
-        blank=True, 
-        null=True, 
-        choices=PAYMENT_STATUS
-    ) 
-    date_created = models.DateTimeField(auto_now_add=True) 
-    date_modified = models.DateTimeField(auto_now=True) 

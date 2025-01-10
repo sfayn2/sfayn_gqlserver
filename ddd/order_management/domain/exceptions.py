@@ -4,3 +4,7 @@ class InvalidStatusTransitionError(Exception):
 
 class InvalidOrderOperation(Exception):
     pass
+
+
+class InvalidPaymentOperation(Exception):
+    pass
