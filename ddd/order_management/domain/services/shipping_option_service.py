@@ -25,7 +25,7 @@ class ShippingOptionStrategy(ABC):
         """
             Calculate the cost of shipping based on weight and dimensions
         """
-        currency = order.get_currency()
+        currency = order.currency
         return value_objects.Money(
             amount=self.base_cost,
             currency=currency
@@ -37,15 +37,15 @@ class ShippingOption1Strategy(ShippingOptionStrategy):
         """
             Only allow packages under 30kg
         """
-        return order.get_total_weight() <= Decimal(30)
+        return order.total_weight <= Decimal(30)
 
     def calculate_cost(self, order: models.Order) -> value_objects.Money:
         """
             Base cost + flat rate per kg
         """
-        currency = order.get_currency()
+        currency = order.currency
         return value_objects.Money(
-            amount=self.base_cost + (self.flat_rate * order.get_total_weight()),
+            amount=self.base_cost + (self.flat_rate * order.total_weight),
             currency=currency
         )
 

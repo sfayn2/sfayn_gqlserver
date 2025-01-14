@@ -29,27 +29,27 @@ class OfferStrategy(ABC):
         #reuse if the offer is based on coupon
         return (self.requires_coupon == True
             and (datetime.now() >= self.start_date and datetime.now() <= self.end_date)
-            and self.coupon_code in order.get_customer_coupons()
+            and self.coupon_code in order.customer_coupons
         )
 
     def validate_minimum_quantity(self, order:models.Order):
         return self.minimum_quantity and (sum(item.order_quantity for item in order.line_items) >= self.minimum_quantity)
 
     def validate_minimum_order_total(self, order:models.Order):
-        return self.minimum_order_total and (order.get_total_amount().amount >= self.minimum_order_total)
+        return self.minimum_order_total and (order.total_amount.amount >= self.minimum_order_total)
 
 class PercentageDiscountStrategy(OfferStrategy):
 
     #apply on order
     def apply(self, order: models.Order):
         total_discount = 0
-        currency = order.get_currency()
+        currency = order.currency
         discounted_items = []
         eligible_products = self.conditions.get("eligible_products")
         for item in order.line_items:
-            if eligible_products and (item.get_product_name() in eligible_products):
-                total_discount += item.get_total_price() * (self.discount_value / 100)
-                discounted_items.append(item.get_product_name())
+            if eligible_products and (item.product_name in eligible_products):
+                total_discount += item.total_price * (self.discount_value / 100)
+                discounted_items.append(item.product_name)
                 #item.set_discounts_fee(value_objects.Money(
                 #    amount=total_discount,
                 #    currency=currency
@@ -66,7 +66,7 @@ class FreeGiftOfferStrategy(OfferStrategy):
 
     def apply(self, order: models.Order):
         free_gifts = []
-        currency = order.get_currency()
+        currency = order.currency
         gift_products = self.conditions.get("gift_products")
         if self.validate_minimum_quantity(order):
             for free_product in gift_products:
@@ -86,7 +86,7 @@ class FreeGiftOfferStrategy(OfferStrategy):
 class FreeShippingOfferStrategy(OfferStrategy):
 
     def apply(self, order: models.Order):
-        currency = order.get_currency()
+        currency = order.currency
         if self.validate_minimum_order_total(order):
             zero_shipping_cost = value_objects.Money(
                 amount=0,
@@ -105,14 +105,14 @@ class PercentageDiscountCouponOfferStrategy(OfferStrategy):
     def apply(self, order: models.Order):
         total_discount = 0
         discounted_items = []
-        currency = order.get_currency()
+        currency = order.currency
         eligible_products = self.conditions.get("eligible_products")
 
         if self.validate_coupon(order):
             for item in order.line_items:
-                if eligible_products and item.get_product_name() in eligible_products:
-                    total_discount += item.get_total_price() * (self.discount_value / 100)
-                    discounted_items.append(item.get_product_name())
+                if eligible_products and item.product_name in eligible_products:
+                    total_discount += item.total_price * (self.discount_value / 100)
+                    discounted_items.append(item.product_name)
 
                     order.update_total_discounts_fee(
                             value_objects.Money(
