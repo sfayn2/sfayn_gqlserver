@@ -192,39 +192,39 @@ class Order(models.Model):
     @staticmethod
     def from_domain(order):
         order_model, created = Order.objects.update_or_create(
-            id=order.get_order_id(), 
+            id=order.order_id,
             defaults={ 
-                "order_status": order.get_status(),
-                "cancellation_reason": order.get_cancellation_reason(),
+                "order_status": order.order_status,
+                "cancellation_reason": order.cancellation_reason,
                 "customer_first_name": order.customer_details.first_name,
                 "customer_last_name": order.customer_details.last_name,
                 "customer_email": order.customer_details.email,
-                "customer_coupons": order.get_customer_coupons(),
+                "customer_coupons": order.customer_coupons,
                 "delivery_address": order.destination.address,
                 "delivery_city": order.destination.city,
                 "delivery_postal": order.destination.postal,
                 "delivery_country": order.destination.country,
                 "delivery_state": order.destination.state,
-                "total_discounts_fee": order.get_total_discounts_fee().amount,
+                "total_discounts_fee": order.total_discounts_fee.amount,
                 "shipping_method": order.shipping_details.method,
                 "shipping_delivery_time": order.shipping_details.delivery_time,
                 "shipping_cost": order.shipping_details.cost,
-                "tax_details": order.get_tax_details(),
-                "tax_amount": order.get_tax_amount().amount,
-                "total_amount": order.get_total_amount().amount,
-                "offer_details": order.get_offer_details(),
-                "final_amount": order.get_final_amount(),
+                "tax_details": order.tax_details,
+                "tax_amount": order.tax_amount.amount,
+                "total_amount": order.total_amount.amount,
+                "offer_details": order.offer_details,
+                "final_amount": order.final_amount.amount,
                 "payment_method": order.payment_details.method,
                 "payment_reference": order.payment_details.transaction_id,
                 "payment_amount": order.payment_details.paid_amount,
-                "currency": order.get_currency(),
-                "date_created": order.get_date_created(),
-                "date_modified": order.get_date_modified()
+                "currency": order.currency,
+                "date_created": order.date_created,
+                "date_modified": order.date_modified
             }
         )
 
         for line_item in order.line_items:
-            OrderLine.from_domain(line_item, order.get_order_id())
+            OrderLine.from_domain(line_item, order.order_id)
 
 
 
@@ -267,19 +267,19 @@ class OrderLine(models.Model):
         orderline_model, created = OrderLine.objects.update_or_create(
             id=line_item.get_id(),
             defaults={
-                "product_sku": line_item.get_product_sku(),
-                "product_name": line_item.get_product_name(),
-                "product_category": line_item.get_product_category(),
+                "product_sku": line_item.product_sku,
+                "product_name": line_item.product_name,
+                "product_category": line_item.product_category,
                 "is_free_gift": line_item.is_free_gift,
                 "is_taxable": line_item.is_taxable,
-                "options": line_item.get_options,
-                "product_price": line_item.get_product_price(),
-                "order_quantity": line_item.get_order_quantity(),
+                "options": line_item.options,
+                "product_price": line_item.product_price,
+                "order_quantity": line_item.order_quantity,
                 "package_weight": line_item.package.weight,
                 "package_length": line_item.package.dimensions[0],
                 "package_width": line_item.package.dimensions[1],
                 "package_height": line_item.package.dimensions[2],
-                "total_price": line_item.get_total_price(),
+                "total_price": line_item.total_price,
                 "order_id": order_id
             }
 
