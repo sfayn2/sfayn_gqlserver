@@ -45,7 +45,8 @@ INSTALLED_APPS = [
     'graphene_django',
     'product_catalog',
     'order_management',
-    'vendor_management'
+    'vendor_management',
+    'customer_management'
 ]
 
 MIDDLEWARE = [
