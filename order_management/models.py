@@ -265,7 +265,7 @@ class OrderLine(models.Model):
     @staticmethod
     def from_domain(line_item, order_id):
         orderline_model, created = OrderLine.objects.update_or_create(
-            id=line_item.get_id(),
+            id=line_item.id,
             defaults={
                 "product_sku": line_item.product_sku,
                 "product_name": line_item.product_name,

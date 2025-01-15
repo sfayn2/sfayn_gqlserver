@@ -71,14 +71,14 @@ class ShippingOptionStrategyService:
         vendor_shipping_options = self.vendor_repository.get_shipping_options(vendor_name)
         valid_shipping_options = []
 
-        for shipping_option in vendor_shipping_options:
+        for option in vendor_shipping_options:
             valid_shipping_options.append(
                 ShippingOptionStrategy(
-                    name=shipping_option.name,
-                    delivery_time=shipping_option.delivery_time,
-                    conditions=json.loads(shipping_option.conditions),
-                    base_cost=shipping_option.base_cost,
-                    flat_rate=shipping_option.flat_rate
+                    name=option.get("name"),
+                    delivery_time=option.get("delivery_time"),
+                    conditions=json.loads(option.get("conditions")),
+                    base_cost=option.get("base_cost"),
+                    flat_rate=option.get("flat_rate")
                 )
             )
 
