@@ -43,7 +43,7 @@ class Money:
 
 @dataclass(frozen=True)
 class Address:
-    address: str
+    street: str
     city: str
     postal: int
     country: str

@@ -1,18 +1,22 @@
 import uuid
 from abc import ABC
 from dataclasses import dataclass
-from typing import Union, List
+from typing import Union, List, Optional
 from datetime import datetime
-from ddd.order_management.domain import enums, value_objects
+from ddd.order_management.domain import enums, value_objects, models
 
 class Command(ABC):
     pass
 
 @dataclass
-class CreateOrderCommand(Command):
-    customer_id: str
+class CheckoutCommand(Command):
+    customer_id: Optional[bool]
+    first_name: str
+    last_name: str
+    email: str
     address: value_objects.Address
-    order_lines: List[value_objects.OrderLine]
+    line_items: List[models.LineItem]
+
 
 @dataclass
 class ConfirmOrderCommand:
