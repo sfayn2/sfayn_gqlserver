@@ -12,13 +12,11 @@ class Customer(models.Model):
 
     #allows us t odecouple the customer data from User model?
     customer_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False) #uuid for external integration
-    name = models.CharField(max_length=255)
-    email = models.EmailField(unique=True)
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True) 
 
     def __str__(self):
-        return f"{self.name} {self.email}"
+        return f"{self.user.first_name} {self.user.last_name} {self.user.email}"
 
 class Address(models.Model):
     ADDRESS_TYPE_CHOICES = (

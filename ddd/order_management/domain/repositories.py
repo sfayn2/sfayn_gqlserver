@@ -11,6 +11,12 @@ class OrderRepository(ABC):
     def get(self, order_id: str) -> models.Order:
         raise NotImplementedError("Subclasses must implement this method")
 
+class CustomerRepository(ABC):
+
+    @abstractmethod
+    def get_customer_details(self, customer_id: str):
+        raise NotImplementedError("Subclasses must implement this method")
+
 class VendorRepository(ABC):
 
     @abstractmethod
