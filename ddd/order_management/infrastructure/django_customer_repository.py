@@ -25,7 +25,7 @@ class DjangoCustomerRepository(repositories.CustomerRepository):
         return {
             'first_name': customer_details.get('user__first_name'),
             'last_name': customer_details.get('user__last_name'),
-            'first_name': customer_details.get('user__email'),
+            'email': customer_details.get('user__email'),
             'street': customer_details.get('addresses__street'),
             'city': customer_details.get('addresses__city'),
             'state': customer_details.get('addresses__state'),

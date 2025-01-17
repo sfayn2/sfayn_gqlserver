@@ -83,25 +83,43 @@ class LineItem:
 @dataclass
 class Order:
     _order_id: str
+    _date_created: datetime 
     destination: value_objects.Address
     line_items: List[LineItem]
     customer_details: value_objects.CustomerDetails
-    shipping_details: value_objects.ShippingDetails
-    payment_details: value_objects.PaymentDetails
-    _cancellation_reason: str
-    _total_discounts_fee: value_objects.Money
-    _offer_details: List[str]
-    _tax_details: List[str]
-    _tax_amount: Optional[value_objects.Money]
-    _total_amount: value_objects.Money
-    _final_amount: value_objects.Money
-    _shipping_reference: Optional[str]
-    _currency: str
-    _coupon_codes: Optional[List[str]] = field(default_factory=list, init=False)
-    _status: enums.OrderStatus = enums.OrderStatus.DRAFT.name
-
-    _date_created: datetime = field(default_factory=datetime.now)
+    shipping_details: Optional[value_objects.ShippingDetails] = None
+    payment_details: Optional[value_objects.PaymentDetails] = None
+    _cancellation_reason: Optional[str] = None
+    _total_discounts_fee: Optional[value_objects.Money] = None
+    _offer_details: Optional[List[str]] = field(default_factory=list)
+    _tax_details: Optional[List[str]]= field(default_factory=list)
+    _tax_amount: Optional[value_objects.Money] = None
+    _total_amount: Optional[value_objects.Money] = None
+    _final_amount: Optional[value_objects.Money] = None
+    _shipping_reference: Optional[str] = None
+    _currency: Optional[str] = None
+    _coupon_codes: Optional[List[str]] = field(default_factory=list)
+    _status: Optional[enums.OrderStatus] = enums.OrderStatus.DRAFT
     _date_modified: Optional[datetime] = None
+
+    @classmethod
+    def create_order(cls, customer_details: value_objects.CustomerDetails, 
+                     destination: value_objects.Address, line_items: List[LineItem]):
+
+        if not line_items:
+            raise exceptions.InvalidOrderOperation("Order must have at least one line item.")
+
+        if not customer_details:
+            raise exceptions.InvalidOrderOperation("Either guest details or a customer must be provided.")
+
+        return cls(
+            _order_id=f"ORD-{uuid.uuid4().hex[:8].upper()}",
+            _status=enums.OrderStatus.DRAFT.name,
+            _date_created=datetime.now(),
+            customer_details=customer_details,
+            line_items=line_items,
+            destination=destination
+        )
 
     def update_modified_date(self):
         self._date_modified = datetime.now()

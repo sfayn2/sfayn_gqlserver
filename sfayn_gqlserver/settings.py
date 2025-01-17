@@ -46,7 +46,7 @@ INSTALLED_APPS = [
     'product_catalog',
     'order_management',
     'vendor_management',
-    'customer_management'
+    'customer_management',
 ]
 
 MIDDLEWARE = [
@@ -173,5 +173,4 @@ PAYPAL_BASE_URL = ""
 
 STRIPE_API_KEY = os.getenv("STRIPE_API_KEY")
 STRIPE_BASE_URL = ""
-
 

@@ -16,7 +16,7 @@ class Customer(models.Model):
     date_modified = models.DateTimeField(auto_now=True) 
 
     def __str__(self):
-        return f"{self.user.first_name} {self.user.last_name} {self.user.email}"
+        return f"{self.user.email}"
 
 class Address(models.Model):
     ADDRESS_TYPE_CHOICES = (

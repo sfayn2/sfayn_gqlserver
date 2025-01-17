@@ -8,7 +8,7 @@ class AddressInline(admin.TabularInline):
 
 class CustomerAdmin(admin.ModelAdmin):
     inlines = (AddressInline,)
-    list_display = ['customer_id', 'user__first_name', 'user__last_name', 'user__email']
+    list_display = ['user__email', 'user__first_name', 'user__last_name']
 
 class AddressAdmin(admin.ModelAdmin):
     pass
