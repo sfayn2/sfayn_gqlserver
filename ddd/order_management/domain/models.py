@@ -162,7 +162,7 @@ class Order:
                      destination: value_objects.Address, line_items: List[LineItem]):
 
         if not customer_details:
-            raise exceptions.InvalidOrderOperation("Either guest details or a customer must be provided.")
+            raise exceptions.InvalidOrderOperation("Customer details must be provided.")
 
         if not line_items:
             raise exceptions.InvalidOrderOperation("Order must have at least one line item.")
@@ -184,10 +184,10 @@ class Order:
 
     def _validate_line_item(self, line_item: LineItem):
         if self.currency != line_item.product_price.currency:
-            raise exceptions.InvalidOrderOperation("Order currency doesn't match w line item currency.")
+            raise exceptions.InvalidOrderOperation("Currency mismatch between order and line item.")
 
         if self.vendor_name and self.vendor_name != line_item.vendor_name:
-            raise exceptions.InvalidOrderOperation("Order Vendor doesn't match w line item vendor.")
+            raise exceptions.InvalidOrderOperation("Vendor mismatch between order and line item.")
 
 
     def update_modified_date(self):
@@ -204,7 +204,7 @@ class Order:
 
     def remove_line_item(self, line_item: LineItem) -> None:
         if not line_item:
-            raise ValueError("Please provide line item to remove.")
+            raise ValueError("Line item does not exists in the order.")
         self.line_items.remove(line_item)
         self.update_totals()
 
@@ -221,7 +221,7 @@ class Order:
 
     def place_order(self):
         if not self.line_items:
-            raise exceptions.InvalidOrderOperation("Order must have at least one line item.")
+            raise exceptions.InvalidOrderOperation("Canno place an order without line items.")
         if not self.shipping_details:
             raise exceptions.InvalidOrderOperation("Order must have a selected Shipping method")
         self._status = enums.OrderStatus.PENDING.name
