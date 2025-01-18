@@ -11,6 +11,7 @@ class LineItem:
     def __init__(self, id: uuid.uuid4, 
                  product_sku: str, 
                  product_name: str, 
+                 vendor_name: str,
                  product_category: str, 
                  options: dict, 
                  product_price: value_objects.Money, 
@@ -20,7 +21,17 @@ class LineItem:
                  is_taxable: bool = True):
 
         if order_quantity <= 0:
-            raise ValueError("Value must be greater than zero.")
+            raise ValueError("Order quantity must be greater than zero.")
+
+        if product_price.amount < 0:
+            raise ValueError("Product price cannot be negative.")
+
+        if any(d <= 0 for d in package.dimensions):
+            raise ValueError("Package dimensions must be positive value.")
+
+        #TODO? really?
+        if is_free_gift and is_taxable:
+            raise ValueError("Free gift is not taxable.")
 
         self._id = id
         self._product_sku = product_sku
@@ -29,6 +40,7 @@ class LineItem:
         self._options = options
         self._product_price = product_price
         self._order_quantity = order_quantity
+        self._vendor_name = vendor_name
         self.package = package
         self._is_free_gift = is_free_gift
         self._is_taxable = is_taxable
@@ -94,6 +106,10 @@ class LineItem:
     def is_taxable(self):
         return self._is_taxable
 
+    @property
+    def vendor_name(self):
+        return self._vendor_name
+
 
 
 class Order:
@@ -114,11 +130,14 @@ class Order:
                 total_amount: Optional[value_objects.Money] = None,
                 final_amount: Optional[value_objects.Money] = None,
                 shipping_reference: Optional[str] = None,
-                currency: Optional[str] = None,
                 coupon_codes: Optional[List[str]] = field(default_factory=list),
                 status: Optional[enums.OrderStatus] = enums.OrderStatus.DRAFT,
                 date_modified: Optional[datetime] = None,
                  ):
+
+
+        #this is for rehydrate loading from repository only?
+
         self._order_id = order_id
         self._date_created = date_created
         self.destination = destination
@@ -134,7 +153,6 @@ class Order:
         self._total_amount = total_amount
         self._final_amount = final_amount
         self._shipping_reference = shipping_reference
-        self._currency = currency
         self._coupon_codes = coupon_codes
         self._status = status
         self._date_modified = date_modified
@@ -143,11 +161,17 @@ class Order:
     def create_order(cls, customer_details: value_objects.CustomerDetails, 
                      destination: value_objects.Address, line_items: List[LineItem]):
 
-        if not line_items:
-            raise exceptions.InvalidOrderOperation("Order must have at least one line item.")
-
         if not customer_details:
             raise exceptions.InvalidOrderOperation("Either guest details or a customer must be provided.")
+
+        if not line_items:
+            raise exceptions.InvalidOrderOperation("Order must have at least one line item.")
+        
+        if any(item.product_price.currency != line_items[0].product_price.currency for item in line_items):
+            raise exceptions.InvalidOrderOperation("All line items must have the same currency.")
+
+        if len(set(item.vendor_name for item in line_items)) > 1:
+            raise exceptions.InvalidOrderOperation("All line items must belong to the same vendor.")
 
         return cls(
             order_id=f"ORD-{uuid.uuid4().hex[:8].upper()}",
@@ -158,28 +182,42 @@ class Order:
             destination=destination
         )
 
+    def _validate_line_item(self, line_item: LineItem):
+        if self.currency != line_item.product_price.currency:
+            raise exceptions.InvalidOrderOperation("Order currency doesn't match w line item currency.")
+
+        if self.vendor_name and self.vendor_name != line_item.vendor_name:
+            raise exceptions.InvalidOrderOperation("Order Vendor doesn't match w line item vendor.")
+
+
     def update_modified_date(self):
         self._date_modified = datetime.now()
 
-    def add_line_item(self, line_item: value_objects.OrderLine) -> None:
+    def add_line_item(self, line_item: LineItem) -> None:
         if not line_item:
             raise ValueError("Please provide line item to add.")
+
+        self._validate_line_item(line_item)
+
         self.line_items.add(line_item)
         self.update_totals()
 
-    def remove_line_item(self, line_item: value_objects.OrderLine) -> None:
+    def remove_line_item(self, line_item: LineItem) -> None:
         if not line_item:
             raise ValueError("Please provide line item to remove.")
         self.line_items.remove(line_item)
         self.update_totals()
 
-    def update_line_item(self, line_item: value_objects.OrderLine):
-        #use to update specific item quantity or other item info
-        if not line_item:
-            raise ValueError("Please provide line item to update details.")
-        self.line_items.remove(line_item)
-        self.line_items.add(line_item)
-        self.update_totals()
+    #NA just make use of add_line_item and remove_line_item
+    #def update_line_item(self, line_item: LineItem):
+    #    #use to update specific item quantity or other item info
+    #    if not line_item:
+    #        raise ValueError("Please provide line item to update details.")
+    #    self._validate_line_item(line_item)
+    #    #TODO remove wont work since this line_item is not the existing item
+    #    self.line_items.remove(line_item)
+    #    self.line_items.add(line_item)
+    #    self.update_totals()
 
     def place_order(self):
         if not self.line_items:
@@ -239,14 +277,6 @@ class Order:
 
     def update_tax_details(self, tax_details: List[str]):
         self._tax_details = tax_details
-
-    #def apply_offers(self, offer_service: offer_service.OfferStrategyService):
-    #    if not self.shipping_details:
-    #        raise exceptions.InvalidOrderOperation("Only when shipping option is selected.")
-    #    offer_service.apply_offers(self)
-
-    #def apply_taxes(self, tax_service: tax_service.TaxStrategyService):
-    #    tax_service.apply_taxes(self)
 
     def apply_coupon(self, coupon_code: str):
         self._coupon_codes.append(coupon_code)
@@ -335,7 +365,9 @@ class Order:
 
     @property
     def currency(self) -> str:
-        return self._currency
+        #assuming invariants
+        return self.line_items[0].product_price.currency
+        #return self._currency
 
     @property
     def tax_details(self) -> str:
@@ -372,6 +404,12 @@ class Order:
     @property
     def offer_details(self) -> str:
         return self._offer_details
+
+    @property
+    def vendor_name(self) -> str:
+        #assuming invariant
+        return self.line_items[0].vendor_name
+
 
 
 

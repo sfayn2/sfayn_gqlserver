@@ -141,6 +141,7 @@ class VariantItem(models.Model):
             help_text="default price, exclusive of tax", 
             default=Decimal("0.0")
         )
+    currency = models.CharField(max_length=50, help_text="Currency for calculation requirements & validation. e.g. SGD", default=settings.DEFAULT_CURRENCY)
     stock = models.PositiveIntegerField()
     default = models.BooleanField(default=False, help_text="default to display in product details page of similar product")
     is_active = models.BooleanField(default=True)
