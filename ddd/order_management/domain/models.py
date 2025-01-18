@@ -6,33 +6,49 @@ from typing import List, Optional, Tuple
 from dataclasses import dataclass, field
 from ddd.order_management.domain import value_objects, enums, exceptions
 
-@dataclass
 class LineItem:
-    _id: uuid.uuid4
-    _product_sku: str
-    _product_name: str
-    _product_category: str
-    _options: dict
-    _product_price: value_objects.Money
-    _order_quantity: int
-    package: value_objects.Package
-    _is_free_gift: bool = False
-    _is_taxable: bool = True
+    
+    def __init__(self, id: uuid.uuid4, 
+                 product_sku: str, 
+                 product_name: str, 
+                 product_category: str, 
+                 options: dict, 
+                 product_price: value_objects.Money, 
+                 order_quantity: int, 
+                 package: value_objects.Package,
+                 is_free_gift: bool = False,
+                 is_taxable: bool = True):
 
+        if order_quantity <= 0:
+            raise ValueError("Value must be greater than zero.")
+
+        self._id = id
+        self._product_sku = product_sku
+        self._product_name = product_name
+        self._product_category = product_category
+        self._options = options
+        self._product_price = product_price
+        self._order_quantity = order_quantity
+        self.package = package
+        self._is_free_gift = is_free_gift
+        self._is_taxable = is_taxable
+
+
+    
     def set_options(self, options):
         self._options = options
 
-    def add(self, quantity: int):
-        if quantity < 0:
-            raise ValueError("Value must be greater than current quantity.")
+    #def add(self, quantity: int):
+    #    if quantity < 0:
+    #        raise ValueError("Value must be greater than current quantity.")
 
-        self._order_quantity += quantity
+    #    self._order_quantity += quantity
 
-    def subtract(self, quantity: int):
-        if quantity < 0 or quantity > self.order_quantity:
-            raise ValueError("Value must be less than or equal to the current quantity.")
+    #def subtract(self, quantity: int):
+    #    if quantity < 0 or quantity > self.order_quantity:
+    #        raise ValueError("Value must be less than or equal to the current quantity.")
 
-        self._order_quantity -= quantity
+    #    self._order_quantity -= quantity
 
     @property
     def total_price(self) -> value_objects.Money:
@@ -80,27 +96,48 @@ class LineItem:
 
 
 
-@dataclass
 class Order:
-    _order_id: str
-    _date_created: datetime 
-    destination: value_objects.Address
-    line_items: List[LineItem]
-    customer_details: value_objects.CustomerDetails
-    shipping_details: Optional[value_objects.ShippingDetails] = None
-    payment_details: Optional[value_objects.PaymentDetails] = None
-    _cancellation_reason: Optional[str] = None
-    _total_discounts_fee: Optional[value_objects.Money] = None
-    _offer_details: Optional[List[str]] = field(default_factory=list)
-    _tax_details: Optional[List[str]]= field(default_factory=list)
-    _tax_amount: Optional[value_objects.Money] = None
-    _total_amount: Optional[value_objects.Money] = None
-    _final_amount: Optional[value_objects.Money] = None
-    _shipping_reference: Optional[str] = None
-    _currency: Optional[str] = None
-    _coupon_codes: Optional[List[str]] = field(default_factory=list)
-    _status: Optional[enums.OrderStatus] = enums.OrderStatus.DRAFT
-    _date_modified: Optional[datetime] = None
+
+    def __init__(self,
+                order_id: str,
+                date_created: datetime, 
+                destination: value_objects.Address,
+                line_items: List[LineItem],
+                customer_details: value_objects.CustomerDetails,
+                shipping_details: Optional[value_objects.ShippingDetails] = None,
+                payment_details: Optional[value_objects.PaymentDetails] = None,
+                cancellation_reason: Optional[str] = None,
+                total_discounts_fee: Optional[value_objects.Money] = None,
+                offer_details: Optional[List[str]] = field(default_factory=list),
+                tax_details: Optional[List[str]]= field(default_factory=list),
+                tax_amount: Optional[value_objects.Money] = None,
+                total_amount: Optional[value_objects.Money] = None,
+                final_amount: Optional[value_objects.Money] = None,
+                shipping_reference: Optional[str] = None,
+                currency: Optional[str] = None,
+                coupon_codes: Optional[List[str]] = field(default_factory=list),
+                status: Optional[enums.OrderStatus] = enums.OrderStatus.DRAFT,
+                date_modified: Optional[datetime] = None,
+                 ):
+        self._order_id = order_id
+        self._date_created = date_created
+        self.destination = destination
+        self.line_items = line_items
+        self.customer_details = customer_details
+        self.shipping_details = shipping_details
+        self.payment_details = payment_details
+        self._cancellation_reason = cancellation_reason
+        self._total_discounts_fee = total_discounts_fee
+        self._offer_details = offer_details
+        self._tax_details = tax_details
+        self._tax_amount = tax_amount
+        self._total_amount = total_amount
+        self._final_amount = final_amount
+        self._shipping_reference = shipping_reference
+        self._currency = currency
+        self._coupon_codes = coupon_codes
+        self._status = status
+        self._date_modified = date_modified
 
     @classmethod
     def create_order(cls, customer_details: value_objects.CustomerDetails, 
@@ -113,9 +150,9 @@ class Order:
             raise exceptions.InvalidOrderOperation("Either guest details or a customer must be provided.")
 
         return cls(
-            _order_id=f"ORD-{uuid.uuid4().hex[:8].upper()}",
-            _status=enums.OrderStatus.DRAFT.name,
-            _date_created=datetime.now(),
+            order_id=f"ORD-{uuid.uuid4().hex[:8].upper()}",
+            status=enums.OrderStatus.DRAFT.name,
+            date_created=datetime.now(),
             customer_details=customer_details,
             line_items=line_items,
             destination=destination

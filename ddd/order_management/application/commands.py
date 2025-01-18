@@ -10,7 +10,6 @@ class Command(ABC):
 
 @dataclass
 class CheckoutCommand(Command):
-    customer_id: Optional[bool]
     first_name: str
     last_name: str
     email: str

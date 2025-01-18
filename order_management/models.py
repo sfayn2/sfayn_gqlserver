@@ -115,7 +115,7 @@ class Order(models.Model):
     def to_domain(self):
         line_items = [
             domain_models.LineItem(
-                _id=uuid.uuid4,
+                _id=order_line.id,
                 _product_sku=order_line.product_sku,
                 _product_name=order_line.product_name,
                 _product_category=order_line.product_category,

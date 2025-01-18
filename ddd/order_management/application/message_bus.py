@@ -16,8 +16,9 @@ def handle(message: Union[commands.Command, events.DomainEvent], uow: unit_of_wo
         handler = COMMAND_HANDLERS.get(type(message))
         if not handler:
             raise ValueError(f"No handler registered for command: {type(message)}")
-        event = handler(message, uow)
+        results, event = handler(message, uow)
         handle_event(event, uow)
+        return results
     elif isinstance(message, events.DomainEvent):
         handlers = EVENT_HANDLERS.get(type(message), [])
         for handler in handlers:
