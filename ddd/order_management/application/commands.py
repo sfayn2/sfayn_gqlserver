@@ -34,4 +34,4 @@ class CompleteOrderCommand:
 @dataclass
 class ApplyPaymentCommand:
     order_id: str
-    payment: value_objects.Payment
+    payment: value_objects.PaymentDetails

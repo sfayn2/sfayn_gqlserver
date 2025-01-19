@@ -8,7 +8,7 @@ from ddd.order_management.domain import value_objects, enums, exceptions
 
 class LineItem:
     
-    def __init__(self, id: uuid.uuid4, 
+    def __init__(self, 
                  product_sku: str, 
                  product_name: str, 
                  vendor_name: str,
@@ -33,7 +33,6 @@ class LineItem:
         if is_free_gift and is_taxable:
             raise ValueError("Free gift is not taxable.")
 
-        self._id = id
         self._product_sku = product_sku
         self._product_name = product_name
         self._product_category = product_category
@@ -85,10 +84,6 @@ class LineItem:
     @property
     def product_sku(self):
         return self._product_sku
-
-    @property
-    def id(self):
-        return self._id
 
     @property
     def options(self):

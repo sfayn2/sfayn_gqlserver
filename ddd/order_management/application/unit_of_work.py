@@ -35,11 +35,13 @@ class AbstractUnitOfWork(ABC):
 class DjangoUnitOfWork(AbstractUnitOfWork):
     #make sure to call uow within block statement
     #to trigger this
-    def __enter__(self):
+    def __init__(self):
         self.order = django_order_repository.DjangoOrderRepository
         self.customer = django_customer_repository.DjangoCustomerRepository
         self.vendor = django_vendor_repository.DjangoVendorRepository
         self.payment_gateway = paypal_gateway_repository.PaypalPaymentGatewayRepository
+
+    def __enter__(self):
 
         self.atomic = transaction.atomic()
         self.atomic.__enter__()

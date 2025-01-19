@@ -8,11 +8,7 @@ def handle_checkout(command: commands.CheckoutCommand, uow: unit_of_work.DjangoU
     with uow:
         order = models.Order.create_order(
             destination=command.address,
-            customer_details=value_objects.CustomerDetails(
-                first_name=command.first_name,
-                last_name=command.last_name,
-                email=command.email
-            ),
+            customer_details=command.customer_details,
             line_items=command.line_items
         )
 
