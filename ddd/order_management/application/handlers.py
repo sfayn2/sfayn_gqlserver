@@ -17,6 +17,7 @@ def handle_checkout(command: commands.CheckoutCommand, uow: unit_of_work.DjangoU
         )
 
         event = events.ProductCheckedout(
+            order_id=order.order_id,
             destination=order.destination,
             customer_details=order.customer_details,
             line_items=order.line_items

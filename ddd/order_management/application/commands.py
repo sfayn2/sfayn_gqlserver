@@ -8,11 +8,9 @@ from ddd.order_management.domain import enums, value_objects, models
 class Command(ABC):
     pass
 
-@dataclass
+@dataclass(frozen=True)
 class CheckoutCommand(Command):
-    first_name: str
-    last_name: str
-    email: str
+    customer_details: value_objects.CustomerDetails
     address: value_objects.Address
     line_items: List[models.LineItem]
 

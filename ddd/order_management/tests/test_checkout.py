@@ -35,7 +35,7 @@ def test_checkout():
     order = message_bus.handle(command, uow)
 
     response_dto = dtos.CheckoutResponseDTO(
-        order_id=order.id,
+        order_id=order.order_id,
         status=order.status,
         message="Order successfully created."
     )

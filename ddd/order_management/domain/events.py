@@ -1,9 +1,17 @@
 from abc import ABC
+from typing import List
 from dataclasses import dataclass
-from ddd.order_management.domain import value_objects
+from ddd.order_management.domain import value_objects, models
 
 class DomainEvent(ABC):
     pass
+
+@dataclass(frozen=True)
+class ProductCheckedout(DomainEvent):
+    order_id: str
+    destination: value_objects.Address
+    customer_details: value_objects.CustomerDetails
+    line_items: List[models.LineItem]
 
 @dataclass
 class OrderPlaced(DomainEvent):
