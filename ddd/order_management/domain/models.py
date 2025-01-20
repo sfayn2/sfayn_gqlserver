@@ -153,7 +153,7 @@ class Order:
         self._date_modified = date_modified
 
     @classmethod
-    def create_order(cls, customer_details: value_objects.CustomerDetails, 
+    def create_draft_order(cls, customer_details: value_objects.CustomerDetails, 
                      destination: value_objects.Address, line_items: List[LineItem]):
 
         if not customer_details:

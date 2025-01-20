@@ -6,7 +6,7 @@ from ddd.order_management.domain import models, events, value_objects, enums
 
 def handle_checkout(command: commands.CheckoutCommand, uow: unit_of_work.DjangoUnitOfWork):
     with uow:
-        order = models.Order.create_order(
+        order = models.Order.create_draft_order(
             destination=command.address,
             customer_details=command.customer_details,
             line_items=command.line_items

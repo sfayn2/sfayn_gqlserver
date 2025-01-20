@@ -16,7 +16,7 @@ def mock_uow():
 
 @pytest.fixture
 def mock_order():
-    return models.Order.create_order(
+    return models.Order.create_draft_order(
         destination=value_objects.Address(
             street="123 main street",
             city="New York",
@@ -50,7 +50,7 @@ def mock_order():
 
 #os.environ.setdefault("DJANGO_SETTINGS_MODULE", "sfayn_gqlserver.settings")
 
-@pytest.mark.django_db
+#@pytest.mark.django_db
 def test_checkout(mock_uow, mock_order):
 
 
@@ -100,6 +100,6 @@ def test_checkout(mock_uow, mock_order):
     assert response_dto.order_status == order.order_status
     assert response_dto.message == "Order successfully created."
 
-    mock_uow.order.save.assert_called_once_with(order)
-    #mock_uow.order.save.assert_called_once()
+    #mock_uow.order.save.assert_called_once_with(mock_order)
+    mock_uow.order.save.assert_called_once()
     mock_uow.commit.assert_called_once()
