@@ -1,4 +1,6 @@
+from __future__ import annotations
 import datetime
+import json
 from decimal import Decimal
 from pydantic import BaseModel
 from typing import List, Optional, Tuple
@@ -63,6 +65,27 @@ class LineItemDTO(BaseModel):
             is_taxable=self.is_taxable
         )
 
+    @staticmethod
+    def from_django_model(django_line_item) -> LineItemDTO:
+        return LineItemDTO(
+            product_sku=django_line_item.product_sku,
+            product_name=django_line_item.product_name,
+            vendor_name=django_line_item.vendor_name,
+            product_category=django_line_item.product_category,
+            options=json.loads(django_line_item.options),
+            product_price=MoneyDTO(
+                amount=django_line_item.product_price,
+                currency=django_line_item.currency
+            ),
+            order_quantity=django_line_item.order_quantity,
+            package=PackageDTO(
+                weight=django_line_item.weight,
+                dimensions=[django_line_item.length, django_line_item.width, django_line_item.height] 
+            ),
+            is_free_gift=django_line_item.is_free_gift,
+            is_taxable=django_line_item.is_taxable
+        )
+
 class ShippingDetailsDTO(BaseModel):
     method: enums.ShippingMethod
     delivery_time: str
@@ -125,3 +148,68 @@ class OrderDTO(BaseModel):
 
     def to_django_defaults(self):
         return self.dict(exclude={"order_id", "line_items"})
+
+    @staticmethod
+    def from_django_model(django_order) -> OrderDTO:
+        return OrderDTO(
+            order_id=django_order.order_id,
+            date_created=django_order.date_created,
+            date_modified=django_order.date_modified, 
+            destination=AddressDTO(
+                street=django_order.delivery_street,
+                city=django_order.delivery_city,
+                postal=django_order.delivery_postal,
+                country=django_order.delivery_country,
+                state=django_order.delivery_state
+            ),
+            line_items=[
+                LineItemDTO.from_django_model(item) for item in django_order.line_items.all()
+            ],
+            customer_details=CustomerDetailsDTO(
+                first_name=django_order.customer_first_name,
+                last_name=django_order.customer_last_name,
+                email=django_order.customer_email
+            ),
+            shipping_details=ShippingDetailsDTO(
+                method=django_order.shipping_method,
+                delivery_time=django_order.shipping_delivery_time,
+                cost=MoneyDTO(
+                    amount=django_order.shipping_cost,
+                    currency=django_order.currency
+                ),
+                orig_cost=MoneyDTO(
+                    amount=django_order.shipping_cost,
+                    currency=django_order.currency
+                ),
+            ),
+            payment_details=PaymentDetailsDTO(
+                method=django_order.payment_method,
+                transaction_id=django_order.payment_reference,
+                paid_amount=MoneyDTO(
+                    amount=django_order.payment_amount,
+                    currency=django_order.currency
+                )
+            ),
+            cancellation_reason=django_order.cancellation_reason,
+            total_discounts_fee=MoneyDTO(
+                amount=django_order.total_discounts_fee,
+                currency=django_order.currency
+            ),
+            offer_details=django_order.offer_details,
+            tax_details=django_order.tax_details,
+            tax_amount=MoneyDTO(
+                amount=django_order.tax_amount,
+                currency=django_order.currency
+            ),
+            total_amount=MoneyDTO(
+                amount=django_order.total_amount,
+                currency=django_order.currency
+            ),
+            final_amount=MoneyDTO(
+                amount=django_order.final_amount,
+                currency=django_order.currency
+            ),
+            shipping_reference=django_order.shipping_tracking_reference,
+            coupon_codes=django_order.coupon_codes,
+            status=django_order.status
+        )
