@@ -2,7 +2,8 @@ from pydantic import BaseModel
 import uuid
 from decimal import Decimal
 from typing import Optional, List, Tuple
-from ddd.order_management.domain import value_objects, models, dtos
+from ddd.order_management.domain import value_objects, models
+from ddd.order_management.infrastructure import dtos
 
 class CheckoutRequestDTO(BaseModel):
     customer_details: dtos.CustomerDetailsDTO
@@ -16,8 +17,6 @@ class CheckoutRequestDTO(BaseModel):
             destination=self.address.to_domain(),
             line_items=line_items
         )
-
-
 
 class CheckoutResponseDTO(BaseModel):
     order_id: str

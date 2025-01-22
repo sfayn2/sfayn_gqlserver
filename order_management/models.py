@@ -112,121 +112,87 @@ class Order(models.Model):
     def __str__(self):
         return f"{self.order_id} - {self.shipping_address} ( {self.status} )"
 
-    def to_domain(self):
+    def to_dict(self):
         line_items = [
-            domain_models.LineItem(
-                _id=order_line.id,
-                _product_sku=order_line.product_sku,
-                _product_name=order_line.product_name,
-                _product_category=order_line.product_category,
-                _options=json.loads(order_line.options),
-                _product_price=value_objects.Money(
-                    amount=order_line.product_price,
-                    currency=self.currency),
-                _order_quantity=order_line.order_quantity,
-                _is_free_gift=order_line.is_free_gift,
-                _is_taxable=order_line.is_taxable,
-                package=value_objects.Package(
-                    weight=order_line.weight,
-                    dimensions=(order_line.length, order_line.width, order_line.height)
-                )
-            )
+            {
+                "product_sku": order_line.product_sku,
+                "vendor_name": order_line.vendor_name,
+                "product_name": order_line.product_name,
+                "product_category": order_line.product_category,
+                "options": json.loads(order_line.options),
+                "product_price": {
+                    "amount": order_line.product_price,
+                    "currency": order_line.currency
+                },
+                "order_quantity":order_line.order_quantity,
+                "is_free_gift": order_line.is_free_gift,
+                "is_taxable": order_line.is_taxable,
+                "package": {
+                    "weight": order_line.weight,
+                    "dimensions": (order_line.length, order_line.width, order_line.height)
+                }
+            }
             for order_line in self.line_items.all()
         ]
 
-        order = domain_models.Order(
-            _order_id=self.order_id,
-            destination=value_objects.Address(
-                address=self.delivery_address,
-                city=self.delivery_city,
-                postal=self.delivery_postal,
-                state=self.delivery_state,
-                country=self.delivery_country
-            ),
-            line_items=line_items,
-            customer_details=value_objects.CustomerDetails(
-                first_name=self.customer_first_name,
-                last_name=self.customer_last_name,
-                email=self.customer_email
-            ),
-            shipping_details=value_objects.ShippingDetails(
-                method=self.shipping_method,
-                delivery_time=self.shipping_delivery_time,
-                cost=self.shipping_cost
-            ),
-            payment_details=value_objects.PaymentDetails(
-                method=self.payment_method,
-                paid_amount=value_objects.Money(
-                    amount=self.payment_amount,
-                    currency=self.currency
-                    ),
-                transaction_id=self.payment_reference
-            ),
-            _status=self.order_status,
-            _cancellation_reason=self.cancellation_reason,
-            _total_discounts_fee=value_objects.Money(
-                amount=self.total_discounts_fee,
-                currency=self.currency
-            ),
-            _offer_details=self.offer_details,
-            _tax_details=self.tax_details,
-            _tax_amount=self.tax_amount,
-            _total_amount=value_objects.Money(
-                amount=self.total_amount,
-                currency=self.currency
-            ),
-            _final_amount=value_objects.Money(
-                amount=self.final_amount,
-                currency=self.currency
-            ),
-            _shipping_reference=self.shipping_tracking_reference,
-            _currency=self.currency,
-            _coupon_codes=self.customer_coupons,
-            _date_created=self.date_created,
-            _date_modified=self.date_modified
-        ) 
+        order = {
+            "order_id": self.order_id,
+            "destination": {
+                "address": self.delivery_address,
+                "city": self.delivery_city,
+                "postal": self.delivery_postal,
+                "state" : self.delivery_state,
+                "country" : self.delivery_country
+            },
+            "line_items": line_items,
+            "customer_details": {
+                "first_name": self.customer_first_name,
+                "last_name": self.customer_last_name,
+                "email" : self.customer_email
+            },
+            "shipping_details": {
+                "method": self.shipping_method,
+                "delivery_time": self.shipping_delivery_time,
+                "cost": self.shipping_cost
+            },
+            "payment_details": {
+                "method":self.payment_method,
+                "paid_amount": {
+                    "amount":self.payment_amount,
+                    "currency":self.currency
+                },
+                "transaction_id":self.payment_reference
+            },
+            "status":self.order_status,
+            "cancellation_reason": self.cancellation_reason,
+            "total_discounts_fee": {
+                "amount": self.total_discounts_fee,
+                "currency": self.currency
+            },
+            "offer_details": self.offer_details,
+            "tax_details": self.tax_details,
+            "tax_amount" : {
+                "amount": self.tax_amount,
+                "currency": self.currency
+
+            },
+            "total_amount" : {
+                "amount": self.total_amount,
+                "currency": self.currency
+            },
+            "final_amount": {
+                "amount":self.final_amount,
+                "currency": self.currency
+            },
+            "shipping_reference":self.shipping_tracking_reference,
+            "currency": self.currency,
+            "coupon_codes": self.customer_coupons,
+            "date_created":self.date_created,
+            "date_modified": self.date_modified
+        }
         
         
         return order 
-
-    @staticmethod
-    def from_domain(order):
-        order_model, created = Order.objects.update_or_create(
-            id=order.order_id,
-            defaults={ 
-                "order_status": order.order_status,
-                "cancellation_reason": order.cancellation_reason,
-                "customer_first_name": order.customer_details.first_name,
-                "customer_last_name": order.customer_details.last_name,
-                "customer_email": order.customer_details.email,
-                "customer_coupons": order.customer_coupons,
-                "delivery_address": order.destination.address,
-                "delivery_city": order.destination.city,
-                "delivery_postal": order.destination.postal,
-                "delivery_country": order.destination.country,
-                "delivery_state": order.destination.state,
-                "total_discounts_fee": order.total_discounts_fee.amount,
-                "shipping_method": order.shipping_details.method,
-                "shipping_delivery_time": order.shipping_details.delivery_time,
-                "shipping_cost": order.shipping_details.cost,
-                "tax_details": order.tax_details,
-                "tax_amount": order.tax_amount.amount,
-                "total_amount": order.total_amount.amount,
-                "offer_details": order.offer_details,
-                "final_amount": order.final_amount.amount,
-                "payment_method": order.payment_details.method,
-                "payment_reference": order.payment_details.transaction_id,
-                "payment_amount": order.payment_details.paid_amount,
-                "currency": order.currency,
-                "date_created": order.date_created,
-                "date_modified": order.date_modified
-            }
-        )
-
-        for line_item in order.line_items:
-            OrderLine.from_domain(line_item, order.order_id)
-
-
 
 
 class OrderLine(models.Model):
@@ -263,30 +229,3 @@ class OrderLine(models.Model):
 
     def __str__(self):
         return f"Item {self.options} ({self.quantity})"
-
-    @staticmethod
-    def from_domain(line_item, order_id):
-        orderline_model, created = OrderLine.objects.update_or_create(
-            id=line_item.id,
-            defaults={
-                "product_sku": line_item.product_sku,
-                "product_name": line_item.product_name,
-                "product_category": line_item.product_category,
-                "is_free_gift": line_item.is_free_gift,
-                "is_taxable": line_item.is_taxable,
-                "options": line_item.options,
-                "product_price": line_item.product_price,
-                "order_quantity": line_item.order_quantity,
-                "package_weight": line_item.package.weight,
-                "package_length": line_item.package.dimensions[0],
-                "package_width": line_item.package.dimensions[1],
-                "package_height": line_item.package.dimensions[2],
-                "total_price": line_item.total_price,
-                "order_id": order_id
-            }
-
-        )
-
-
-        return orderline_model
-
