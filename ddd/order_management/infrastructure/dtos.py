@@ -1,5 +1,5 @@
 from __future__ import annotations
-import datetime
+from datetime import datetime
 import json
 from decimal import Decimal
 from pydantic import BaseModel, Field, AliasChoices, parse_obj_as
@@ -139,7 +139,7 @@ class OrderDTO(BaseModel):
     tax_amount: MoneyDTO
     total_amount: MoneyDTO
     final_amount: MoneyDTO
-    shipping_reference: str = Field(validate_alias=AliasChoices('shipping_tracking_reference', 'shipping_reference'))
+    shipping_reference: str = Field(json_schema_extra=AliasChoices('shipping_tracking_reference', 'shipping_reference'))
     coupon_codes: List[str]
     status: enums.OrderStatus
     date_modified: datetime
@@ -239,10 +239,10 @@ class OrderDTO(BaseModel):
     def from_domain(order: models.Order) -> OrderDTO:
         return OrderDTO(
             **order.__dict__,
-            destination=AddressDTO.model_validate(order.destination),
+            destination=AddressDTO(order.destination),
             line_items=parse_obj_as(List[LineItemDTO], order.line_items),
-            customer_details=CustomerDetailsDTO.model_validate(order.customer_details),
-            shipping_details=ShippingDetailsDTO.model_validate(order.shipping_details),
-            payment_details=PaymentDetailsDTO.model_validate(order.payment_details),
+            customer_details=CustomerDetailsDTO(order.customer_details),
+            shipping_details=ShippingDetailsDTO(order.shipping_details),
+            payment_details=PaymentDetailsDTO(order.payment_details),
         )
 
