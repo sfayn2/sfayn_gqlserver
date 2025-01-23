@@ -9,17 +9,17 @@ class DjangoOrderRepository(repositories.OrderRepository):
         return order_dto.to_domain()
     
     def save(self, order: models.Order): 
-        #TODO need to impl from_domain method
+        order_dto = dtos.OrderDTO.from_domain(order)
         order_dict = {
             "order_id": order.order_id,
-            "defaults": dtos.OrderDTO(**order.__dict__).to_django_defaults()
+            "defaults": order_dto.to_django_defaults()
         }
-        django_models.Order.objects.update_or_create(**order_dict)
+        django_order, created = django_models.Order.objects.update_or_create(**order_dict)
 
         for line_item in order.line_items:
-            default_dict = dtos.LineItemDTO(**line_item.__dict__).dict().update({"order_id": order.order_id})
+            line_item_dto = dtos.LineItemDTO.from_domain(line_item)
             line_item_dict = {
                 "product_sku": line_item.product_sku,
-                "defaults": default_dict
+                "defaults": line_item_dto.to_django_defaults(order)
             }
             django_models.OrderLine.update_or_create(**line_item_dict)

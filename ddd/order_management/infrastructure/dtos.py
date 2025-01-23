@@ -2,7 +2,7 @@ from __future__ import annotations
 import datetime
 import json
 from decimal import Decimal
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, AliasChoices, parse_obj_as
 from typing import List, Optional, Tuple
 from ddd.order_management.domain import value_objects, models, enums
 
@@ -86,6 +86,27 @@ class LineItemDTO(BaseModel):
             is_taxable=django_line_item.is_taxable
         )
 
+    @staticmethod
+    def from_domain(line_item: models.LineItem) -> LineItemDTO:
+        return LineItemDTO(
+            product_sku=line_item.product_sku,
+            product_name=line_item.product_name,
+            vendor_name=line_item.vendor_name,
+            product_category=line_item.product_category,
+            options=line_item.options,
+            product_price=MoneyDTO(
+                amount=line_item.product_price,
+                currency=line_item.currency
+            ),
+            order_quantity=line_item.order_quantity,
+            package=PackageDTO(line_item.package),
+            is_free_gift=line_item.is_free_gift,
+            is_taxable=line_item.is_taxable
+        )
+
+    def to_django_defaults(self, order: models.Order) -> dict:
+        return self.dict().update({"order_id": order.order_id})
+
 class ShippingDetailsDTO(BaseModel):
     method: enums.ShippingMethod
     delivery_time: str
@@ -118,7 +139,7 @@ class OrderDTO(BaseModel):
     tax_amount: MoneyDTO
     total_amount: MoneyDTO
     final_amount: MoneyDTO
-    shipping_reference: str
+    shipping_reference: str = Field(validate_alias=AliasChoices('shipping_tracking_reference', 'shipping_reference'))
     coupon_codes: List[str]
     status: enums.OrderStatus
     date_modified: datetime
@@ -213,3 +234,15 @@ class OrderDTO(BaseModel):
             coupon_codes=django_order.coupon_codes,
             status=django_order.status
         )
+
+    @staticmethod
+    def from_domain(order: models.Order) -> OrderDTO:
+        return OrderDTO(
+            **order.__dict__,
+            destination=AddressDTO.model_validate(order.destination),
+            line_items=parse_obj_as(List[LineItemDTO], order.line_items),
+            customer_details=CustomerDetailsDTO.model_validate(order.customer_details),
+            shipping_details=ShippingDetailsDTO.model_validate(order.shipping_details),
+            payment_details=PaymentDetailsDTO.model_validate(order.payment_details),
+        )
+
