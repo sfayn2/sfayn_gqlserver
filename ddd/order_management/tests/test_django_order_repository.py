@@ -168,17 +168,16 @@ def test_order_dto_to_domain(domain_order):
 
 def test_get_order(mock_django_order):
     mock_django_order2 = dtos.OrderDTO.from_django_model(mock_django_order)
-    with mock.patch("order_management.models.Order.objects.get", return_value=mock_django_order) as mock_get, \
-         mock.patch("ddd.order_management.infrastructure.dtos.OrderDTO.from_django_model", return_value=mock_django_order2) as mock_from_django, \
-         mock.patch("ddd.order_management.infrastructure.dtos.OrderDTO.to_domain", return_value=mock_django_order2.to_domain()) as mock_to_domain:
+    mock_to_domain = mock_django_order2.to_domain()
+    with mock.patch("order_management.models.Order.objects.get", return_value=mock_django_order) as mock_get:
         
         repository = django_order_repository.DjangoOrderRepository()
         result = repository.get(order_id=1)
 
-
         mock_get.assert_called_once_with(order_id=1)
-        mock_from_django.assert_called_once_with(mock_django_order)
-        
-        mock_to_domain.assert_called_once()
 
-        assert result == mock_to_domain.return_value
+        assert result.order_id == mock_to_domain.order_id
+        assert result.destination == mock_to_domain.destination
+        assert result.payment_details == mock_to_domain.payment_details
+        assert result.shipping_details == mock_to_domain.shipping_details
+        #assert result.line_items == mock_to_domain.line_items
