@@ -4,7 +4,7 @@ from ddd.order_management.infrastructure import dtos
 
 class DjangoOrderRepository(repositories.OrderRepository):
     def get(self, order_id):
-        order = django_models.Order.objects.get(id=order_id)
+        order = django_models.Order.objects.get(order_id=order_id)
         order_dto = dtos.OrderDTO.from_django_model(order)
         return order_dto.to_domain()
     

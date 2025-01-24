@@ -2,7 +2,7 @@ import pytest
 from datetime import datetime
 from unittest import mock
 from decimal import Decimal
-from ddd.order_management.infrastructure import dtos
+from ddd.order_management.infrastructure import dtos, django_order_repository
 from ddd.order_management.domain import models, value_objects, enums
 
 @pytest.fixture
@@ -166,3 +166,19 @@ def test_order_dto_to_domain(domain_order):
     assert len(domain.line_items) == 1
     assert domain.line_items[0].product_name == domain_order.line_items[0].product_name
 
+def test_get_order(mock_django_order):
+    mock_django_order2 = dtos.OrderDTO.from_django_model(mock_django_order)
+    with mock.patch("order_management.models.Order.objects.get", return_value=mock_django_order) as mock_get, \
+         mock.patch("ddd.order_management.infrastructure.dtos.OrderDTO.from_django_model", return_value=mock_django_order2) as mock_from_django, \
+         mock.patch("ddd.order_management.infrastructure.dtos.OrderDTO.to_domain", return_value=mock_django_order2.to_domain()) as mock_to_domain:
+        
+        repository = django_order_repository.DjangoOrderRepository()
+        result = repository.get(order_id=1)
+
+
+        mock_get.assert_called_once_with(order_id=1)
+        mock_from_django.assert_called_once_with(mock_django_order)
+        
+        mock_to_domain.assert_called_once()
+
+        assert result == mock_to_domain.return_value
