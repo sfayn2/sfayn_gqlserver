@@ -82,7 +82,7 @@ class ShippingDetails:
     orig_cost: Money
 
     def __post_init__(self):
-        if not self.method.strip():
+        if not self.method:
             raise ValueError("Shipping method is required.")
         
     #make use of order.update_shipping_details to take effect

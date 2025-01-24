@@ -3,6 +3,7 @@ from datetime import datetime
 import json
 from decimal import Decimal
 from pydantic import BaseModel, Field, AliasChoices, parse_obj_as
+from dataclasses import asdict
 from typing import List, Optional, Tuple
 from ddd.order_management.domain import value_objects, models, enums
 
@@ -12,7 +13,7 @@ class CustomerDetailsDTO(BaseModel):
     email: str
 
     def to_domain(self) -> value_objects.CustomerDetails:
-        return value_objects.CustomerDetails(**self.dict())
+        return value_objects.CustomerDetails(**self.model_dump())
 
 
 class AddressDTO(BaseModel):
@@ -23,21 +24,21 @@ class AddressDTO(BaseModel):
     state: str
 
     def to_domain(self) -> value_objects.Address:
-        return value_objects.Address(**self.dict())
+        return value_objects.Address(**self.model_dump())
 
 class MoneyDTO(BaseModel):
     amount: Decimal
     currency: str
 
     def to_domain(self) -> value_objects.Money:
-        return value_objects.Money(**self.dict())
+        return value_objects.Money(**self.model_dump())
 
 class PackageDTO(BaseModel):
     weight: Decimal
     dimensions: Tuple[int, int, int]
 
     def to_domain(self) -> value_objects.Package:
-        return value_objects.Package(**self.dict())
+        return value_objects.Package(**self.model_dump())
 
 class LineItemDTO(BaseModel):
     product_sku: str
@@ -94,12 +95,9 @@ class LineItemDTO(BaseModel):
             vendor_name=line_item.vendor_name,
             product_category=line_item.product_category,
             options=line_item.options,
-            product_price=MoneyDTO(
-                amount=line_item.product_price,
-                currency=line_item.currency
-            ),
+            product_price=MoneyDTO(**asdict(line_item.product_price)),
             order_quantity=line_item.order_quantity,
-            package=PackageDTO(line_item.package),
+            package=PackageDTO(**asdict(line_item.package)),
             is_free_gift=line_item.is_free_gift,
             is_taxable=line_item.is_taxable
         )
@@ -114,15 +112,15 @@ class ShippingDetailsDTO(BaseModel):
     orig_cost: MoneyDTO
 
     def to_domain(self) -> value_objects.ShippingDetails:
-        return value_objects.ShippingDetails(**self.dict())
+        return value_objects.ShippingDetails(**self.model_dump())
 
 class PaymentDetailsDTO(BaseModel):
-    method: str
+    method: enums.PaymentMethod
     paid_amount: MoneyDTO
     transaction_id: str
 
     def to_domain(self) -> value_objects.PaymentDetails:
-        return value_objects.PaymentDetails(**self.dict())
+        return value_objects.PaymentDetails(**self.model_dump())
 
 class OrderDTO(BaseModel):
     order_id: str
@@ -149,7 +147,7 @@ class OrderDTO(BaseModel):
         return models.Order(
             order_id=self.order_id,
             date_created=self.date_created,
-            destination=self.address.to_domain(),
+            destination=self.destination.to_domain(),
             line_items=line_items,
             customer_details=self.customer_details.to_domain(),
             shipping_details=self.shipping_details.to_domain(),
@@ -238,11 +236,25 @@ class OrderDTO(BaseModel):
     @staticmethod
     def from_domain(order: models.Order) -> OrderDTO:
         return OrderDTO(
-            **order.__dict__,
-            destination=AddressDTO(order.destination),
-            line_items=parse_obj_as(List[LineItemDTO], order.line_items),
-            customer_details=CustomerDetailsDTO(order.customer_details),
-            shipping_details=ShippingDetailsDTO(order.shipping_details),
-            payment_details=PaymentDetailsDTO(order.payment_details),
+            order_id=order.order_id,
+            date_created=order.date_created,
+            date_modified=order.date_modified,
+            cancellation_reason=order.cancellation_reason,
+            total_discounts_fee=MoneyDTO(**asdict(order.total_discounts_fee)),
+            offer_details=order.offer_details,
+            tax_details=order.tax_details,
+            tax_amount=MoneyDTO(**asdict(order.tax_amount)),
+            total_amount=MoneyDTO(**asdict(order.total_amount)),
+            final_amount=MoneyDTO(**asdict(order.final_amount)),
+            shipping_reference=order.shipping_reference,
+            coupon_codes=order.customer_coupons,
+            status=order.order_status,
+            destination=AddressDTO(**asdict(order.destination)),
+            customer_details=CustomerDetailsDTO(**asdict(order.customer_details)),
+            shipping_details=ShippingDetailsDTO(**asdict(order.shipping_details)),
+            payment_details=PaymentDetailsDTO(**asdict(order.payment_details)),
+            line_items=[
+                LineItemDTO.from_domain(item) for item in order.line_items
+            ],
         )
 

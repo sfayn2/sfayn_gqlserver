@@ -107,6 +107,7 @@ class LineItem:
 
 
 
+
 class Order:
 
     def __init__(self,
@@ -334,6 +335,10 @@ class Order:
                 - self.total_discounts_fee
                 - self.tax_amount
             ) + (self.shipping_details.cost if self.shipping_details else value_objects.Money(0, self.currency))
+
+    @property
+    def shipping_reference(self):
+        return self._shipping_reference
 
     @property
     def total_amount(self) -> value_objects.Money:

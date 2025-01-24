@@ -7,22 +7,22 @@ from ddd.order_management.domain import models, value_objects, enums
 
 @pytest.fixture
 def mock_django_line_item():
-    m = mock.MagicMock()
-    m.product_sku = "SKU123"
-    m.product_name = "Test Product"
-    m.vendor_name = "VENDOR1"
-    m.product_category = "Category1"
-    m.options = '{"color": "red", "size": "m" }'
-    m.product_price = Decimal("50.00")
-    m.currency = "SGD"
-    m.order_quantity = 2
-    m.weight = Decimal("1.5")
-    m.length = 10
-    m.width = 5
-    m.height = 5
-    m.is_free_gift = False
-    m.is_taxable = True
-    return m
+    mck = mock.MagicMock()
+    mck.product_sku = "SKU123"
+    mck.product_name = "Test Product"
+    mck.vendor_name = "VENDOR1"
+    mck.product_category = "Category1"
+    mck.options = '{"color": "red", "size": "m" }'
+    mck.product_price = Decimal("50.00")
+    mck.currency = "SGD"
+    mck.order_quantity = 2
+    mck.weight = Decimal("1.5")
+    mck.length = 10
+    mck.width = 5
+    mck.height = 5
+    mck.is_free_gift = False
+    mck.is_taxable = True
+    return mck
 
 @pytest.fixture
 def domain_line_item():
@@ -47,37 +47,37 @@ def domain_line_item():
 
 @pytest.fixture
 def mock_django_order(mock_django_line_item):
-    m = mock.MagicMock()
-    m.order_id = "ORDER123"
-    m.date_created = datetime(2025, 1, 1, 12, 0, 0)
-    m.date_modified = datetime(2025, 1, 2, 12, 0, 0)
-    m.delivery_street = "123 Main St"
-    m.delivery_city = "New York"
-    m.delivery_postal = 10001
-    m.delivery_state = "NY"
-    m.delivery_country = "USA"
-    m.customer_first_name = "John"
-    m.customer_last_name = "Doe"
-    m.customer_email = "john.doe@example.com"
-    m.shipping_method = enums.ShippingMethod.STANDARD.value
-    m.shipping_delivery_time = "3-5 business days"
-    m.shipping_cost = Decimal("10.00")
-    m.currency = "SGD"
-    m.payment_method = enums.PaymentMethod.PAYPAL.value
-    m.payment_reference = "PAY123"
-    m.payment_amount = Decimal("110.50")
-    m.cancellation_reason = ""
-    m.total_discounts_fee = Decimal("5.00")
-    m.offer_details = "New Year Offer"
-    m.tax_details = "Tax Included"
-    m.tax_amount = Decimal("15.00")
-    m.total_amount = Decimal("120.00")
-    m.final_amount = Decimal("110.50")
-    m.shipping_tracking_reference = "TRACK123"
-    m.coupon_codes = ["NEWYEAR2025"]
-    m.status = enums.OrderStatus.PENDING.value
-    m.line_items.all.return_value = [mock_django_line_item]
-    return m
+    mck = mock.MagicMock()
+    mck.order_id = "ORDER123"
+    mck.date_created = datetime(2025, 1, 1, 12, 0, 0)
+    mck.date_modified = datetime(2025, 1, 2, 12, 0, 0)
+    mck.delivery_street = "123 Main St"
+    mck.delivery_city = "New York"
+    mck.delivery_postal = 10001
+    mck.delivery_state = "NY"
+    mck.delivery_country = "USA"
+    mck.customer_first_name = "John"
+    mck.customer_last_name = "Doe"
+    mck.customer_email = "john.doe@example.com"
+    mck.shipping_method = enums.ShippingMethod.STANDARD.value
+    mck.shipping_delivery_time = "3-5 business days"
+    mck.shipping_cost = Decimal("10.00")
+    mck.currency = "SGD"
+    mck.payment_method = enums.PaymentMethod.PAYPAL.value
+    mck.payment_reference = "PAY123"
+    mck.payment_amount = Decimal("110.50")
+    mck.cancellation_reason = ""
+    mck.total_discounts_fee = Decimal("5.00")
+    mck.offer_details = "New Year Offer"
+    mck.tax_details = "Tax Included"
+    mck.tax_amount = Decimal("15.00")
+    mck.total_amount = Decimal("120.00")
+    mck.final_amount = Decimal("110.50")
+    mck.shipping_tracking_reference = "TRACK123"
+    mck.coupon_codes = ["NEWYEAR2025"]
+    mck.status = enums.OrderStatus.PENDING.value
+    mck.line_items.all.return_value = [mock_django_line_item]
+    return mck
 
 @pytest.fixture
 def domain_order(domain_line_item):
@@ -157,12 +157,12 @@ def test_order_dto_from_django_model(mock_django_order):
     assert len(dto.line_items) == 1
     assert dto.line_items[0].product_name == mock_django_order.line_items.all()[0].product_name
 
-#def test_order_dto_to_domain(domain_order):
-#    dto = dtos.OrderDTO.from_domain(domain_order)
-#    domain = dto.to_domain()
-#
-#    assert domain.order_id == domain_order.order_id
-#    assert domain.destination.city == domain_order.destination.city
-#    assert len(domain.line_items) == 1
-#    assert domain.line_items[0].product_name == domain_order.line_items[0].product_name
+def test_order_dto_to_domain(domain_order):
+    dto = dtos.OrderDTO.from_domain(domain_order)
+    domain = dto.to_domain()
+
+    assert domain.order_id == domain_order.order_id
+    assert domain.destination.city == domain_order.destination.city
+    assert len(domain.line_items) == 1
+    assert domain.line_items[0].product_name == domain_order.line_items[0].product_name
 
