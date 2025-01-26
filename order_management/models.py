@@ -27,7 +27,7 @@ class Order(models.Model):
         help_text="e.g. ['WELCOME25', 'FREESHIP']"
         ) 
 
-    delivery_address = models.TextField(blank=True, help_text="Delivery address")
+    delivery_street = models.TextField(blank=True, help_text="Delivery address")
     delivery_city = models.CharField(max_length=50, blank=True, null=True, help_text="Optional for other countries (e.g. Singapore)")
     delivery_postal = models.CharField(max_length=50, blank=True, null=True, help_text="some countries dont use this (e.g Ireland?)")
     delivery_country = models.CharField(max_length=50)
@@ -110,7 +110,7 @@ class Order(models.Model):
 
 
     def __str__(self):
-        return f"{self.order_id} - {self.shipping_address} ( {self.status} )"
+        return f"{self.order_id} - {self.delivery_street} ( {self.order_status} )"
 
 class OrderLine(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False) #uuid for global unique id
@@ -145,4 +145,4 @@ class OrderLine(models.Model):
     )
 
     def __str__(self):
-        return f"Item {self.options} ({self.quantity})"
+        return f"{self.product_sku} {self.options} ({self.order_quantity})"

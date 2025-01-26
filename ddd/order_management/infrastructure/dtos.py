@@ -102,8 +102,25 @@ class LineItemDTO(BaseModel):
             is_taxable=line_item.is_taxable
         )
 
-    def to_django_defaults(self, order: models.Order) -> dict:
-        return self.dict().update({"order_id": order.order_id})
+    def to_django(self, order: models.Order) -> dict:
+        return {
+                "product_sku": self.product_sku,
+                "defaults":  {
+                    'product_name': self.product_name, 
+                    'vendor_name': self.vendor_name, 
+                    'product_category': self.product_category, 
+                    'options': self.options, 
+                    'product_price': self.product_price.amount, 
+                    'order_quantity': self.order_quantity, 
+                    'package_weight': self.package.weight,
+                    'package_length': self.package.dimensions[0],
+                    'package_width': self.package.dimensions[1],
+                    'package_height': self.package.dimensions[2],
+                    'is_free_gift': self.is_free_gift, 
+                    'is_taxable': self.is_taxable, 
+                    'order_id': order.order_id
+                }
+            }
 
 class ShippingDetailsDTO(BaseModel):
     method: enums.ShippingMethod
@@ -127,20 +144,20 @@ class OrderDTO(BaseModel):
     date_created: datetime 
     destination: AddressDTO
     line_items: List[LineItemDTO]
-    customer_details: CustomerDetailsDTO | None
-    shipping_details: ShippingDetailsDTO | None
-    payment_details: PaymentDetailsDTO | None
-    cancellation_reason: str | None
-    total_discounts_fee: MoneyDTO | None
-    offer_details: str | None
-    tax_details: str | None
-    tax_amount: MoneyDTO | None
-    total_amount: MoneyDTO | None
-    final_amount: MoneyDTO | None
-    shipping_reference: None | str = Field(json_schema_extra=AliasChoices('shipping_tracking_reference', 'shipping_reference'))
-    customer_coupons: List[str] | None
-    status: enums.OrderStatus | None
-    date_modified: datetime | None
+    customer_details: Optional[CustomerDetailsDTO]
+    shipping_details: Optional[ShippingDetailsDTO]
+    payment_details: Optional[PaymentDetailsDTO]
+    cancellation_reason: Optional[str]
+    total_discounts_fee: Optional[MoneyDTO]
+    offer_details: Optional[List[str]]
+    tax_details: Optional[List[str]]
+    tax_amount: Optional[MoneyDTO]
+    total_amount: Optional[MoneyDTO]
+    final_amount: Optional[MoneyDTO]
+    shipping_reference: Optional[str] = Field(json_schema_extra=AliasChoices('shipping_tracking_reference', 'shipping_reference'))
+    customer_coupons: Optional[List[str]]
+    order_status: enums.OrderStatus
+    date_modified: Optional[datetime]
 
     def to_domain(self) -> models.Order:
         line_items = [item.to_domain() for item in self.line_items]
@@ -165,8 +182,41 @@ class OrderDTO(BaseModel):
             date_modified=self.date_modified
         )
 
-    def to_django_defaults(self):
-        return self.dict(exclude={"order_id", "line_items"})
+    def to_django(self):
+        return {
+            'order_id': self.order_id,
+            'defaults': {
+                    'date_created': self.date_created,
+                    'delivery_street': self.destination.street,
+                    'delivery_city': self.destination.city,
+                    'delivery_postal': self.destination.postal,
+                    'delivery_country': self.destination.country, 
+                    'delivery_state': self.destination.state, 
+                    'customer_first_name': self.customer_details.first_name, 
+                    'customer_last_name': self.customer_details.last_name, 
+                    'customer_email': self.customer_details.email if self.customer_details else None, 
+                    'shipping_method': self.shipping_details.method if self.shipping_details else None, 
+                    'shipping_delivery_time': self.shipping_details.delivery_time if self.shipping_details else None,
+                    'shipping_cost': self.shipping_details.cost.amount if self.shipping_details else None,
+                    'shipping_tracking_reference': self.shipping_reference,
+                    'payment_method': self.payment_details.method if self.payment_details else None,
+                    'payment_reference': self.payment_details.transaction_id if self.payment_details else None,
+                    'payment_amount': self.payment_details.paid_amount if self.payment_details else None, 
+                    'cancellation_reason': self.cancellation_reason, 
+                    'total_discounts_fee': self.total_discounts_fee.amount if self.total_discounts_fee else None, 
+                    'offer_details': ','.join(self.offer_details),
+                    'tax_details': ','.join(self.tax_details), 
+                    'tax_amount': self.tax_amount.amount if self.tax_amount else None, 
+                    'total_amount': self.total_amount.amount if self.total_amount else None, 
+                    'final_amount': self.final_amount.amount if self.final_amount else None, 
+                    'shipping_tracking_reference': self.shipping_reference, 
+                    'customer_coupons': ','.join(self.customer_coupons), 
+                    'order_status': self.order_status.value, 
+                    'date_modified': self.date_modified
+                }
+        }
+    
+
 
     @staticmethod
     def from_django_model(django_order) -> OrderDTO:
@@ -229,8 +279,8 @@ class OrderDTO(BaseModel):
                 currency=django_order.currency
             ),
             shipping_reference=django_order.shipping_tracking_reference,
-            coupon_codes=django_order.coupon_codes,
-            status=django_order.status
+            customer_coupons=django_order.customer_coupons,
+            status=django_order.order_status
         )
 
     @staticmethod
@@ -257,7 +307,7 @@ class OrderDTO(BaseModel):
             final_amount=final_amount,
             shipping_reference=order.shipping_reference,
             customer_coupons=order.customer_coupons,
-            status=order.order_status,
+            order_status=order.order_status,
             customer_details=CustomerDetailsDTO(**asdict(order.customer_details)),
             line_items=[
                 LineItemDTO.from_domain(item) for item in order.line_items

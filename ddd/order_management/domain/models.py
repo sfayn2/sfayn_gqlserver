@@ -55,10 +55,10 @@ class Order:
     customer_details: value_objects.CustomerDetails
     shipping_details: Optional[value_objects.ShippingDetails] = None
     payment_details: Optional[value_objects.PaymentDetails] = None
-    cancellation_reason: Optional[str] = ""
+    cancellation_reason: Optional[str] = None
     total_discounts_fee: Optional[value_objects.Money] = None
-    offer_details: Optional[str] = ""
-    tax_details: Optional[str] = ""
+    offer_details: Optional[List[str]] = field(default_factory=list)
+    tax_details: Optional[List[str]] = field(default_factory=list)
     tax_amount: Optional[value_objects.Money] = None
     total_amount: Optional[value_objects.Money] = None
     final_amount: Optional[value_objects.Money] = None

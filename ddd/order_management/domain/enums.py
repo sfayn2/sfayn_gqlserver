@@ -10,7 +10,7 @@ class OrderStatus(Enum):
 
     @classmethod
     def choices(cls):
-        return tuple((i.name, i.value) for i in cls)
+        return tuple((i.value, i.name) for i in cls)
 
 class ShippingMethod(Enum):
     STANDARD = "Standard"
@@ -20,7 +20,7 @@ class ShippingMethod(Enum):
 
     @classmethod
     def choices(cls):
-        return tuple((i.name, i.value) for i in cls)
+        return tuple((i.value, i.name) for i in cls)
 
 class OfferType(Enum):
     PERCENTAGE_DISCOUNT = "Percentage Discount"
@@ -37,4 +37,4 @@ class PaymentMethod(Enum):
 
     @classmethod
     def choices(cls):
-        return tuple((i.name, i.value) for i in cls)
+        return tuple((i.value, i.name) for i in cls)

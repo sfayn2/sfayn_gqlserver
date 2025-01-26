@@ -62,8 +62,45 @@ class CheckoutOrderMutation(relay.ClientIDMutation):
             message="Order successfully created."
         )
 
-        return cls(
-            order_id=response_dto.order_id,
-            order_status=response_dto.order_status,
-            message=response_dto.message
-        )
+        return cls(**response_dto.model_dump())
+
+"""
+mutation {
+  checkoutOrder(input: {
+    customerDetails: {
+      firstName: "John",
+      lastName: "Doe",
+      email: "JohnDoe@gmail.com"
+    },
+    address: {
+      street: "123 main street",
+      city: "New York",
+      state: "NYC",
+      postal: "1001",
+      country: "USA"
+    },
+    lineItems: [
+      {
+        productSku: "SKU1",
+        productName: "Product1",
+        vendorName: "Vendor1",
+        productCategory: "Category1",
+        orderQuantity: 1,
+        options: {color:"red"},
+        productPrice: {
+          amount: 2.1,
+          currency: "SGD"
+        },
+        package: {
+          weight: 1.5,
+          dimensions: [10, 10, 10]
+        }
+      }
+    ]
+  }) {
+    orderId
+    orderStatus
+    message
+  }
+}
+"""
