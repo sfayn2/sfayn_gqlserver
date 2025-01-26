@@ -1,5 +1,6 @@
 import graphene
 import product_catalog.schema
+import order_management.schema
 
 class Query(
     product_catalog.schema.Query
@@ -8,5 +9,8 @@ class Query(
     #as we begin to add more apps to our project
     pass
 
-schema = graphene.Schema(query=Query)
+class Mutation(graphene.ObjectType):
+    checkout_order = order_management.schema.CheckoutOrderMutation.Field()
+
+schema = graphene.Schema(query=Query, mutation=Mutation)
 

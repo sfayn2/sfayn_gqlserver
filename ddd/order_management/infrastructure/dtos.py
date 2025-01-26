@@ -127,20 +127,20 @@ class OrderDTO(BaseModel):
     date_created: datetime 
     destination: AddressDTO
     line_items: List[LineItemDTO]
-    customer_details: CustomerDetailsDTO
-    shipping_details: ShippingDetailsDTO
-    payment_details: PaymentDetailsDTO
-    cancellation_reason: str
-    total_discounts_fee: MoneyDTO
-    offer_details: str
-    tax_details: str
-    tax_amount: MoneyDTO
-    total_amount: MoneyDTO
-    final_amount: MoneyDTO
-    shipping_reference: str = Field(json_schema_extra=AliasChoices('shipping_tracking_reference', 'shipping_reference'))
-    coupon_codes: List[str]
-    status: enums.OrderStatus
-    date_modified: datetime
+    customer_details: CustomerDetailsDTO | None
+    shipping_details: ShippingDetailsDTO | None
+    payment_details: PaymentDetailsDTO | None
+    cancellation_reason: str | None
+    total_discounts_fee: MoneyDTO | None
+    offer_details: str | None
+    tax_details: str | None
+    tax_amount: MoneyDTO | None
+    total_amount: MoneyDTO | None
+    final_amount: MoneyDTO | None
+    shipping_reference: None | str = Field(json_schema_extra=AliasChoices('shipping_tracking_reference', 'shipping_reference'))
+    customer_coupons: List[str] | None
+    status: enums.OrderStatus | None
+    date_modified: datetime | None
 
     def to_domain(self) -> models.Order:
         line_items = [item.to_domain() for item in self.line_items]
@@ -160,7 +160,7 @@ class OrderDTO(BaseModel):
             total_amount=self.total_amount.to_domain(),
             final_amount=self.final_amount.to_domain(),
             shipping_reference=self.shipping_reference,
-            coupon_codes=[coupon for coupon in self.coupon_codes],
+            customer_coupons=[coupon for coupon in self.customer_coupons],
             status=self.status,
             date_modified=self.date_modified
         )
@@ -235,24 +235,30 @@ class OrderDTO(BaseModel):
 
     @staticmethod
     def from_domain(order: models.Order) -> OrderDTO:
+        total_discounts_fee=MoneyDTO(**asdict(order.total_discounts_fee)) if order.total_discounts_fee else None
+        tax_amount=MoneyDTO(**asdict(order.tax_amount)) if order.tax_amount else None
+        total_amount=MoneyDTO(**asdict(order.total_amount)) if order.total_amount else None
+        final_amount=MoneyDTO(**asdict(order.final_amount)) if order.final_amount else None
+        shipping_details=ShippingDetailsDTO(**asdict(order.shipping_details)) if order.shipping_details else None
+        payment_details=PaymentDetailsDTO(**asdict(order.payment_details)) if order.payment_details else None
         return OrderDTO(
             order_id=order.order_id,
+            destination=AddressDTO(**asdict(order.destination)),
+            payment_details=payment_details,
+            total_discounts_fee=total_discounts_fee,
             date_created=order.date_created,
             date_modified=order.date_modified,
             cancellation_reason=order.cancellation_reason,
-            total_discounts_fee=MoneyDTO(**asdict(order.total_discounts_fee)),
             offer_details=order.offer_details,
             tax_details=order.tax_details,
-            tax_amount=MoneyDTO(**asdict(order.tax_amount)),
-            total_amount=MoneyDTO(**asdict(order.total_amount)),
-            final_amount=MoneyDTO(**asdict(order.final_amount)),
+            shipping_details=shipping_details,
+            tax_amount=tax_amount,
+            total_amount=total_amount,
+            final_amount=final_amount,
             shipping_reference=order.shipping_reference,
-            coupon_codes=order.customer_coupons,
+            customer_coupons=order.customer_coupons,
             status=order.order_status,
-            destination=AddressDTO(**asdict(order.destination)),
             customer_details=CustomerDetailsDTO(**asdict(order.customer_details)),
-            shipping_details=ShippingDetailsDTO(**asdict(order.shipping_details)),
-            payment_details=PaymentDetailsDTO(**asdict(order.payment_details)),
             line_items=[
                 LineItemDTO.from_domain(item) for item in order.line_items
             ],

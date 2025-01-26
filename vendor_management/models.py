@@ -43,7 +43,7 @@ class Offer(models.Model):
     stackable = models.BooleanField(default=False, help_text="Set to True, To combine w other stackable")
     priority = models.PositiveIntegerField(default=0, help_text="The highest number will be prioritized on multistack or single stack")
     required_coupons = models.BooleanField(default=False, help_text="Set to True, To make use of coupons to apply")
-    coupon = models.ManyToManyField(Coupon, blank=True, null=True, help_text="Provide a coupons to manually apply for this offer.")
+    coupon = models.ManyToManyField(Coupon, blank=True, help_text="Provide a coupons to manually apply for this offer.")
     start_date = models.DateTimeField(help_text="Only valid on start of this date; To ignore if required_coupon is True", blank=True, null=True)
     end_date = models.DateTimeField(help_text="Only valid on before end date; To ignore if required_coupon is True", blank=True, null=True)
     #manual_apply = models.BooleanField(default=False, help_text="Determine whether to apply manually.; To ignore if required_coupons")

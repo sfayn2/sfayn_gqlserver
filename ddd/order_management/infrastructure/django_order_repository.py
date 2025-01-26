@@ -14,12 +14,13 @@ class DjangoOrderRepository(repositories.OrderRepository):
             "order_id": order.order_id,
             "defaults": order_dto.to_django_defaults()
         }
+        print(order_dict)
         django_order, created = django_models.Order.objects.update_or_create(**order_dict)
 
-        for line_item in order.line_items:
-            line_item_dto = dtos.LineItemDTO.from_domain(line_item)
-            line_item_dict = {
-                "product_sku": line_item.product_sku,
-                "defaults": line_item_dto.to_django_defaults(order)
-            }
-            django_models.OrderLine.update_or_create(**line_item_dict)
+        #for line_item in order.line_items:
+        #    line_item_dto = dtos.LineItemDTO.from_domain(line_item)
+        #    line_item_dict = {
+        #        "product_sku": line_item.product_sku,
+        #        "defaults": line_item_dto.to_django_defaults(order)
+        #    }
+        #    django_models.OrderLine.update_or_create(**line_item_dict)
