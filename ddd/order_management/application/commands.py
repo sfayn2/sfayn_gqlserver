@@ -1,37 +1,30 @@
 import uuid
 from abc import ABC
-from dataclasses import dataclass
+from pydantic import BaseModel
 from typing import Union, List, Optional
 from datetime import datetime
-from ddd.order_management.domain import enums, value_objects, models
+from ddd.order_management.infrastructure import dtos
 
-class Command(ABC):
+class Command(BaseModel, frozen=True):
     pass
 
-@dataclass(frozen=True)
 class CheckoutCommand(Command):
-    customer_details: value_objects.CustomerDetails
-    address: value_objects.Address
-    line_items: List[models.LineItem]
+    customer_details: dtos.CustomerDetailsDTO
+    address: dtos.AddressDTO
+    line_items: List[dtos.LineItemDTO]
 
-
-@dataclass
-class ConfirmOrderCommand:
+class ConfirmOrderCommand(Command):
     order_id: str
 
-@dataclass
-class ShipOrderCommand:
+class ShipOrderCommand(Command):
     order_id: str
 
-@dataclass
-class CancelOrderCommand:
+class CancelOrderCommand(Command):
     order_id: str
 
-@dataclass
-class CompleteOrderCommand:
+class CompleteOrderCommand(Command):
     order_id: str
 
-@dataclass
-class ApplyPaymentCommand:
+class ApplyPaymentCommand(Command):
     order_id: str
-    payment: value_objects.PaymentDetails
+    payment: dtos.PaymentDetailsDTO
