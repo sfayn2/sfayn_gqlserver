@@ -21,10 +21,11 @@ class Order(models.Model):
     customer_first_name = models.CharField(max_length=255)
     customer_last_name = models.CharField(max_length=255)
     customer_email = models.EmailField(max_length=255, blank=True, null=True)
-    customer_coupons = models.JSONField(
+    customer_coupons = models.CharField(
+        max_length=150,
         blank=True, 
         null=True, 
-        help_text="e.g. ['WELCOME25', 'FREESHIP']"
+        help_text=r'e.g. ["WELCOME25", "FREESHIP"]'
         ) 
 
     delivery_street = models.TextField(blank=True, help_text="Delivery address")
@@ -45,7 +46,8 @@ class Order(models.Model):
     shipping_tracking_reference = models.CharField(max_length=50, null=True, blank=True, help_text="")
 
 
-    tax_details = models.JSONField(
+    tax_details = models.CharField(
+        max_length=150,
         blank=True, 
         null=True, 
         help_text='e.g. ["GST (9%)", "Local State (2%)"]'
@@ -75,7 +77,8 @@ class Order(models.Model):
         help_text="overall total", 
     )
 
-    offer_details = models.JSONField(
+    offer_details = models.CharField(
+        max_length=150,
         blank=True, 
         null=True, 
         help_text='e.g. ["Free Shipping applied", "Discount applied: $20.00"]'
@@ -128,7 +131,7 @@ class OrderLine(models.Model):
     product_category = models.CharField(max_length=100, help_text="some countries uses category to calculate tax")
     is_free_gift = models.BooleanField(default=False)
     is_taxable = models.BooleanField(default=True)
-    options = models.JSONField(help_text='ex. {"Size": "M", "Color": "RED"}') # anticipated to have complex tables to support multi dimension variants, decided to use JSONField
+    options = models.CharField(max_length=150, help_text='ex. {"Size": "M", "Color": "RED"}') # anticipated to have complex tables to support multi dimension variants, decided to use JSONField
     product_price = models.DecimalField(max_digits=10, decimal_places=2)
     product_currency = models.CharField(max_length=50, help_text="Currency for calculation requirements & validation. e.g. SGD")
     order_quantity = models.PositiveIntegerField(null=True)

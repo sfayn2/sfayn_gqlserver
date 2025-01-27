@@ -53,18 +53,18 @@ class Order:
     destination: value_objects.Address
     line_items: List[LineItem]
     customer_details: value_objects.CustomerDetails
+    order_status: enums.OrderStatus
     shipping_details: Optional[value_objects.ShippingDetails] = None
     payment_details: Optional[value_objects.PaymentDetails] = None
     cancellation_reason: Optional[str] = None
-    total_discounts_fee: Optional[value_objects.Money] = None
     offer_details: Optional[List[str]] = field(default_factory=list)
     tax_details: Optional[List[str]] = field(default_factory=list)
-    tax_amount: Optional[value_objects.Money] = None
-    total_amount: Optional[value_objects.Money] = None
-    final_amount: Optional[value_objects.Money] = None
     shipping_reference: Optional[str] = None
     customer_coupons: Optional[List[str]] = field(default_factory=list)
-    order_status: Optional[enums.OrderStatus] = None
+    total_discounts_fee: value_objects.Money = value_objects.Money.default()
+    tax_amount: value_objects.Money = value_objects.Money.default()
+    total_amount: value_objects.Money = value_objects.Money.default()
+    final_amount: value_objects.Money = value_objects.Money.default()
     date_modified: Optional[datetime] = None
 
 

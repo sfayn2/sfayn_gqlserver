@@ -14,8 +14,9 @@ class Money:
             raise TypeError("Amount must be a decimal.")
         if not isinstance(self.currency, str):
             raise TypeError("Currency must be a string.")
-        if self.amount <= Decimal(0):
-            raise ValueError(f"Amount must be non zero.")
+
+        if self.amount < Decimal("0"):
+            raise ValueError(f"Amount must not be negative.")
 
         if len(self.currency) != 3:
             raise ValueError("Currency must be a valid 3 character ISO code.")
@@ -38,6 +39,10 @@ class Money:
 
     def reset_amount(self) -> Money:
         return Money(amount=Decimal("0"), currency=self.currency)
+
+    @classmethod
+    def default(cls) -> Money:
+        return Money(amount=Decimal("0"), currency="TBD") #need to get from settigns?
 
 
 

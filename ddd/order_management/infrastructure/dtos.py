@@ -1,6 +1,7 @@
 from __future__ import annotations
 from datetime import datetime
 import json
+import ast
 from decimal import Decimal
 from pydantic import BaseModel, Field, AliasChoices, parse_obj_as
 from dataclasses import asdict
@@ -73,7 +74,7 @@ class LineItemDTO(BaseModel):
             product_name=django_line_item.product_name,
             vendor_name=django_line_item.vendor_name,
             product_category=django_line_item.product_category,
-            options=json.loads(django_line_item.options),
+            options=ast.literal_eval(django_line_item.options),
             product_price=MoneyDTO(
                 amount=django_line_item.product_price,
                 currency=django_line_item.currency
@@ -177,8 +178,8 @@ class OrderDTO(BaseModel):
             total_amount=self.total_amount.to_domain(),
             final_amount=self.final_amount.to_domain(),
             shipping_reference=self.shipping_reference,
-            customer_coupons=[coupon for coupon in self.customer_coupons],
-            status=self.status,
+            customer_coupons=self.customer_coupons,
+            order_status=self.order_status,
             date_modified=self.date_modified
         )
 
@@ -204,13 +205,13 @@ class OrderDTO(BaseModel):
                     'payment_amount': self.payment_details.paid_amount if self.payment_details else None, 
                     'cancellation_reason': self.cancellation_reason, 
                     'total_discounts_fee': self.total_discounts_fee.amount if self.total_discounts_fee else None, 
-                    'offer_details': ','.join(self.offer_details),
-                    'tax_details': ','.join(self.tax_details), 
+                    'offer_details': self.offer_details if self.offer_details else [],
+                    'tax_details': self.tax_details if self.tax_details else [], 
                     'tax_amount': self.tax_amount.amount if self.tax_amount else None, 
                     'total_amount': self.total_amount.amount if self.total_amount else None, 
                     'final_amount': self.final_amount.amount if self.final_amount else None, 
                     'shipping_tracking_reference': self.shipping_reference, 
-                    'customer_coupons': ','.join(self.customer_coupons), 
+                    'customer_coupons': self.customer_coupons if self.customer_coupons else [], 
                     'order_status': self.order_status.value, 
                     'date_modified': self.date_modified
                 }
@@ -264,8 +265,8 @@ class OrderDTO(BaseModel):
                 amount=django_order.total_discounts_fee,
                 currency=django_order.currency
             ),
-            offer_details=django_order.offer_details,
-            tax_details=django_order.tax_details,
+            offer_details=ast.literal_eval(django_order.offer_details),
+            tax_details=ast.literal_eval(django_order.tax_details),
             tax_amount=MoneyDTO(
                 amount=django_order.tax_amount,
                 currency=django_order.currency
@@ -279,8 +280,8 @@ class OrderDTO(BaseModel):
                 currency=django_order.currency
             ),
             shipping_reference=django_order.shipping_tracking_reference,
-            customer_coupons=django_order.customer_coupons,
-            status=django_order.order_status
+            customer_coupons=ast.literal_eval(django_order.customer_coupons),
+            order_status=django_order.order_status
         )
 
     @staticmethod
