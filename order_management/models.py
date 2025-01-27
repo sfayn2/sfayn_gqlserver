@@ -147,5 +147,10 @@ class OrderLine(models.Model):
         help_text="Total price w/o discounts; to apply discount per Order", 
     )
 
+    class Meta:
+        unique_together = ("product_sku", "order_id")
+
     def __str__(self):
-        return f"{self.product_sku} {self.options} ({self.order_quantity})"
+        return f"{self.order.order_id} - {self.product_sku} {self.options} ({self.order_quantity})"
+
+

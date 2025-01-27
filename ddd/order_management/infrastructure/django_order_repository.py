@@ -1,4 +1,4 @@
-from ddd.order_management.domain import repositories, models
+from ddd.order_management.domain import repositories, models, exceptions
 from order_management import models as django_models
 from ddd.order_management.infrastructure import dtos
 

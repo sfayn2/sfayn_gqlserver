@@ -106,20 +106,21 @@ class LineItemDTO(BaseModel):
     def to_django(self, order: models.Order) -> dict:
         return {
                 "product_sku": self.product_sku,
+                "order_id": order.order_id,
                 "defaults":  {
                     'product_name': self.product_name, 
                     'vendor_name': self.vendor_name, 
                     'product_category': self.product_category, 
                     'options': self.options, 
                     'product_price': self.product_price.amount, 
+                    'product_currency': self.product_price.currency,
                     'order_quantity': self.order_quantity, 
                     'package_weight': self.package.weight,
                     'package_length': self.package.dimensions[0],
                     'package_width': self.package.dimensions[1],
                     'package_height': self.package.dimensions[2],
                     'is_free_gift': self.is_free_gift, 
-                    'is_taxable': self.is_taxable, 
-                    'order_id': order.order_id
+                    'is_taxable': self.is_taxable
                 }
             }
 

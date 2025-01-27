@@ -35,8 +35,10 @@ class LineItem:
         if self.is_free_gift and self.is_taxable:
             raise ValueError("Free gift is not taxable.")
 
-    #def set_options(self, options):
-    #    self._options = options
+    def update_order_quantity(self, new_quantity: int):
+        if new_quantity <= 0:
+            raise ValueError("Order quantity must be greater than zero.")
+        self.order_quantity = new_quantity
 
     @property
     def total_price(self) -> value_objects.Money:
@@ -57,9 +59,9 @@ class Order:
     shipping_details: Optional[value_objects.ShippingDetails] = None
     payment_details: Optional[value_objects.PaymentDetails] = None
     cancellation_reason: Optional[str] = None
+    shipping_reference: Optional[str] = None
     offer_details: Optional[List[str]] = field(default_factory=list)
     tax_details: Optional[List[str]] = field(default_factory=list)
-    shipping_reference: Optional[str] = None
     customer_coupons: Optional[List[str]] = field(default_factory=list)
     total_discounts_fee: value_objects.Money = value_objects.Money.default()
     tax_amount: value_objects.Money = value_objects.Money.default()
@@ -118,6 +120,14 @@ class Order:
             raise ValueError("Line item does not exists in the order.")
         self.line_items.remove(line_item)
         self.update_totals()
+
+    def update_order_quantity(self, product_sku: str, new_quantity: int):
+        for line_item in self.line_items:
+            if line_item.product_sku == product_sku:
+                line_item.update_order_quantity(new_quantity)
+                self.update_totals()
+                return
+        raise ValueError(f"Product w Sku {product_sku} not found in the order.")
 
     def place_order(self):
         if not self.line_items:
