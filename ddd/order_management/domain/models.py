@@ -62,7 +62,7 @@ class Order:
     shipping_reference: Optional[str] = None
     offer_details: Optional[List[str]] = field(default_factory=list)
     tax_details: Optional[List[str]] = field(default_factory=list)
-    customer_coupons: Optional[List[str]] = field(default_factory=list)
+    coupons: Optional[List[value_objects.Coupon]] = field(default_factory=list)
     total_discounts_fee: value_objects.Money = value_objects.Money.default()
     tax_amount: value_objects.Money = value_objects.Money.default()
     total_amount: value_objects.Money = value_objects.Money.default()
@@ -119,6 +119,12 @@ class Order:
         if not line_item:
             raise ValueError("Line item does not exists in the order.")
         self.line_items.remove(line_item)
+        self.update_totals()
+
+    def update_line_items(self, line_items: List[LineItem]) -> None:
+        if not line_items:
+            raise ValueError("Line item does not exists in the order.")
+        self.line_items =line_items
         self.update_totals()
 
     def update_order_quantity(self, product_sku: str, new_quantity: int):
@@ -188,11 +194,11 @@ class Order:
     def update_tax_details(self, tax_details: List[str]):
         self.tax_details = tax_details
 
-    def apply_coupon(self, coupon_code: str):
-        self.customer_coupons.append(coupon_code)
+    def apply_coupon(self, coupon_code: value_objects.Coupon):
+        self.coupons.append(coupon_code)
 
-    def remove_coupon(self, coupon_code: str):
-        self.customer_coupons.remove(coupon_code)
+    def remove_coupon(self, coupon_code: value_objects.Coupon):
+        self.coupons.remove(coupon_code)
     
     def update_shipping_details(self, shipping_details: value_objects.ShippingDetails):
         if not shipping_details:

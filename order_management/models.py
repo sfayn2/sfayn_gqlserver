@@ -21,7 +21,7 @@ class Order(models.Model):
     customer_first_name = models.CharField(max_length=255)
     customer_last_name = models.CharField(max_length=255)
     customer_email = models.EmailField(max_length=255, blank=True, null=True)
-    customer_coupons = models.CharField(
+    coupons = models.CharField(
         max_length=150,
         blank=True, 
         null=True, 

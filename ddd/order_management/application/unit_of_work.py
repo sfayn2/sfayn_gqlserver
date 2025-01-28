@@ -32,7 +32,7 @@ class AbstractUnitOfWork(ABC):
         raise NotImplementedError
 
 
-class DjangoUnitOfWork(AbstractUnitOfWork):
+class DjangoOrderUnitOfWork(AbstractUnitOfWork):
     #make sure to call uow within block statement
     #to trigger this
     def __init__(self):

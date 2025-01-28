@@ -8,3 +8,13 @@ class CheckoutResponseDTO(BaseModel):
     order_id: str
     order_status: str
     message: str
+
+class PlaceOrderResponseDTO(BaseModel):
+    order_id: str
+    order_status: str
+    message: str
+    tax_details: List[str]
+    offer_details: List[str]
+    tax_amount: dtos.MoneyDTO
+    total_discounts_fee: dtos.MoneyDTO
+    final_amount: dtos.MoneyDTO

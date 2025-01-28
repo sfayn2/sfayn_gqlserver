@@ -8,6 +8,12 @@ from dataclasses import asdict
 from typing import List, Optional, Tuple
 from ddd.order_management.domain import value_objects, models, enums
 
+class CouponDTO(BaseModel):
+    coupon_code: str
+
+    def to_domain(self) -> value_objects.Coupon:
+        return value_objects.Coupon(**self.model_dump())
+
 class CustomerDetailsDTO(BaseModel):
     first_name: str
     last_name: str
@@ -128,7 +134,7 @@ class ShippingDetailsDTO(BaseModel):
     method: enums.ShippingMethod
     delivery_time: str
     cost: MoneyDTO
-    orig_cost: MoneyDTO
+    #orig_cost: MoneyDTO
 
     def to_domain(self) -> value_objects.ShippingDetails:
         return value_objects.ShippingDetails(**self.model_dump())
@@ -157,7 +163,7 @@ class OrderDTO(BaseModel):
     total_amount: Optional[MoneyDTO]
     final_amount: Optional[MoneyDTO]
     shipping_reference: Optional[str] = Field(json_schema_extra=AliasChoices('shipping_tracking_reference', 'shipping_reference'))
-    customer_coupons: Optional[List[str]]
+    coupons: Optional[List[str]]
     order_status: enums.OrderStatus
     date_modified: Optional[datetime]
 
@@ -179,7 +185,7 @@ class OrderDTO(BaseModel):
             total_amount=self.total_amount.to_domain(),
             final_amount=self.final_amount.to_domain(),
             shipping_reference=self.shipping_reference,
-            customer_coupons=self.customer_coupons,
+            coupons=self.coupons,
             order_status=self.order_status,
             date_modified=self.date_modified
         )
@@ -212,7 +218,7 @@ class OrderDTO(BaseModel):
                     'total_amount': self.total_amount.amount if self.total_amount else None, 
                     'final_amount': self.final_amount.amount if self.final_amount else None, 
                     'shipping_tracking_reference': self.shipping_reference, 
-                    'customer_coupons': self.customer_coupons if self.customer_coupons else [], 
+                    'coupons': self.coupons if self.coupons else [], 
                     'order_status': self.order_status.value, 
                     'date_modified': self.date_modified
                 }
@@ -281,7 +287,7 @@ class OrderDTO(BaseModel):
                 currency=django_order.currency
             ),
             shipping_reference=django_order.shipping_tracking_reference,
-            customer_coupons=ast.literal_eval(django_order.customer_coupons),
+            coupons=ast.literal_eval(django_order.coupons),
             order_status=django_order.order_status
         )
 
@@ -308,7 +314,7 @@ class OrderDTO(BaseModel):
             total_amount=total_amount,
             final_amount=final_amount,
             shipping_reference=order.shipping_reference,
-            customer_coupons=order.customer_coupons,
+            coupons=order.coupons,
             order_status=order.order_status,
             customer_details=CustomerDetailsDTO(**asdict(order.customer_details)),
             line_items=[

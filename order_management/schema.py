@@ -34,6 +34,14 @@ class CustomerDetailsInput(graphene.InputObjectType):
     last_name = graphene.String(required=True)
     email = graphene.String(required=True)
 
+class ShippingDetailsInput(graphene.InputObjectType):
+    method = graphene.String(required=True)
+    delivery_time = graphene.String(required=True)
+    cost = graphene.Field(MoneyInput, required=True)
+
+class CouponInput(graphene.InputObjectType):
+    coupon_code = graphene.String(required=True)
+
 class CheckoutOrderMutation(relay.ClientIDMutation):
     class Input:
         customer_details = graphene.Field(CustomerDetailsInput, required=True)
@@ -48,7 +56,7 @@ class CheckoutOrderMutation(relay.ClientIDMutation):
     def mutate_and_get_payload(cls, root, info, **input):
         command = commands.CheckoutCommand.model_validate(input)
 
-        order = message_bus.handle(command, unit_of_work.DjangoUnitOfWork())
+        order = message_bus.handle(command, unit_of_work.DjangoOrderUnitOfWork())
 
         response_dto = dtos.CheckoutResponseDTO(
             order_id=order.order_id,
@@ -58,7 +66,49 @@ class CheckoutOrderMutation(relay.ClientIDMutation):
 
         return cls(**response_dto.model_dump())
 
+class PlaceOrderMutation(relay.ClientIDMutation):
+    class Input:
+        order_id = graphene.String()
+        customer_details = graphene.Field(CustomerDetailsInput, required=True)
+        shipping_address = graphene.Field(AddressInput, required=True)
+        line_items = graphene.List(LineItemInput, required=True)
+        shipping_details = graphene.Field(ShippingDetailsInput, required=True)
+        coupons = graphene.List(CouponInput, required=False)
+
+    order_id = graphene.String()
+    order_status = graphene.String()
+    message = graphene.String()
+    tax_details = graphene.List(graphene.String)
+    offer_details = graphene.List(graphene.String)
+    tax_amount  = graphene.Field(MoneyInput)
+    total_discounts_fee = graphene.Field(MoneyInput)
+    final_amount = graphene.Field(MoneyInput)
+
+    @classmethod
+    def mutate_and_get_payload(cls, root, info, **input):
+        command = commands.PlaceOrderCommand.model_validate(input)
+
+        order = message_bus.handle(command, unit_of_work.DjangoOrderUnitOfWork)
+
+        #placed order status only in Pending; once payment is confirmed ; webhook will trigger and call api to confirm order
+        response_dto = dtos.PlaceOrderResponseDTO(
+            order_id=order.order_id,
+            order_status=order.order_status,
+            message="Order successfully placed.",
+            tax_details=order.tax_details,
+            offer_details=order.offer_details,
+            tax_amount=order.tax_amount,
+            total_discounts_fee=order.total_discounts_fee,
+            final_amount=order.final_amount
+        )
+
+        return cls(**response_dto.model_dump())
+
+
+
 """
+Sample CheckOrderMutation mutation
+
 mutation {
   checkoutOrder(input: {
     customerDetails: {
@@ -95,6 +145,72 @@ mutation {
     orderId
     orderStatus
     message
+  }
+}
+"""
+
+"""
+Sample PlaceOrderMutation mutation
+
+mutation {
+  checkoutOrder(input: {
+    customerDetails: {
+      firstName: "John",
+      lastName: "Doe",
+      email: "JohnDoe@gmail.com"
+    },
+    shipping_address: {
+      street: "123 main street",
+      city: "New York",
+      state: "NYC",
+      postal: "1001",
+      country: "USA"
+    },
+    lineItems: [
+      {
+        productSku: "SKU1",
+        productName: "Product1",
+        vendorName: "Vendor1",
+        productCategory: "Category1",
+        orderQuantity: 1,
+        options: {color:"red"},
+        productPrice: {
+          amount: 2.1,
+          currency: "SGD"
+        },
+        package: {
+          weight: 1.5,
+          dimensions: [10, 10, 10]
+        }
+      }
+    ],
+    shippingDetails: {
+      method: "STANDARD",
+      deliveryTime: "3-5 business days",
+      cost: {
+        amount: 5.99,
+        currency: "SGD"
+      }
+    },
+    coupons: ["WELCOME25"]
+  }) {
+    orderId
+    orderStatus
+    message
+    taxDetails
+    offerDetails
+    taxAmount {
+      amount
+      currency
+    }
+    totalDiscountsFee {
+      amount
+      currency
+    }
+    finalAmount {
+      amount
+      currency
+    }
   }
 }
 """

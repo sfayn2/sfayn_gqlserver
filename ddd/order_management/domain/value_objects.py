@@ -5,6 +5,10 @@ from decimal import Decimal
 from ddd.order_management.domain import enums
 
 @dataclass(frozen=True)
+class Coupon:
+    coupon_code: str
+
+@dataclass(frozen=True)
 class Money:
     amount: Decimal
     currency: str
@@ -84,7 +88,7 @@ class ShippingDetails:
     method: enums.ShippingMethod
     delivery_time: str
     cost: Money
-    orig_cost: Money
+    #orig_cost: Money
 
     def __post_init__(self):
         if not self.method:
@@ -102,8 +106,7 @@ class ShippingDetails:
     def update_cost(self, new_cost: Money):
         return ShippingDetails(method=self.method, 
                                delivery_time=self.delivery_time, 
-                               cost=new_cost, 
-                               orig_cost=self.orig_cost
+                               cost=new_cost
                             )
 
     

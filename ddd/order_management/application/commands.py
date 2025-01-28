@@ -13,6 +13,14 @@ class CheckoutCommand(Command):
     address: dtos.AddressDTO
     line_items: List[dtos.LineItemDTO]
 
+class PlaceOrderCommand(Command):
+    order_id: str
+    customer_details: dtos.CustomerDetailsDTO
+    shipping_address: dtos.AddressDTO
+    line_items: List[dtos.LineItemDTO]
+    shipping_details = dtos.ShippingDetailsDTO
+    coupons: List[dtos.CouponDTO]
+
 class ConfirmOrderCommand(Command):
     order_id: str
 
