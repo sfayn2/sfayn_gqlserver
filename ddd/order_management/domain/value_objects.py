@@ -8,6 +8,10 @@ from ddd.order_management.domain import enums
 class Coupon:
     coupon_code: str
 
+    def __post_init__(self):
+        if not self.coupon_code:
+            raise ValueError("Coupon code cannot be empty.")
+
 @dataclass(frozen=True)
 class Money:
     amount: Decimal
@@ -59,6 +63,13 @@ class Address:
     state: str
     # make use of country to country code converter if require?
 
+    def __post_init__(self):
+        if not self.street or not self.city or not self.postal or not self.state:
+            raise ValueError("Address fields (street, city, postal, country, state) cannot be empty.")
+        if not isinstance(self.postal, int) or self.postal <= 0:
+            raise ValueError(f"Invalid postal code {self.postal}. It must be a positive integer.")
+        #TODO: validate country & state?
+
     def is_international(self, origin_country: str) -> bool:
         return self.country != origin_country
 
@@ -66,7 +77,17 @@ class Address:
 @dataclass(frozen=True)
 class Package:
     weight: Decimal #in kg
+    #weight_unit: str = "kg"
     dimensions: Tuple[int, int, int] # (length, width, height) in cm
+    #dimensions_unit: str = "cm"
+
+    def __post_init__(self):
+        if self.weight <= Decimal("0"):
+            raise ValueError("Weight must be greater than zero.")
+        if not isinstance(self.dimensions, tuple) and len(self.dimensions) == 3:
+            raise TypeError("Dimensions must be a tuple of length 3 (length, width, height)")
+        if any(d <= 0 for d in self.dimensions):
+            raise ValueError("All dimensions must be greater than zero.")
 
 
 @dataclass(frozen=True)
@@ -75,6 +96,19 @@ class PaymentDetails:
     paid_amount: Money
     transaction_id: str
 
+    def __post_init__(self):
+        if not self.method:
+            raise ValueError("Payment method is required.")
+
+        if not self.method in [item.value for item in enums.PaymentMethod]:
+            raise ValueError("Payment method not supported.")
+
+        if self.paid_amount.amount < Decimal("0"):
+            raise ValueError("Paid amount cannot be negative.")
+
+        if not self.method != enums.PaymentMethod.COD and not self.transaction_id:
+            raise ValueError("Transaction ID is required for non-COD payments.")
+
 
 #right now only for Gues customer
 @dataclass(frozen=True)    
@@ -82,6 +116,11 @@ class CustomerDetails:
     first_name: str
     last_name: str
     email: str
+
+    def __post_init__(self):
+        if not self.first_name or not self.last_name or not self.email:
+            raise ValueError("Customer details are incomplete.")
+        #TODO: validate email
 
 @dataclass(frozen=True)
 class ShippingDetails:
@@ -93,14 +132,24 @@ class ShippingDetails:
     def __post_init__(self):
         if not self.method:
             raise ValueError("Shipping method is required.")
+
+        if not self.delivery_time:
+            raise ValueError("Delivery time is required.")
+
+        if not self.method in [item.value for item in enums.ShippingMethod]:
+            raise ValueError("Shipping method not supported.")
+
+        if self.cost.amount < Decimal("0"):
+            raise ValueError("Shipping cost cannot be negative.")
+
         
     #make use of order.update_shipping_details to take effect
-    def reset_cost(self):
-        return ShippingDetails(method=self.method, 
-                               delivery_time=self.delivery_time, 
-                               cost=self.orig_cost, 
-                               orig_cost=self.orig_cost
-                            )
+    #def reset_cost(self):
+    #    return ShippingDetails(method=self.method, 
+    #                           delivery_time=self.delivery_time, 
+    #                           cost=self.orig_cost, 
+    #                           orig_cost=self.orig_cost
+    #                        )
 
     #make use of order.update_shipping_details to take effect
     def update_cost(self, new_cost: Money):

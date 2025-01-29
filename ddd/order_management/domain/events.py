@@ -1,40 +1,43 @@
 from abc import ABC
 from typing import List
 from dataclasses import dataclass
-from ddd.order_management.domain import value_objects, models
+from pydantic import BaseModel
+from ddd.order_management.domain import value_objects, models, enums
+from ddd.order_management.infrastructure import dtos
 
-class DomainEvent(ABC):
+class DomainEvent(BaseModel, frozen=True):
     pass
 
-@dataclass(frozen=True)
 class ProductCheckedout(DomainEvent):
     order_id: str
-    destination: value_objects.Address
-    customer_details: value_objects.CustomerDetails
-    line_items: List[models.LineItem]
+    destination: dtos.AddressDTO
+    customer_details: dtos.CustomerDetailsDTO
+    line_items: List[dtos.LineItemDTO]
 
-@dataclass
 class OrderPlaced(DomainEvent):
     order_id: str
-    customer_id: str
+    order_status: enums.OrderStatus
+    customer_details: dtos.CustomerDetailsDTO
+    shipping_details: dtos.ShippingDetailsDTO
+    line_items: List[dtos.LineItemDTO]
+    tax_details: List[str]
+    tax_amount: dtos.MoneyDTO
+    offer_details: List[str]
+    total_discounts_fee: dtos.MoneyDTO
+    final_amount: dtos.MoneyDTO
 
-@dataclass
 class OrderConfirmed(DomainEvent):
     order_id: str
 
-@dataclass
 class OrderShipped(DomainEvent):
     order_id: str
 
-@dataclass
 class OrderCancelled(DomainEvent):
     order_id: str
 
-@dataclass
 class OrderCompleted(DomainEvent):
     order_id: str
 
-@dataclass
 class PaymentApplied(DomainEvent):
     order_id: str
     amount: value_objects.Money

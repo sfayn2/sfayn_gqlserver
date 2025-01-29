@@ -35,10 +35,11 @@ def handle_place_order(command: commands.PlaceOrderCommand, uow: unit_of_work.Dj
             raise ValueError(f"Order w ID {command.order_id} not found.")
 
         order.update_customer_details(command.customer_details.to_domain())
+        order.update_destination(command.shipping_address.to_domain())
         order.update_shipping_details(command.shipping_details.to_domain())
         order.apply_coupon(command.coupons.to_domain())
         order.update_line_items([item.to_domain() for item in command.line_items])
-
+        order.place_order()
 
         event = events.OrderPlaced(
             order_id=order.order_id,

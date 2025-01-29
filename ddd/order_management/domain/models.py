@@ -123,7 +123,7 @@ class Order:
 
     def update_line_items(self, line_items: List[LineItem]) -> None:
         if not line_items:
-            raise ValueError("Line item does not exists in the order.")
+            raise exceptions.InvalidOrderOperation("Line items cannot be none.")
         self.line_items =line_items
         self.update_totals()
 
@@ -133,52 +133,56 @@ class Order:
                 line_item.update_order_quantity(new_quantity)
                 self.update_totals()
                 return
-        raise ValueError(f"Product w Sku {product_sku} not found in the order.")
+        raise exceptions.InvalidOrderOperation(f"Product w Sku {product_sku} not found in the order.")
 
     def place_order(self):
         if not self.line_items:
-            raise exceptions.InvalidOrderOperation("Canno place an order without line items.")
+            raise exceptions.InvalidOrderOperation("Cannot place an order without line items.")
         if not self.shipping_details:
             raise exceptions.InvalidOrderOperation("Order must have a selected Shipping method")
-        self.order_status = enums.OrderStatus.PENDING.name
+        self.order_status = enums.OrderStatus.PENDING.value
         self.update_modified_date()
 
     def confirm_order(self, payment_verified: bool):
-        if self.order_status != enums.OrderStatus.PENDING.name:
+        if self.order_status != enums.OrderStatus.PENDING.value:
             raise exceptions.InvalidOrderOperation("Only pending orders can be confirmed.")
         if not payment_verified:
             raise exceptions.InvalidOrderOperation("Order cannot be confirmed without verified payment.")
 
-        self.order_status = enums.OrderStatus.CONFIRMED.name
+        self.order_status = enums.OrderStatus.CONFIRMED.value
         self.update_modified_date()
 
     def update_payment_details(self, payment_details: value_objects.PaymentDetails):
+        if not payment_details:
+            raise exceptions.InvalidOrderOperation("Payment details cannot be none.")
         self.payment_details = payment_details
 
     def update_customer_details(self, customer_details: value_objects.CustomerDetails):
+        if not customer_details:
+            raise exceptions.InvalidOrderOperation("Customer details cannot be none.")
         self.customer_details = customer_details
 
     def mark_as_shipped(self):
-        if self.order_status != enums.OrderStatus.CONFIRMED.name:
+        if self.order_status != enums.OrderStatus.CONFIRMED.value:
             raise exceptions.InvalidOrderOperation("Only confirm order can mark as shipped.")
-        self.order_status = enums.OrderStatus.SHIPPED.name
+        self.order_status = enums.OrderStatus.SHIPPED.value
         self.update_modified_date()
 
     def cancel_order(self, cancellation_reason: str):
-        if not self.order_status in (enums.OrderStatus.PENDING.name, enums.OrderStatus.CONFIRMED.name):
+        if not self.order_status in (enums.OrderStatus.PENDING.value, enums.OrderStatus.CONFIRMED.value):
             raise exceptions.InvalidOrderOperation("Cannot cancel a completed or already cancelled order or shipped order")
-        self.order_status = enums.OrderStatus.CANCELLED.name
+        self.order_status = enums.OrderStatus.CANCELLED.value
         self.cancellation_reason = cancellation_reason
         self.update_modified_date()
     
     def mark_as_completed(self):
-        if self.order_status != enums.OrderStatus.SHIPPED.name:
+        if self.order_status != enums.OrderStatus.SHIPPED.value:
             raise exceptions.InvalidOrderOperation("Only shipped order can mark as completed.")
 
         if self.payment_details.method == enums.PaymentMethod.COD and not self.payment_details:
             raise exceptions.InvalidOrderOperation("Cannot mark as completed with outstanding payments.")
 
-        self.order_status = enums.OrderStatus.COMPLETED.name
+        self.order_status = enums.OrderStatus.COMPLETED.value
         self.update_modified_date()
 
     def add_shipping_tracking_reference(self, shipping_reference: str):
@@ -195,10 +199,20 @@ class Order:
         self.tax_details = tax_details
 
     def apply_coupon(self, coupon_code: value_objects.Coupon):
+        if not coupon_code:
+            raise exceptions.InvalidOrderOperation("Coupon code cannot be none.")
         self.coupons.append(coupon_code)
 
     def remove_coupon(self, coupon_code: value_objects.Coupon):
+        if not coupon_code:
+            raise exceptions.InvalidOrderOperation("Coupon code cannot be none.")
         self.coupons.remove(coupon_code)
+
+    def update_destination(self, destination: value_objects.Address):
+        if not destination:
+            raise exceptions.InvalidOrderOperation("Destination cannot be none.")
+        self.destination = destination
+        self.update_modified_date()
     
     def update_shipping_details(self, shipping_details: value_objects.ShippingDetails):
         if not shipping_details:
@@ -213,8 +227,7 @@ class Order:
                 self.update_shipping_details(value_objects.ShippingDetails(
                         method=option.get("name"),
                         delivery_time=option.get("delivery_time"),
-                        cost=option.get("cost"),
-                        orig_cost=option.get("cost")
+                        cost=option.get("cost")
                     )
                 )
                 return
@@ -249,6 +262,9 @@ class Order:
         #TODO: reset free gifts??
 
     def calculate_final_amount(self):
+        if not self.tax_details:
+            raise exceptions.InvalidOrderOperation("No tax calculation has been applied.")
+
         #make sure to call apply_offers & apply_taxes
         self.final_amount = (
                 self.total_amount 
@@ -271,7 +287,6 @@ class Order:
     def currency(self) -> str:
         #assuming invariants
         return self.line_items[0].product_price.currency
-        #return self._currency
 
     @property
     def vendor_name(self) -> str:
