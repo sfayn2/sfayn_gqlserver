@@ -4,7 +4,8 @@ from ddd.order_management.application import unit_of_work, handlers, commands
 from ddd.order_management.domain import events
 
 COMMAND_HANDLERS = {
-    commands.CheckoutCommand: handlers.handle_checkout
+    commands.DraftOrderCommand: handlers.handler_draft_order,
+    commands.PlaceOrderCommand: handlers.handle_place_order
 }
 
 EVENT_HANDLERS = {

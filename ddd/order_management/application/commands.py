@@ -8,7 +8,7 @@ from ddd.order_management.infrastructure import dtos
 class Command(BaseModel, frozen=True):
     pass
 
-class CheckoutCommand(Command):
+class DraftOrderCommand(Command):
     customer_details: dtos.CustomerDetailsDTO
     address: dtos.AddressDTO
     line_items: List[dtos.LineItemDTO]

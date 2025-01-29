@@ -2,6 +2,21 @@ from typing import List
 from ddd.order_management.domain import models, value_objects
 from ddd.order_management.domain.services import tax_service, offer_service
 
+def draft_order(
+    customer_details: value_objects.CustomerDetails,
+    destination: value_objects.Address,
+    line_items: List[models.LineItem]
+) -> models.Order:
+
+    order = models.Order.create_draft_order(
+        destination=destination,
+        customer_details=customer_details,
+        line_items=line_items
+    )
+
+    return order
+
+
 def place_order(
         order:  models.Order,
         customer_details: value_objects.CustomerDetails,

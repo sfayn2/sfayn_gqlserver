@@ -54,7 +54,7 @@ class CheckoutOrderMutation(relay.ClientIDMutation):
 
     @classmethod
     def mutate_and_get_payload(cls, root, info, **input):
-        command = commands.CheckoutCommand.model_validate(input)
+        command = commands.DraftOrderCommand.model_validate(input)
 
         order = message_bus.handle(command, unit_of_work.DjangoOrderUnitOfWork())
 

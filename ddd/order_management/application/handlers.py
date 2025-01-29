@@ -5,27 +5,27 @@ from ddd.order_management.application import commands, unit_of_work
 from ddd.order_management.domain import models, events, value_objects, enums
 from ddd.order_management.domain.services import order_service, offer_service, tax_service
 
-def handle_checkout(command: commands.CheckoutCommand, uow: unit_of_work.DjangoOrderUnitOfWork):
+def handler_draft_order(command: commands.DraftOrderCommand, uow: unit_of_work.DjangoOrderUnitOfWork):
     with uow:
 
-        order = models.Order.create_draft_order(
+        draft_order = order_service.draft_order(
             destination=command.address.to_domain(),
             customer_details=command.customer_details.to_domain(),
             line_items=[item.to_domain() for item in command.line_items]
         )
 
         event = events.ProductCheckedout(
-            order_id=order.order_id,
-            destination=order.destination,
-            customer_details=order.customer_details,
-            line_items=order.line_items
+            order_id=draft_order.order_id,
+            destination=draft_order.destination,
+            customer_details=draft_order.customer_details,
+            line_items=draft_order.line_items
         )
 
-        uow.order.save(order)
+        uow.order.save(draft_order)
         uow.commit()
 
         #results, event
-        return order, event
+        return draft_order, event
 
 def handle_place_order(command: commands.PlaceOrderCommand, uow: unit_of_work.DjangoOrderUnitOfWork):
     with uow:
@@ -64,4 +64,4 @@ def handle_place_order(command: commands.PlaceOrderCommand, uow: unit_of_work.Dj
         uow.commit()
 
         #results, event
-        return order, event
+        return placed_order, event
