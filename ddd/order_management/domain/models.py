@@ -113,25 +113,25 @@ class Order:
         self._validate_line_item(line_item)
 
         self.line_items.add(line_item)
-        self.update_totals()
+        self._update_totals()
 
     def remove_line_item(self, line_item: LineItem) -> None:
         if not line_item:
             raise ValueError("Line item does not exists in the order.")
         self.line_items.remove(line_item)
-        self.update_totals()
+        self._update_totals()
 
     def update_line_items(self, line_items: List[LineItem]) -> None:
         if not line_items:
             raise exceptions.InvalidOrderOperation("Line items cannot be none.")
         self.line_items =line_items
-        self.update_totals()
+        self._update_totals()
 
     def update_order_quantity(self, product_sku: str, new_quantity: int):
         for line_item in self.line_items:
             if line_item.product_sku == product_sku:
                 line_item.update_order_quantity(new_quantity)
-                self.update_totals()
+                self._update_totals()
                 return
         raise exceptions.InvalidOrderOperation(f"Product w Sku {product_sku} not found in the order.")
 
@@ -233,12 +233,11 @@ class Order:
                 return
         raise exceptions.InvalidOrderOperation(f"Shipping option not supported: {shipping_option}")
 
-    def update_totals(self):
+    def _update_totals(self):
         self.total_amount = value_objects.Money(
             amount=sum(line.total_price for line in self.line_items),
             currency=self.currency
         )
-        self.calculate_final_amount()
 
     def update_total_discounts_fee(self, total_discounts: value_objects.Money):
         self.total_discounts_fee = total_discounts
@@ -258,7 +257,7 @@ class Order:
                 currency=self.currency
             )
         )
-        self.update_totals()
+        self._update_totals()
         #TODO: reset free gifts??
 
     def calculate_final_amount(self):
