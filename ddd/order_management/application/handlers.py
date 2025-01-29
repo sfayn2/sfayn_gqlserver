@@ -60,7 +60,7 @@ def handle_place_order(command: commands.PlaceOrderCommand, uow: unit_of_work.Dj
             final_amount=placed_order.final_amount
         )
 
-        uow.order.save(order)
+        uow.order.save(placed_order)
         uow.commit()
 
         #results, event

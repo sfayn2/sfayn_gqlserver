@@ -16,12 +16,14 @@ def place_order(
     order.update_customer_details(customer_details)
     order.update_destination(shipping_address)
     order.update_shipping_details(shipping_details)
-    for coupon in coupons:
-        order.apply_coupon(coupon)
     order.update_line_items(line_items)
 
+    for coupon in coupons:
+        order.apply_coupon(coupon)
     offer_service.apply_offers(order)
+
     tax_service.apply_taxes(order)
+
     order.calculate_final_amount()
     
     order.place_order()
