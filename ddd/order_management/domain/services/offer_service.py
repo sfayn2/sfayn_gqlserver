@@ -29,7 +29,7 @@ class OfferStrategy(ABC):
         #reuse if the offer is based on coupon
         return (self.requires_coupon == True
             and (datetime.now() >= self.start_date and datetime.now() <= self.end_date)
-            and self.coupon_code in order.customer_coupons
+            and self.coupon_code in order.coupons
         )
 
     def validate_minimum_quantity(self, order:models.Order):
@@ -75,10 +75,10 @@ class FreeGiftOfferStrategy(OfferStrategy):
                 # add free product gifts
                 order.add_line_item(
                     value_objects.LineItem(
-                        _product_sku=free_product.get('sku'),
-                        _product_price=value_objects.Money(0, currency),
-                        _order_quantity=free_product.get('quantity'),
-                        _is_free_gift=True
+                        product_sku=free_product.get('sku'),
+                        product_price=value_objects.Money(0, currency),
+                        order_quantity=free_product.get('quantity'),
+                        is_free_gift=True
                     )
                 )
                 return f"{self.description} applied ( {','.join(free_gifts)} )"
@@ -137,9 +137,9 @@ class OfferStrategyService:
         self.vendor_repository = vendor_repository
 
     def apply_offers(self, order: models.Order):
-        if not self.order.shipping_details:
+        if not order.shipping_details:
             raise exceptions.InvalidOrderOperation("Only when shipping option is selected.")
-        available_offers = self._fetch_valid_offers(order.vendor)
+        available_offers = self._fetch_valid_offers(order.vendor_name)
         offer_details = []
         for strategy in available_offers:
             offer_details.append(

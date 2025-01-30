@@ -35,7 +35,7 @@ def place_order(
 
     for coupon in coupons:
         order.apply_coupon(coupon)
-    #offer_service.apply_offers(order)
+    offer_service.apply_offers(order)
 
     tax_service.apply_taxes(order)
 

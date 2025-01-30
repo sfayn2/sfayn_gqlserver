@@ -239,7 +239,6 @@ class Order:
 
     def update_total_discounts_fee(self, total_discounts: value_objects.Money):
         self.total_discounts_fee = total_discounts
-        self.calculate_final_amount()
 
     def reset_order_details(self):
         #reset offers free shipping + discounts + free gifts

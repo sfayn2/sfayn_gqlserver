@@ -4,6 +4,7 @@ from datetime import datetime
 from ddd.order_management.application import commands, unit_of_work
 from ddd.order_management.domain import models, events, value_objects, enums
 from ddd.order_management.domain.services import order_service, offer_service, tax_service
+from ddd.order_management.infrastructure import django_vendor_repository
 
 def handler_draft_order(command: commands.DraftOrderCommand, uow: unit_of_work.DjangoOrderUnitOfWork):
     with uow:
@@ -35,7 +36,9 @@ def handle_place_order(command: commands.PlaceOrderCommand, uow: unit_of_work.Dj
         if not order:
             raise ValueError(f"Order w ID {command.order_id} not found.")
 
-        #offer_service = offer_service.OfferStrategyService()
+        offer_svc = offer_service.OfferStrategyService(
+            django_vendor_repository.DjangoVendorRepository()
+        )
 
 
         placed_order = order_service.place_order(
@@ -46,7 +49,7 @@ def handle_place_order(command: commands.PlaceOrderCommand, uow: unit_of_work.Dj
             coupons=[item.to_domain() for item in command.coupons],
             line_items=[item.to_domain() for item in command.line_items],
             tax_service=tax_service.TaxStrategyService(),
-            offer_service=offer_service
+            offer_service=offer_svc
         )
 
 
