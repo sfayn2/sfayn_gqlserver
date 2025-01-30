@@ -28,4 +28,3 @@ CSRF_COOKIE_NAME = "_csrf-s"
 VIEW_SITE_URL = "/sfayn-gql/graphql/"
 SESSION_COOKIE_NAME = "_s-id"
 
-

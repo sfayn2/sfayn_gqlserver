@@ -13,10 +13,10 @@ class SingaporeTaxStrategy(TaxStrategy):
 
     def apply(self, order: models.Order):
         if order.destination.country.lower() == "singapore":
-            current_tax = order.get_tax_amount()
-            tax_amount = order.get_total_amount().add(
+            current_tax = order.tax_amount
+            tax_amount = order.total_amount.add(
                     order.shipping_details.cost
-                ).multiply(self.GST_RATE)
+                ).multiply(self.GST_RATE).format()
 
             if current_tax:
                 order.update_tax_amount(
@@ -25,7 +25,7 @@ class SingaporeTaxStrategy(TaxStrategy):
             else:
                 order.update_tax_amount(tax_amount)
 
-            return f"GST ({self.GST_RATE*100} %) : {order.get_tax_amount()}"
+            return f"GST ({self.GST_RATE*100} %) | {order.tax_amount.amount} {order.tax_amount.currency}"
 
 class USStateTaxStrategy(TaxStrategy):
     STATE_TAX_RATES = {
@@ -38,8 +38,8 @@ class USStateTaxStrategy(TaxStrategy):
         if order.destination.country.lower() == "united states":
             state = order.destination.state
             state_tax_rate = self.STATE_TAX_RATES.get(state, 0)
-            current_tax = order.get_tax_amount()
-            tax_amount = order.get_total_amount().add(
+            current_tax = order.tax_amount
+            tax_amount = order.total_amount.add(
                     order.shipping_details.cost
                 ).multiply(state_tax_rate)
 
@@ -50,7 +50,7 @@ class USStateTaxStrategy(TaxStrategy):
             else:
                 order.update_tax_amount(tax_amount)
 
-            return f"{state} State Tax ({state_tax_rate*100} %) : {order.get_tax_amount()}"
+            return f"{state} State Tax ({state_tax_rate*100} %) | {order.tax_amount.amount} {order.tax_amount.currency}"
 
 TAX_STRATEGIES = [
     SingaporeTaxStrategy(),
@@ -61,7 +61,7 @@ class TaxStrategyService:
 
     def apply_taxes(self, order: models.Order):
         tax_details = []
-        currency = order.get_currency()
+        currency = order.currency
 
         #Reset tax amount
         order.update_tax_amount(
@@ -72,9 +72,9 @@ class TaxStrategyService:
         )
 
         for tax_strategy in TAX_STRATEGIES:
-            tax_details.append(
-                tax_strategy.apply(order)
-            )
+            res = tax_strategy.apply(order)
+            if res:
+                tax_details.append(res)
 
         order.update_tax_details(tax_details)
 

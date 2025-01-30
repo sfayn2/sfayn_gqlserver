@@ -1,10 +1,20 @@
 import graphene
+import logging
+from dataclasses import asdict
 from graphene import relay
 from graphene.types.generic import GenericScalar
 from ddd.order_management.application import message_bus, dtos, commands, unit_of_work
-from ddd.order_management.domain import enums
+from ddd.order_management.domain import enums, exceptions
+from ddd.order_management.infrastructure import dtos as infra_dtos
+
+#logger = logging.getLogger("django")
+logger = logging.getLogger(__name__)
 
 class MoneyInput(graphene.InputObjectType):
+    amount = graphene.Float(required=True)
+    currency = graphene.String(required=True)
+
+class MoneyType(graphene.ObjectType):
     amount = graphene.Float(required=True)
     currency = graphene.String(required=True)
 
@@ -50,19 +60,35 @@ class CheckoutOrderMutation(relay.ClientIDMutation):
 
     order_id = graphene.String()
     order_status = graphene.String()
+    success = graphene.Boolean()
     message = graphene.String()
 
     @classmethod
     def mutate_and_get_payload(cls, root, info, **input):
-        command = commands.DraftOrderCommand.model_validate(input)
+        try: 
+            command = commands.DraftOrderCommand.model_validate(input)
 
-        order = message_bus.handle(command, unit_of_work.DjangoOrderUnitOfWork())
+            order = message_bus.handle(command, unit_of_work.DjangoOrderUnitOfWork())
 
-        response_dto = dtos.CheckoutResponseDTO(
-            order_id=order.order_id,
-            order_status=order.order_status,
-            message="Order successfully created."
-        )
+            response_dto = dtos.CheckoutResponseDTO(
+                order_id=order.order_id,
+                order_status=order.order_status,
+                success=True,
+                message="Order successfully created."
+            )
+
+        except (exceptions.InvalidOrderOperation, ValueError) as e:
+            logger.error(f"{e}")
+            response_dto = dtos.ResponseWExceptionDTO(
+                success=False,
+                message=str(e)
+            )
+        except Exception as e:
+            logger.error(f"Unexpected error during checkout {e}", exc_info=True)
+            response_dto = dtos.ResponseWExceptionDTO(
+                success=False,
+                message="An unexpected error occured. Please contact support."
+            )
 
         return cls(**response_dto.model_dump())
 
@@ -77,30 +103,47 @@ class PlaceOrderMutation(relay.ClientIDMutation):
 
     order_id = graphene.String()
     order_status = graphene.String()
+    success = graphene.String()
     message = graphene.String()
     tax_details = graphene.List(graphene.String)
     offer_details = graphene.List(graphene.String)
-    tax_amount  = graphene.Field(MoneyInput)
-    total_discounts_fee = graphene.Field(MoneyInput)
-    final_amount = graphene.Field(MoneyInput)
+    tax_amount  = graphene.Field(MoneyType)
+    total_discounts_fee = graphene.Field(MoneyType)
+    final_amount = graphene.Field(MoneyType)
 
     @classmethod
     def mutate_and_get_payload(cls, root, info, **input):
-        command = commands.PlaceOrderCommand.model_validate(input)
+        try:
+            command = commands.PlaceOrderCommand.model_validate(input)
 
-        order = message_bus.handle(command, unit_of_work.DjangoOrderUnitOfWork)
+            order = message_bus.handle(command, unit_of_work.DjangoOrderUnitOfWork())
 
-        #placed order status only in Pending; once payment is confirmed ; webhook will trigger and call api to confirm order
-        response_dto = dtos.PlaceOrderResponseDTO(
-            order_id=order.order_id,
-            order_status=order.order_status,
-            message="Order successfully placed.",
-            tax_details=order.tax_details,
-            offer_details=order.offer_details,
-            tax_amount=order.tax_amount,
-            total_discounts_fee=order.total_discounts_fee,
-            final_amount=order.final_amount
-        )
+            #placed order status only in Pending; once payment is confirmed ; webhook will trigger and call api to confirm order
+            response_dto = dtos.PlaceOrderResponseDTO(
+                order_id=order.order_id,
+                order_status=order.order_status,
+                success=True,
+                message="Order successfully placed.",
+                tax_details=order.tax_details,
+                offer_details=order.offer_details,
+                tax_amount=asdict(order.tax_amount),
+                total_discounts_fee=asdict(order.total_discounts_fee),
+                final_amount=asdict(order.final_amount)
+            )
+
+        except (exceptions.InvalidOrderOperation, ValueError) as e:
+            logger.error(f"{e}")
+            response_dto = dtos.ResponseWExceptionDTO(
+                success=False,
+                message=str(e)
+            )
+        except Exception as e:
+            logger.error(f"Unexpected error during place order {e}", exc_info=True)
+            response_dto = dtos.ResponseWExceptionDTO(
+                success=False,
+                message="An unexpected error occured. Please contact support."
+            )
+
 
         return cls(**response_dto.model_dump())
 
@@ -144,6 +187,7 @@ mutation {
   }) {
     orderId
     orderStatus
+    success
     message
   }
 }
@@ -153,13 +197,14 @@ mutation {
 Sample PlaceOrderMutation mutation
 
 mutation {
-  checkoutOrder(input: {
+  placeOrder(input: {
+    orderId: "ORD-CAB3E0E2"
     customerDetails: {
       firstName: "John",
       lastName: "Doe",
       email: "JohnDoe@gmail.com"
     },
-    shipping_address: {
+    shippingAddress: {
       street: "123 main street",
       city: "New York",
       state: "NYC",
@@ -185,17 +230,18 @@ mutation {
       }
     ],
     shippingDetails: {
-      method: "STANDARD",
+      method: "Standard",
       deliveryTime: "3-5 business days",
       cost: {
         amount: 5.99,
         currency: "SGD"
       }
     },
-    coupons: ["WELCOME25"]
+    coupons: [{ couponCode:"WELCOME25"}]
   }) {
     orderId
     orderStatus
+    success
     message
     taxDetails
     offerDetails

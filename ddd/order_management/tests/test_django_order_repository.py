@@ -105,10 +105,6 @@ def domain_order(domain_line_item):
                 amount=Decimal("10.00"),
                 currency="SGD"    
             ),
-            orig_cost=value_objects.Money(
-                amount=Decimal("10.00"),
-                currency="SGD"    
-            )
         ),
         payment_details=value_objects.PaymentDetails(
             method=enums.PaymentMethod.PAYPAL,

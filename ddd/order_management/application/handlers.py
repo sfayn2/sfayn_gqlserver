@@ -35,14 +35,17 @@ def handle_place_order(command: commands.PlaceOrderCommand, uow: unit_of_work.Dj
         if not order:
             raise ValueError(f"Order w ID {command.order_id} not found.")
 
+        #offer_service = offer_service.OfferStrategyService()
+
+
         placed_order = order_service.place_order(
             order=order,
             customer_details=command.customer_details.to_domain(),
             shipping_address=command.shipping_address.to_domain(),
             shipping_details=command.shipping_details.to_domain(),
-            coupons=command.coupons.to_domain(),
+            coupons=[item.to_domain() for item in command.coupons],
             line_items=[item.to_domain() for item in command.line_items],
-            tax_service=tax_service,
+            tax_service=tax_service.TaxStrategyService(),
             offer_service=offer_service
         )
 

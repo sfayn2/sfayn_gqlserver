@@ -11,4 +11,5 @@ __pycache__/
 *.orig
 *.sqlite3.*
 *.env.production
+django_logs
 media/

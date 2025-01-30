@@ -1,7 +1,7 @@
 from __future__ import annotations
 from dataclasses import dataclass
 from typing import Union, Tuple
-from decimal import Decimal
+from decimal import Decimal, ROUND_HALF_UP
 from ddd.order_management.domain import enums
 
 @dataclass(frozen=True)
@@ -28,6 +28,10 @@ class Money:
 
         if len(self.currency) != 3:
             raise ValueError("Currency must be a valid 3 character ISO code.")
+
+
+    def format(self) -> Money:
+        return Money(amount=Decimal(self.amount).quantize(Decimal("0.0001"), rounding=ROUND_HALF_UP), currency=self.currency)
 
     def add(self, other: Money) -> Money:
         if self.currency != other.currency:
@@ -100,10 +104,13 @@ class PaymentDetails:
         if not self.method:
             raise ValueError("Payment method is required.")
 
-        if not self.method in [item.value for item in enums.PaymentMethod]:
-            raise ValueError("Payment method not supported.")
+        if not self.paid_amount:
+            raise ValueError("Paid amount is required.")
 
-        if self.paid_amount.amount < Decimal("0"):
+        if not self.method.value in [item.value for item in enums.PaymentMethod]:
+            raise ValueError(f"Payment method {self.method.value} not supported.")
+
+        if self.paid_amount and self.paid_amount.amount < Decimal("0"):
             raise ValueError("Paid amount cannot be negative.")
 
         if not self.method != enums.PaymentMethod.COD and not self.transaction_id:
@@ -133,13 +140,16 @@ class ShippingDetails:
         if not self.method:
             raise ValueError("Shipping method is required.")
 
+        if not self.cost:
+            raise ValueError("Shipping cost is required.")
+
         if not self.delivery_time:
             raise ValueError("Delivery time is required.")
 
-        if not self.method in [item.value for item in enums.ShippingMethod]:
-            raise ValueError("Shipping method not supported.")
+        if not self.method.value in [item.value for item in enums.ShippingMethod]:
+            raise ValueError(f"Shipping method {self.method.value} not supported.")
 
-        if self.cost.amount < Decimal("0"):
+        if self.cost and self.cost.amount < Decimal("0"):
             raise ValueError("Shipping cost cannot be negative.")
 
         

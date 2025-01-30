@@ -11,7 +11,7 @@ COMMAND_HANDLERS = {
 EVENT_HANDLERS = {
 }
 
-def handle(message: Union[commands.Command, events.DomainEvent], uow: unit_of_work.DjangoUnitOfWork):
+def handle(message: Union[commands.Command, events.DomainEvent], uow: unit_of_work.DjangoOrderUnitOfWork):
     """ dispatch message to appropriate handler(s) """
     if isinstance(message, commands.Command):
         handler = COMMAND_HANDLERS.get(type(message))

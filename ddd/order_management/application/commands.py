@@ -18,7 +18,7 @@ class PlaceOrderCommand(Command):
     customer_details: dtos.CustomerDetailsDTO
     shipping_address: dtos.AddressDTO
     line_items: List[dtos.LineItemDTO]
-    shipping_details = dtos.ShippingDetailsDTO
+    shipping_details: dtos.ShippingDetailsDTO
     coupons: List[dtos.CouponDTO]
 
 class ConfirmOrderCommand(Command):

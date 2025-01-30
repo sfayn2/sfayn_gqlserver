@@ -174,3 +174,21 @@ PAYPAL_BASE_URL = ""
 STRIPE_API_KEY = os.getenv("STRIPE_API_KEY")
 STRIPE_BASE_URL = ""
 
+#LOGGING = {
+#    "version": 1,
+#    "disable_existing_loggers": False,
+#    "handlers": {
+#        "file": {
+#            "level": "ERROR",
+#            "class": "logging.FileHandler",
+#            "filename": "django_logs"
+#        },
+#    },
+#    "loggers": {
+#        "django": {
+#            "handlers": ["file"],
+#            "level": "ERROR",
+#            "propagate": True,
+#        },
+#    }
+#}

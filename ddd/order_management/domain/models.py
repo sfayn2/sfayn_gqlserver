@@ -42,7 +42,7 @@ class LineItem:
 
     @property
     def total_price(self) -> value_objects.Money:
-        return (self.product_price * self.order_quantity)
+        return self.product_price.multiply(self.order_quantity)
 
     @property
     def total_weight(self) -> Decimal:
@@ -190,7 +190,6 @@ class Order:
 
     def update_tax_amount(self, amount: value_objects.Money):
         self.tax_amount = amount
-        self.calculate_final_amount()
     
     def update_offer_details(self, offer_details: List[str]):
         self.offer_details = offer_details
@@ -218,7 +217,6 @@ class Order:
         if not shipping_details:
             raise exceptions.InvalidOrderOperation("Shipping details cannot be none.")
         self.shipping_details = shipping_details
-        self.calculate_final_amount()
         self.update_modified_date()
     
     def select_shipping_option(self, shipping_option: enums.ShippingMethod, shipping_options: List[dict]):
@@ -235,7 +233,7 @@ class Order:
 
     def _update_totals(self):
         self.total_amount = value_objects.Money(
-            amount=sum(line.total_price for line in self.line_items),
+            amount=sum(line.total_price.amount for line in self.line_items),
             currency=self.currency
         )
 
@@ -264,12 +262,10 @@ class Order:
         if not self.tax_details:
             raise exceptions.InvalidOrderOperation("No tax calculation has been applied.")
 
-        #make sure to call apply_offers & apply_taxes
+        #TODO revisit calculation
         self.final_amount = (
-                self.total_amount 
-                - self.total_discounts_fee
-                - self.tax_amount
-            ) + (self.shipping_details.cost if self.shipping_details else value_objects.Money(0, self.currency))
+                self.total_amount.subtract(self.total_discounts_fee).add(self.shipping_details.cost if self.shipping_details else value_objects.Money(0, self.currency))
+        ).add(self.tax_amount)
 
     @property
     def total_weight(self) -> Decimal:

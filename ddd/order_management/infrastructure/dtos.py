@@ -14,6 +14,12 @@ class CouponDTO(BaseModel):
     def to_domain(self) -> value_objects.Coupon:
         return value_objects.Coupon(**self.model_dump())
 
+    @staticmethod
+    def from_domain(coupon: value_objects.Coupon) -> CouponDTO:
+        return CouponDTO(
+            coupon_code=coupon.coupon_code
+        )
+
 class CustomerDetailsDTO(BaseModel):
     first_name: str
     last_name: str
@@ -83,12 +89,12 @@ class LineItemDTO(BaseModel):
             options=ast.literal_eval(django_line_item.options),
             product_price=MoneyDTO(
                 amount=django_line_item.product_price,
-                currency=django_line_item.currency
+                currency=django_line_item.product_currency
             ),
             order_quantity=django_line_item.order_quantity,
             package=PackageDTO(
-                weight=django_line_item.weight,
-                dimensions=[django_line_item.length, django_line_item.width, django_line_item.height] 
+                weight=django_line_item.package_weight,
+                dimensions=[django_line_item.package_length, django_line_item.package_width, django_line_item.package_height] 
             ),
             is_free_gift=django_line_item.is_free_gift,
             is_taxable=django_line_item.is_taxable
@@ -137,7 +143,14 @@ class ShippingDetailsDTO(BaseModel):
     #orig_cost: MoneyDTO
 
     def to_domain(self) -> value_objects.ShippingDetails:
-        return value_objects.ShippingDetails(**self.model_dump())
+        return value_objects.ShippingDetails(
+            method=self.method,
+            delivery_time=self.delivery_time,
+            cost=value_objects.Money(
+                amount=self.cost.amount,
+                currency=self.cost.currency
+            )
+        )
 
 class PaymentDetailsDTO(BaseModel):
     method: enums.PaymentMethod
@@ -145,7 +158,14 @@ class PaymentDetailsDTO(BaseModel):
     transaction_id: str
 
     def to_domain(self) -> value_objects.PaymentDetails:
-        return value_objects.PaymentDetails(**self.model_dump())
+        return value_objects.PaymentDetails(
+            method=self.method,
+            paid_amount=value_objects.Money(
+                amount=self.paid_amount.amount,
+                currency=self.paid_amount.currency
+            ),
+            transaction_id=self.transaction_id
+        )
 
 class OrderDTO(BaseModel):
     order_id: str
@@ -163,8 +183,9 @@ class OrderDTO(BaseModel):
     total_amount: Optional[MoneyDTO]
     final_amount: Optional[MoneyDTO]
     shipping_reference: Optional[str] = Field(json_schema_extra=AliasChoices('shipping_tracking_reference', 'shipping_reference'))
-    coupons: Optional[List[str]]
+    coupons: Optional[List[CouponDTO]]
     order_status: enums.OrderStatus
+    currency: str
     date_modified: Optional[datetime]
 
     def to_domain(self) -> models.Order:
@@ -175,8 +196,8 @@ class OrderDTO(BaseModel):
             destination=self.destination.to_domain(),
             line_items=line_items,
             customer_details=self.customer_details.to_domain(),
-            shipping_details=self.shipping_details.to_domain(),
-            payment_details=self.payment_details.to_domain(),
+            shipping_details=self.shipping_details.to_domain() if self.shipping_details else None,
+            payment_details=self.payment_details.to_domain() if self.payment_details else None,
             cancellation_reason=self.cancellation_reason,
             total_discounts_fee=self.total_discounts_fee.to_domain(),
             offer_details=self.offer_details,
@@ -203,11 +224,11 @@ class OrderDTO(BaseModel):
                     'customer_first_name': self.customer_details.first_name, 
                     'customer_last_name': self.customer_details.last_name, 
                     'customer_email': self.customer_details.email if self.customer_details else None, 
-                    'shipping_method': self.shipping_details.method if self.shipping_details else None, 
+                    'shipping_method': self.shipping_details.method.value if self.shipping_details else None, 
                     'shipping_delivery_time': self.shipping_details.delivery_time if self.shipping_details else None,
                     'shipping_cost': self.shipping_details.cost.amount if self.shipping_details else None,
                     'shipping_tracking_reference': self.shipping_reference,
-                    'payment_method': self.payment_details.method if self.payment_details else None,
+                    'payment_method': self.payment_details.method.value if self.payment_details else None,
                     'payment_reference': self.payment_details.transaction_id if self.payment_details else None,
                     'payment_amount': self.payment_details.paid_amount if self.payment_details else None, 
                     'cancellation_reason': self.cancellation_reason, 
@@ -218,8 +239,9 @@ class OrderDTO(BaseModel):
                     'total_amount': self.total_amount.amount if self.total_amount else None, 
                     'final_amount': self.final_amount.amount if self.final_amount else None, 
                     'shipping_tracking_reference': self.shipping_reference, 
-                    'coupons': self.coupons if self.coupons else [], 
+                    'coupons': [coupon.coupon_code for coupon in self.coupons], 
                     'order_status': self.order_status.value, 
+                    'currency': self.currency,
                     'date_modified': self.date_modified
                 }
         }
@@ -228,6 +250,28 @@ class OrderDTO(BaseModel):
 
     @staticmethod
     def from_django_model(django_order) -> OrderDTO:
+        shipping_details_dto = None
+        if django_order.shipping_method:
+            shipping_details_dto=ShippingDetailsDTO(
+                method=django_order.shipping_method,
+                delivery_time=django_order.shipping_delivery_time,
+                cost=MoneyDTO(
+                    amount=django_order.shipping_cost,
+                    currency=django_order.currency
+                )
+            )
+
+        payment_details_dto = None
+        if django_order.payment_method:
+            payment_details_dto=PaymentDetailsDTO(
+                method=django_order.payment_method,
+                transaction_id=django_order.payment_reference,
+                paid_amount=MoneyDTO(
+                    amount=django_order.payment_amount,
+                    currency=django_order.currency
+                )
+            )
+
         return OrderDTO(
             order_id=django_order.order_id,
             date_created=django_order.date_created,
@@ -247,26 +291,8 @@ class OrderDTO(BaseModel):
                 last_name=django_order.customer_last_name,
                 email=django_order.customer_email
             ),
-            shipping_details=ShippingDetailsDTO(
-                method=django_order.shipping_method,
-                delivery_time=django_order.shipping_delivery_time,
-                cost=MoneyDTO(
-                    amount=django_order.shipping_cost,
-                    currency=django_order.currency
-                ),
-                orig_cost=MoneyDTO(
-                    amount=django_order.shipping_cost,
-                    currency=django_order.currency
-                ),
-            ),
-            payment_details=PaymentDetailsDTO(
-                method=django_order.payment_method,
-                transaction_id=django_order.payment_reference,
-                paid_amount=MoneyDTO(
-                    amount=django_order.payment_amount,
-                    currency=django_order.currency
-                )
-            ),
+            shipping_details=shipping_details_dto if shipping_details_dto else None,
+            payment_details=payment_details_dto if payment_details_dto else None,
             cancellation_reason=django_order.cancellation_reason,
             total_discounts_fee=MoneyDTO(
                 amount=django_order.total_discounts_fee,
@@ -288,6 +314,7 @@ class OrderDTO(BaseModel):
             ),
             shipping_reference=django_order.shipping_tracking_reference,
             coupons=ast.literal_eval(django_order.coupons),
+            currency=django_order.currency,
             order_status=django_order.order_status
         )
 
@@ -314,11 +341,12 @@ class OrderDTO(BaseModel):
             total_amount=total_amount,
             final_amount=final_amount,
             shipping_reference=order.shipping_reference,
-            coupons=order.coupons,
+            coupons=[CouponDTO.from_domain(item) for item in order.coupons],
             order_status=order.order_status,
             customer_details=CustomerDetailsDTO(**asdict(order.customer_details)),
             line_items=[
                 LineItemDTO.from_domain(item) for item in order.line_items
             ],
+            currency=order.currency
         )
 
