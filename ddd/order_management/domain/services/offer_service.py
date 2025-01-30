@@ -11,7 +11,7 @@ class OfferStrategy(ABC):
     def __init__(self, offer_type: enums.OfferType, name: str, 
                  conditions: dict, start_date: datetime, end_date: datetime, 
                  discount_value: Union[int, Decimal], required_coupon: bool, 
-                 coupon_code: str):
+                 offer_coupons: dict):
         self.offer_type = offer_type
         self.name = name
         self.conditions = conditions
@@ -19,7 +19,7 @@ class OfferStrategy(ABC):
         self.end_date = end_date
         self.discount_value = discount_value
         self.required_coupon = required_coupon
-        self.coupon_code = coupon_code
+        self.offer_coupons = offer_coupons
 
     @abstractmethod
     def apply(self, order: models.Order):
@@ -27,10 +27,10 @@ class OfferStrategy(ABC):
 
     def validate_coupon(self, order: models.Order):
         #reuse if the offer is based on coupon
-        return (self.requires_coupon == True
-            and (datetime.now() >= self.start_date and datetime.now() <= self.end_date)
-            and self.coupon_code in order.coupons
-        )
+        for coupon in order.coupons:
+            if self.required_coupon == True and coupon.coupon_code in [item.get("coupon_code") for item in self.offer_coupons]:
+                return True
+        return False
 
     def validate_minimum_quantity(self, order:models.Order):
         return self.conditions and self.conditions.get("minimum_quantity") and (sum(item.order_quantity for item in order.line_items) >= self.conditions.get("minimum_quantity"))
@@ -87,7 +87,7 @@ class FreeShippingOfferStrategy(OfferStrategy):
 
     def apply(self, order: models.Order):
         currency = order.currency
-        if self.validate_minimum_order_total(order):
+        if self.validate_minimum_order_total(order) and self.validate_coupon(order):
             zero_shipping_cost = value_objects.Money(
                 amount=Decimal("0"),
                 currency=currency
@@ -172,7 +172,7 @@ class OfferStrategyService:
                             discount_value=offer.get("discount_value"),
                             conditions=offer.get("conditions"),
                             required_coupon=offer.get("required_coupon"),
-                            coupon_code=offer.get("coupon_code"),
+                            offer_coupons=offer.get("coupons"),
                             start_date=offer.get("start_date"),
                             end_date=offer.get("end_date")
                         )

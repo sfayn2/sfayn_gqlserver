@@ -10,15 +10,17 @@ from ddd.order_management.domain import value_objects, models, enums
 
 class CouponDTO(BaseModel):
     coupon_code: str
+    start_date: Optional[datetime]
+    end_date: Optional[datetime]
+    is_active: Optional[bool]
 
     def to_domain(self) -> value_objects.Coupon:
         return value_objects.Coupon(**self.model_dump())
 
     @staticmethod
     def from_domain(coupon: value_objects.Coupon) -> CouponDTO:
-        return CouponDTO(
-            coupon_code=coupon.coupon_code
-        )
+        return CouponDTO(**asdict(coupon))
+
 
 class CustomerDetailsDTO(BaseModel):
     first_name: str
@@ -298,8 +300,8 @@ class OrderDTO(BaseModel):
                 amount=django_order.total_discounts_fee,
                 currency=django_order.currency
             ),
-            offer_details=ast.literal_eval(django_order.offer_details),
-            tax_details=ast.literal_eval(django_order.tax_details),
+            offer_details=ast.literal_eval(django_order.offer_details) if django_order.offer_details else None,
+            tax_details=ast.literal_eval(django_order.tax_details) if django_order.tax_details else None,
             tax_amount=MoneyDTO(
                 amount=django_order.tax_amount,
                 currency=django_order.currency
@@ -313,7 +315,7 @@ class OrderDTO(BaseModel):
                 currency=django_order.currency
             ),
             shipping_reference=django_order.shipping_tracking_reference,
-            coupons=ast.literal_eval(django_order.coupons),
+            coupons=ast.literal_eval(django_order.coupons) if django_order.coupons else None,
             currency=django_order.currency,
             order_status=django_order.order_status
         )
@@ -358,7 +360,7 @@ class OfferDTO(BaseModel):
     discount_value: int | Decimal
     conditions: dict
     required_coupon: bool
-    coupon_code: Optional[CouponDTO]
+    coupons: Optional[List[CouponDTO]]
     stackable: bool
     priority: int
     start_date: datetime
@@ -379,7 +381,15 @@ class VendorDTO(BaseModel):
                     discount_value=offer.get("discount_value"),
                     conditions=ast.literal_eval(offer.get("conditions")),
                     required_coupon=offer.get("required_coupons"),
-                    coupon_code=ast.literal_eval(offer.get("coupon")) if offer.get("coupon") else None,
+                    coupons=[
+                        CouponDTO(
+                            coupon_code=item.get("coupon_code"),
+                            start_date=item.get("start_date"),
+                            end_date=item.get("end_date"),
+                            is_active=item.get("is_active")
+                        )
+                        for item in offer.get("coupons")
+                    ],
                     stackable=offer.get("stackable"),
                     priority=offer.get("priority"),
                     start_date=offer.get("start_date"),

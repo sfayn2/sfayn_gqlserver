@@ -19,7 +19,7 @@ class Coupon(models.Model):
     is_active = models.BooleanField(default=False, help_text="To quickly control whether this offer is still valid")
 
     def __str__(self):
-        return self.coupon_code
+        return f"{self.coupon_code} | Validity: {self.start_date} - {self.end_date} | Active: {self.is_active}"
 
 class Offer(models.Model):
     OFFER_TYPE_CHOICES = (

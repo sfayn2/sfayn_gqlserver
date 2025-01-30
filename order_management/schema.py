@@ -50,6 +50,10 @@ class ShippingDetailsInput(graphene.InputObjectType):
 
 class CouponInput(graphene.InputObjectType):
     coupon_code = graphene.String(required=True)
+    start_date = graphene.DateTime(required=False)
+    end_date = graphene.DateTime(required=False)
+    is_active = graphene.Boolean(required=False)
+
 
 class CheckoutOrderMutation(relay.ClientIDMutation):
     class Input:
@@ -197,7 +201,7 @@ Sample PlaceOrderMutation mutation
 
 mutation {
   placeOrder(input: {
-    orderId: "ORD-CAB3E0E2"
+    orderId: "ORD-58D6A174"
     customerDetails: {
       firstName: "John",
       lastName: "Doe",
@@ -208,7 +212,7 @@ mutation {
       city: "New York",
       state: "NYC",
       postal: "1001",
-      country: "USA"
+      country: "Singapore"
     },
     lineItems: [
       {
@@ -236,7 +240,7 @@ mutation {
         currency: "SGD"
       }
     },
-    coupons: [{ couponCode:"WELCOME25"}]
+    coupons: [{ couponCode:"WELCOME25", startDate: "2025-01-29T13:33:08Z", endDate: "2025-02-20T13:33:12Z", isActive: true}]
   }) {
     orderId
     orderStatus
@@ -258,4 +262,5 @@ mutation {
     }
   }
 }
+
 """

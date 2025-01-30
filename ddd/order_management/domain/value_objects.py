@@ -1,4 +1,6 @@
 from __future__ import annotations
+import pytz
+from datetime import datetime
 from dataclasses import dataclass
 from typing import Union, Tuple
 from decimal import Decimal, ROUND_HALF_UP
@@ -7,10 +9,18 @@ from ddd.order_management.domain import enums
 @dataclass(frozen=True)
 class Coupon:
     coupon_code: str
+    start_date: datetime
+    end_date: datetime
+    is_active: bool
 
     def __post_init__(self):
         if not self.coupon_code:
             raise ValueError("Coupon code cannot be empty.")
+
+        if (not (datetime.now(pytz.utc) >= self.start_date and datetime.now(pytz.utc) <= self.end_date) or self.is_active == False):
+            raise ValueError("Coupon code no longer valid.")
+
+
 
 @dataclass(frozen=True)
 class Money:

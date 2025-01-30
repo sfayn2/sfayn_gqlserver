@@ -197,15 +197,15 @@ class Order:
     def update_tax_details(self, tax_details: List[str]):
         self.tax_details = tax_details
 
-    def apply_coupon(self, coupon_code: value_objects.Coupon):
-        if not coupon_code:
-            raise exceptions.InvalidOrderOperation("Coupon code cannot be none.")
-        self.coupons.append(coupon_code)
+    def apply_coupon(self, coupon: value_objects.Coupon):
+        if not coupon:
+            raise exceptions.InvalidOrderOperation("Coupon cannot be none.")
+        self.coupons.append(coupon)
 
-    def remove_coupon(self, coupon_code: value_objects.Coupon):
-        if not coupon_code:
-            raise exceptions.InvalidOrderOperation("Coupon code cannot be none.")
-        self.coupons.remove(coupon_code)
+    def remove_coupon(self, coupon: value_objects.Coupon):
+        if not coupon:
+            raise exceptions.InvalidOrderOperation("Coupon cannot be none.")
+        self.coupons.remove(coupon)
 
     def update_destination(self, destination: value_objects.Address):
         if not destination:
