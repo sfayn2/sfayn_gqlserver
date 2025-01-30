@@ -5,7 +5,6 @@ from graphene import relay
 from graphene.types.generic import GenericScalar
 from ddd.order_management.application import message_bus, dtos, commands, unit_of_work
 from ddd.order_management.domain import enums, exceptions
-from ddd.order_management.infrastructure import dtos as infra_dtos
 
 #logger = logging.getLogger("django")
 logger = logging.getLogger(__name__)

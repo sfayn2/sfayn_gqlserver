@@ -28,12 +28,12 @@ class ShippingMethod(Enum):
         return generate_choices(cls)
 
 class OfferType(Enum):
-    PERCENTAGE_DISCOUNT = "Percentage Discount"
-    FIXED_DISCOUNT = "Fixed Discount"
-    COUPON_DISCOUNT = "Coupon Percentage Discount"
-    BUNDLE = "Bundle"
-    FREE_GIFT = "Free Gift"
-    FREE_SHIPPING = "Free Shipping"
+    PERCENTAGE_DISCOUNT = "percentage_discount"
+    FIXED_DISCOUNT = "fixed_discount"
+    COUPON_PERCENTAGE_DISCOUNT = "coupon_discount"
+    BUNDLE = "bundle"
+    FREE_GIFT = "free_gift"
+    FREE_SHIPPING = "free_shipping"
 
     @classmethod
     def choices(cls):

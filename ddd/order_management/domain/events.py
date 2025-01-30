@@ -3,7 +3,7 @@ from typing import List
 from dataclasses import dataclass
 from pydantic import BaseModel
 from ddd.order_management.domain import value_objects, models, enums
-from ddd.order_management.infrastructure import dtos
+from ddd.order_management.infrastructure import order_dtos
 
 class DomainEvent(ABC):
     pass

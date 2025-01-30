@@ -3,23 +3,23 @@ from abc import ABC
 from pydantic import BaseModel
 from typing import Union, List, Optional
 from datetime import datetime
-from ddd.order_management.infrastructure import dtos
+from ddd.order_management.infrastructure import order_dtos
 
 class Command(BaseModel, frozen=True):
     pass
 
 class DraftOrderCommand(Command):
-    customer_details: dtos.CustomerDetailsDTO
-    address: dtos.AddressDTO
-    line_items: List[dtos.LineItemDTO]
+    customer_details: order_dtos.CustomerDetailsDTO
+    address: order_dtos.AddressDTO
+    line_items: List[order_dtos.LineItemDTO]
 
 class PlaceOrderCommand(Command):
     order_id: str
-    customer_details: dtos.CustomerDetailsDTO
-    shipping_address: dtos.AddressDTO
-    line_items: List[dtos.LineItemDTO]
-    shipping_details: dtos.ShippingDetailsDTO
-    coupons: List[dtos.CouponDTO]
+    customer_details: order_dtos.CustomerDetailsDTO
+    shipping_address: order_dtos.AddressDTO
+    line_items: List[order_dtos.LineItemDTO]
+    shipping_details: order_dtos.ShippingDetailsDTO
+    coupons: List[order_dtos.CouponDTO]
 
 class ConfirmOrderCommand(Command):
     order_id: str
@@ -35,4 +35,4 @@ class CompleteOrderCommand(Command):
 
 class ApplyPaymentCommand(Command):
     order_id: str
-    payment: dtos.PaymentDetailsDTO
+    payment: order_dtos.PaymentDetailsDTO

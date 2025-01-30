@@ -2,7 +2,7 @@ from pydantic import BaseModel
 import uuid
 from decimal import Decimal
 from typing import Optional, List, Tuple
-from ddd.order_management.infrastructure import dtos
+from ddd.order_management.infrastructure import order_dtos
 
 class CheckoutResponseDTO(BaseModel):
     order_id: str
@@ -17,9 +17,9 @@ class PlaceOrderResponseDTO(BaseModel):
     message: str
     tax_details: List[str]
     offer_details: List[str]
-    tax_amount: dtos.MoneyDTO
-    total_discounts_fee: dtos.MoneyDTO
-    final_amount: dtos.MoneyDTO
+    tax_amount: order_dtos.MoneyDTO
+    total_discounts_fee: order_dtos.MoneyDTO
+    final_amount: order_dtos.MoneyDTO
 
 class ResponseWExceptionDTO(BaseModel):
     success: bool

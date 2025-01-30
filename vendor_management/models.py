@@ -39,7 +39,7 @@ class Offer(models.Model):
             help_text="Percentage or Fix amount?", 
             default=Decimal("0.0")
         )
-    conditions = models.JSONField(help_text='ex. min_purchase, applicable_products')
+    conditions = models.CharField(max_length=150, help_text='ex. min_purchase, applicable_products')
     stackable = models.BooleanField(default=False, help_text="Set to True, To combine w other stackable")
     priority = models.PositiveIntegerField(default=0, help_text="The highest number will be prioritized on multistack or single stack")
     required_coupons = models.BooleanField(default=False, help_text="Set to True, To make use of coupons to apply")
@@ -51,7 +51,7 @@ class Offer(models.Model):
 
 
     def __str__(self):
-        return f"{self.name} ( {self.offer_type} )"
+        return f"{self.name} ( {self.offer_type} ) | Required Coupons : {self.required_coupons} | {self.start_date} - {self.end_date} | Is Active: {self.is_active}"
 
 
 
@@ -66,7 +66,7 @@ class ShippingOption(models.Model):
         )
 
     #need this?
-    conditions = models.JSONField(help_text='ex. only package under 30kg?')
+    conditions = models.CharField(max_length=150, help_text='ex. only package under 30kg?')
 
     flat_rate = models.DecimalField(
             decimal_places=settings.DEFAULT_DECIMAL_PLACES, 

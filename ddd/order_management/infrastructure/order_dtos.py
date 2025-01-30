@@ -350,3 +350,43 @@ class OrderDTO(BaseModel):
             currency=order.currency
         )
 
+
+
+class OfferDTO(BaseModel):
+    offer_type: enums.OfferType
+    name: str
+    discount_value: int | Decimal
+    conditions: dict
+    required_coupon: bool
+    coupon_code: Optional[CouponDTO]
+    stackable: bool
+    priority: int
+    start_date: datetime
+    end_date: datetime
+
+
+class VendorDTO(BaseModel):
+    offers: List[OfferDTO]
+
+    @staticmethod
+    def from_django_filters(django_offers):
+        offers_dto = []
+        for offer in django_offers:
+            offers_dto.append(
+                OfferDTO(
+                    offer_type=offer.get("offer_type"),
+                    name=offer.get("name"),
+                    discount_value=offer.get("discount_value"),
+                    conditions=ast.literal_eval(offer.get("conditions")),
+                    required_coupon=offer.get("required_coupons"),
+                    coupon_code=ast.literal_eval(offer.get("coupon")) if offer.get("coupon") else None,
+                    stackable=offer.get("stackable"),
+                    priority=offer.get("priority"),
+                    start_date=offer.get("start_date"),
+                    end_date=offer.get("end_date")
+                )
+            )
+
+        return VendorDTO(
+            offers=offers_dto
+        )

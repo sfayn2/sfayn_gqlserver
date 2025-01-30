@@ -151,6 +151,6 @@ class OrderLine(models.Model):
         unique_together = ("product_sku", "order_id")
 
     def __str__(self):
-        return f"{self.product_name} (SKU: {self.product_sku}) | Quantity: {self.order_quantity} | Total: {self.product_price * self.order_quantity} {self.product_currency}"
+        return f"{self.order.order_id} | {self.product_name} (SKU: {self.product_sku}) | Quantity: {self.order_quantity} | Total: {self.product_price * self.order_quantity} {self.product_currency}"
 
 

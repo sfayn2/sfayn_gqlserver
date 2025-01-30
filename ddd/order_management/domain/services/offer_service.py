@@ -1,5 +1,5 @@
 from __future__ import annotations
-import json
+import pytz
 from datetime import datetime
 from dataclasses import dataclass
 from abc import ABC, abstractmethod
@@ -8,12 +8,12 @@ from ddd.order_management.domain import enums, exceptions, models, value_objects
 from decimal import Decimal
 
 class OfferStrategy(ABC):
-    def __init__(self, offer_type: enums.OfferType, description: str, 
+    def __init__(self, offer_type: enums.OfferType, name: str, 
                  conditions: dict, start_date: datetime, end_date: datetime, 
                  discount_value: Union[int, Decimal], required_coupon: bool, 
                  coupon_code: str):
         self.offer_type = offer_type
-        self.description = description
+        self.name = name
         self.conditions = conditions
         self.start_date = start_date
         self.end_date = end_date
@@ -33,10 +33,10 @@ class OfferStrategy(ABC):
         )
 
     def validate_minimum_quantity(self, order:models.Order):
-        return self.minimum_quantity and (sum(item.order_quantity for item in order.line_items) >= self.minimum_quantity)
+        return self.conditions and self.conditions.get("minimum_quantity") and (sum(item.order_quantity for item in order.line_items) >= self.conditions.get("minimum_quantity"))
 
     def validate_minimum_order_total(self, order:models.Order):
-        return self.minimum_order_total and (order.total_amount.amount >= self.minimum_order_total)
+        return self.conditions and self.conditions.get("minimum_order_total") and (order.total_amount.amount >= self.conditions.get("minimum_order_total"))
 
 class PercentageDiscountStrategy(OfferStrategy):
 
@@ -60,7 +60,7 @@ class PercentageDiscountStrategy(OfferStrategy):
                             currency=currency
                         )
                     )
-                return f"{self.description} applied ( {','.join(discounted_items)} )"
+                return f"{self.name} | {','.join(discounted_items)} )"
 
 class FreeGiftOfferStrategy(OfferStrategy):
 
@@ -81,7 +81,7 @@ class FreeGiftOfferStrategy(OfferStrategy):
                         is_free_gift=True
                     )
                 )
-                return f"{self.description} applied ( {','.join(free_gifts)} )"
+                return f"{self.description} | {','.join(free_gifts)}"
     
 class FreeShippingOfferStrategy(OfferStrategy):
 
@@ -89,14 +89,14 @@ class FreeShippingOfferStrategy(OfferStrategy):
         currency = order.currency
         if self.validate_minimum_order_total(order):
             zero_shipping_cost = value_objects.Money(
-                amount=0,
+                amount=Decimal("0"),
                 currency=currency
             )
             order.update_shipping_details(
                     order.shipping_details.update_cost(zero_shipping_cost)
                 )
 
-            return f"{self.description} applied"
+            return f"{self.name} | 0 {currency}"
 
 
 
@@ -120,15 +120,15 @@ class PercentageDiscountCouponOfferStrategy(OfferStrategy):
                                 currency=currency
                             )
                         )
-                    return f"{self.description} applied ( {','.join(discounted_items)} )"
+                    return f"{self.name} | {','.join(discounted_items)}"
 
 
 # when adding new offer need to map the strategy
 OFFER_STRATEGIES = {
-    enums.OfferType.PERCENTAGE_DISCOUNT.name: PercentageDiscountStrategy,
-    enums.OfferType.FREE_GIFT.name: FreeGiftOfferStrategy,
-    enums.OfferType.COUPON_DISCOUNT.name: PercentageDiscountCouponOfferStrategy,
-    enums.OfferType.FREE_SHIPPING.name: FreeShippingOfferStrategy
+    enums.OfferType.PERCENTAGE_DISCOUNT: PercentageDiscountStrategy,
+    enums.OfferType.FREE_GIFT: FreeGiftOfferStrategy,
+    enums.OfferType.COUPON_PERCENTAGE_DISCOUNT: PercentageDiscountCouponOfferStrategy,
+    enums.OfferType.FREE_SHIPPING: FreeShippingOfferStrategy
 }
 
 class OfferStrategyService:        
@@ -142,9 +142,9 @@ class OfferStrategyService:
         available_offers = self._fetch_valid_offers(order.vendor_name)
         offer_details = []
         for strategy in available_offers:
-            offer_details.append(
-                strategy.apply(order)
-            )
+            res = strategy.apply(order)
+            if res:
+                offer_details.append(res)
 
         order.update_offer_details(offer_details)
 
@@ -161,16 +161,18 @@ class OfferStrategyService:
             #strategy function
             offer_strategy_class = OFFER_STRATEGIES.get(offer.get("offer_type"))
 
-            if offer_strategy_class:
+            if (offer_strategy_class and 
+                datetime.now(pytz.utc) >= offer.get("start_date") and 
+                datetime.now(pytz.utc) <= offer.get("end_date")):
 
                 valid_offers.append(
                     offer_strategy_class(
-                            offer_type=enums.OfferType[offer.get("offer_type")],
-                            description=offer.get("name"),
+                            offer_type=offer.get("offer_type"),
+                            name=offer.get("name"),
                             discount_value=offer.get("discount_value"),
-                            condition=json.loads(offer.get("conditions")),
+                            conditions=offer.get("conditions"),
                             required_coupon=offer.get("required_coupon"),
-                            coupon_code=json.loads(offer.get("coupon_code")),
+                            coupon_code=offer.get("coupon_code"),
                             start_date=offer.get("start_date"),
                             end_date=offer.get("end_date")
                         )
