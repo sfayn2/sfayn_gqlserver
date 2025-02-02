@@ -162,8 +162,10 @@ class OfferStrategyService:
             offer_strategy_class = OFFER_STRATEGIES.get(offer.get("offer_type"))
 
             if (offer_strategy_class and 
-                datetime.now(pytz.utc) >= offer.get("start_date") and 
-                datetime.now(pytz.utc) <= offer.get("end_date")):
+                (offer.get("is_active") == True and datetime.now(pytz.utc) >= offer.get("start_date") and 
+                datetime.now(pytz.utc) <= offer.get("end_date")) ):
+
+                #TODO: shall we make Offer value object + Coupon?
 
                 valid_offers.append(
                     offer_strategy_class(
@@ -172,6 +174,7 @@ class OfferStrategyService:
                             discount_value=offer.get("discount_value"),
                             conditions=offer.get("conditions"),
                             required_coupon=offer.get("required_coupon"),
+                            #offer_coupons=[value_objects.Coupon(**coupon) for coupon in offer.get("coupons")],
                             offer_coupons=offer.get("coupons"),
                             start_date=offer.get("start_date"),
                             end_date=offer.get("end_date")

@@ -17,8 +17,8 @@ class Coupon:
         if not self.coupon_code:
             raise ValueError("Coupon code cannot be empty.")
 
-        if (not (datetime.now(pytz.utc) >= self.start_date and datetime.now(pytz.utc) <= self.end_date) or self.is_active == False):
-            raise ValueError("Coupon code no longer valid.")
+        if not (self.is_active and datetime.now(pytz.utc) >= self.start_date and datetime.now(pytz.utc) <= self.end_date):
+            raise ValueError(f"Coupon code {self.coupon_code} no longer valid.")
 
 
 

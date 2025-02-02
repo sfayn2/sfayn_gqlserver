@@ -50,9 +50,9 @@ class ShippingDetailsInput(graphene.InputObjectType):
 
 class CouponInput(graphene.InputObjectType):
     coupon_code = graphene.String(required=True)
-    start_date = graphene.DateTime(required=False)
-    end_date = graphene.DateTime(required=False)
-    is_active = graphene.Boolean(required=False)
+    #start_date = graphene.DateTime(required=False)
+    #end_date = graphene.DateTime(required=False)
+    #is_active = graphene.Boolean(required=False)
 
 
 class CheckoutOrderMutation(relay.ClientIDMutation):

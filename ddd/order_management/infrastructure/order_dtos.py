@@ -7,19 +7,27 @@ from pydantic import BaseModel, Field, AliasChoices, parse_obj_as
 from dataclasses import asdict
 from typing import List, Optional, Tuple
 from ddd.order_management.domain import value_objects, models, enums
+from vendor_management import models as django_vendor_models
 
 class CouponDTO(BaseModel):
     coupon_code: str
-    start_date: Optional[datetime]
-    end_date: Optional[datetime]
-    is_active: Optional[bool]
+    start_date: Optional[datetime] = None
+    end_date: Optional[datetime] = None
+    is_active: Optional[bool] = None
+
+    #TODO: reloading coupons from db the validate is safe or correct approach?
+    def from_django(self) -> CouponDTO:
+        #only care on coupon code & load the rest of attrs value from db
+        django_coupon = django_vendor_models.Coupon.objects.filter(coupon_code=self.coupon_code).values()
+        return CouponDTO(**list(django_coupon)[0])
 
     def to_domain(self) -> value_objects.Coupon:
-        return value_objects.Coupon(**self.model_dump())
+        return value_objects.Coupon(**self.from_django().model_dump())
 
     @staticmethod
     def from_domain(coupon: value_objects.Coupon) -> CouponDTO:
-        return CouponDTO(**asdict(coupon))
+        django_coupon = django_vendor_models.Coupon.objects.filter(coupon_code=coupon.coupon_code).values()
+        return CouponDTO(**list(django_coupon)[0])
 
 
 class CustomerDetailsDTO(BaseModel):
@@ -365,6 +373,7 @@ class OfferDTO(BaseModel):
     priority: int
     start_date: datetime
     end_date: datetime
+    is_active: bool
 
 
 class VendorDTO(BaseModel):
@@ -393,7 +402,8 @@ class VendorDTO(BaseModel):
                     stackable=offer.get("stackable"),
                     priority=offer.get("priority"),
                     start_date=offer.get("start_date"),
-                    end_date=offer.get("end_date")
+                    end_date=offer.get("end_date"),
+                    is_active=offer.get("is_active")
                 )
             )
 
