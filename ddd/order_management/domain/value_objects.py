@@ -2,7 +2,7 @@ from __future__ import annotations
 import pytz
 from datetime import datetime
 from dataclasses import dataclass
-from typing import Union, Tuple
+from typing import Union, Tuple, Optional, List
 from decimal import Decimal, ROUND_HALF_UP
 from ddd.order_management.domain import enums
 
@@ -178,4 +178,21 @@ class ShippingDetails:
                                cost=new_cost
                             )
 
-    
+@dataclass(frozen=True) 
+class OfferStrategy:
+    offer_type: enums.OfferType
+    name: str
+    discount_value: int | Decimal
+    conditions: dict
+    required_coupon: bool
+    coupons: Optional[List[Coupon]]
+    stackable: bool
+    priority: int
+    start_date: datetime
+    end_date: datetime
+    is_active: bool
+
+    def is_valid(self) -> bool:
+        return (self.is_active == True and datetime.now(pytz.utc) >= self.start_date and 
+                datetime.now(pytz.utc) <= self.end_date)
+

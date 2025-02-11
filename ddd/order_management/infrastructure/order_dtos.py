@@ -16,13 +16,15 @@ class CouponDTO(BaseModel):
     is_active: Optional[bool] = None
 
     #TODO: reloading coupons from db the validate is safe or correct approach?
-    def from_django(self) -> CouponDTO:
+    @staticmethod
+    def from_django(coupon_code) -> CouponDTO:
         #only care on coupon code & load the rest of attrs value from db
-        django_coupon = django_vendor_models.Coupon.objects.filter(coupon_code=self.coupon_code).values()
+        django_coupon = django_vendor_models.Coupon.objects.filter(coupon_code=coupon_code).values()
         return CouponDTO(**list(django_coupon)[0])
 
     def to_domain(self) -> value_objects.Coupon:
-        return value_objects.Coupon(**self.from_django().model_dump())
+        from_django = django_vendor_models.Coupon.objects.filter(coupon_code=self.coupon_code).values()[0]
+        return value_objects.Coupon(**CouponDTO(**from_django).model_dump())
 
     @staticmethod
     def from_domain(coupon: value_objects.Coupon) -> CouponDTO:
@@ -323,7 +325,7 @@ class OrderDTO(BaseModel):
                 currency=django_order.currency
             ),
             shipping_reference=django_order.shipping_tracking_reference,
-            coupons=ast.literal_eval(django_order.coupons) if django_order.coupons else None,
+            coupons=[CouponDTO.from_django(item) for item in ast.literal_eval(django_order.coupons)],
             currency=django_order.currency,
             order_status=django_order.order_status
         )
@@ -362,7 +364,7 @@ class OrderDTO(BaseModel):
 
 
 
-class OfferDTO(BaseModel):
+class OfferStrategyDTO(BaseModel):
     offer_type: enums.OfferType
     name: str
     discount_value: int | Decimal
@@ -375,16 +377,23 @@ class OfferDTO(BaseModel):
     end_date: datetime
     is_active: bool
 
+    def to_domain(self) -> value_objects.OfferStrategy:
+        coupons = [item.to_domain() for item in self.coupons]
+        return models.OfferStrategy(
+            **self.model_dump(exclude={"coupons"}),
+            coupons=coupons
+        )
+
 
 class VendorDTO(BaseModel):
-    offers: List[OfferDTO]
+    offers: List[OfferStrategyDTO]
 
     @staticmethod
     def from_django_filters(django_offers):
         offers_dto = []
         for offer in django_offers:
             offers_dto.append(
-                OfferDTO(
+                OfferStrategyDTO(
                     offer_type=offer.get("offer_type"),
                     name=offer.get("name"),
                     discount_value=offer.get("discount_value"),

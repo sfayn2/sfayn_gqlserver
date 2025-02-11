@@ -1,5 +1,7 @@
+import pytz
 from datetime import datetime
-from ddd.order_management.domain import repositories
+from typing import List
+from ddd.order_management.domain import repositories, enums, value_objects
 from vendor_management import models as django_vendor_models
 from ddd.order_management.infrastructure import order_dtos
 
@@ -13,6 +15,7 @@ class DjangoVendorRepository(repositories.VendorRepository):
         ]
         offers_dto = order_dtos.VendorDTO.from_django_filters(offer_list)
         return offers_dto.model_dump().get("offers")
+
 
     def get_shipping_options(self, vendor_name: str):
         shipping_options = django_vendor_models.ShippingOption.filter(vendor__name=vendor_name)

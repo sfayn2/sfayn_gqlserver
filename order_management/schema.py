@@ -240,7 +240,7 @@ mutation {
         currency: "SGD"
       }
     },
-    coupons: [{ couponCode:"WELCOME25", startDate: "2025-01-29T13:33:08Z", endDate: "2025-02-20T13:33:12Z", isActive: true}]
+    coupons: [{ couponCode:"WELCOME25"}]
   }) {
     orderId
     orderStatus

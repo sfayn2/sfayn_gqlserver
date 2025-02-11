@@ -8,18 +8,8 @@ from ddd.order_management.domain import enums, exceptions, models, value_objects
 from decimal import Decimal
 
 class OfferStrategy(ABC):
-    def __init__(self, offer_type: enums.OfferType, name: str, 
-                 conditions: dict, start_date: datetime, end_date: datetime, 
-                 discount_value: Union[int, Decimal], required_coupon: bool, 
-                 offer_coupons: dict):
-        self.offer_type = offer_type
-        self.name = name
-        self.conditions = conditions
-        self.start_date = start_date
-        self.end_date = end_date
-        self.discount_value = discount_value
-        self.required_coupon = required_coupon
-        self.offer_coupons = offer_coupons
+    def __init__(self, strategy: value_objects.OfferStrategy):
+        self.strategy = strategy
 
     @abstractmethod
     def apply(self, order: models.Order):
@@ -28,15 +18,15 @@ class OfferStrategy(ABC):
     def validate_coupon(self, order: models.Order):
         #reuse if the offer is based on coupon
         for coupon in order.coupons:
-            if self.required_coupon == True and coupon.coupon_code in [item.get("coupon_code") for item in self.offer_coupons]:
+            if self.strategy.required_coupon == True and coupon in [item for item in self.coupons]:
                 return True
         return False
 
     def validate_minimum_quantity(self, order:models.Order):
-        return self.conditions and self.conditions.get("minimum_quantity") and (sum(item.order_quantity for item in order.line_items) >= self.conditions.get("minimum_quantity"))
+        return self.strategy.conditions and self.strategy.conditions.get("minimum_quantity") and (sum(item.order_quantity for item in order.line_items) >= self.stategy.conditions.get("minimum_quantity"))
 
     def validate_minimum_order_total(self, order:models.Order):
-        return self.conditions and self.conditions.get("minimum_order_total") and (order.total_amount.amount >= self.conditions.get("minimum_order_total"))
+        return self.strategy.conditions and self.strategy.conditions.get("minimum_order_total") and (order.total_amount.amount >= self.stategy.conditions.get("minimum_order_total"))
 
 class PercentageDiscountStrategy(OfferStrategy):
 
@@ -45,10 +35,10 @@ class PercentageDiscountStrategy(OfferStrategy):
         total_discount = 0
         currency = order.currency
         discounted_items = []
-        eligible_products = self.conditions.get("eligible_products")
+        eligible_products = self.strategy.conditions.get("eligible_products")
         for item in order.line_items:
             if eligible_products and (item.product_name in eligible_products):
-                total_discount += item.total_price * (self.discount_value / 100)
+                total_discount += item.total_price * (self.strategy.discount_value / 100)
                 discounted_items.append(item.product_name)
                 #item.set_discounts_fee(value_objects.Money(
                 #    amount=total_discount,
@@ -67,7 +57,7 @@ class FreeGiftOfferStrategy(OfferStrategy):
     def apply(self, order: models.Order):
         free_gifts = []
         currency = order.currency
-        gift_products = self.conditions.get("gift_products")
+        gift_products = self.strategy.conditions.get("gift_products")
         if self.validate_minimum_quantity(order):
             for free_product in gift_products:
                 free_gifts.append(free_product)
@@ -106,12 +96,12 @@ class PercentageDiscountCouponOfferStrategy(OfferStrategy):
         total_discount = 0
         discounted_items = []
         currency = order.currency
-        eligible_products = self.conditions.get("eligible_products")
+        eligible_products = self.strategy.conditions.get("eligible_products")
 
         if self.validate_coupon(order):
             for item in order.line_items:
                 if eligible_products and item.product_name in eligible_products:
-                    total_discount += item.total_price * (self.discount_value / 100)
+                    total_discount += item.total_price * (self.strategy.discount_value / 100)
                     discounted_items.append(item.product_name)
 
                     order.update_total_discounts_fee(
@@ -146,7 +136,8 @@ class OfferStrategyService:
             if res:
                 offer_details.append(res)
 
-        order.update_offer_details(offer_details)
+        if offer_details:
+            order.update_offer_details(offer_details)
 
     def _fetch_valid_offers(self, vendor_name: str):
         #The assumption is all Offers are auto applied (except those w Coupons)
@@ -158,27 +149,16 @@ class OfferStrategyService:
 
         for offer in sorted_vendor_offers:
 
-            #strategy function
             offer_strategy_class = OFFER_STRATEGIES.get(offer.get("offer_type"))
 
-            if (offer_strategy_class and 
-                (offer.get("is_active") == True and datetime.now(pytz.utc) >= offer.get("start_date") and 
-                datetime.now(pytz.utc) <= offer.get("end_date")) ):
+            offer_strategy = value_objects.OfferStrategy(**{
+                **offer,
+                "coupons":[value_objects.Coupon(**coupon) for coupon in offer.get("coupons")]
+            })
 
-                #TODO: shall we make Offer value object + Coupon?
-
+            if offer_strategy.is_valid:
                 valid_offers.append(
-                    offer_strategy_class(
-                            offer_type=offer.get("offer_type"),
-                            name=offer.get("name"),
-                            discount_value=offer.get("discount_value"),
-                            conditions=offer.get("conditions"),
-                            required_coupon=offer.get("required_coupon"),
-                            #offer_coupons=[value_objects.Coupon(**coupon) for coupon in offer.get("coupons")],
-                            offer_coupons=offer.get("coupons"),
-                            start_date=offer.get("start_date"),
-                            end_date=offer.get("end_date")
-                        )
+                    offer_strategy_class(offer_strategy)
                 )
 
                 if offer.get("stackable") == False:
@@ -186,6 +166,3 @@ class OfferStrategyService:
                     return valid_offers
 
         return valid_offers
-
-
-

@@ -1,5 +1,5 @@
 from typing import List
-from ddd.order_management.domain import models, value_objects
+from ddd.order_management.domain import models, value_objects, enums, exceptions
 from ddd.order_management.domain.services import tax_service, offer_service
 
 def draft_order(
@@ -27,6 +27,7 @@ def place_order(
         tax_service: tax_service.TaxStrategyService,
         offer_service: offer_service.OfferStrategyService
 ) -> models.Order:
+
 
     order.update_customer_details(customer_details)
     order.update_destination(shipping_address)
