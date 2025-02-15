@@ -9,13 +9,13 @@ from ddd.order_management.domain import enums, exceptions
 #logger = logging.getLogger("django")
 logger = logging.getLogger(__name__)
 
+# ====================
+# Input Types
+# ====================
 class MoneyInput(graphene.InputObjectType):
     amount = graphene.Float(required=True)
     currency = graphene.String(required=True)
 
-class MoneyType(graphene.ObjectType):
-    amount = graphene.Float(required=True)
-    currency = graphene.String(required=True)
 
 class PackageInput(graphene.InputObjectType):
     weight = graphene.Float(required=True)
@@ -43,11 +43,6 @@ class CustomerDetailsInput(graphene.InputObjectType):
     last_name = graphene.String(required=True)
     email = graphene.String(required=True)
 
-class ShippingDetailsType(graphene.ObjectType):
-    method = graphene.String(required=True)
-    delivery_time = graphene.String(required=True)
-    cost = graphene.Field(MoneyType, required=True)
-
 class ShippingDetailsInput(graphene.InputObjectType):
     method = graphene.String(required=True)
     delivery_time = graphene.String(required=True)
@@ -55,11 +50,40 @@ class ShippingDetailsInput(graphene.InputObjectType):
 
 class CouponInput(graphene.InputObjectType):
     coupon_code = graphene.String(required=True)
-    #start_date = graphene.DateTime(required=False)
-    #end_date = graphene.DateTime(required=False)
-    #is_active = graphene.Boolean(required=False)
 
+# ====================
+# Object Types
+# ====================
+class MoneyType(graphene.ObjectType):
+    amount = graphene.Float(required=True)
+    currency = graphene.String(required=True)
 
+class ShippingDetailsType(graphene.ObjectType):
+    method = graphene.String(required=True)
+    delivery_time = graphene.String(required=True)
+    cost = graphene.Field(MoneyType, required=True)
+
+# ==================
+# helper function
+# =================
+def handle_invalid_order_operation(err):
+    logger.error(f"{err}")
+    response_dto = dtos.ResponseWExceptionDTO(
+        success=False,
+        message=str(err)
+    )
+    return response_dto
+
+def handle_unexpected_error(err_details):
+    logger.error(f"{err_details}", exc_info=True)
+    response_dto = dtos.ResponseWExceptionDTO(
+        success=False,
+        message="An unexpected error occured. Please contact support."
+    )
+
+# ==========================
+# Mutations 
+# ===================
 class CheckoutOrderMutation(relay.ClientIDMutation):
     class Input:
         customer_details = graphene.Field(CustomerDetailsInput, required=True)
@@ -86,17 +110,9 @@ class CheckoutOrderMutation(relay.ClientIDMutation):
             )
 
         except (exceptions.InvalidOrderOperation, ValueError) as e:
-            logger.error(f"{e}")
-            response_dto = dtos.ResponseWExceptionDTO(
-                success=False,
-                message=str(e)
-            )
+            response_dto = handle_invalid_order_operation(e)
         except Exception as e:
-            logger.error(f"Unexpected error during checkout {e}", exc_info=True)
-            response_dto = dtos.ResponseWExceptionDTO(
-                success=False,
-                message="An unexpected error occured. Please contact support."
-            )
+            response_dto = handle_unexpected_error(f"Unexpected error during check out {e}")
 
         return cls(**response_dto.model_dump())
 
@@ -124,7 +140,6 @@ class PlaceOrderMutation(relay.ClientIDMutation):
     def mutate_and_get_payload(cls, root, info, **input):
         try:
             command = commands.PlaceOrderCommand.model_validate(input)
-
             order = message_bus.handle(command, unit_of_work.DjangoOrderUnitOfWork())
 
             #placed order status only in Pending; once payment is confirmed ; webhook will trigger and call api to confirm order
@@ -142,18 +157,9 @@ class PlaceOrderMutation(relay.ClientIDMutation):
             )
 
         except (exceptions.InvalidOrderOperation, ValueError) as e:
-            logger.error(f"{e}")
-            response_dto = dtos.ResponseWExceptionDTO(
-                success=False,
-                message=str(e)
-            )
+            response_dto = handle_invalid_order_operation(e)
         except Exception as e:
-            logger.error(f"Unexpected error during place order {e}", exc_info=True)
-            response_dto = dtos.ResponseWExceptionDTO(
-                success=False,
-                message="An unexpected error occured. Please contact support."
-            )
-
+            response_dto = handle_unexpected_error(f"Unexpected error during place order {e}")
 
         return cls(**response_dto.model_dump())
 
