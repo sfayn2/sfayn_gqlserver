@@ -43,6 +43,11 @@ class CustomerDetailsInput(graphene.InputObjectType):
     last_name = graphene.String(required=True)
     email = graphene.String(required=True)
 
+class ShippingDetailsType(graphene.ObjectType):
+    method = graphene.String(required=True)
+    delivery_time = graphene.String(required=True)
+    cost = graphene.Field(MoneyType, required=True)
+
 class ShippingDetailsInput(graphene.InputObjectType):
     method = graphene.String(required=True)
     delivery_time = graphene.String(required=True)
@@ -110,6 +115,7 @@ class PlaceOrderMutation(relay.ClientIDMutation):
     message = graphene.String()
     tax_details = graphene.List(graphene.String)
     offer_details = graphene.List(graphene.String)
+    shipping_details = graphene.Field(ShippingDetailsType)
     tax_amount  = graphene.Field(MoneyType)
     total_discounts_fee = graphene.Field(MoneyType)
     final_amount = graphene.Field(MoneyType)
@@ -129,6 +135,7 @@ class PlaceOrderMutation(relay.ClientIDMutation):
                 message="Order successfully placed.",
                 tax_details=order.tax_details,
                 offer_details=order.offer_details,
+                shipping_details=asdict(order.shipping_details),
                 tax_amount=asdict(order.tax_amount),
                 total_discounts_fee=asdict(order.total_discounts_fee),
                 final_amount=asdict(order.final_amount)

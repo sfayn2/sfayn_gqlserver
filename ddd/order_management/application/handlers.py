@@ -40,8 +40,6 @@ def handle_place_order(command: commands.PlaceOrderCommand, uow: unit_of_work.Dj
             django_vendor_repository.DjangoVendorRepository()
         )
 
-        #TODO: need to load coupons start_date, end_date, is_active from db?
-
         placed_order = order_service.place_order(
             order=order,
             customer_details=command.customer_details.to_domain(),

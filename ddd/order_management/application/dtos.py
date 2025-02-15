@@ -15,6 +15,7 @@ class PlaceOrderResponseDTO(BaseModel):
     order_status: str
     success: bool
     message: str
+    shipping_details: order_dtos.ShippingDetailsDTO
     tax_details: List[str]
     offer_details: List[str]
     tax_amount: order_dtos.MoneyDTO
