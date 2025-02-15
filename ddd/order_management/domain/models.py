@@ -136,22 +136,22 @@ class Order:
         raise exceptions.InvalidOrderOperation(f"Product w Sku {product_sku} not found in the order.")
 
     def place_order(self):
-        if self.order_status != enums.OrderStatus.DRAFT.value:
+        if self.order_status != enums.OrderStatus.DRAFT:
             raise exceptions.InvalidOrderOperation("Only draft can place an order.")
         if not self.line_items:
             raise exceptions.InvalidOrderOperation("Cannot place an order without line items.")
         if not self.shipping_details:
             raise exceptions.InvalidOrderOperation("Order must have a selected Shipping method")
-        self.order_status = enums.OrderStatus.PENDING.value
+        self.order_status = enums.OrderStatus.PENDING
         self.update_modified_date()
 
     def confirm_order(self, payment_verified: bool):
-        if self.order_status != enums.OrderStatus.PENDING.value:
+        if self.order_status != enums.OrderStatus.PENDING:
             raise exceptions.InvalidOrderOperation("Only pending orders can be confirmed.")
         if not payment_verified:
             raise exceptions.InvalidOrderOperation("Order cannot be confirmed without verified payment.")
 
-        self.order_status = enums.OrderStatus.CONFIRMED.value
+        self.order_status = enums.OrderStatus.CONFIRMED
         self.update_modified_date()
 
     def update_payment_details(self, payment_details: value_objects.PaymentDetails):
@@ -165,26 +165,26 @@ class Order:
         self.customer_details = customer_details
 
     def mark_as_shipped(self):
-        if self.order_status != enums.OrderStatus.CONFIRMED.value:
+        if self.order_status != enums.OrderStatus.CONFIRMED:
             raise exceptions.InvalidOrderOperation("Only confirm order can mark as shipped.")
-        self.order_status = enums.OrderStatus.SHIPPED.value
+        self.order_status = enums.OrderStatus.SHIPPED
         self.update_modified_date()
 
     def cancel_order(self, cancellation_reason: str):
-        if not self.order_status in (enums.OrderStatus.PENDING.value, enums.OrderStatus.CONFIRMED.value):
+        if not self.order_status in (enums.OrderStatus.PENDING, enums.OrderStatus.CONFIRMED):
             raise exceptions.InvalidOrderOperation("Cannot cancel a completed or already cancelled order or shipped order")
-        self.order_status = enums.OrderStatus.CANCELLED.value
+        self.order_status = enums.OrderStatus.CANCELLED
         self.cancellation_reason = cancellation_reason
         self.update_modified_date()
     
     def mark_as_completed(self):
-        if self.order_status != enums.OrderStatus.SHIPPED.value:
+        if self.order_status != enums.OrderStatus.SHIPPED:
             raise exceptions.InvalidOrderOperation("Only shipped order can mark as completed.")
 
         if self.payment_details.method == enums.PaymentMethod.COD and not self.payment_details:
             raise exceptions.InvalidOrderOperation("Cannot mark as completed with outstanding payments.")
 
-        self.order_status = enums.OrderStatus.COMPLETED.value
+        self.order_status = enums.OrderStatus.COMPLETED
         self.update_modified_date()
 
     def add_shipping_tracking_reference(self, shipping_reference: str):

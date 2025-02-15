@@ -19,17 +19,17 @@ class CouponDTO(BaseModel):
     @staticmethod
     def from_django(coupon_code) -> CouponDTO:
         #only care on coupon code & load the rest of attrs value from db
-        django_coupon = django_vendor_models.Coupon.objects.filter(coupon_code=coupon_code).values()
-        return CouponDTO(**list(django_coupon)[0])
+        django_coupon = django_vendor_models.Coupon.objects.filter(coupon_code=coupon_code).values().first()
+        return CouponDTO(**django_coupon)
 
     def to_domain(self) -> value_objects.Coupon:
-        from_django = django_vendor_models.Coupon.objects.filter(coupon_code=self.coupon_code).values()[0]
+        from_django = django_vendor_models.Coupon.objects.filter(coupon_code=self.coupon_code).values().first()
         return value_objects.Coupon(**CouponDTO(**from_django).model_dump())
 
     @staticmethod
     def from_domain(coupon: value_objects.Coupon) -> CouponDTO:
-        django_coupon = django_vendor_models.Coupon.objects.filter(coupon_code=coupon.coupon_code).values()
-        return CouponDTO(**list(django_coupon)[0])
+        django_coupon = django_vendor_models.Coupon.objects.filter(coupon_code=coupon.coupon_code).values().first()
+        return CouponDTO(**django_coupon)
 
 
 class CustomerDetailsDTO(BaseModel):
@@ -368,7 +368,7 @@ class OfferStrategyDTO(BaseModel):
     offer_type: enums.OfferType
     name: str
     discount_value: int | Decimal
-    conditions: dict
+    conditions: str
     required_coupon: bool
     coupons: Optional[List[CouponDTO]]
     stackable: bool
@@ -378,44 +378,19 @@ class OfferStrategyDTO(BaseModel):
     is_active: bool
 
     def to_domain(self) -> value_objects.OfferStrategy:
-        coupons = [item.to_domain() for item in self.coupons]
-        return models.OfferStrategy(
-            **self.model_dump(exclude={"coupons"}),
+
+        #first coupon is invalid and second is valid should not stop processing Offer, hence, skipping error
+        coupons = []
+        for item in self.coupons:
+            try:
+                coupons.append(item.to_domain())
+            except:
+                #TODO: add logger
+                continue
+
+        return value_objects.OfferStrategy(
+            **self.model_dump(exclude={"coupons", "conditions"}),
+            conditions=ast.literal_eval(self.conditions),
             coupons=coupons
         )
 
-
-class VendorDTO(BaseModel):
-    offers: List[OfferStrategyDTO]
-
-    @staticmethod
-    def from_django_filters(django_offers):
-        offers_dto = []
-        for offer in django_offers:
-            offers_dto.append(
-                OfferStrategyDTO(
-                    offer_type=offer.get("offer_type"),
-                    name=offer.get("name"),
-                    discount_value=offer.get("discount_value"),
-                    conditions=ast.literal_eval(offer.get("conditions")),
-                    required_coupon=offer.get("required_coupons"),
-                    coupons=[
-                        CouponDTO(
-                            coupon_code=item.get("coupon_code"),
-                            start_date=item.get("start_date"),
-                            end_date=item.get("end_date"),
-                            is_active=item.get("is_active")
-                        )
-                        for item in offer.get("coupons")
-                    ],
-                    stackable=offer.get("stackable"),
-                    priority=offer.get("priority"),
-                    start_date=offer.get("start_date"),
-                    end_date=offer.get("end_date"),
-                    is_active=offer.get("is_active")
-                )
-            )
-
-        return VendorDTO(
-            offers=offers_dto
-        )

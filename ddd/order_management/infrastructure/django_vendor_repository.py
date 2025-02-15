@@ -1,7 +1,7 @@
 import pytz
 from datetime import datetime
 from typing import List
-from ddd.order_management.domain import repositories, enums, value_objects
+from ddd.order_management.domain import repositories, enums, value_objects, exceptions
 from vendor_management import models as django_vendor_models
 from ddd.order_management.infrastructure import order_dtos
 
@@ -13,8 +13,17 @@ class DjangoVendorRepository(repositories.VendorRepository):
             { **offer, "coupons": list(django_vendor_models.Coupon.objects.filter(offer__id=offer.get("id")).values()) }
             for offer in offers
         ]
-        offers_dto = order_dtos.VendorDTO.from_django_filters(offer_list)
-        return offers_dto.model_dump().get("offers")
+
+        final_offers = []
+        for offer in offer_list:
+            offer_dto = order_dtos.OfferStrategyDTO(**offer)
+            try:
+                final_offers.append(offer_dto.to_domain())
+            except (exceptions.InvalidOffer, ValueError) as e:
+                #TODO send notification for invalid offer?
+                print(f"DjangoVendorRepository.get_offer exception > {str(e)}")
+                continue
+        return final_offers
 
 
     def get_shipping_options(self, vendor_name: str):

@@ -42,7 +42,7 @@ class Offer(models.Model):
     conditions = models.CharField(max_length=150, help_text='ex. min_purchase, applicable_products')
     stackable = models.BooleanField(default=False, help_text="Set to True, To combine w other stackable")
     priority = models.PositiveIntegerField(default=0, help_text="The highest number will be prioritized on multistack or single stack")
-    required_coupons = models.BooleanField(default=False, help_text="Set to True, To make use of coupons to apply")
+    required_coupon = models.BooleanField(default=False, help_text="Set to True, To make use of coupons to apply")
     coupon = models.ManyToManyField(Coupon, blank=True, help_text="Provide a coupons to manually apply for this offer.")
     start_date = models.DateTimeField(help_text="Only valid on start of this date; To ignore if required_coupon is True", blank=True, null=True)
     end_date = models.DateTimeField(help_text="Only valid on before end date; To ignore if required_coupon is True", blank=True, null=True)
@@ -51,7 +51,7 @@ class Offer(models.Model):
 
 
     def __str__(self):
-        return f"{self.name} ( {self.offer_type} ) | Required Coupons : {self.required_coupons} | {self.start_date} - {self.end_date} | Is Active: {self.is_active}"
+        return f"{self.name} ( {self.offer_type} ) | Required Coupon : {self.required_coupon} | {self.start_date} - {self.end_date} | Is Active: {self.is_active}"
 
 
 

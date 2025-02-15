@@ -18,15 +18,15 @@ class OfferStrategy(ABC):
     def validate_coupon(self, order: models.Order):
         #reuse if the offer is based on coupon
         for coupon in order.coupons:
-            if self.strategy.required_coupon == True and coupon in [item for item in self.coupons]:
+            if self.strategy.required_coupon == True and coupon in [item for item in self.strategy.coupons]:
                 return True
         return False
 
     def validate_minimum_quantity(self, order:models.Order):
-        return self.strategy.conditions and self.strategy.conditions.get("minimum_quantity") and (sum(item.order_quantity for item in order.line_items) >= self.stategy.conditions.get("minimum_quantity"))
+        return self.strategy.conditions and self.strategy.conditions.get("minimum_quantity") and (sum(item.order_quantity for item in order.line_items) >= self.strategy.conditions.get("minimum_quantity"))
 
     def validate_minimum_order_total(self, order:models.Order):
-        return self.strategy.conditions and self.strategy.conditions.get("minimum_order_total") and (order.total_amount.amount >= self.stategy.conditions.get("minimum_order_total"))
+        return self.strategy.conditions and self.strategy.conditions.get("minimum_order_total") and (order.total_amount.amount >= self.strategy.conditions.get("minimum_order_total"))
 
 class PercentageDiscountStrategy(OfferStrategy):
 
@@ -40,17 +40,13 @@ class PercentageDiscountStrategy(OfferStrategy):
             if eligible_products and (item.product_name in eligible_products):
                 total_discount += item.total_price * (self.strategy.discount_value / 100)
                 discounted_items.append(item.product_name)
-                #item.set_discounts_fee(value_objects.Money(
-                #    amount=total_discount,
-                #    currency=currency
-                #))
                 order.update_total_discounts_fee(
                         value_objects.Money(
                             amount=total_discount,
                             currency=currency
                         )
                     )
-                return f"{self.name} | {','.join(discounted_items)} )"
+                return f"{self.strategy.name} | {','.join(discounted_items)} )"
 
 class FreeGiftOfferStrategy(OfferStrategy):
 
@@ -71,13 +67,14 @@ class FreeGiftOfferStrategy(OfferStrategy):
                         is_free_gift=True
                     )
                 )
-                return f"{self.description} | {','.join(free_gifts)}"
+                return f"{self.strategy.name} | {','.join(free_gifts)}"
     
 class FreeShippingOfferStrategy(OfferStrategy):
 
     def apply(self, order: models.Order):
         currency = order.currency
-        if self.validate_minimum_order_total(order) and self.validate_coupon(order):
+        #if self.validate_minimum_order_total(order) and self.validate_coupon(order):
+        if self.validate_minimum_order_total(order):
             zero_shipping_cost = value_objects.Money(
                 amount=Decimal("0"),
                 currency=currency
@@ -86,7 +83,7 @@ class FreeShippingOfferStrategy(OfferStrategy):
                     order.shipping_details.update_cost(zero_shipping_cost)
                 )
 
-            return f"{self.name} | 0 {currency}"
+            return f"{self.strategy.name} | 0 {currency}"
 
 
 
@@ -95,22 +92,22 @@ class PercentageDiscountCouponOfferStrategy(OfferStrategy):
     def apply(self, order: models.Order):
         total_discount = 0
         discounted_items = []
-        currency = order.currency
         eligible_products = self.strategy.conditions.get("eligible_products")
 
         if self.validate_coupon(order):
             for item in order.line_items:
-                if eligible_products and item.product_name in eligible_products:
-                    total_discount += item.total_price * (self.strategy.discount_value / 100)
-                    discounted_items.append(item.product_name)
-
-                    order.update_total_discounts_fee(
-                            value_objects.Money(
-                                amount=total_discount,
-                                currency=currency
-                            )
+                if eligible_products and item.product_sku in eligible_products:
+                    if total_discount == 0:
+                        total_discount = item.total_price.multiply(self.strategy.discount_value / 100)
+                    else:
+                        total_discount = total_discount.add(
+                            item.total_price.multiply(self.strategy.discount_value / 100)
                         )
-                    return f"{self.name} | {','.join(discounted_items)}"
+                    discounted_items.append(item.product_sku)
+
+                    order.update_total_discounts_fee(total_discount)
+
+                    return f"{self.strategy.name} | {','.join(discounted_items)} | {total_discount.amount} {total_discount.currency}"
 
 
 # when adding new offer need to map the strategy
@@ -145,24 +142,17 @@ class OfferStrategyService:
         valid_offers = []
 
         #sorted by "priority" in descending order
-        sorted_vendor_offers = sorted(vendor_offers, key=lambda x: x["priority"], reverse=True)
+        sorted_vendor_offers = sorted(vendor_offers, key=lambda vo: vo.priority, reverse=True)
 
         for offer in sorted_vendor_offers:
 
-            offer_strategy_class = OFFER_STRATEGIES.get(offer.get("offer_type"))
+            offer_strategy_class = OFFER_STRATEGIES.get(offer.offer_type)
+            valid_offers.append(
+                offer_strategy_class(offer)
+            )
 
-            offer_strategy = value_objects.OfferStrategy(**{
-                **offer,
-                "coupons":[value_objects.Coupon(**coupon) for coupon in offer.get("coupons")]
-            })
-
-            if offer_strategy.is_valid:
-                valid_offers.append(
-                    offer_strategy_class(offer_strategy)
-                )
-
-                if offer.get("stackable") == False:
-                    #make sure offers already ordered based on highest priority, so checking stackable is enough
-                    return valid_offers
+            if offer.stackable == False:
+                #make sure offers already ordered based on highest priority, so checking stackable is enough
+                return valid_offers
 
         return valid_offers

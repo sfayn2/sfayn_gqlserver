@@ -5,6 +5,9 @@ class InvalidStatusTransitionError(Exception):
 class InvalidOrderOperation(Exception):
     pass
 
+class InvalidOffer(Exception):
+    pass
+
 
 class InvalidPaymentOperation(Exception):
     pass
