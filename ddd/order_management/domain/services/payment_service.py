@@ -78,11 +78,11 @@ class PaymentService:
         self.payment_method = payment_method
     
     def verify_payment(self, transaction_id: str, expected_amount: value_objects.Money, order_id: str):
-        payment_strategy_class = PAYMENT_STRATEGY.get(self.payment_method, None)
-        if payment_strategy_class == None:
+        strategy_class = PAYMENT_STRATEGY.get(self.payment_method, None)
+        if not strategy_class:
             raise ValueError(f"Unsupported payment method: {self.payment_method.value}")
 
-        return payment_strategy_class(self.payment_gateway_repository).verify_payment(
+        return strategy_class(self.payment_gateway_repository).verify_payment(
             transaction_id=transaction_id,
             expected_amount=expected_amount,
             order_id=order_id

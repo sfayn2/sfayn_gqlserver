@@ -19,6 +19,7 @@ def handle_unexpected_error(err_details):
         success=False,
         message="An unexpected error occured. Please contact support."
     )
+    return response_dto
 
 def get_order_response_dto(order: models.Order, success: bool = True, message: str = None):
         response_dto = dtos.OrderResponseDTO(
