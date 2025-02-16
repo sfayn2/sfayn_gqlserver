@@ -63,6 +63,18 @@ class ShippingDetailsType(graphene.ObjectType):
     delivery_time = graphene.String(required=True)
     cost = graphene.Field(MoneyType, required=True)
 
+class OrderResponseType(graphene.ObjectType):
+    order_id = graphene.String()
+    order_status = graphene.String()
+    success = graphene.Boolean()
+    message = graphene.String()
+    tax_details = graphene.List(graphene.String)
+    offer_details = graphene.List(graphene.String)
+    shipping_details = graphene.Field(ShippingDetailsType)
+    tax_amount  = graphene.Field(MoneyType)
+    total_discounts_fee = graphene.Field(MoneyType)
+    final_amount = graphene.Field(MoneyType)
+
 
 # ==========================
 # Mutations 
@@ -76,23 +88,13 @@ class PlaceOrderMutation(relay.ClientIDMutation):
         shipping_details = graphene.Field(ShippingDetailsInput, required=True)
         coupons = graphene.List(CouponInput, required=False)
 
-    order_id = graphene.String()
-    order_status = graphene.String()
-    success = graphene.Boolean()
-    message = graphene.String()
-    tax_details = graphene.List(graphene.String)
-    offer_details = graphene.List(graphene.String)
-    shipping_details = graphene.Field(ShippingDetailsType)
-    tax_amount  = graphene.Field(MoneyType)
-    total_discounts_fee = graphene.Field(MoneyType)
-    final_amount = graphene.Field(MoneyType)
+    order = graphene.Field(OrderResponseType)
 
     @classmethod
     def mutate_and_get_payload(cls, root, info, **input):
         try:
             command = commands.PlaceOrderCommand.model_validate(input)
             order = message_bus.handle(command, unit_of_work.DjangoOrderUnitOfWork())
-
             #placed order status only in Pending; once payment is confirmed ; webhook will trigger and call api to confirm order
             response_dto = helpers.get_order_response_dto(order, success=True, message="Order successfully placed.")
 
@@ -101,7 +103,7 @@ class PlaceOrderMutation(relay.ClientIDMutation):
         except Exception as e:
             response_dto = helpers.handle_unexpected_error(f"Unexpected error during place order {e}")
 
-        return cls(**response_dto.model_dump())
+        return cls(order=OrderResponseType(**response_dto.model_dump()))
 
 class ConfirmOrderMutation(relay.ClientIDMutation):
     class Input:
@@ -109,16 +111,7 @@ class ConfirmOrderMutation(relay.ClientIDMutation):
         order_id = graphene.String(required=True)
         amount = graphene.Field(MoneyInput, required=True)
 
-    order_id = graphene.String()
-    order_status = graphene.String()
-    success = graphene.Boolean()
-    message = graphene.String()
-    tax_details = graphene.List(graphene.String)
-    offer_details = graphene.List(graphene.String)
-    shipping_details = graphene.Field(ShippingDetailsType)
-    tax_amount  = graphene.Field(MoneyType)
-    total_discounts_fee = graphene.Field(MoneyType)
-    final_amount = graphene.Field(MoneyType)
+    order = graphene.Field(OrderResponseType)
 
     @classmethod
     def mutate_and_get_payload(cls, root, info, **input):
@@ -132,7 +125,7 @@ class ConfirmOrderMutation(relay.ClientIDMutation):
         except Exception as e:
             response_dto = helpers.handle_unexpected_error(f"Unexpected error during confirmation order {e}")
 
-        return cls(**response_dto.model_dump())
+        return cls(order=OrderResponseType(**response_dto.model_dump()))
 
 
 
