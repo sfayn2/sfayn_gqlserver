@@ -116,6 +116,8 @@ class Order:
         raise exceptions.InvalidOrderOperation(f"Product w Sku {product_sku} not found in the order.")
 
     def place_order(self):
+        if self.order_status != enums.OrderStatus.DRAFT:
+            raise exceptions.InvalidOrderOperation("Only draft orders can be place order.")
         if not self.line_items:
             raise exceptions.InvalidOrderOperation("Cannot place an order without line items.")
         if not self.customer_details:

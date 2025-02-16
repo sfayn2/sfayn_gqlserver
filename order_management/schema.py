@@ -78,7 +78,7 @@ class PlaceOrderMutation(relay.ClientIDMutation):
 
     order_id = graphene.String()
     order_status = graphene.String()
-    success = graphene.String()
+    success = graphene.Boolean()
     message = graphene.String()
     tax_details = graphene.List(graphene.String)
     offer_details = graphene.List(graphene.String)
@@ -94,18 +94,7 @@ class PlaceOrderMutation(relay.ClientIDMutation):
             order = message_bus.handle(command, unit_of_work.DjangoOrderUnitOfWork())
 
             #placed order status only in Pending; once payment is confirmed ; webhook will trigger and call api to confirm order
-            response_dto = dtos.PlaceOrderResponseDTO(
-                order_id=order.order_id,
-                order_status=order.order_status,
-                success=True,
-                message="Order successfully placed.",
-                tax_details=order.tax_details,
-                offer_details=order.offer_details,
-                shipping_details=asdict(order.shipping_details),
-                tax_amount=asdict(order.tax_amount),
-                total_discounts_fee=asdict(order.total_discounts_fee),
-                final_amount=asdict(order.final_amount)
-            )
+            response_dto = helpers.get_order_response_dto(order, success=True, message="Order successfully placed.")
 
         except (exceptions.InvalidOrderOperation, ValueError) as e:
             response_dto = helpers.handle_invalid_order_operation(e)
@@ -114,58 +103,46 @@ class PlaceOrderMutation(relay.ClientIDMutation):
 
         return cls(**response_dto.model_dump())
 
+class ConfirmOrderMutation(relay.ClientIDMutation):
+    class Input:
+        transaction_id = graphene.String(required=True)
+        order_id = graphene.String(required=True)
+        amount = graphene.Field(MoneyInput, required=True)
+
+    order_id = graphene.String()
+    order_status = graphene.String()
+    success = graphene.Boolean()
+    message = graphene.String()
+    tax_details = graphene.List(graphene.String)
+    offer_details = graphene.List(graphene.String)
+    shipping_details = graphene.Field(ShippingDetailsType)
+    tax_amount  = graphene.Field(MoneyType)
+    total_discounts_fee = graphene.Field(MoneyType)
+    final_amount = graphene.Field(MoneyType)
+
+    @classmethod
+    def mutate_and_get_payload(cls, root, info, **input):
+        try:
+            command = commands.ConfirmOrderCommand.model_validate(input)
+            order = message_bus.handle(command, unit_of_work.DjangoOrderUnitOfWork())
+            response_dto = helpers.get_order_response_dto(order, success=True, message="Order successfully confirmed.")
+
+        except (exceptions.InvalidOrderOperation, ValueError) as e:
+            response_dto = helpers.handle_invalid_order_operation(e)
+        except Exception as e:
+            response_dto = helpers.handle_unexpected_error(f"Unexpected error during confirmation order {e}")
+
+        return cls(**response_dto.model_dump())
 
 
+
+# ===========
+# Sample PlaceOrderMutation
+# ======================
 """
-Sample CheckOrderMutation mutation
-
-mutation {
-  checkoutOrder(input: {
-    customerDetails: {
-      firstName: "John",
-      lastName: "Doe",
-      email: "JohnDoe@gmail.com"
-    },
-    address: {
-      street: "123 main street",
-      city: "New York",
-      state: "NYC",
-      postal: "1001",
-      country: "USA"
-    },
-    lineItems: [
-      {
-        productSku: "SKU1",
-        productName: "Product1",
-        vendorName: "Vendor1",
-        productCategory: "Category1",
-        orderQuantity: 1,
-        options: {color:"red"},
-        productPrice: {
-          amount: 2.1,
-          currency: "SGD"
-        },
-        package: {
-          weight: 1.5,
-          dimensions: [10, 10, 10]
-        }
-      }
-    ]
-  }) {
-    orderId
-    orderStatus
-    success
-    message
-  }
-}
-"""
-
-"""
-Sample PlaceOrderMutation mutation
-
 mutation {
   placeOrder(input: {
-    orderId: "ORD-58D6A174"
+    orderId: "ORD-32DE8813"
     customerDetails: {
       firstName: "John",
       lastName: "Doe",
@@ -204,7 +181,7 @@ mutation {
         currency: "SGD"
       }
     },
-    coupons: [{ couponCode:"WELCOME25"}]
+    coupons: [{ couponCode: "WELCOME25"}]
   }) {
     orderId
     orderStatus
@@ -212,6 +189,14 @@ mutation {
     message
     taxDetails
     offerDetails
+    shippingDetails {
+      method
+      deliveryTime
+      cost {
+        amount
+        currency
+      }
+    }
     taxAmount {
       amount
       currency
@@ -224,7 +209,7 @@ mutation {
       amount
       currency
     }
+    
   }
 }
-
 """

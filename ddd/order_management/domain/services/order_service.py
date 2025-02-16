@@ -2,7 +2,23 @@ import uuid
 from datetime import datetime
 from typing import List
 from ddd.order_management.domain import models, value_objects, enums, exceptions
-from ddd.order_management.domain.services import tax_service, offer_service
+from ddd.order_management.domain.services import tax_service, offer_service, payment_service
+
+def confirm_order(payment_service: payment_service.PaymentService, 
+                  order: models.Order, 
+                  transaction_id: str, 
+                  amount: value_objects.Money):
+
+        is_paid, message = payment_service.verify_payment(
+            order_id=order.order_id,
+            transaction_id=transaction_id,
+            expected_amount=amount,
+        )
+
+        order.confirm_order(is_paid)
+
+        return order
+
 
 def place_order(
         customer_details: value_objects.CustomerDetails,
@@ -16,7 +32,7 @@ def place_order(
 
     order = models.Order(
         order_id=f"ORD-{uuid.uuid4().hex[:8].upper()}",
-        order_status=enums.OrderStatus.DRAFT.value,
+        order_status=enums.OrderStatus.DRAFT,
         date_created=datetime.now(),
         customer_details=customer_details,
         shipping_details=shipping_details,

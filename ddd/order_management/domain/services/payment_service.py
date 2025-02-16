@@ -59,8 +59,8 @@ class StripePaymentVerifierStrategy(PaymentVerifierStrategy):
         return True, "Payment verified successfully"
 
 PAYMENT_STRATEGY = {
-    enums.PaymentMethod.PAYPAL: PayPalPaymentVerifierStrategy(),
-    enums.PaymentMethod.STRIPE: StripePaymentVerifierStrategy()
+    enums.PaymentMethod.PAYPAL: PayPalPaymentVerifierStrategy,
+    enums.PaymentMethod.STRIPE: StripePaymentVerifierStrategy
 }
 
 class PaymentService:
@@ -69,11 +69,11 @@ class PaymentService:
         self.payment_method = payment_method
     
     def verify_payment(self, transaction_id: str, expected_amount: value_objects.Money, order_id: str):
-        strategy = PAYMENT_STRATEGY.get(self.payment_method, None)
-        if strategy == None:
+        payment_strategy_class = PAYMENT_STRATEGY.get(self.payment_method, None)
+        if payment_strategy_class == None:
             raise ValueError(f"Unsupported payment method: {self.payment_method.value}")
 
-        return strategy.verify_payment(
+        return payment_strategy_class(self.payment_gateway_repository).verify_payment(
             transaction_id=transaction_id,
             expected_amount=expected_amount,
             order_id=order_id

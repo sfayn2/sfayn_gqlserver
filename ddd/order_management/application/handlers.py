@@ -3,8 +3,8 @@ from decimal import Decimal
 from datetime import datetime
 from ddd.order_management.application import commands, unit_of_work
 from ddd.order_management.domain import models, events, value_objects, enums
-from ddd.order_management.domain.services import order_service, offer_service, tax_service
-from ddd.order_management.infrastructure import django_vendor_repository
+from ddd.order_management.domain.services import order_service, offer_service, tax_service, payment_service
+from ddd.order_management.infrastructure import django_vendor_repository, paypal_gateway_repository
 
 def handle_place_order(command: commands.PlaceOrderCommand, uow: unit_of_work.DjangoOrderUnitOfWork):
     with uow:
@@ -42,3 +42,24 @@ def handle_place_order(command: commands.PlaceOrderCommand, uow: unit_of_work.Dj
 
         #results, event
         return placed_order, event
+
+def handle_confirm_order(command: commands.ConfirmOrderCommand, uow: unit_of_work.DjangoOrderUnitOfWork):
+    with uow:
+
+        order = uow.order.get(order_id=command.order_id)
+
+        payment_svc = payment_service.PaymentService(
+            paypal_gateway_repository.PaypalPaymentGatewayRepository(),
+            enums.PaymentMethod.PAYPAL
+        )
+
+        confirmed_order = order_service.confirm_order(
+            payment_service=payment_svc,
+            order=order,
+            transaction_id=command.transaction_id,
+            amount=command.amount
+        )
+
+        event = events.OrderConfirmed(order_id=command.order_id)
+
+        return confirmed_order, event

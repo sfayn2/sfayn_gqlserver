@@ -4,13 +4,7 @@ from decimal import Decimal
 from typing import Optional, List, Tuple
 from ddd.order_management.infrastructure import order_dtos
 
-class CheckoutResponseDTO(BaseModel):
-    order_id: str
-    order_status: str
-    success: bool
-    message: str
-
-class PlaceOrderResponseDTO(BaseModel):
+class OrderResponseDTO(BaseModel):
     order_id: str
     order_status: str
     success: bool
@@ -22,6 +16,7 @@ class PlaceOrderResponseDTO(BaseModel):
     total_discounts_fee: order_dtos.MoneyDTO
     final_amount: order_dtos.MoneyDTO
 
-class ResponseWExceptionDTO(BaseModel):
+
+class ResponseDTO(BaseModel):
     success: bool
     message: str
