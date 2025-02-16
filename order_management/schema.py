@@ -3,7 +3,7 @@ import logging
 from dataclasses import asdict
 from graphene import relay
 from graphene.types.generic import GenericScalar
-from ddd.order_management.application import message_bus, dtos, commands, unit_of_work
+from ddd.order_management.application import message_bus, dtos, commands, unit_of_work, helpers
 from ddd.order_management.domain import enums, exceptions
 
 #logger = logging.getLogger("django")
@@ -63,23 +63,6 @@ class ShippingDetailsType(graphene.ObjectType):
     delivery_time = graphene.String(required=True)
     cost = graphene.Field(MoneyType, required=True)
 
-# ==================
-# helper function
-# =================
-def handle_invalid_order_operation(err):
-    logger.error(f"{err}")
-    response_dto = dtos.ResponseWExceptionDTO(
-        success=False,
-        message=str(err)
-    )
-    return response_dto
-
-def handle_unexpected_error(err_details):
-    logger.error(f"{err_details}", exc_info=True)
-    response_dto = dtos.ResponseWExceptionDTO(
-        success=False,
-        message="An unexpected error occured. Please contact support."
-    )
 
 # ==========================
 # Mutations 
@@ -110,9 +93,9 @@ class CheckoutOrderMutation(relay.ClientIDMutation):
             )
 
         except (exceptions.InvalidOrderOperation, ValueError) as e:
-            response_dto = handle_invalid_order_operation(e)
+            response_dto = helpers.handle_invalid_order_operation(e)
         except Exception as e:
-            response_dto = handle_unexpected_error(f"Unexpected error during check out {e}")
+            response_dto = helpers.handle_unexpected_error(f"Unexpected error during check out {e}")
 
         return cls(**response_dto.model_dump())
 
@@ -157,9 +140,9 @@ class PlaceOrderMutation(relay.ClientIDMutation):
             )
 
         except (exceptions.InvalidOrderOperation, ValueError) as e:
-            response_dto = handle_invalid_order_operation(e)
+            response_dto = helpers.handle_invalid_order_operation(e)
         except Exception as e:
-            response_dto = handle_unexpected_error(f"Unexpected error during place order {e}")
+            response_dto = helpers.handle_unexpected_error(f"Unexpected error during place order {e}")
 
         return cls(**response_dto.model_dump())
 

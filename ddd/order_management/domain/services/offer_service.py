@@ -7,6 +7,9 @@ from typing import Tuple, List, Dict, Union
 from ddd.order_management.domain import enums, exceptions, models, value_objects, repositories
 from decimal import Decimal
 
+# ==========================
+# Offer Strategy Contract
+# =================
 class OfferStrategy(ABC):
     def __init__(self, strategy: value_objects.OfferStrategy):
         self.strategy = strategy
@@ -28,6 +31,9 @@ class OfferStrategy(ABC):
     def validate_minimum_order_total(self, order:models.Order):
         return self.strategy.conditions and self.strategy.conditions.get("minimum_order_total") and (order.total_amount.amount >= self.strategy.conditions.get("minimum_order_total"))
 
+# =========================
+# Offer Strategies
+# ====================
 class PercentageDiscountStrategy(OfferStrategy):
 
     #apply on order
@@ -109,6 +115,9 @@ class PercentageDiscountCouponOfferStrategy(OfferStrategy):
 
                     return f"{self.strategy.name} | {','.join(discounted_items)} | {total_discount.amount} {total_discount.currency}"
 
+# ==============
+# Offer Strategy Mapper
+# ===============
 
 # when adding new offer need to map the strategy
 OFFER_STRATEGIES = {
@@ -117,6 +126,10 @@ OFFER_STRATEGIES = {
     enums.OfferType.COUPON_PERCENTAGE_DISCOUNT: PercentageDiscountCouponOfferStrategy,
     enums.OfferType.FREE_SHIPPING: FreeShippingOfferStrategy
 }
+
+# ================
+# Offer Strategy Service
+# ==================
 
 class OfferStrategyService:        
 
