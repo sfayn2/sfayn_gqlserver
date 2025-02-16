@@ -3,6 +3,9 @@ from typing import Tuple
 from abc import ABC, abstractmethod
 from ddd.order_management.domain import enums, value_objects, repositories, exceptions
 
+# ==================
+# Payment verifier contract
+# ======================
 class PaymentVerifierStrategy(ABC):
     @abstractmethod
     def verify_payment(self, transaction_id: str, expected_amount: value_objects.Money, order_id: str) -> Tuple[bool, str]:
@@ -58,11 +61,17 @@ class StripePaymentVerifierStrategy(PaymentVerifierStrategy):
         
         return True, "Payment verified successfully"
 
+# ====================
+# Payment Verifier Strategy Mapper
+# ===========
 PAYMENT_STRATEGY = {
     enums.PaymentMethod.PAYPAL: PayPalPaymentVerifierStrategy,
     enums.PaymentMethod.STRIPE: StripePaymentVerifierStrategy
 }
 
+# ===============
+# Payment Verifier service
+# =======================
 class PaymentService:
     def __init__(self, payment_gateway_repository: repositories.PaymentGatewayRepository, payment_method: enums.PaymentMethod):
         self.payment_gateway_repository = payment_gateway_repository
