@@ -10,7 +10,6 @@ class Query(
     pass
 
 class Mutation(graphene.ObjectType):
-    checkout_order = order_management.schema.CheckoutOrderMutation.Field()
     place_order = order_management.schema.PlaceOrderMutation.Field()
 
 schema = graphene.Schema(query=Query, mutation=Mutation)

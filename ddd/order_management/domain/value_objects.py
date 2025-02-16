@@ -64,7 +64,7 @@ class Money:
 
     @classmethod
     def default(cls) -> Money:
-        return Money(amount=Decimal("0"), currency="TBD") #need to get from settigns?
+        return Money(amount=Decimal("0"), currency="SGD") #need to get from settigns?
 
 
 

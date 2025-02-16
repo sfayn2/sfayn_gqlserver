@@ -53,10 +53,10 @@ class Order:
     order_id: str
     date_created: datetime
     destination: value_objects.Address
-    line_items: List[LineItem]
     customer_details: value_objects.CustomerDetails
     order_status: enums.OrderStatus
-    shipping_details: Optional[value_objects.ShippingDetails] = None
+    shipping_details: value_objects.ShippingDetails
+    line_items: List[LineItem] = None
     payment_details: Optional[value_objects.PaymentDetails] = None
     cancellation_reason: Optional[str] = None
     shipping_reference: Optional[str] = None
@@ -68,32 +68,6 @@ class Order:
     total_amount: value_objects.Money = value_objects.Money.default()
     final_amount: value_objects.Money = value_objects.Money.default()
     date_modified: Optional[datetime] = None
-
-
-    @classmethod
-    def create_draft_order(cls, customer_details: value_objects.CustomerDetails, 
-                     destination: value_objects.Address, line_items: List[LineItem]):
-
-        if not customer_details:
-            raise exceptions.InvalidOrderOperation("Customer details must be provided.")
-
-        if not line_items:
-            raise exceptions.InvalidOrderOperation("Order must have at least one line item.")
-        
-        if any(item.product_price.currency != line_items[0].product_price.currency for item in line_items):
-            raise exceptions.InvalidOrderOperation("All line items must have the same currency.")
-
-        if len(set(item.vendor_name for item in line_items)) > 1:
-            raise exceptions.InvalidOrderOperation("All line items must belong to the same vendor.")
-
-        return cls(
-            order_id=f"ORD-{uuid.uuid4().hex[:8].upper()}",
-            order_status=enums.OrderStatus.DRAFT.value,
-            date_created=datetime.now(),
-            customer_details=customer_details,
-            line_items=line_items,
-            destination=destination
-        )
 
     def _validate_line_item(self, line_item: LineItem):
         if self.currency != line_item.product_price.currency:
@@ -127,6 +101,12 @@ class Order:
         self.line_items =line_items
         self._update_totals()
 
+    def update_shipping_details(self, shipping_details: value_objects.ShippingDetails) -> None:
+        if not shipping_details:
+            raise exceptions.InvalidOrderOperation("Shipping details must be provided.")
+        self.shipping_details = shipping_details
+        self.update_modified_date()
+
     def update_order_quantity(self, product_sku: str, new_quantity: int):
         for line_item in self.line_items:
             if line_item.product_sku == product_sku:
@@ -136,12 +116,19 @@ class Order:
         raise exceptions.InvalidOrderOperation(f"Product w Sku {product_sku} not found in the order.")
 
     def place_order(self):
-        if self.order_status != enums.OrderStatus.DRAFT:
-            raise exceptions.InvalidOrderOperation("Only draft can place an order.")
         if not self.line_items:
             raise exceptions.InvalidOrderOperation("Cannot place an order without line items.")
+        if not self.customer_details:
+            raise exceptions.InvalidOrderOperation("Customer details must be provided.")
+        if any(item.product_price.currency != self.line_items[0].product_price.currency for item in self.line_items):
+            raise exceptions.InvalidOrderOperation("All line items must have the same currency.")
+
+        if len(set(item.vendor_name for item in self.line_items)) > 1:
+            raise exceptions.InvalidOrderOperation("All line items must belong to the same vendor.")
+
         if not self.shipping_details:
             raise exceptions.InvalidOrderOperation("Order must have a selected Shipping method")
+
         self.order_status = enums.OrderStatus.PENDING
         self.update_modified_date()
 
@@ -158,11 +145,6 @@ class Order:
         if not payment_details:
             raise exceptions.InvalidOrderOperation("Payment details cannot be none.")
         self.payment_details = payment_details
-
-    def update_customer_details(self, customer_details: value_objects.CustomerDetails):
-        if not customer_details:
-            raise exceptions.InvalidOrderOperation("Customer details cannot be none.")
-        self.customer_details = customer_details
 
     def mark_as_shipped(self):
         if self.order_status != enums.OrderStatus.CONFIRMED:
@@ -213,12 +195,6 @@ class Order:
         if not destination:
             raise exceptions.InvalidOrderOperation("Destination cannot be none.")
         self.destination = destination
-        self.update_modified_date()
-    
-    def update_shipping_details(self, shipping_details: value_objects.ShippingDetails):
-        if not shipping_details:
-            raise exceptions.InvalidOrderOperation("Shipping details cannot be none.")
-        self.shipping_details = shipping_details
         self.update_modified_date()
     
     def select_shipping_option(self, shipping_option: enums.ShippingMethod, shipping_options: List[dict]):

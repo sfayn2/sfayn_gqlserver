@@ -67,38 +67,6 @@ class ShippingDetailsType(graphene.ObjectType):
 # ==========================
 # Mutations 
 # ===================
-class CheckoutOrderMutation(relay.ClientIDMutation):
-    class Input:
-        customer_details = graphene.Field(CustomerDetailsInput, required=True)
-        address = graphene.Field(AddressInput, required=True)
-        line_items = graphene.List(LineItemInput, required=True)
-
-    order_id = graphene.String()
-    order_status = graphene.String()
-    success = graphene.Boolean()
-    message = graphene.String()
-
-    @classmethod
-    def mutate_and_get_payload(cls, root, info, **input):
-        try: 
-            command = commands.DraftOrderCommand.model_validate(input)
-
-            order = message_bus.handle(command, unit_of_work.DjangoOrderUnitOfWork())
-
-            response_dto = dtos.CheckoutResponseDTO(
-                order_id=order.order_id,
-                order_status=order.order_status,
-                success=True,
-                message="Order successfully created."
-            )
-
-        except (exceptions.InvalidOrderOperation, ValueError) as e:
-            response_dto = helpers.handle_invalid_order_operation(e)
-        except Exception as e:
-            response_dto = helpers.handle_unexpected_error(f"Unexpected error during check out {e}")
-
-        return cls(**response_dto.model_dump())
-
 class PlaceOrderMutation(relay.ClientIDMutation):
     class Input:
         order_id = graphene.String()

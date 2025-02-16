@@ -9,13 +9,6 @@ class DomainEvent(ABC):
     pass
 
 @dataclass
-class ProductCheckedout(DomainEvent):
-    order_id: str
-    destination: value_objects.Address
-    customer_details: value_objects.CustomerDetails
-    line_items: List[models.LineItem]
-
-@dataclass
 class OrderPlaced(DomainEvent):
     order_id: str
     order_status: enums.OrderStatus
