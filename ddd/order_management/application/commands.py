@@ -18,8 +18,7 @@ class PlaceOrderCommand(Command):
 
 class ConfirmOrderCommand(Command):
     order_id: str
-    transaction_id: str
-    amount: order_dtos.MoneyDTO
+    payment_details: order_dtos.PaymentDetailsDTO
 
 class ShipOrderCommand(Command):
     order_id: str

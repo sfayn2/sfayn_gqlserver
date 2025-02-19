@@ -8,14 +8,11 @@ from ddd.order_management.infrastructure import (
     django_vendor_repository, 
     paypal_gateway_repository
 )
+from ddd.order_management.application import message_bus
 
 T = TypeVar("T")
 
 class AbstractUnitOfWork(ABC):
-    order: repositories.OrderRepository
-    vendor: repositories.VendorRepository
-    customer: repositories.CustomerRepository
-    payment_gateway: repositories.PaymentGatewayRepository
 
     def __enter__(self) -> T:
         return self
@@ -39,7 +36,8 @@ class DjangoOrderUnitOfWork(AbstractUnitOfWork):
         self.order = django_order_repository.DjangoOrderRepository()
         self.customer = django_customer_repository.DjangoCustomerRepository()
         self.vendor = django_vendor_repository.DjangoVendorRepository()
-        #self.payment_gateway = paypal_gateway_repository.PaypalPaymentGatewayRepository()
+        self.event_publisher = message_bus
+        self.payment_gateway = paypal_gateway_repository.PaypalPaymentGatewayRepository()
 
     def __enter__(self):
 

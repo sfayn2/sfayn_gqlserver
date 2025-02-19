@@ -38,8 +38,9 @@ def handle_place_order(command: commands.PlaceOrderCommand, uow: unit_of_work.Dj
         uow.order.save(placed_order)
         uow.commit()
 
-        #results, event
-        return placed_order, event
+        uow.event_publisher.publish(event)
+
+        return placed_order
 
 def handle_confirm_order(command: commands.ConfirmOrderCommand, uow: unit_of_work.DjangoOrderUnitOfWork):
     with uow:
@@ -50,16 +51,20 @@ def handle_confirm_order(command: commands.ConfirmOrderCommand, uow: unit_of_wor
 
         payment_svc = payment_service.PaymentService(
             uow.payment_gateway,
-            enums.PaymentMethod.PAYPAL
+            command.payment_details.method
         )
 
         confirmed_order = order_service.confirm_order(
             payment_service=payment_svc,
             order=order,
-            transaction_id=command.transaction_id,
-            amount=command.amount
+            payment_details=command.payment_details.to_domain()
         )
 
         event = events.OrderConfirmed(order_id=command.order_id)
 
-        return confirmed_order, event
+        uow.order.save(confirmed_order)
+        uow.commit()
+
+        uow.event_publisher.publish(event)
+
+        return confirmed_order

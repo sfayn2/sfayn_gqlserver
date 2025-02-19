@@ -48,6 +48,12 @@ class ShippingDetailsInput(graphene.InputObjectType):
     delivery_time = graphene.String(required=True)
     cost = graphene.Field(MoneyInput, required=True)
 
+class PaymentDetailsInput(graphene.InputObjectType):
+    method = graphene.String(required=True)
+    paid_amount = graphene.Field(MoneyInput, required=True)
+    transaction_id = graphene.String(required=True)
+
+
 class CouponInput(graphene.InputObjectType):
     coupon_code = graphene.String(required=True)
 
@@ -63,6 +69,11 @@ class ShippingDetailsType(graphene.ObjectType):
     delivery_time = graphene.String(required=True)
     cost = graphene.Field(MoneyType, required=True)
 
+class PaymentDetailsType(graphene.ObjectType):
+    method = graphene.String(required=True)
+    paid_amount = graphene.Field(MoneyType, required=True)
+    transaction_id = graphene.String(required=True)
+
 class OrderResponseType(graphene.ObjectType):
     order_id = graphene.String()
     order_status = graphene.String()
@@ -71,6 +82,7 @@ class OrderResponseType(graphene.ObjectType):
     tax_details = graphene.List(graphene.String)
     offer_details = graphene.List(graphene.String)
     shipping_details = graphene.Field(ShippingDetailsType)
+    payment_details = graphene.Field(PaymentDetailsType)
     tax_amount  = graphene.Field(MoneyType)
     total_discounts_fee = graphene.Field(MoneyType)
     final_amount = graphene.Field(MoneyType)
@@ -107,9 +119,8 @@ class PlaceOrderMutation(relay.ClientIDMutation):
 
 class ConfirmOrderMutation(relay.ClientIDMutation):
     class Input:
-        transaction_id = graphene.String(required=True)
         order_id = graphene.String(required=True)
-        amount = graphene.Field(MoneyInput, required=True)
+        payment_details = graphene.Field(PaymentDetailsInput, required=True)
 
     order = graphene.Field(OrderResponseType)
 

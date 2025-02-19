@@ -16,8 +16,7 @@ def handle(message: Union[commands.Command, events.DomainEvent], uow: unit_of_wo
         handler = COMMAND_HANDLERS.get(type(message))
         if not handler:
             raise ValueError(f"No handler registered for command: {type(message)}")
-        results, event = handler(message, uow)
-        handle_event(event, uow)
+        results = handler(message, uow)
         return results
     elif isinstance(message, events.DomainEvent):
         handlers = EVENT_HANDLERS.get(type(message), [])
@@ -26,7 +25,7 @@ def handle(message: Union[commands.Command, events.DomainEvent], uow: unit_of_wo
     else:
         raise ValueError(f"Unknown message type {type(message)}")
 
-def handle_event(event, uow):
+def publish(event, uow):
     # handle the event locally by triggering event handlers
     handlers = EVENT_HANDLERS.get(type(event), [])
     for handler in handlers:
