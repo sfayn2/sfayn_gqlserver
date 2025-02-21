@@ -21,24 +21,8 @@ def handle_place_order(command: commands.PlaceOrderCommand, uow: unit_of_work.Dj
             offer_service=offer_svc
         )
 
-
-        event = events.OrderPlaced(
-            order_id=placed_order.order_id,
-            order_status=placed_order.order_status,
-            customer_details=placed_order.customer_details,
-            shipping_details=placed_order.shipping_details,
-            line_items=placed_order.line_items,
-            tax_details=placed_order.tax_details,
-            tax_amount=placed_order.tax_amount,
-            offer_details=placed_order.offer_details,
-            total_discounts_fee=placed_order.total_discounts_fee,
-            final_amount=placed_order.final_amount
-        )
-
         uow.order.save(placed_order)
         uow.commit()
-
-        uow.event_publisher.publish(event)
 
         return placed_order
 
@@ -60,11 +44,7 @@ def handle_confirm_order(command: commands.ConfirmOrderCommand, uow: unit_of_wor
             payment_details=command.payment_details.to_domain()
         )
 
-        event = events.OrderConfirmed(order_id=command.order_id)
-
         uow.order.save(confirmed_order)
         uow.commit()
-
-        uow.event_publisher.publish(event)
 
         return confirmed_order

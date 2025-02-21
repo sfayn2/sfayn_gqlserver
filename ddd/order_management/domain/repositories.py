@@ -3,6 +3,10 @@ from abc import ABC, abstractmethod
 from ddd.order_management.domain import models
 
 class OrderRepository(ABC):
+
+    def __init__(self):
+        self.seen = [] #track loaded entities for event collection
+
     @abstractmethod
     def save(self, order: models.Order):
         raise NotImplementedError("Subclasses must implement this method")

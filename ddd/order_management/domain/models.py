@@ -4,7 +4,7 @@ from datetime import datetime
 from decimal import Decimal
 from typing import List, Optional, Tuple
 from dataclasses import dataclass, field
-from ddd.order_management.domain import value_objects, enums, exceptions
+from ddd.order_management.domain import value_objects, enums, exceptions, events
 
 @dataclass
 class LineItem:
@@ -68,6 +68,7 @@ class Order:
     total_amount: value_objects.Money = value_objects.Money.default()
     final_amount: value_objects.Money = value_objects.Money.default()
     date_modified: Optional[datetime] = None
+    _events: List[events.DomainEvent] = field(default_factory=list, init=False)
 
     def _validate_line_item(self, line_item: LineItem):
         if self.currency != line_item.product_price.currency:
@@ -115,6 +116,10 @@ class Order:
                 return
         raise exceptions.InvalidOrderOperation(f"Product w Sku {product_sku} not found in the order.")
 
+    def raise_event(self, event: events.DomainEvent):
+        self._events.append(event)
+
+
     def place_order(self):
         if self.order_status != enums.OrderStatus.DRAFT:
             raise exceptions.InvalidOrderOperation("Only draft orders can be place order.")
@@ -134,6 +139,13 @@ class Order:
         self.order_status = enums.OrderStatus.PENDING
         self.update_modified_date()
 
+        event = events.OrderPlaced(
+            order_id=self.order_id,
+            order_status=self.order_status,
+        )
+
+        self.raise_event(event)
+
     def confirm_order(self, payment_verified: bool):
         if self.order_status != enums.OrderStatus.PENDING:
             raise exceptions.InvalidOrderOperation("Only pending orders can be confirmed.")
@@ -142,6 +154,13 @@ class Order:
 
         self.order_status = enums.OrderStatus.CONFIRMED
         self.update_modified_date()
+
+        event = events.OrderConfirmed(
+            order_id=self.order_id,
+            order_status=self.order_status,
+        )
+
+        self.raise_event(event)
 
     def update_payment_details(self, payment_details: value_objects.PaymentDetails):
         if not payment_details:

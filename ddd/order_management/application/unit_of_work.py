@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import TypeVar
+from typing import TypeVar, List
 from django.db import transaction
 from ddd.order_management.domain import repositories
 from ddd.order_management.infrastructure import (
@@ -29,6 +29,7 @@ class AbstractUnitOfWork(ABC):
         raise NotImplementedError
 
 
+
 class DjangoOrderUnitOfWork(AbstractUnitOfWork):
     #make sure to call uow within block statement
     #to trigger this
@@ -37,7 +38,8 @@ class DjangoOrderUnitOfWork(AbstractUnitOfWork):
         self.customer = django_customer_repository.DjangoCustomerRepository()
         self.vendor = django_vendor_repository.DjangoVendorRepository()
         self.event_publisher = message_bus
-        self.payment_gateway = paypal_gateway_repository.PaypalPaymentGatewayRepository()
+        self._events = []
+        #self.payment_gateway = paypal_gateway_repository.PaypalPaymentGatewayRepository()
 
     def __enter__(self):
 
@@ -52,7 +54,23 @@ class DjangoOrderUnitOfWork(AbstractUnitOfWork):
 
     def commit(self):
         #do nothing since transaction.atomic() auto handle it
-        pass
+        self._collect_events()
+        self._publish_events()
 
     def rollback(self):
         self.atomic.__exit__(Exception, Exception(), None)
+
+    def _collect_events(self):
+        self._events = []
+
+        for entity in self.order.seen:
+            if hasattr(entity, "_events"):
+                self._events.extend(entity._events) #append not override
+                entity._events.clear() #prevent duplicate processing
+
+    def _publish_events(self):
+        for event in self._events:
+            #TODO
+            print(f"Publish event : {event}")
+            self.event_publisher.publish(event, self)
+

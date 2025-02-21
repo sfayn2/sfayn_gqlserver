@@ -9,7 +9,7 @@ class Command(BaseModel, frozen=True):
     pass
 
 class PlaceOrderCommand(Command):
-    order_id: str
+    #order_id: str
     customer_details: order_dtos.CustomerDetailsDTO
     shipping_address: order_dtos.AddressDTO
     line_items: List[order_dtos.LineItemDTO]

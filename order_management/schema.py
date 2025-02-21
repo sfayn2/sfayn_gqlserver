@@ -93,7 +93,7 @@ class OrderResponseType(graphene.ObjectType):
 # ===================
 class PlaceOrderMutation(relay.ClientIDMutation):
     class Input:
-        order_id = graphene.String()
+        #order_id = graphene.String()
         customer_details = graphene.Field(CustomerDetailsInput, required=True)
         shipping_address = graphene.Field(AddressInput, required=True)
         line_items = graphene.List(LineItemInput, required=True)
@@ -146,7 +146,6 @@ class ConfirmOrderMutation(relay.ClientIDMutation):
 """
 mutation {
   placeOrder(input: {
-    orderId: "ORD-32DE8813"
     customerDetails: {
       firstName: "John",
       lastName: "Doe",
@@ -187,7 +186,8 @@ mutation {
     },
     coupons: [{ couponCode: "WELCOME25"}]
   }) {
-    orderId
+    order	{
+        orderId
     orderStatus
     success
     message
@@ -214,6 +214,7 @@ mutation {
       currency
     }
     
+    }
   }
 }
 """
