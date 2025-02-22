@@ -5,10 +5,12 @@ from ddd.order_management.domain import models, value_objects, enums, exceptions
 from ddd.order_management.domain.services import payment_verify_service, tax_service, offer_service
 
 def confirm_order(payment_verify_service: payment_verify_service.PaymentVerifyService, 
-                  order: models.Order, payment_details: value_objects.PaymentDetails):
+                  order: models.Order, payment_details: value_objects.PaymentDetails,
+                  transaction_id: str):
 
         is_paid, message = payment_verify_service.verify_payment(
             order_id=order.order_id,
+            transaction_id=transaction_id,
             expected_amount=payment_details.paid_amount,
         )
 

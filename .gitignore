@@ -5,6 +5,7 @@
 __pycache__/
 *.py[cod]
 **/__pycache__/
+*.scratch
 *.env
 *.swp
 *.swo

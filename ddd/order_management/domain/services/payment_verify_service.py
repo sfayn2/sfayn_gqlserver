@@ -19,20 +19,22 @@ class PayPalPaymentVerifyStrategy(PaymentVerifyStrategy):
 
     def verify_payment(self, payment_details: Dict, expected_amount: value_objects.Money, order_id: str) -> Tuple[bool, str]:
             
-        if payment_details.get("id") != order_id:
+        purchase_units = payment_details.get("purchase_units")
+        # =====
+        # custom_id is internal order_id
+        # =====
+        if purchase_units.get("custom_id") != order_id:
             return False, "Order ID mismatch"
 
-        #TODO strange somehow Paypal uses value instead of amount total & currency_code instead of currency
-        purchase_units = payment_details.get("purchase_units")
         actual_amount = value_objects.Money(
-            amount=Decimal(purchase_units[0]["amount"]["total"]),
-            currency=purchase_units[0]["amount"]["currency"]
+            amount=Decimal(purchase_units[0]["amount"]["value"]),
+            currency=purchase_units[0]["amount"]["currency_code"]
         ) 
         for purchase_unit in purchase_units[1:]:
             actual_amount = actual_amount.add(
                 value_objects.Money(
-                    amount=Decimal(purchase_unit["amount"]["total"]),
-                    currency=purchase_unit["amount"]["currency"]
+                    amount=Decimal(purchase_unit["amount"]["value"]),
+                    currency=purchase_unit["amount"]["currency_code"]
                 )
             )
 
@@ -82,9 +84,9 @@ class PaymentVerifyService:
         self.payment_gateway_repository = payment_gateway_repository
         self.payment_method = payment_method
     
-    def verify_payment(self, expected_amount: value_objects.Money, order_id: str):
+    def verify_payment(self, expected_amount: value_objects.Money, transaction_id: str, order_id: str):
         #payment_details = self.payment_gateway_repository.get_payment_details("9S819517D88141438")
-        payment_details = self.payment_gateway_repository.get_payment_details(order_id)
+        payment_details = self.payment_gateway_repository.get_payment_details(transaction_id)
         strategy_class = PAYMENT_STRATEGY.get(self.payment_method, None)
         if not strategy_class:
             raise ValueError(f"Unsupported Payment Verification: {self.payment_method.value}")
