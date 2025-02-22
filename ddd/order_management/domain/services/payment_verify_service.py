@@ -7,7 +7,7 @@ from ddd.order_management.domain import enums, value_objects, repositories, exce
 # ==================
 # Payment verifier contract
 # ======================
-class PaymentVerifierStrategy(ABC):
+class PaymentVerifyStrategy(ABC):
     @abstractmethod
     def verify_payment(self, payment_details: Dict, expected_amount: value_objects.Money, order_id: str) -> Tuple[bool, str]:
         """
@@ -15,7 +15,7 @@ class PaymentVerifierStrategy(ABC):
             Returns a dictionary containing status and message
         """
     
-class PayPalPaymentVerifierStrategy(PaymentVerifierStrategy):
+class PayPalPaymentVerifyStrategy(PaymentVerifyStrategy):
 
     def verify_payment(self, payment_details: Dict, expected_amount: value_objects.Money, order_id: str) -> Tuple[bool, str]:
             
@@ -45,7 +45,7 @@ class PayPalPaymentVerifierStrategy(PaymentVerifierStrategy):
 
         return True, "Payment verified successfully"
 
-class StripePaymentVerifierStrategy(PaymentVerifierStrategy):
+class StripePaymentVerifyStrategy(PaymentVerifyStrategy):
     # ========
     # Not tested
     # ==========
@@ -67,15 +67,15 @@ class StripePaymentVerifierStrategy(PaymentVerifierStrategy):
         return True, "Payment verified successfully"
 
 # ====================
-# Payment Verifier Strategy Mapper
+# Payment Verify Strategy Mapper
 # ===========
 PAYMENT_STRATEGY = {
-    enums.PaymentMethod.PAYPAL: PayPalPaymentVerifierStrategy,
-    enums.PaymentMethod.STRIPE: StripePaymentVerifierStrategy
+    enums.PaymentMethod.PAYPAL: PayPalPaymentVerifyStrategy,
+    enums.PaymentMethod.STRIPE: StripePaymentVerifyStrategy
 }
 
 # ===============
-# Payment Verifier service
+# Payment Verify service
 # =======================
 class PaymentVerifyService:
     def __init__(self, payment_gateway_repository: repositories.PaymentGatewayRepository, payment_method: enums.PaymentMethod):
