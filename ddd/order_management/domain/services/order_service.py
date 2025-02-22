@@ -2,15 +2,14 @@ import uuid
 from datetime import datetime
 from typing import List
 from ddd.order_management.domain import models, value_objects, enums, exceptions
-from ddd.order_management.domain.services import tax_service, offer_service, payment_service
+from ddd.order_management.domain.services import payment_verify_service, tax_service, offer_service
 
-def confirm_order(payment_service: payment_service.PaymentService, 
+def confirm_order(payment_verify_service: payment_verify_service.PaymentVerifyService, 
                   order: models.Order, payment_details: value_objects.PaymentDetails):
 
-        is_paid, message = payment_service.verify_payment(
+        is_paid, message = payment_verify_service.verify_payment(
             order_id=order.order_id,
-            transaction_id=payment_details.transaction_id,
-            expected_amount=payment_details.amount,
+            expected_amount=payment_details.paid_amount,
         )
 
         order.confirm_order(is_paid)

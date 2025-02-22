@@ -6,7 +6,8 @@ from ddd.order_management.infrastructure import (
     django_customer_repository, 
     django_order_repository, 
     django_vendor_repository, 
-    paypal_gateway_repository
+    paypal_gateway_repository,
+    stripe_gateway_repository
 )
 from ddd.order_management.application import message_bus
 
@@ -37,9 +38,12 @@ class DjangoOrderUnitOfWork(AbstractUnitOfWork):
         self.order = django_order_repository.DjangoOrderRepository()
         self.customer = django_customer_repository.DjangoCustomerRepository()
         self.vendor = django_vendor_repository.DjangoVendorRepository()
+
+        self.paypal_gateway = paypal_gateway_repository.PaypalPaymentGatewayRepository()
+        self.stripe_gateway = stripe_gateway_repository.StripePaymentGatewayRepository()
+
         self.event_publisher = message_bus
         self._events = []
-        #self.payment_gateway = paypal_gateway_repository.PaypalPaymentGatewayRepository()
 
     def __enter__(self):
 

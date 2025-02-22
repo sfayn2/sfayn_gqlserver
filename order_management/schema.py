@@ -218,3 +218,52 @@ mutation {
   }
 }
 """
+
+# ==============
+# Sample Confirm Order
+# ========
+"""
+mutation {
+  confirmOrder(input: {
+    paymentDetails: {
+      method: "Paypal",
+      paidAmount: {
+        amount: 1.00,
+        currency: "USD"
+      },
+      transactionId: "10W03868HB1172112"
+    },
+    orderId: "ORD-32DE8813"
+  }) {
+    order	{
+        orderId
+    orderStatus
+    success
+    message
+    taxDetails
+    offerDetails
+    shippingDetails {
+      method
+      deliveryTime
+      cost {
+        amount
+        currency
+      }
+    }
+    taxAmount {
+      amount
+      currency
+    }
+    totalDiscountsFee {
+      amount
+      currency
+    }
+    finalAmount {
+      amount
+      currency
+    }
+    
+    }
+  }
+}
+"""
