@@ -5,10 +5,10 @@ from ddd.order_management.domain import repositories
 from ddd.order_management.infrastructure import (
     django_customer_repository, 
     django_order_repository, 
-    django_vendor_repository
+    django_vendor_repository,
+    payments_repository
 )
 from ddd.order_management.application import message_bus
-from ddd.order_management.infrastructure.payments import payments_repository
 
 T = TypeVar("T")
 
@@ -38,7 +38,7 @@ class DjangoOrderUnitOfWork(AbstractUnitOfWork):
         self.customer = django_customer_repository.DjangoCustomerRepository()
         self.vendor = django_vendor_repository.DjangoVendorRepository()
 
-        self.payments = payments_repository.PaymentGatewayFactory()
+        self.payments = payments_repository.PaymentGatewayFactory
 
         self.event_publisher = message_bus
         self._events = []
