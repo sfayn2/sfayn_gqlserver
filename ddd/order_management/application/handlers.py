@@ -3,7 +3,7 @@ from decimal import Decimal
 from datetime import datetime
 from ddd.order_management.application import commands, unit_of_work, helpers
 from ddd.order_management.domain import models, events, value_objects, enums, exceptions
-from ddd.order_management.domain.services import order_service, offer_service, payment_verify_service, tax_service
+from ddd.order_management.domain.services import order_service, offer_service, tax_service
 
 def handle_place_order(command: commands.PlaceOrderCommand, uow: unit_of_work.DjangoOrderUnitOfWork):
     with uow:
@@ -33,17 +33,10 @@ def handle_confirm_order(command: commands.ConfirmOrderCommand, uow: unit_of_wor
             raise exceptions.InvalidOrderOperation(f"Order id {order.order_id} not found.")
 
         payment_gateway = helpers.select_payment_gateway(uow, command.method)
-
-        payment_verify_svc = payment_verify_service.PaymentVerifyService(payment_gateway)
-        is_verified, payment_details = payment_verify_svc.verify_payment(
-                            transaction_id=command.transaction_id,
-                            order_id=command.order_id,
-                            expected_amount=order.final_amount
-                        )
+        payment_details = payment_gateway.get_payment_details(command.transaction_id)
 
         confirmed_order = order_service.confirm_order(
             order=order,
-            is_verified=is_verified,
             payment_details=payment_details
         )
 

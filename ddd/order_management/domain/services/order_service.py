@@ -4,10 +4,19 @@ from typing import List
 from ddd.order_management.domain import models, value_objects, enums, exceptions
 from ddd.order_management.domain.services import payment_verify_service, tax_service, offer_service
 
-def confirm_order(payment_details: value_objects.PaymentDetails, is_verified: bool,
+def confirm_order(payment_details: value_objects.PaymentDetails,
                   order: models.Order):
 
-        order.confirm_order(is_verified)
+        if payment_details.order_id != order.order_id:
+            raise exceptions.InvalidPaymentOperation("Payment Verification Order ID mismatch")
+
+        if payment_details.paid_amount != order.final_amount:
+            raise exceptions.InvalidPaymentOperation(f"Transaction Amount mismatch: expected {order.final_amount.amount} {order.final_amount.currency}")
+
+        if payment_details.status != "COMPLETED":
+            raise exceptions.InvalidPaymentOperation("Transaction not completed")
+        
+        order.confirm_order(True)
         order.update_payment_details(payment_details)
 
         return order
