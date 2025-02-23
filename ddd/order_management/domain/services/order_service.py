@@ -4,15 +4,10 @@ from typing import List
 from ddd.order_management.domain import models, value_objects, enums, exceptions
 from ddd.order_management.domain.services import payment_verify_service, tax_service, offer_service
 
-def confirm_order(payment_verify_service: payment_verify_service.PaymentVerifyService, 
-                  order: models.Order, transaction_id: str):
+def confirm_order(payment_details: value_objects.PaymentDetails, is_verified: bool,
+                  order: models.Order):
 
-        is_paid, payment_details = payment_verify_service.verify_payment(
-            order=order,
-            transaction_id=transaction_id
-        )
-
-        order.confirm_order(is_paid)
+        order.confirm_order(is_verified)
         order.update_payment_details(payment_details)
 
         return order

@@ -34,14 +34,17 @@ def handle_confirm_order(command: commands.ConfirmOrderCommand, uow: unit_of_wor
 
         payment_gateway = helpers.select_payment_gateway(uow, command.method)
 
-        payment_verify_svc = payment_verify_service.PaymentVerifyService(
-            payment_gateway
-        )
+        payment_verify_svc = payment_verify_service.PaymentVerifyService(payment_gateway)
+        is_verified, payment_details = payment_verify_svc.verify_payment(
+                            transaction_id=command.transaction_id,
+                            order_id=command.order_id,
+                            expected_amount=order.final_amount
+                        )
 
         confirmed_order = order_service.confirm_order(
-            payment_verify_service=payment_verify_svc,
             order=order,
-            transaction_id=command.transaction_id
+            is_verified=is_verified,
+            payment_details=payment_details
         )
 
         uow.order.save(confirmed_order)
