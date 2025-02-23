@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime
 from typing import List
 from ddd.order_management.domain import models, value_objects, enums, exceptions
-from ddd.order_management.domain.services import payment_verify_service, tax_service, offer_service
+from ddd.order_management.domain.services import tax_service, offer_service
 
 def confirm_order(payment_details: value_objects.PaymentDetails,
                   order: models.Order):
