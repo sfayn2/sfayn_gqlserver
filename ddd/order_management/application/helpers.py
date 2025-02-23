@@ -35,13 +35,3 @@ def get_order_response_dto(order: models.Order, success: bool = True, message: s
                 final_amount=asdict(order.final_amount)
             )
         return response_dto
-
-def select_payment_gateway(uow, payment_method):
-    if payment_method == enums.PaymentMethod.PAYPAL:
-        return uow.paypal_gateway
-    elif payment_method == enums.PaymentMethod.STRIPE:
-        return uow.stripe_gateway
-    #elif payment_method == enums.PaymentMethod.COD:
-    #    pass
-    else:
-        raise ValueError(f"Unsupported payment gateway: {payment_method}")

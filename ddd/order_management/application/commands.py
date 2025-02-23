@@ -20,7 +20,7 @@ class PlaceOrderCommand(Command):
 class ConfirmOrderCommand(Command):
     order_id: str
     transaction_id: str
-    method: enums.PaymentMethod
+    payment_method: enums.PaymentMethod
 
 class ShipOrderCommand(Command):
     order_id: str

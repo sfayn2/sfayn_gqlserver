@@ -32,7 +32,7 @@ def handle_confirm_order(command: commands.ConfirmOrderCommand, uow: unit_of_wor
         if not order:
             raise exceptions.InvalidOrderOperation(f"Order id {order.order_id} not found.")
 
-        payment_gateway = helpers.select_payment_gateway(uow, command.method)
+        payment_gateway = uow.payments.get_payment_gateway(command.payment_method)
         payment_details = payment_gateway.get_payment_details(command.transaction_id)
 
         confirmed_order = order_service.confirm_order(
