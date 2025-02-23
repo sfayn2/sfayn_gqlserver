@@ -222,7 +222,7 @@ class OrderDTO(BaseModel):
             total_amount=self.total_amount.to_domain(),
             final_amount=self.final_amount.to_domain(),
             shipping_reference=self.shipping_reference,
-            coupons=self.coupons,
+            coupons=[coupon.to_domain() for coupon in self.coupons], 
             order_status=self.order_status,
             date_modified=self.date_modified
         )
