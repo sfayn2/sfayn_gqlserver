@@ -40,8 +40,8 @@ class Money:
             raise ValueError("Currency must be a valid 3 character ISO code.")
 
 
-    def format(self) -> Money:
-        return Money(amount=Decimal(self.amount).quantize(Decimal("0.0001"), rounding=ROUND_HALF_UP), currency=self.currency)
+    #def format(self) -> Money:
+    #    return Money(amount=Decimal(self.amount).quantize(Decimal("0.00"), rounding=ROUND_HALF_UP), currency=self.currency)
 
     def add(self, other: Money) -> Money:
         if self.currency != other.currency:
@@ -106,16 +106,24 @@ class Package:
 
 @dataclass(frozen=True)
 class PaymentDetails:
+    order_id: str
     method: str
     paid_amount: Money
     transaction_id: str
+    status: str
 
     def __post_init__(self):
+        if not self.order_id:
+            raise ValueError("Order Id in is required for 3rd Party payment verification.")
+
         if not self.method:
             raise ValueError("Payment method is required.")
 
         if not self.paid_amount:
             raise ValueError("Paid amount is required.")
+
+        if not self.status:
+            raise ValueError("Payment status is required.")
 
         if not self.method.value in [item.value for item in enums.PaymentMethod]:
             raise ValueError(f"Payment method {self.method.value} not supported.")

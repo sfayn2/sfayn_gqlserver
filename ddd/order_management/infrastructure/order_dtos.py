@@ -165,18 +165,22 @@ class ShippingDetailsDTO(BaseModel):
         )
 
 class PaymentDetailsDTO(BaseModel):
+    order_id: str
     method: enums.PaymentMethod
     paid_amount: MoneyDTO
     transaction_id: str
+    status: str
 
     def to_domain(self) -> value_objects.PaymentDetails:
         return value_objects.PaymentDetails(
+            order_id=self.order_id,
             method=self.method,
             paid_amount=value_objects.Money(
                 amount=self.paid_amount.amount,
                 currency=self.paid_amount.currency
             ),
-            transaction_id=self.transaction_id
+            transaction_id=self.transaction_id,
+            status=self.status
         )
 
 class OrderDTO(BaseModel):
@@ -242,7 +246,7 @@ class OrderDTO(BaseModel):
                     'shipping_tracking_reference': self.shipping_reference,
                     'payment_method': self.payment_details.method.value if self.payment_details else None,
                     'payment_reference': self.payment_details.transaction_id if self.payment_details else None,
-                    'payment_amount': self.payment_details.paid_amount if self.payment_details else None, 
+                    'payment_amount': self.payment_details.paid_amount.amount if self.payment_details else None, 
                     'cancellation_reason': self.cancellation_reason, 
                     'total_discounts_fee': self.total_discounts_fee.amount if self.total_discounts_fee else None, 
                     'offer_details': self.offer_details if self.offer_details else [],
