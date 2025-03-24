@@ -176,11 +176,11 @@ class Order:
         if self.tax_details:
             raise exceptions.InvalidTaxOperation("Taxes have already been applied.")
         if not any(item.is_taxable for item in self.line_items):
-            return #skip tax
+            return #Skip tax if no taxable items
         if self.sub_total.amount == 0:
-            raise exceptions.InvalidTaxOperation("Calculate sub total before applying tax.")
+            raise #Skip tax for zero subtotal
 
-        tax_amount = value_objects.Money(amount=Decimal("0"), currency=self.currency)
+        tax_amount = value_objects.Money.default()
         tax_details = []
 
         for tax_strategy in tax_strategies:
