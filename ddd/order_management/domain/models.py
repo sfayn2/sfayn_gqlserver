@@ -180,7 +180,6 @@ class Order:
         if self.sub_total.amount == 0:
             raise exceptions.InvalidTaxOperation("Calculate sub total before applying tax.")
 
-        #TODO: how about tax exemption? should be in Tax strategy ; need to include "Tax exempted" in tax details
         for tax_strategy in tax_strategies:
             amount, details = tax_strategy.apply(self)
             if amount and details:
