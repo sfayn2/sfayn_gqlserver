@@ -8,16 +8,13 @@ from ddd.order_management.domain.services import order_service, offer_service, t
 def handle_place_order(command: commands.PlaceOrderCommand, uow: unit_of_work.DjangoOrderUnitOfWork):
     with uow:
 
-        offer_svc = offer_service.OfferStrategyService(uow.vendor)
-
         placed_order = order_service.place_order(
             customer_details=command.customer_details.to_domain(),
             shipping_address=command.shipping_address.to_domain(),
             shipping_details=command.shipping_details.to_domain(),
             coupons=[item.to_domain() for item in command.coupons],
             line_items=[item.to_domain() for item in command.line_items],
-            tax_service=tax_service.TaxStrategyService(),
-            offer_service=offer_svc
+            offer_service=offer_service.OfferStrategyService(uow.vendor)
         )
 
         uow.order.save(placed_order)

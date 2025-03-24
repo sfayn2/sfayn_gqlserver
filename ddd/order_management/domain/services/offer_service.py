@@ -137,8 +137,6 @@ class OfferStrategyService:
         self.vendor_repository = vendor_repository
 
     def apply_offers(self, order: models.Order):
-        if not order.shipping_details:
-            raise exceptions.InvalidOrderOperation("Only when shipping option is selected.")
         available_offers = self._fetch_valid_offers(order.vendor_name)
         offer_details = []
         for strategy in available_offers:

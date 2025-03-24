@@ -5,6 +5,7 @@ from decimal import Decimal
 from typing import List, Optional, Tuple
 from dataclasses import dataclass, field
 from ddd.order_management.domain import value_objects, enums, exceptions, events
+from ddd.order_management.domain.services import offer_service, tax_service
 
 @dataclass
 class LineItem:
@@ -162,6 +163,31 @@ class Order:
 
         self.raise_event(event)
 
+    def apply_offers(self, offer_service: offer_service.OfferStrategyService):
+        if not self.shipping_details:
+            raise exceptions.InvalidOfferOperation("Only when shipping option is selected.")
+        offer_service.apply_offers(self)
+
+    def apply_taxes(self, tax_strategies: List[tax_service.TaxStrategy]):
+        if self.order_status != enums.OrderStatus.DRAFT:
+            raise exceptions.InvalidTaxOperation("Tax can only be applied to draft orders.")
+        if not self.destination:
+            raise exceptions.InvalidTaxOperation("Shipping address is required for tax calculation.")
+        if self.tax_details:
+            raise exceptions.InvalidTaxOperation("Taxes have already been applied.")
+        if not any(item.is_taxable for item in self.line_items):
+            return #skip tax
+        if self.sub_total.amount == 0:
+            raise exceptions.InvalidTaxOperation("Calculate sub total before applying tax.")
+
+        #TODO: how about tax exemption? should be in Tax strategy ; need to include "Tax exempted" in tax details
+        for tax_strategy in tax_strategies:
+            amount, details = tax_strategy.apply(self)
+            if amount and details:
+                self.tax_details.append(details)
+                self.tax_amount.add(amount)
+
+
     def update_payment_details(self, payment_details: value_objects.PaymentDetails):
         if not payment_details:
             raise exceptions.InvalidOrderOperation("Payment details cannot be none.")
@@ -193,14 +219,8 @@ class Order:
     def add_shipping_tracking_reference(self, shipping_reference: str):
         self.shipping_reference = shipping_reference
 
-    def update_tax_amount(self, amount: value_objects.Money):
-        self.tax_amount = amount
-    
     def update_offer_details(self, offer_details: List[str]):
         self.offer_details = offer_details
-
-    def update_tax_details(self, tax_details: List[str]):
-        self.tax_details = tax_details
 
     def apply_coupon(self, coupon: value_objects.Coupon):
         if not coupon:
@@ -256,14 +276,16 @@ class Order:
         self._update_totals()
         #TODO: reset free gifts??
 
+    @property
+    def sub_total(self):
+        return self.total_amount.subtract(self.total_discounts_fee).add(self.shipping_details.cost if self.shipping_details else value_objects.Money(0, self.currency))
+
     def calculate_final_amount(self):
-        if not self.tax_details:
-            raise exceptions.InvalidOrderOperation("No tax calculation has been applied.")
+        #if not self.tax_details:
+        #    raise exceptions.InvalidOrderOperation("No tax calculation has been applied.")
 
         #TODO revisit calculation
-        self.final_amount = (
-                self.total_amount.subtract(self.total_discounts_fee).add(self.shipping_details.cost if self.shipping_details else value_objects.Money(0, self.currency))
-        ).add(self.tax_amount)
+        self.final_amount = self.sub_total.add(self.tax_amount)
 
     @property
     def total_weight(self) -> Decimal:

@@ -28,7 +28,6 @@ def place_order(
         shipping_details: value_objects.ShippingDetails,
         coupons: List[value_objects.Coupon],
         line_items: List[models.LineItem],
-        tax_service: tax_service.TaxStrategyService,
         offer_service: offer_service.OfferStrategyService
 ) -> models.Order:
 
@@ -44,8 +43,9 @@ def place_order(
     order.update_line_items(line_items)
     for coupon in coupons:
         order.apply_coupon(coupon)
-    offer_service.apply_offers(order)
-    tax_service.apply_taxes(order)
+
+    order.apply_offers(offer_service)
+    order.apply_taxes(tax_service.TAX_STRATEGIES)
 
     order.calculate_final_amount()
     
