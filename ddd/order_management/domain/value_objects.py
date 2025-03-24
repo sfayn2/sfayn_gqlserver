@@ -234,3 +234,8 @@ class OfferStrategy:
             )
         )
 
+
+@dataclass(frozen=True) 
+class TaxBreakdown:
+    desc: str
+    amount: Money

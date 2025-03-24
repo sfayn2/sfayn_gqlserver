@@ -180,11 +180,20 @@ class Order:
         if self.sub_total.amount == 0:
             raise exceptions.InvalidTaxOperation("Calculate sub total before applying tax.")
 
+        tax_amount = value_objects.Money(amount=Decimal("0"), currency=self.currency)
+        tax_details = []
+
         for tax_strategy in tax_strategies:
-            amount, details = tax_strategy.apply(self)
-            if amount and details:
-                self.tax_details.append(details)
-                self.tax_amount.add(amount)
+            tax_results = tax_strategy.apply(self)
+            if tax_results:
+                tax_details.append(tax_results.desc)
+                tax_amount.add(tax_results.amount)
+
+        if tax_amount < 0:
+            raise exceptions.InvalidTaxOperation("Tax amount cannot be negative.")
+
+        self.tax_amount = tax_amount
+        self.tax_details = tax_details
 
 
     def update_payment_details(self, payment_details: value_objects.PaymentDetails):

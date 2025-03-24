@@ -4,7 +4,7 @@ from decimal import Decimal
 from ddd.order_management.domain import value_objects, models
 
 class TaxStrategy(ABC):
-    def apply(self, order: models.Order):
+    def apply(self, order: models.Order) -> value_objects.TaxBreakdown:
         raise NotImplementedError("Subclasses must implement this method")
 
 #Singapore Tax
@@ -14,8 +14,10 @@ class SingaporeTaxStrategy(TaxStrategy):
     def apply(self, order: models.Order):
         if order.destination.country.lower() == "singapore":
             tax_amount = order.sub_total.multiply(self.GST_RATE)
+            desc = f"GST ({self.GST_RATE*100} %) | {order.tax_amount.amount} {order.tax_amount.currency}"
 
-            return tax_amount, f"GST ({self.GST_RATE*100} %) | {order.tax_amount.amount} {order.tax_amount.currency}"
+            return value_objects.TaxBreakdown(amount=tax_amount, desc=desc)
+
 
 class USStateTaxStrategy(TaxStrategy):
     STATE_TAX_RATES = {
@@ -29,8 +31,9 @@ class USStateTaxStrategy(TaxStrategy):
             state = order.destination.state
             state_tax_rate = self.STATE_TAX_RATES.get(state, 0)
             tax_amount = order.sub_total.multiply(state_tax_rate)
+            desc = f"{state} State Tax ({state_tax_rate*100} %) | {order.tax_amount.amount} {order.tax_amount.currency}"
 
-            return tax_amount, f"{state} State Tax ({state_tax_rate*100} %) | {order.tax_amount.amount} {order.tax_amount.currency}"
+            return value_objects.TaxBreakdown(amount=tax_amount, desc=desc)
 
 TAX_STRATEGIES = [
     SingaporeTaxStrategy(),
