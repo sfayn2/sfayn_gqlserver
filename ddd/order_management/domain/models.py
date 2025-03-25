@@ -85,6 +85,10 @@ class Order:
     def add_line_item(self, line_item: LineItem) -> None:
         if not line_item:
             raise ValueError("Please provide line item to add.")
+        if self.order_status != enums.OrderStatus.DRAFT:
+            raise exceptions.InvalidOrderOperation("Only draft order can add line item.")
+        if line_item.is_free_gift and line_item.product_price.amount > 0:
+            raise exceptions.InvalidOrderOperation("Free gifts must have a price of zero.")
 
         self._validate_line_item(line_item)
 
@@ -94,22 +98,30 @@ class Order:
     def remove_line_item(self, line_item: LineItem) -> None:
         if not line_item:
             raise ValueError("Line item does not exists in the order.")
+        if self.order_status != enums.OrderStatus.DRAFT:
+            raise exceptions.InvalidOrderOperation("Only draft order can remove line items.")
         self.line_items.remove(line_item)
         self._update_totals()
 
     def update_line_items(self, line_items: List[LineItem]) -> None:
         if not line_items:
             raise exceptions.InvalidOrderOperation("Line items cannot be none.")
+        if self.order_status != enums.OrderStatus.DRAFT:
+            raise exceptions.InvalidOrderOperation("Only draft order can update line items.")
         self.line_items =line_items
         self._update_totals()
 
     def update_shipping_details(self, shipping_details: value_objects.ShippingDetails) -> None:
         if not shipping_details:
             raise exceptions.InvalidOrderOperation("Shipping details must be provided.")
+        if self.order_status != enums.OrderStatus.DRAFT:
+            raise exceptions.InvalidOrderOperation("Only draft order can update shipping details.")
         self.shipping_details = shipping_details
         self.update_modified_date()
 
     def update_order_quantity(self, product_sku: str, new_quantity: int):
+        if self.order_status != enums.OrderStatus.DRAFT:
+            raise exceptions.InvalidOrderOperation("Only draft order can update order quantity.")
         for line_item in self.line_items:
             if line_item.product_sku == product_sku:
                 line_item.update_order_quantity(new_quantity)
@@ -123,7 +135,7 @@ class Order:
 
     def place_order(self):
         if self.order_status != enums.OrderStatus.DRAFT:
-            raise exceptions.InvalidOrderOperation("Only draft orders can be place order.")
+            raise exceptions.InvalidOrderOperation("Only draft order can be place order.")
         if not self.line_items:
             raise exceptions.InvalidOrderOperation("Cannot place an order without line items.")
         if not self.customer_details:
@@ -165,7 +177,7 @@ class Order:
 
     def apply_offers(self, offer_service: offer_service.OfferStrategyService):
         if self.order_status != enums.OrderStatus.DRAFT:
-            raise exceptions.InvalidTaxOperation("Offer can only be applied to draft orders.")
+            raise exceptions.InvalidTaxOperation("Only draft order can apply offers (Free shipping, Free gifts, etc)")
         if self.offer_details:
             raise exceptions.InvalidTaxOperation("Offers have already been applied.")
         if not self.shipping_details:
@@ -174,7 +186,7 @@ class Order:
 
     def apply_taxes(self, tax_strategies: List[tax_service.TaxStrategy]):
         if self.order_status != enums.OrderStatus.DRAFT:
-            raise exceptions.InvalidTaxOperation("Tax can only be applied to draft orders.")
+            raise exceptions.InvalidTaxOperation("Only draft order can calculate taxes.")
         if not self.destination:
             raise exceptions.InvalidTaxOperation("Shipping address is required for tax calculation.")
         if self.tax_details:
@@ -193,7 +205,7 @@ class Order:
                 tax_details.append(tax_results.desc)
                 tax_amount.add(tax_results.amount)
 
-        if tax_amount < 0:
+        if tax_amount.amount < Decimal("0"):
             raise exceptions.InvalidTaxOperation("Tax amount cannot be negative.")
 
         self.tax_amount = tax_amount
@@ -203,6 +215,8 @@ class Order:
     def update_payment_details(self, payment_details: value_objects.PaymentDetails):
         if not payment_details:
             raise exceptions.InvalidOrderOperation("Payment details cannot be none.")
+        if self.order_status != enums.OrderStatus.PENDING:
+            raise exceptions.InvalidOrderOperation("Only pending order can update payment details.")
         self.payment_details = payment_details
 
     def mark_as_shipped(self):
@@ -229,28 +243,40 @@ class Order:
         self.update_modified_date()
 
     def add_shipping_tracking_reference(self, shipping_reference: str):
+        if self.order_status != enums.OrderStatus.SHIPPED:
+            raise exceptions.InvalidOrderOperation("Only shipped order can add tracking reference.")
         self.shipping_reference = shipping_reference
 
     def update_offer_details(self, offer_details: List[str]):
+        if self.order_status != enums.OrderStatus.DRAFT:
+            raise exceptions.InvalidTaxOperation("Only draft order can update offer details.")
         self.offer_details = offer_details
 
     def apply_coupon(self, coupon: value_objects.Coupon):
         if not coupon:
             raise exceptions.InvalidOrderOperation("Coupon cannot be none.")
+        if self.order_status != enums.OrderStatus.DRAFT:
+            raise exceptions.InvalidTaxOperation("Only draft order can apply coupon.")
         self.coupons.append(coupon)
 
     def remove_coupon(self, coupon: value_objects.Coupon):
         if not coupon:
             raise exceptions.InvalidOrderOperation("Coupon cannot be none.")
+        if self.order_status != enums.OrderStatus.DRAFT:
+            raise exceptions.InvalidTaxOperation("Only draft order can remove coupon.")
         self.coupons.remove(coupon)
 
     def update_destination(self, destination: value_objects.Address):
         if not destination:
             raise exceptions.InvalidOrderOperation("Destination cannot be none.")
+        if self.order_status != enums.OrderStatus.DRAFT:
+            raise exceptions.InvalidTaxOperation("Only draft order can update destination.")
         self.destination = destination
         self.update_modified_date()
     
     def select_shipping_option(self, shipping_option: enums.ShippingMethod, shipping_options: List[dict]):
+        if self.order_status != enums.OrderStatus.DRAFT:
+            raise exceptions.InvalidTaxOperation("Only draft order can select shipping option.")
         for option in shipping_options:
             if option.get("name") == shipping_option:
                 self.update_shipping_details(value_objects.ShippingDetails(
@@ -269,32 +295,34 @@ class Order:
         )
 
     def update_total_discounts_fee(self, total_discounts: value_objects.Money):
+        if self.order_status != enums.OrderStatus.DRAFT:
+            raise exceptions.InvalidTaxOperation("Only draft order can update total discount fees.")
         self.total_discounts_fee = total_discounts
 
-    def reset_order_details(self):
-        #reset offers free shipping + discounts + free gifts
-        self.update_shipping_details(
-                self.shipping_details.reset_cost()
-            )
-        self.update_total_discounts_fee(
-                self.total_discounts_fee.reset_amount()
-            )
-        self.update_tax_amount(
-            value_objects.Money(
-                amount=0,
-                currency=self.currency
-            )
-        )
-        self._update_totals()
-        #TODO: reset free gifts??
+    #def reset_order_details(self):
+    #    #reset offers free shipping + discounts + free gifts
+    #    self.update_shipping_details(
+    #            self.shipping_details.reset_cost()
+    #        )
+    #    self.update_total_discounts_fee(
+    #            self.total_discounts_fee.reset_amount()
+    #        )
+    #    self.update_tax_amount(
+    #        value_objects.Money(
+    #            amount=0,
+    #            currency=self.currency
+    #        )
+    #    )
+    #    self._update_totals()
+    #    #TODO: reset free gifts??
 
     @property
     def sub_total(self):
         return self.total_amount.subtract(self.total_discounts_fee).add(self.shipping_details.cost if self.shipping_details else value_objects.Money(0, self.currency))
 
     def calculate_final_amount(self):
-        #if not self.tax_details:
-        #    raise exceptions.InvalidOrderOperation("No tax calculation has been applied.")
+        if self.order_status != enums.OrderStatus.DRAFT:
+            raise exceptions.InvalidTaxOperation("Only draft order can calculate final amount.")
 
         #TODO revisit calculation
         self.final_amount = self.sub_total.add(self.tax_amount)
