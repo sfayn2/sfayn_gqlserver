@@ -164,6 +164,10 @@ class Order:
         self.raise_event(event)
 
     def apply_offers(self, offer_service: offer_service.OfferStrategyService):
+        if self.order_status != enums.OrderStatus.DRAFT:
+            raise exceptions.InvalidTaxOperation("Offer can only be applied to draft orders.")
+        if self.offer_details:
+            raise exceptions.InvalidTaxOperation("Offers have already been applied.")
         if not self.shipping_details:
             raise exceptions.InvalidOfferOperation("Only when shipping option is selected.")
         offer_service.apply_offers(self)

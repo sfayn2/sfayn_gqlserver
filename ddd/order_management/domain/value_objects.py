@@ -203,22 +203,22 @@ class OfferStrategy:
     def __post_init__(self):
         if not (self.is_active == True and datetime.now(pytz.utc) >= self.start_date and 
                 datetime.now(pytz.utc) <= self.end_date):
-            raise exceptions.InvalidOffer(f"Offer {self.name} is no longer valid.")
+            raise exceptions.InvalidOfferOperation(f"Offer {self.name} is no longer valid.")
 
         if self.offer_type == enums.OfferType.PERCENTAGE_DISCOUNT:
             if not self._is_valid_sku_list(self.conditions.get("eligible_products")):
-                raise exceptions.InvalidOffer(f"Eligible products must be a list of non-empty SKU strings.")
+                raise exceptions.InvalidOfferOperation(f"Eligible products must be a list of non-empty SKU strings.")
 
             if self.discount_value <= 0 or self.discount_value > 100:
-                raise exceptions.InvalidOffer("Discount value (%) must be between 0 and 100")
+                raise exceptions.InvalidOfferOperation("Discount value (%) must be between 0 and 100")
 
         if self.offer_type == enums.OfferType.FREE_GIFT:
             if  not self._is_valid_gift_products(self.conditions.get("gift_products")):
-                raise exceptions.InvalidOffer("Free gift offers must include a valid list of gift products w SKU and quantity.")
+                raise exceptions.InvalidOfferOperation("Free gift offers must include a valid list of gift products w SKU and quantity.")
         
         if self.offer_type == enums.OfferType.FREE_SHIPPING:
             if not isinstance(self.conditions.get("minimum_order_total"), (Decimal, int)):
-                raise exceptions.InvalidOffer("Free shipping must specify a minimum order total")
+                raise exceptions.InvalidOfferOperation("Free shipping must specify a minimum order total")
 
     def _is_valid_sku_list(self, skus: List[str]) -> bool:
         return isinstance(skus, list) and all(isinstance(sku, str) and sku.strip() for sku in skus)
@@ -236,6 +236,6 @@ class OfferStrategy:
 
 
 @dataclass(frozen=True) 
-class TaxBreakdown:
+class TaxResult:
     desc: str
     amount: Money

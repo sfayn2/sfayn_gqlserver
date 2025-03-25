@@ -4,7 +4,7 @@ from decimal import Decimal
 from ddd.order_management.domain import value_objects, models
 
 class TaxStrategy(ABC):
-    def apply(self, order: models.Order) -> value_objects.TaxBreakdown:
+    def apply(self, order: models.Order) -> value_objects.TaxResult:
         raise NotImplementedError("Subclasses must implement this method")
 
 #Singapore Tax
@@ -16,7 +16,7 @@ class SingaporeTaxStrategy(TaxStrategy):
             tax_amount = order.sub_total.multiply(self.GST_RATE)
             desc = f"GST ({self.GST_RATE*100} %) | {order.tax_amount.amount} {order.tax_amount.currency}"
 
-            return value_objects.TaxBreakdown(amount=tax_amount, desc=desc)
+            return value_objects.TaxResult(amount=tax_amount, desc=desc)
 
 
 class USStateTaxStrategy(TaxStrategy):
@@ -33,7 +33,7 @@ class USStateTaxStrategy(TaxStrategy):
             tax_amount = order.sub_total.multiply(state_tax_rate)
             desc = f"{state} State Tax ({state_tax_rate*100} %) | {order.tax_amount.amount} {order.tax_amount.currency}"
 
-            return value_objects.TaxBreakdown(amount=tax_amount, desc=desc)
+            return value_objects.TaxResult(amount=tax_amount, desc=desc)
 
 TAX_STRATEGIES = [
     SingaporeTaxStrategy(),
