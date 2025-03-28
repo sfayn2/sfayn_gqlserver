@@ -28,4 +28,12 @@ class DjangoVendorRepository(repositories.VendorRepository):
 
     def get_shipping_options(self, vendor_name: str):
         shipping_options = django_vendor_models.ShippingOption.filter(vendor__name=vendor_name)
-        return list(shipping_options)
+        final_opts = []
+        for option in shipping_options:
+            ship_opt_dto = order_dtos.ShippingOptionStrategyDTO(**option)
+            try:
+                final_opts.append(ship_opt_dto.to_domain())
+            except (ValueError) as e:
+                print(f"DjangoVendorRepository.get_shipping_options exception > {str(e)}")
+                continue
+        return final_opts

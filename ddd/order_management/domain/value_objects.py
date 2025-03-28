@@ -255,3 +255,4 @@ class ShippingOptionStrategy:
     conditions: dict
     base_cost: Money
     flat_rate: Money
+    is_active: bool

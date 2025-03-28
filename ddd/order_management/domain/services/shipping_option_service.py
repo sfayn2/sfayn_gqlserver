@@ -6,9 +6,7 @@ from typing import Tuple, List
 from ddd.order_management.domain import enums, exceptions, models, value_objects, repositories
 from decimal import Decimal
 
-class ShippingOptionStrategy(ABC):
-    def __init__(self, ship_opt_strategy: value_objects.ShippingOptionStrategy):
-        self.ship_opt_strategy = ship_opt_strategy
+class ShippingOptionStrategy(value_objects.ShippingOptionStrategy):
 
     @abstractmethod
     def is_eligible(self, order: models.Order) -> bool:
@@ -30,7 +28,7 @@ class StandardShippingStrategy(ShippingOptionStrategy):
         """
             Only allow packages under 30kg + Domestic shipping
         """
-        return order.total_weight <= self.ship_opt_strategy.conditions.get("total_weight") and not order.destination.is_international(order.vendor_country)
+        return order.total_weight <= self.conditions.get("total_weight") and not order.destination.is_international(order.vendor_country)
 
     def calculate_cost(self, order: models.Order) -> value_objects.Money:
         """
@@ -46,10 +44,10 @@ class ExpressShippingStrategy(ShippingOptionStrategy):
 
     def is_before_cutoff(self):
         current_time = datetime.now(pytz.utc).time()
-        return current_time <= self.ship_opt_strategy.conditions.get("cutoff_time")
+        return current_time <= self.conditions.get("cutoff_time")
 
     def is_eligible(self, order: models.Order) -> bool:
-        return order.total_weight <= self.ship_opt_strategy.conditions.get("total_weight") and self.is_before_cutoff()
+        return order.total_weight <= self.conditions.get("total_weight") and self.is_before_cutoff()
 
     def calculate_cost(self, order: models.Order) -> value_objects.Money:
         currency = order.currency
@@ -66,7 +64,7 @@ class LocalPickupShippingStrategy(ShippingOptionStrategy):
     def is_eligible(self, order: models.Order) -> bool:
         #TODO nearby only?
         current_time = datetime.now(pytz.utc).time()
-        return current_time >= self.ship_opt_strategy.conditions.get("pickup_hours_from") and current_time <= self.ship_opt_strategy.conditions.get("pickup_hours_to")
+        return current_time >= self.conditions.get("pickup_hours_from") and current_time <= self.conditions.get("pickup_hours_to")
 
     def calculate_cost(self, order: models.Order) -> value_objects.Money:
         #default is zero
@@ -76,7 +74,7 @@ class FreeShippingStrategy(ShippingOptionStrategy):
 
     def is_eligible(self, order: models.Order) -> bool:
         #orders above $50?
-        return order.sub_total > self.ship_opt_strategy.conditions.get("total_orders")
+        return order.sub_total > self.conditions.get("total_orders")
 
     def calculate_cost(self, order: models.Order) -> value_objects.Money:
         #default is zero
@@ -121,11 +119,11 @@ class ShippingMethodStrategyService:
             ship_opt_strategy_class = SHIPPING_OPTIONS_STRATEGIES.get(option.name)
             valid_shipping_options.append(
                 ship_opt_strategy_class(
-                    name=option.get("name"),
-                    delivery_time=option.get("delivery_time"),
-                    conditions=json.loads(option.get("conditions")),
-                    base_cost=option.get("base_cost"),
-                    flat_rate=option.get("flat_rate")
+                    name=option.name,
+                    delivery_time=option.delivery_time,
+                    conditions=option.conditions,
+                    base_cost=option.base_cost,
+                    flat_rate=option.flat_rate
                 )
             )
 

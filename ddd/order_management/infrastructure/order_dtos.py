@@ -409,3 +409,17 @@ class OfferStrategyDTO(BaseModel):
             coupons=coupons
         )
 
+
+class ShippingOptionStrategyDTO(BaseModel):
+    name: enums.ShippingMethod
+    delivery_time: str
+    conditions: str
+    base_cost: MoneyDTO
+    flat_rate: MoneyDTO
+    is_active: bool
+
+    def to_domain(self) -> value_objects.ShippingOptionStrategy:
+        return value_objects.ShippingOptionStrategy(
+            **self.model_dump(),
+            conditions=ast.literal_eval(self.conditions)
+        )
