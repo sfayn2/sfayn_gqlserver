@@ -20,6 +20,8 @@ class OrderStatus(Enum):
 class ShippingMethod(Enum):
     STANDARD = "Standard"
     EXPRESS = "Express"
+    LOCAL_PICKUP = "Local Pickup"
+    FREE_SHIPPING = "Free Shipping"
     SAME_DAY = "Same Day Delivery"
     FLAT_RATE = "Flat Rate"
 

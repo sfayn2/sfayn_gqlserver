@@ -149,7 +149,9 @@ class CustomerDetails:
 
 @dataclass(frozen=True)
 class ShippingDetails:
+    #customer shipping option
     method: enums.ShippingMethod
+
     delivery_time: str
     cost: Money
     #orig_cost: Money
@@ -239,3 +241,17 @@ class OfferStrategy:
 class TaxResult:
     desc: str
     amount: Money
+
+@dataclass(frozen=True) 
+class VendorDetails:
+    name: str
+    country: str
+
+
+@dataclass(frozen=True) 
+class ShippingOptionStrategy:
+    name: enums.ShippingMethod
+    delivery_time: str
+    conditions: dict
+    base_cost: Money
+    flat_rate: Money

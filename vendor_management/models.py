@@ -5,6 +5,7 @@ from decimal import Decimal
 # Create your models here.
 class Vendor(models.Model):
     name = models.CharField(max_length=200, primary_key=True)
+    country = models.CharField(max_length=50, required=True)
     is_active = models.BooleanField(default=True, help_text="To quickly control whether the is valid")
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True) 
@@ -57,7 +58,12 @@ class Offer(models.Model):
 
 class ShippingOption(models.Model):
     vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE, related_name="shipping_options")
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, help_text="ex. Standard")
+
+    #for future fullfilmmemt requirement?
+    #method = models.CharField(max_length=255, help_text="DHL Standard")
+    #carrier = models.CharField(max_length=255, help_text="DHL")
+
     base_cost = models.DecimalField(
             decimal_places=settings.DEFAULT_DECIMAL_PLACES, 
             max_digits=settings.DEFAULT_MAX_DIGITS,
@@ -65,8 +71,7 @@ class ShippingOption(models.Model):
             default=Decimal("0.0")
         )
 
-    #need this?
-    conditions = models.CharField(max_length=150, help_text='ex. only package under 30kg?')
+    conditions = models.CharField(max_length=150, help_text='ex. { "weight_kg_lt": 30 }')
 
     flat_rate = models.DecimalField(
             decimal_places=settings.DEFAULT_DECIMAL_PLACES, 
@@ -75,6 +80,7 @@ class ShippingOption(models.Model):
             default=Decimal("0.0")
         )
     delivery_time = models.CharField(max_length=255)
+    is_active = models.BooleanField(default=False, help_text="To quickly control whether this option is still valid")
 
     def __str__(self):
-        return f"{self.name} ( {self.delivery_time} )"
+        return f"{self.name} | {self.delivery_time} | {self.conditions}"

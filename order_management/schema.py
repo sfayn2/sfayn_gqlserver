@@ -16,6 +16,9 @@ class MoneyInput(graphene.InputObjectType):
     amount = graphene.Float(required=True)
     currency = graphene.String(required=True)
 
+class VendorDetailsInput(graphene.InputObjectType):
+    name = graphene.String(required=True)
+    country = graphene.String(required=True)
 
 class PackageInput(graphene.InputObjectType):
     weight = graphene.Float(required=True)
@@ -24,7 +27,7 @@ class PackageInput(graphene.InputObjectType):
 class LineItemInput(graphene.InputObjectType):
     product_sku = graphene.String(required=True)
     product_name = graphene.String(required=True)
-    vendor_name = graphene.String(required=True)
+    vendor = graphene.Field(VendorDetailsInput, required=True)
     product_category = graphene.String(required=True)
     order_quantity = graphene.Int(required=True)
     options = GenericScalar(required=True)
@@ -168,7 +171,10 @@ mutation {
       {
         productSku: "SKU1",
         productName: "Product1",
-        vendorName: "Vendor1",
+        vendorDetails {
+          name: "Vendor1",
+          country: "Singapore"
+        },
         productCategory: "Category1",
         orderQuantity: 1,
         options: {color:"red"},

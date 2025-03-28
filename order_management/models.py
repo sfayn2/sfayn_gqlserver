@@ -34,7 +34,7 @@ class Order(models.Model):
     delivery_country = models.CharField(max_length=50)
     delivery_state = models.CharField(max_length=10, blank=True, null=True, help_text="Mandatory in countries like US, Canada, India but irrelevant in small countries")
 
-    shipping_method = models.CharField(max_length=50, null=True, blank=True, help_text="i.e. Free Shipping, Local Pickup", choices=enums.ShippingMethod.choices)
+    shipping_method = models.CharField(max_length=50, null=True, blank=True, help_text="Customer shipping option (not internal shipping method), i.e. Free Shipping, Local Pickup", choices=enums.ShippingMethod.choices)
     shipping_delivery_time = models.CharField(max_length=150, null=True, blank=True, help_text="i.e. 2-3 days delivery")
     shipping_cost = models.DecimalField(
         decimal_places=settings.DEFAULT_DECIMAL_PLACES, 
@@ -126,6 +126,7 @@ class OrderLine(models.Model):
     )
 
     vendor_name = models.CharField(max_length=200, help_text="can use to check if product belongs to same vendor")
+    vendor_country = models.CharField(max_length=200, help_text="can use to determine if shipping is domestic compared w shipping destination")
     product_sku = models.CharField(max_length=50)
     product_name = models.CharField(max_length=255)
     product_category = models.CharField(max_length=100, help_text="some countries uses category to calculate tax")

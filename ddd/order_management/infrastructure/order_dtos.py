@@ -58,6 +58,13 @@ class MoneyDTO(BaseModel):
     def to_domain(self) -> value_objects.Money:
         return value_objects.Money(**self.model_dump())
 
+class VendorDetailsDTO(BaseModel):
+    name: str
+    country: str
+
+    def to_domain(self) -> value_objects.VendorDetails:
+        return value_objects.VendorDetails(**self.model_dump())
+
 class PackageDTO(BaseModel):
     weight: Decimal
     dimensions: Tuple[int, int, int]
@@ -68,7 +75,7 @@ class PackageDTO(BaseModel):
 class LineItemDTO(BaseModel):
     product_sku: str
     product_name: str 
-    vendor_name: str
+    vendor: VendorDetailsDTO
     product_category: str 
     options: dict
     product_price: MoneyDTO
@@ -81,7 +88,7 @@ class LineItemDTO(BaseModel):
         return models.LineItem(
             product_sku=self.product_sku,
             product_name=self.product_name,
-            vendor_name=self.vendor_name,
+            vendor=self.vendor.to_domain(),
             product_category=self.product_category,
             options=self.options,
             product_price=self.product_price.to_domain(),
@@ -96,7 +103,10 @@ class LineItemDTO(BaseModel):
         return LineItemDTO(
             product_sku=django_line_item.product_sku,
             product_name=django_line_item.product_name,
-            vendor_name=django_line_item.vendor_name,
+            vendor=VendorDetailsDTO(
+                name=django_line_item.vendor_name,
+                country=django_line_item.vendor_country
+            ),
             product_category=django_line_item.product_category,
             options=ast.literal_eval(django_line_item.options),
             product_price=MoneyDTO(
@@ -117,7 +127,7 @@ class LineItemDTO(BaseModel):
         return LineItemDTO(
             product_sku=line_item.product_sku,
             product_name=line_item.product_name,
-            vendor_name=line_item.vendor_name,
+            vendor=VendorDetailsDTO(**asdict(line_item.vendor)),
             product_category=line_item.product_category,
             options=line_item.options,
             product_price=MoneyDTO(**asdict(line_item.product_price)),
@@ -133,7 +143,8 @@ class LineItemDTO(BaseModel):
                 "order_id": order.order_id,
                 "defaults":  {
                     'product_name': self.product_name, 
-                    'vendor_name': self.vendor_name, 
+                    'vendor_name': self.vendor.name, 
+                    'vendor_country': self.vendor.country, 
                     'product_category': self.product_category, 
                     'options': self.options, 
                     'product_price': self.product_price.amount, 

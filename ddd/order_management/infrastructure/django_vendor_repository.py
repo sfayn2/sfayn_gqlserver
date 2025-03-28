@@ -19,7 +19,7 @@ class DjangoVendorRepository(repositories.VendorRepository):
             offer_dto = order_dtos.OfferStrategyDTO(**offer)
             try:
                 final_offers.append(offer_dto.to_domain())
-            except (exceptions.InvalidOffer, ValueError) as e:
+            except (exceptions.InvalidOfferOperation, ValueError) as e:
                 #TODO send notification for invalid offer?
                 print(f"DjangoVendorRepository.get_offer exception > {str(e)}")
                 continue

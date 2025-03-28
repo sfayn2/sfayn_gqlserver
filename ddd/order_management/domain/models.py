@@ -13,7 +13,8 @@ class LineItem:
     product_name: str
     product_price: value_objects.Money
     order_quantity: int
-    vendor_name: str
+    vendor: value_objects.VendorDetails
+    #vendor_name: str
     product_category: str
     options: dict
     package: value_objects.Package
@@ -75,7 +76,7 @@ class Order:
         if self.currency != line_item.product_price.currency:
             raise exceptions.InvalidOrderOperation("Currency mismatch between order and line item.")
 
-        if self.vendor_name and self.vendor_name != line_item.vendor_name:
+        if self.vendor_name and self.vendor_name != line_item.vendor.name:
             raise exceptions.InvalidOrderOperation("Vendor mismatch between order and line item.")
 
 
@@ -143,7 +144,7 @@ class Order:
         if any(item.product_price.currency != self.line_items[0].product_price.currency for item in self.line_items):
             raise exceptions.InvalidOrderOperation("All line items must have the same currency.")
 
-        if len(set(item.vendor_name for item in self.line_items)) > 1:
+        if len(set(item.vendor.name for item in self.line_items)) > 1:
             raise exceptions.InvalidOrderOperation("All line items must belong to the same vendor.")
 
         if not self.shipping_details:
@@ -346,7 +347,14 @@ class Order:
     @property
     def vendor_name(self) -> str:
         #assuming invariant
-        return self.line_items[0].vendor_name
+        return self.line_items[0].vendor.name
+
+    @property
+    def vendor_country(self) -> str:
+        #assuming invariant
+        if not self.line_items[0].vendor.country:
+            raise exceptions.InvalidOrderOperation("Vendor country is missing, its crucial in determining domestic shipment.")
+        return self.line_items[0].vendor.country
 
 
 
