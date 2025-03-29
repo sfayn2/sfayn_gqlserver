@@ -256,3 +256,19 @@ class ShippingOptionStrategy:
     base_cost: Money
     flat_rate: Money
     is_active: bool
+
+    def __post_init__(self):
+        #TODO: need to finalize
+        if self.name in (enums.ShippingMethod.STANDARD, enums.ShippingMethod.EXPRESS):
+            if not isinstance(self.conditions.get("min_package_weight"), (Decimal, int)):
+                raise exceptions.InvalidShippingOption("Standard/Express shipping must specify a min_package_weight. ie {'min_package_weight': 30}")
+        if self.name == enums.ShippingMethod.EXPRESS:
+            if not isinstance(self.conditions.get("cutoff_time"), (Decimal, int)):
+                raise exceptions.InvalidShippingOption("Express shipping must specify a cutoff_time.")
+        if self.name == enums.ShippingMethod.LOCAL_PICKUP:
+            if not self.conditions.get("near_by_city"):
+                raise exceptions.InvalidShippingOption("Local Pickup must specify a near_by_city.")
+            if not (self.conditions.get("pickup_time_from") and self.conditions.get("pickup_time_to")):
+                raise exceptions.InvalidShippingOption("Local Pickup must specify a pickup time range. ie. { 'pickup_time_from': '14:00', 'pickup_time_to': '15:00' }")
+
+
