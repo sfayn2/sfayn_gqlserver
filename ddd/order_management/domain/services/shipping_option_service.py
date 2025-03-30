@@ -23,6 +23,7 @@ class ShippingOptionStrategy(value_objects.ShippingOptionStrategy):
         raise NotImplementedError("Subclasses must implement this method")
 
     def get_tz(self):
+        #TODO should we provide time service?
         return pytz.timezone(self.conditions.get("timezone"))
 
     def get_current_time(self):
@@ -52,7 +53,7 @@ class ExpressShippingStrategy(ShippingOptionStrategy):
         return self.get_current_time() <= self.conditions.get("cutoff_time")
 
     def is_eligible(self, order: models.Order) -> bool:
-        return order.total_weight <= self.conditions.get("min_package_weight") and self.is_before_cutoff()
+        return order.total_weight <= self.conditions.get("max_weight") and self.is_before_cutoff()
 
     def calculate_cost(self, order: models.Order) -> value_objects.Money:
         currency = order.currency
@@ -64,7 +65,7 @@ class ExpressShippingStrategy(ShippingOptionStrategy):
 class LocalPickupShippingStrategy(ShippingOptionStrategy):
 
     def is_near_by(self, order: models.Order):
-        return (order.destination.city in self.conditions.get("near_by_city") and 
+        return (order.destination.city in self.conditions.get("near_by_cities") and 
                 order.destination.country == order.vendor_country
         )
 
@@ -83,7 +84,7 @@ class FreeShippingStrategy(ShippingOptionStrategy):
 
     def is_eligible(self, order: models.Order) -> bool:
         #orders above $50?
-        return order.sub_total > self.conditions.get("min_orders")
+        return order.sub_total > self.conditions.get("min_order_amount")
 
     def calculate_cost(self, order: models.Order) -> value_objects.Money:
         #default is zero
@@ -103,7 +104,7 @@ SHIPPING_OPTIONS_STRATEGIES = {
 }
 
 
-class ShippingMethodStrategyService:
+class ShippingOptionStrategyService:
 
     def __init__(self, vendor_repository: repositories.VendorRepository):
         self.vendor_repository = vendor_repository

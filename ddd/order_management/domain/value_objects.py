@@ -258,17 +258,35 @@ class ShippingOptionStrategy:
     is_active: bool
 
     def __post_init__(self):
-        #TODO: need to finalize
+        if not isinstance(self.name, enums.ShippingMethod):
+            raise exceptions.InvalidShippingOption("Invalid shipping method name")
+        if not isinstance(self.delivery_time, str) or not self.delivery_time.strip():
+            raise exceptions.InvalidShippingOption("Delivery time must be a valid non-empty string.")
+
         if self.name in (enums.ShippingMethod.STANDARD, enums.ShippingMethod.EXPRESS):
-            if not isinstance(self.conditions.get("min_package_weight"), (Decimal, int)):
-                raise exceptions.InvalidShippingOption("Standard/Express shipping must specify a min_package_weight. ie {'min_package_weight': 30}")
+            if not isinstance(self.conditions.get("max_weight"), (Decimal, int)):
+                raise exceptions.InvalidShippingOption("Standard/Express shipping must specify a max_weight. ie {'max_weight': 30}")
         if self.name == enums.ShippingMethod.EXPRESS:
-            if not isinstance(self.conditions.get("cutoff_time"), (Decimal, int)):
-                raise exceptions.InvalidShippingOption("Express shipping must specify a cutoff_time.")
+            if not self._is_valid_time_format(self.conditions.get("cutoff_time")):
+                raise exceptions.InvalidShippingOption("Express shipping must specify a valid cutoff time in HH:MM format. (e.g. {'cutoff_time': '14:00'})")
         if self.name == enums.ShippingMethod.LOCAL_PICKUP:
-            if not self.conditions.get("near_by_city"):
-                raise exceptions.InvalidShippingOption("Local Pickup must specify a near_by_city.")
-            if not (self.conditions.get("pickup_time_from") and self.conditions.get("pickup_time_to")):
-                raise exceptions.InvalidShippingOption("Local Pickup must specify a pickup time range. ie. { 'pickup_time_from': '14:00', 'pickup_time_to': '15:00' }")
+            pickup_time_from = self.conditions.get("pickup_time_from")
+            pickup_time_to = self.conditions.get("pickup_time_to")
+            if not self.conditions.get("near_by_cities"):
+                raise exceptions.InvalidShippingOption("Local Pickup must specify a near by cities. (e.g. {'near_by_cities': ['city1', 'city2']})")
+            if not (self._is_valid_time_format(pickup_time_from) and self._is_valid_time_format(pickup_time_to)):
+                raise exceptions.InvalidShippingOption("Local Pickup must specify a valid pickup times. (e.g. { 'pickup_time_from': '14:00', 'pickup_time_to': '15:00' } )")
+        if self.name == enums.ShippingMethod.FREE_SHIPPING:
+            min_order_amount = self.conditions.get("min_order_amount")
+            if not isinstance(min_order_amount, Decimal) or min_order_amount < Decimal("0"):
+                raise exceptions.InvalidShippingOption("Free Shipping must speicify a valid minimum order amount (e.g. { 'min_order_amount': Decimal('50') })")
+
+    def _is_valid_time_format(self, time: str) -> bool:
+        try:
+            datetime.strptime(time, "%H:%M")
+            return True
+        except (ValueError, TypeError):
+            return False
+
 
 

@@ -1,3 +1,4 @@
+from __future__ import annotations
 import uuid
 from abc import ABC, abstractmethod
 from ddd.order_management.domain import models
