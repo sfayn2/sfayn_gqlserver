@@ -22,12 +22,8 @@ class ShippingOptionStrategy(value_objects.ShippingOptionStrategy):
         """
         raise NotImplementedError("Subclasses must implement this method")
 
-    def get_tz(self):
-        #TODO should we provide time service?
-        return pytz.timezone(self.conditions.get("timezone"))
-
     def get_current_time(self):
-        return datetime.now(self.get_tz()).time()
+        return datetime.now(pytz.utc).time()
 
 class StandardShippingStrategy(ShippingOptionStrategy):
 
