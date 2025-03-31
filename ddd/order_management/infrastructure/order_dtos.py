@@ -175,6 +175,10 @@ class ShippingDetailsDTO(BaseModel):
             )
         )
 
+    @staticmethod
+    def from_domain(self, shipping_details: value_objects.ShippingDetails) -> ShippingDetailsDTO:
+        return ShippingDetailsDTO(**asdict(shipping_details))
+
 class PaymentDetailsDTO(BaseModel):
     order_id: str
     method: enums.PaymentMethod

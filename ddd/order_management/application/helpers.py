@@ -1,7 +1,8 @@
 from dataclasses import asdict
+from typing import List
 from ddd.order_management.application import dtos
-from ddd.order_management.domain import models, enums
-from ddd.order_management.infrastructure import logging
+from ddd.order_management.domain import models, enums, value_objects
+from ddd.order_management.infrastructure import logging, order_dtos
 
 logger = logging.get_logger(__name__)
 
@@ -35,3 +36,14 @@ def get_order_response_dto(order: models.Order, success: bool = True, message: s
                 final_amount=asdict(order.final_amount)
             )
         return response_dto
+
+def get_shipping_options_response_dto(shipping_options: List[value_objects.ShippingDetails]) -> List[order_dtos.ShippingDetailsDTO]:
+    response_dtos = []
+    for option in shipping_options:
+        response_dtos.append(
+            order_dtos.ShippingDetailsDTO.from_domain(option)
+        )
+    return response_dtos
+
+    
+

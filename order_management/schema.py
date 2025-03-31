@@ -3,7 +3,9 @@ import logging
 from dataclasses import asdict
 from graphene import relay
 from graphene.types.generic import GenericScalar
-from ddd.order_management.application import message_bus, dtos, commands, unit_of_work, helpers
+from ddd.order_management.application import (
+    message_bus, dtos, commands, unit_of_work, helpers, queries
+  )
 from ddd.order_management.domain import enums, exceptions
 
 #logger = logging.getLogger("django")
@@ -90,6 +92,16 @@ class OrderResponseType(graphene.ObjectType):
     total_discounts_fee = graphene.Field(MoneyType)
     final_amount = graphene.Field(MoneyType)
 
+class ShippingOptionType(graphene.ObjectType):
+    name = graphene.String(required=True)
+    delivery_time = graphene.String(required=True)
+    conditions = GenericScalar(required=True)
+    base_cost = graphene.Field(MoneyType)
+    flat_rate = graphene.Field(MoneyType)
+    is_active = graphene.Boolean()
+
+
+
 
 # ==========================
 # Mutations 
@@ -146,6 +158,22 @@ class ConfirmOrderMutation(relay.ClientIDMutation):
             response_dto = helpers.handle_unexpected_error(f"Unexpected error during confirmation order {e}")
 
         return cls(order=OrderResponseType(**response_dto.model_dump()))
+
+# ===========
+# Query resolvere here
+# ==========
+class ShippingOptionQuery(graphene.ObjectType):
+    class Input:
+        vendor_name = graphene.Field(vendor_name=graphene.String(required=True))
+        order_id = graphene.String(required=True)
+
+    shipping_options = graphene.List(ShippingOptionType)
+    def resolve_shipping_options(root, info, **input):
+        query = queries.ShippingOptionsQuery.model_validate(input)
+        shipping_options = message_bus.handle(query, unit_of_work.DjangoOrderUnitOfWork())
+        response_dto = helpers.get_shipping_options_response_dto(shipping_options)
+
+        return response_dto
 
 
 

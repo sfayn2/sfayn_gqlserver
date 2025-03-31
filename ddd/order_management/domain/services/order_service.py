@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime
 from typing import List
 from ddd.order_management.domain import models, value_objects, enums, exceptions
-from ddd.order_management.domain.services import tax_service, offer_service
+from ddd.order_management.domain.services import tax_service, offer_service, shipping_option_service
 
 def confirm_order(payment_details: value_objects.PaymentDetails,
                   order: models.Order):
@@ -52,3 +52,12 @@ def place_order(
     order.place_order()
 
     return order
+
+
+def get_shipping_options(shipping_option_service: shipping_option_service.ShippingOptionStrategyService, order: models.Order):
+
+    shipping_options = shipping_option_service.get_shipping_options(order)
+    if not shipping_options:
+        raise exceptions.InvalidShippingOption(f"No available shipping options.")
+
+    return shipping_options
