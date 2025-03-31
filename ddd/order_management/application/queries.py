@@ -11,4 +11,3 @@ class Query(BaseModel, frozen=True):
 
 class ShippingOptionsQuery(Query):
     order_id: str
-    vendor_name: str

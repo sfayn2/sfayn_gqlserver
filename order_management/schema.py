@@ -92,13 +92,6 @@ class OrderResponseType(graphene.ObjectType):
     total_discounts_fee = graphene.Field(MoneyType)
     final_amount = graphene.Field(MoneyType)
 
-class ShippingOptionType(graphene.ObjectType):
-    name = graphene.String(required=True)
-    delivery_time = graphene.String(required=True)
-    conditions = GenericScalar(required=True)
-    base_cost = graphene.Field(MoneyType)
-    flat_rate = graphene.Field(MoneyType)
-    is_active = graphene.Boolean()
 
 
 
@@ -167,7 +160,7 @@ class ShippingOptionQuery(graphene.ObjectType):
         #vendor_name = graphene.Field(vendor_name=graphene.String(required=True))
         order_id = graphene.String(required=True)
 
-    shipping_options = graphene.List(ShippingOptionType)
+    shipping_options = graphene.List(ShippingDetailsType)
     def resolve_shipping_options(root, info, **input):
         query = queries.ShippingOptionsQuery.model_validate(input)
         shipping_options = message_bus.handle(query, unit_of_work.DjangoOrderUnitOfWork())

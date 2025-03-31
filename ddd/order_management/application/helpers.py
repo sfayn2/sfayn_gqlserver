@@ -38,12 +38,7 @@ def get_order_response_dto(order: models.Order, success: bool = True, message: s
         return response_dto
 
 def get_shipping_options_response_dto(shipping_options: List[value_objects.ShippingDetails]) -> List[order_dtos.ShippingDetailsDTO]:
-    response_dtos = []
-    for option in shipping_options:
-        response_dtos.append(
-            order_dtos.ShippingDetailsDTO.from_domain(option)
-        )
-    return response_dtos
+    return [order_dtos.ShippingDetailsDTO.from_domain(option) for option in shipping_options]
 
     
 
