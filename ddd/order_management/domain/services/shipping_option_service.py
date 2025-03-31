@@ -1,5 +1,6 @@
 from __future__ import annotations
 import json, pytz
+from dataclasses import asdict
 from datetime import datetime
 from abc import ABC, abstractmethod
 from typing import Tuple, List
@@ -105,16 +106,16 @@ class ShippingOptionStrategyService:
     def __init__(self, vendor_repository: repositories.VendorRepository):
         self.vendor_repository = vendor_repository
 
-    def get_shipping_options(self, order: models.Order) -> List[dict]:
+    def get_shipping_options(self, order: models.Order) -> List[value_objects.ShippingDetails]:
         options = []
         for option in self._fetch_valid_options():
             if option.is_eligible(order):
                 cost = option.calculate_cost(order)
-                options.append({
-                    "name": option.name,
-                    "delivery_time": option.delivery_time,
-                    "cost": cost
-                })
+                options.append(value_objects.ShippingDetails(
+                        name=option.name,
+                        delivery_time=option.delivery_time,
+                        cost=cost)
+                )
         return options
 
     def _fetch_valid_options(self, vendor_name: str):
@@ -124,7 +125,7 @@ class ShippingOptionStrategyService:
         for option in vendor_shipping_options:
             ship_opt_strategy_class = SHIPPING_OPTIONS_STRATEGIES.get(option.name)
             valid_shipping_options.append(
-                ship_opt_strategy_class(**option)
+                ship_opt_strategy_class(**asdict(option))
             )
 
         return valid_shipping_options

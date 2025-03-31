@@ -27,7 +27,7 @@ class DjangoVendorRepository(repositories.VendorRepository):
 
 
     def get_shipping_options(self, vendor_name: str):
-        shipping_options = django_vendor_models.ShippingOption.filter(vendor__name=vendor_name)
+        shipping_options = django_vendor_models.ShippingOption.filter(vendor__name=vendor_name, is_active=True)
         final_opts = []
         for option in shipping_options:
             ship_opt_dto = order_dtos.ShippingOptionStrategyDTO(**option)

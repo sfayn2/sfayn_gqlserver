@@ -148,7 +148,7 @@ class Order:
             raise exceptions.InvalidOrderOperation("All line items must belong to the same vendor.")
 
         if not self.shipping_details:
-            raise exceptions.InvalidOrderOperation("Order must have a selected Shipping method")
+            raise exceptions.InvalidOrderOperation("Order must have a selected shipping option")
 
         self.order_status = enums.OrderStatus.PENDING
         self.update_modified_date()
@@ -275,17 +275,12 @@ class Order:
         self.destination = destination
         self.update_modified_date()
     
-    def select_shipping_option(self, shipping_option: enums.ShippingMethod, shipping_options: List[dict]):
+    def select_shipping_option(self, shipping_option: value_objects.ShippingDetails, shipping_options: List[value_objects.ShippingDetails]):
         if self.order_status != enums.OrderStatus.DRAFT:
             raise exceptions.InvalidTaxOperation("Only draft order can select shipping option.")
         for option in shipping_options:
-            if option.get("name") == shipping_option:
-                self.update_shipping_details(value_objects.ShippingDetails(
-                        method=option.get("name"),
-                        delivery_time=option.get("delivery_time"),
-                        cost=option.get("cost")
-                    )
-                )
+            if option == shipping_option:
+                self.update_shipping_details(option)
                 return
         raise exceptions.InvalidOrderOperation(f"Shipping option not supported: {shipping_option}")
 
