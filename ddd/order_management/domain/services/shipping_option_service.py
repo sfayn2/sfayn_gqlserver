@@ -108,7 +108,7 @@ class ShippingOptionStrategyService:
 
     def get_shipping_options(self, order: models.Order) -> List[value_objects.ShippingDetails]:
         options = []
-        for option in self._fetch_valid_options():
+        for option in self._fetch_valid_options(vendor_name=order.vendor_name):
             if option.is_eligible(order):
                 cost = option.calculate_cost(order)
                 options.append(value_objects.ShippingDetails(

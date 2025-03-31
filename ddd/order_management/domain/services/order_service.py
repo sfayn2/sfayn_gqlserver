@@ -54,9 +54,12 @@ def place_order(
     return order
 
 
-def get_shipping_options(shipping_option_service: shipping_option_service.ShippingOptionStrategyService, order: models.Order):
+def get_shipping_options(
+        shipping_option_service: shipping_option_service.ShippingOptionStrategyService, 
+        order: models.Order):
 
-    shipping_options = shipping_option_service.get_shipping_options(order)
+    shipping_options = shipping_option_service.get_shipping_options(order=order)
+
     if not shipping_options:
         raise exceptions.InvalidShippingOption(f"No available shipping options.")
 

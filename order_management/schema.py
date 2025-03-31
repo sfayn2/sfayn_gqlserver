@@ -164,7 +164,7 @@ class ConfirmOrderMutation(relay.ClientIDMutation):
 # ==========
 class ShippingOptionQuery(graphene.ObjectType):
     class Input:
-        vendor_name = graphene.Field(vendor_name=graphene.String(required=True))
+        #vendor_name = graphene.Field(vendor_name=graphene.String(required=True))
         order_id = graphene.String(required=True)
 
     shipping_options = graphene.List(ShippingOptionType)

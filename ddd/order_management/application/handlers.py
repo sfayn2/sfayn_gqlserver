@@ -50,10 +50,8 @@ def handle_shipping_options(query: queries.ShippingOptionsQuery, uow: unit_of_wo
         if not order:
             raise exceptions.InvalidOrderOperation(f"Order id {order.order_id} not found.")
 
-        ship_opt_svc = shipping_option_service.ShippingOptionStrategyService(vendor_name=query.vendor_name)
-
         shipping_options = order_service.get_shipping_options(
-            shipping_option_service=ship_opt_svc, 
+            shipping_option_service=shipping_option_service.ShippingOptionStrategyService(uow.vendor),
             order=order
         )
 
