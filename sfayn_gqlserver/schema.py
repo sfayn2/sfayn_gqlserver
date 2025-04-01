@@ -13,6 +13,7 @@ class Query(
 class Mutation(graphene.ObjectType):
     place_order = order_management.schema.PlaceOrderMutation.Field()
     confirm_order = order_management.schema.ConfirmOrderMutation.Field()
+    select_shipping_option = order_management.schema.SelectShippingOptionMutation.Field()
 
 schema = graphene.Schema(query=Query, mutation=Mutation)
 

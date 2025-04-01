@@ -22,6 +22,10 @@ class ConfirmOrderCommand(Command):
     transaction_id: str
     payment_method: enums.PaymentMethod
 
+class SelectShippingOptionCommand(Command):
+    order_id: str
+    shipping_details: order_dtos.ShippingDetailsDTO
+
 class ShipOrderCommand(Command):
     order_id: str
 

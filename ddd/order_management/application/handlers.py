@@ -27,7 +27,7 @@ def handle_confirm_order(command: commands.ConfirmOrderCommand, uow: unit_of_wor
 
         order = uow.order.get(order_id=command.order_id)
         if not order:
-            raise exceptions.InvalidOrderOperation(f"Order id {order.order_id} not found.")
+            raise exceptions.InvalidOrderOperation(f"Order id {command.order_id} not found.")
 
         payment_gateway = uow.payments.get_payment_gateway(command.payment_method)
         payment_details = payment_gateway.get_payment_details(command.transaction_id)
@@ -47,8 +47,6 @@ def handle_shipping_options(query: queries.ShippingOptionsQuery, uow: unit_of_wo
     with uow:
 
         order = uow.order.get(order_id=query.order_id)
-        if not order:
-            raise exceptions.InvalidOrderOperation(f"Order id {order.order_id} not found.")
 
         shipping_options = order_service.get_shipping_options(
             shipping_option_service=shipping_option_service.ShippingOptionStrategyService(uow.vendor),
@@ -56,6 +54,27 @@ def handle_shipping_options(query: queries.ShippingOptionsQuery, uow: unit_of_wo
         )
 
         return shipping_options
+
+def handle_selection_shipping_options(command: commands.SelectShippingOption, uow: unit_of_work.DjangoOrderUnitOfWork):
+    with uow:
+
+        order = uow.order.get(order_id=command.order_id)
+
+        available_shipping_options = order_service.get_shipping_options(
+            shipping_option_service=shipping_option_service.ShippingOptionStrategyService(uow.vendor),
+            order=order
+        )
+
+        order_w_shipping_option = order.select_shipping_option(
+                                        command.shipping_details, 
+                                        available_shipping_options
+                                    )
+
+        uow.order.save(order_w_shipping_option)
+        uow.commit()
+
+        return order_w_shipping_option
+
 
         
 

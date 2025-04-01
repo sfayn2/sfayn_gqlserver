@@ -152,6 +152,27 @@ class ConfirmOrderMutation(relay.ClientIDMutation):
 
         return cls(order=OrderResponseType(**response_dto.model_dump()))
 
+class SelectShippingOptionMutation(relay.ClientIDMutation):
+    class Input:
+        order_id = graphene.String(required=True)
+        shipping_details = graphene.Field(ShippingDetailsInput, required=True)
+
+    order = graphene.Field(OrderResponseType)
+
+    @classmethod
+    def mutate_and_get_payload(cls, root, info, **input):
+        try:
+            command = commands.SelectShippingOption.model_validate(input)
+            order = message_bus.handle(command, unit_of_work.DjangoOrderUnitOfWork())
+            response_dto = helpers.get_order_response_dto(order, success=True, message="Order successfully confirmed.")
+
+        except (exceptions.InvalidOrderOperation, ValueError) as e:
+            response_dto = helpers.handle_invalid_order_operation(e)
+        except Exception as e:
+            response_dto = helpers.handle_unexpected_error(f"Unexpected error during shipping option selection {e}")
+
+        return cls(order=OrderResponseType(**response_dto.model_dump()))
+
 # ===========
 # Query resolvere here
 # ==========
