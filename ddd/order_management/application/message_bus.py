@@ -6,7 +6,7 @@ from ddd.order_management.domain import events
 COMMAND_HANDLERS = {
     commands.PlaceOrderCommand: handlers.handle_place_order,
     commands.ConfirmOrderCommand: handlers.handle_confirm_order,
-    commands.SelectShippingOptionCommand: handlers.handle_selection_shipping_options,
+    commands.SelectShippingOptionCommand: handlers.handle_select_shipping_option,
 }
 
 QUERY_HANDLERS = {

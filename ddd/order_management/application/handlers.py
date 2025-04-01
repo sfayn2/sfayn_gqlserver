@@ -55,7 +55,7 @@ def handle_shipping_options(query: queries.ShippingOptionsQuery, uow: unit_of_wo
 
         return shipping_options
 
-def handle_selection_shipping_options(command: commands.SelectShippingOption, uow: unit_of_work.DjangoOrderUnitOfWork):
+def handle_select_shipping_option(command: commands.SelectShippingOption, uow: unit_of_work.DjangoOrderUnitOfWork):
     with uow:
 
         order = uow.order.get(order_id=command.order_id)
