@@ -155,14 +155,12 @@ class ConfirmOrderMutation(relay.ClientIDMutation):
 # ===========
 # Query resolvere here
 # ==========
-class ShippingOptionQuery(graphene.ObjectType):
-    class Input:
-        #vendor_name = graphene.Field(vendor_name=graphene.String(required=True))
-        order_id = graphene.String(required=True)
+class Query(graphene.ObjectType):
 
-    shipping_options = graphene.List(ShippingDetailsType)
-    def resolve_shipping_options(root, info, **input):
-        query = queries.ShippingOptionsQuery.model_validate(input)
+    #shipping_options = graphene.List(ShippingDetailsType)
+    shipping_options_by_order_id = graphene.List(ShippingDetailsType, order_id=graphene.String(required=True))
+    def resolve_shipping_options_by_order_id(root, info, order_id):
+        query = queries.ShippingOptionsQuery(order_id=order_id)
         shipping_options = message_bus.handle(query, unit_of_work.DjangoOrderUnitOfWork())
         response_dto = helpers.get_shipping_options_response_dto(shipping_options)
 

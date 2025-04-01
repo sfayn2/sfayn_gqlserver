@@ -25,12 +25,19 @@ class DjangoVendorRepository(repositories.VendorRepository):
                 continue
         return final_offers
 
+    #def get_vendor_details(self, vendor_name: str):
+    #    vendor_details = django_vendor_models.Vendor.objects.filter(vendor__name=vendor_name, is_active=True)
+    #    if not vendor_details.exists():
+    #        raise exceptions.InvalidVendorDetails(f"Vendor details {vendor_name} not found.")
+
+    #    return order_dtos.VendorDetailsDTO.from_django_filter(vendor_details.values()).to_domain()
 
     def get_shipping_options(self, vendor_name: str):
-        shipping_options = django_vendor_models.ShippingOption.filter(vendor__name=vendor_name, is_active=True)
+        shipping_options = django_vendor_models.ShippingOption.objects.filter(vendor__name=vendor_name, is_active=True)
         final_opts = []
-        for option in shipping_options:
-            ship_opt_dto = order_dtos.ShippingOptionStrategyDTO(**option)
+        for option in shipping_options.values():
+            option.pop("id")
+            ship_opt_dto = order_dtos.ShippingOptionStrategyDTO.from_django_filter(option)
             try:
                 final_opts.append(ship_opt_dto.to_domain())
             except (ValueError) as e:

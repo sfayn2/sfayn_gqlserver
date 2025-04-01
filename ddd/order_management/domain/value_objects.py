@@ -256,6 +256,7 @@ class ShippingOptionStrategy:
     base_cost: Money
     flat_rate: Money
     is_active: bool
+    currency: str
 
     def __post_init__(self):
         if not isinstance(self.name, enums.ShippingMethod):

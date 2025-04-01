@@ -17,3 +17,6 @@ class InvalidTaxOperation(Exception):
 
 class InvalidShippingOption(Exception):
     pass
+
+class InvalidVendorDetails(Exception):
+    pass

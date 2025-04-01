@@ -176,7 +176,7 @@ class ShippingDetailsDTO(BaseModel):
         )
 
     @staticmethod
-    def from_domain(self, shipping_details: value_objects.ShippingDetails) -> ShippingDetailsDTO:
+    def from_domain(shipping_details: value_objects.ShippingDetails) -> ShippingDetailsDTO:
         return ShippingDetailsDTO(**asdict(shipping_details))
 
 class PaymentDetailsDTO(BaseModel):
@@ -417,13 +417,37 @@ class OfferStrategyDTO(BaseModel):
 class ShippingOptionStrategyDTO(BaseModel):
     name: enums.ShippingMethod
     delivery_time: str
-    conditions: str
+    conditions: dict
     base_cost: MoneyDTO
     flat_rate: MoneyDTO
+    currency: str
     is_active: bool
 
     def to_domain(self) -> value_objects.ShippingOptionStrategy:
         return value_objects.ShippingOptionStrategy(
-            **self.model_dump(),
-            conditions=ast.literal_eval(self.conditions)
+            name=self.name,
+            delivery_time=self.delivery_time,
+            conditions=self.conditions,
+            base_cost=self.base_cost.to_domain(),
+            flat_rate=self.flat_rate.to_domain(),
+            currency=self.currency,
+            is_active=self.is_active
+        )
+
+    @staticmethod
+    def from_django_filter(django_shipping_option):
+        return ShippingOptionStrategyDTO(
+            name=django_shipping_option.get("name"),
+            delivery_time=django_shipping_option.get("delivery_time"),
+            currency=django_shipping_option.get("currency"),
+            is_active=django_shipping_option.get("is_active"),
+            base_cost=MoneyDTO(
+                amount=django_shipping_option.get("base_cost"),
+                currency=django_shipping_option.get("currency")
+            ),
+            flat_rate=MoneyDTO(
+                amount=django_shipping_option.get("flat_rate"),
+                currency=django_shipping_option.get("currency")
+            ),
+            conditions=ast.literal_eval(django_shipping_option.get("conditions"))
         )

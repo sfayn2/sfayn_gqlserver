@@ -70,8 +70,9 @@ class ShippingOption(models.Model):
             help_text="", 
             default=Decimal("0.0")
         )
+    currency = models.CharField(max_length=50, help_text="Default currency specific to this Shipping option base cost or flat rate", default=settings.DEFAULT_CURRENCY)
 
-    conditions = models.CharField(max_length=150, help_text='ex. { "weight_kg_lt": 30 }')
+    conditions = models.CharField(max_length=150, help_text='ex. { "max_weight": 30 }')
 
     flat_rate = models.DecimalField(
             decimal_places=settings.DEFAULT_DECIMAL_PLACES, 

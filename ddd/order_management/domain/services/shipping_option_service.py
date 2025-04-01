@@ -7,7 +7,10 @@ from typing import Tuple, List
 from ddd.order_management.domain import enums, exceptions, models, value_objects, repositories
 from decimal import Decimal
 
-class ShippingOptionStrategy(value_objects.ShippingOptionStrategy):
+class ShippingOptionStrategy(ABC):
+
+    def __init__(self, strategy: value_objects.ShippingOptionStrategy):
+        self.strategy = strategy
 
     @abstractmethod
     def is_eligible(self, order: models.Order) -> bool:
@@ -32,44 +35,36 @@ class StandardShippingStrategy(ShippingOptionStrategy):
         """
             Only allow packages under 30kg + Domestic shipping
         """
-        return order.total_weight <= self.conditions.get("min_package_weight") and not order.destination.is_international(order.vendor_country)
+        return order.total_weight <= self.strategy.conditions.get("min_package_weight") and not order.destination.is_international(order.vendor_country)
 
     def calculate_cost(self, order: models.Order) -> value_objects.Money:
         """
             Base cost + flat rate per kg
         """
-        currency = order.currency
-        return value_objects.Money(
-            amount=self.base_cost + (self.flat_rate * order.total_weight),
-            currency=currency
-        )
+        return self.strategy.base_cost.add(self.strategy.flat_rate.multiply(order.total_weight))
 
 class ExpressShippingStrategy(ShippingOptionStrategy):
 
     def is_before_cutoff(self):
-        return self.get_current_time() <= self.conditions.get("cutoff_time")
+        return self.get_current_time() <= self.strategy.conditions.get("cutoff_time")
 
     def is_eligible(self, order: models.Order) -> bool:
-        return order.total_weight <= self.conditions.get("max_weight") and self.is_before_cutoff()
+        return order.total_weight <= self.strategy.conditions.get("max_weight") and self.is_before_cutoff()
 
     def calculate_cost(self, order: models.Order) -> value_objects.Money:
-        currency = order.currency
-        return value_objects.Money(
-            amount=self.base_cost + (self.flat_rate * order.total_weight),
-            currency=currency
-        )
+        return self.strategy.base_cost.add(self.strategy.flat_rate.multiply(order.total_weight))
 
 class LocalPickupShippingStrategy(ShippingOptionStrategy):
 
     def is_near_by(self, order: models.Order):
-        return (order.destination.city in self.conditions.get("near_by_cities") and 
+        return (order.destination.city in self.strategy.conditions.get("near_by_cities") and 
                 order.destination.country == order.vendor_country
         )
 
     def is_eligible(self, order: models.Order) -> bool:
         current_time = self.get_current_time()
-        return (current_time >= self.conditions.get("pickup_time_from") and 
-                current_time <= self.conditions.get("pickup_time_to") and
+        return (current_time >= self.strategy.conditions.get("pickup_time_from") and 
+                current_time <= self.strategy.conditions.get("pickup_time_to") and
                 self.is_near_by(order)
         )
 
@@ -81,7 +76,7 @@ class FreeShippingStrategy(ShippingOptionStrategy):
 
     def is_eligible(self, order: models.Order) -> bool:
         #orders above $50?
-        return order.sub_total > self.conditions.get("min_order_amount")
+        return order.sub_total > self.strategy.conditions.get("min_order_amount")
 
     def calculate_cost(self, order: models.Order) -> value_objects.Money:
         #default is zero
@@ -112,43 +107,20 @@ class ShippingOptionStrategyService:
             if option.is_eligible(order):
                 cost = option.calculate_cost(order)
                 options.append(value_objects.ShippingDetails(
-                        name=option.name,
-                        delivery_time=option.delivery_time,
+                        method=option.strategy.name,
+                        delivery_time=option.strategy.delivery_time,
                         cost=cost)
                 )
         return options
 
     def _fetch_valid_options(self, vendor_name: str):
-        vendor_shipping_options = self.vendor_repository.get_shipping_options(vendor_name)
+        vendor_shipping_options = self.vendor_repository.get_shipping_options(vendor_name=vendor_name)
         valid_shipping_options = []
 
         for option in vendor_shipping_options:
             ship_opt_strategy_class = SHIPPING_OPTIONS_STRATEGIES.get(option.name)
             valid_shipping_options.append(
-                ship_opt_strategy_class(**asdict(option))
+                ship_opt_strategy_class(option)
             )
 
         return valid_shipping_options
-
-        #self.shipping_options = [
-        #    shipping_option_service.ShippingMethodStrategy(
-        #        name=enums.ShippingMethod.STANDARD,
-        #        delivery_time="3-5 business days",
-        #        base_cost=Decimal("5.00")
-        #    ),
-        #    shipping_option_service.ShippingMethodStrategy(
-        #        name=enums.ShippingMethod.EXPRESS,
-        #        delivery_time="1-2 business days",
-        #        base_cost=Decimal("15.00")
-        #    ),
-        #    shipping_option_service.ShippingMethodStrategy(
-        #        name=enums.ShippingMethod.SAME_DAY,
-        #        delivery_time="same day",
-        #        base_cost=Decimal("25.00")
-        #    ),
-        #    shipping_option_service.ShippingMethodStrategy(
-        #        name=enums.ShippingMethod.FLAT_RATE,
-        #        delivery_time="4-6 business days",
-        #        base_cost=Decimal("10.00"),
-        #        flat_rate=Decimal("2.00")
-        #    )

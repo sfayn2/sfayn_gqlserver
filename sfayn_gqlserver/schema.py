@@ -3,7 +3,8 @@ import product_catalog.schema
 import order_management.schema
 
 class Query(
-    product_catalog.schema.Query
+    product_catalog.schema.Query,
+    order_management.schema.Query
 ):
     #This class will inherit from multiple queries
     #as we begin to add more apps to our project

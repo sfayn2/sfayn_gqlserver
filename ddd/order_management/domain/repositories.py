@@ -28,6 +28,10 @@ class VendorRepository(ABC):
     def get_offers(self):
         raise NotImplementedError("Subclasses must implement this method")
 
+    #@abstractmethod
+    #def get_vendor_details(self):
+    #    raise NotImplementedError("Subclasses must implement this method")
+
     @abstractmethod
     def get_shipping_options(self):
         raise NotImplementedError("Subclasses must implement this method")
