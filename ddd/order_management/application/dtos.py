@@ -20,3 +20,4 @@ class OrderResponseDTO(BaseModel):
 class ResponseDTO(BaseModel):
     success: bool
     message: str
+
