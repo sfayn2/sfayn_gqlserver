@@ -101,12 +101,7 @@ class OrderResponseType(graphene.ObjectType):
 # ===================
 class PlaceOrderMutation(relay.ClientIDMutation):
     class Input:
-        #order_id = graphene.String()
-        customer_details = graphene.Field(CustomerDetailsInput, required=True)
-        shipping_address = graphene.Field(AddressInput, required=True)
-        line_items = graphene.List(LineItemInput, required=True)
-        shipping_details = graphene.Field(ShippingDetailsInput, required=True)
-        coupons = graphene.List(CouponInput, required=False)
+        order_id = graphene.String()
 
     order = graphene.Field(OrderResponseType)
 
@@ -211,127 +206,6 @@ class Query(graphene.ObjectType):
 
 
 
-# ===========
-# Sample PlaceOrderMutation
-# ======================
-"""
-mutation {
-  placeOrder(input: {
-    customerDetails: {
-      firstName: "John",
-      lastName: "Doe",
-      email: "JohnDoe@gmail.com"
-    },
-    shippingAddress: {
-      street: "123 main street",
-      city: "New York",
-      state: "NYC",
-      postal: "1001",
-      country: "Singapore"
-    },
-    lineItems: [
-      {
-        productSku: "SKU1",
-        productName: "Product1",
-        vendorDetails {
-          name: "Vendor1",
-          country: "Singapore"
-        },
-        productCategory: "Category1",
-        orderQuantity: 1,
-        options: {color:"red"},
-        productPrice: {
-          amount: 2.1,
-          currency: "SGD"
-        },
-        package: {
-          weight: 1.5,
-          dimensions: [10, 10, 10]
-        }
-      }
-    ],
-    shippingDetails: {
-      method: "Standard",
-      deliveryTime: "3-5 business days",
-      cost: {
-        amount: 5.99,
-        currency: "SGD"
-      }
-    },
-    coupons: [{ couponCode: "WELCOME25"}]
-  }) {
-    order	{
-        orderId
-    orderStatus
-    success
-    message
-    taxDetails
-    offerDetails
-    shippingDetails {
-      method
-      deliveryTime
-      cost {
-        amount
-        currency
-      }
-    }
-    taxAmount {
-      amount
-      currency
-    }
-    totalDiscountsFee {
-      amount
-      currency
-    }
-    finalAmount {
-      amount
-      currency
-    }
-    
-    }
-  }
-}
-"""
 
-# ==============
-# Sample Confirm Order
-# ========
-"""
-mutation {
-  confirmOrder(input: {
-    orderId: "ORD-FC8D8D9F",
-    transactionId: "2L633961FY072164Y",
-    method: "Paypal"
-  }) {
-    order	{
-        orderId
-    orderStatus
-    success
-    message
-    taxDetails
-    offerDetails
-    shippingDetails {
-      method
-      deliveryTime
-      cost {
-        amount
-        currency
-      }
-    }
-    taxAmount {
-      amount
-      currency
-    }
-    totalDiscountsFee {
-      amount
-      currency
-    }
-    finalAmount {
-      amount
-      currency
-    }
-    
-    }
-  }
-}
-"""
+
+
