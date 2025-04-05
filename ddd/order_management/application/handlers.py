@@ -75,6 +75,21 @@ def handle_select_shipping_option(command: commands.SelectShippingOption, uow: u
 
         return order_w_shipping_option
 
+def handle_checkout_items(command: commands.CheckoutItemsCommand, uow: unit_of_work.DjangoOrderUnitOfWork):
+    with uow:
+
+        draft_order = order_service.draft_order(
+            customer_details=command.customer_details.to_domain(),
+            shipping_address=command.shipping_address.to_domain(),
+            line_items=[item.to_domain() for item in command.line_items],
+        )
+
+        uow.order.save(draft_order)
+        uow.commit()
+
+        return draft_order
+
+
 
         
 

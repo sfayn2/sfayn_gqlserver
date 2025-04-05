@@ -52,12 +52,12 @@ class LineItem:
 
 @dataclass
 class Order:
-    order_id: str
     date_created: datetime
     destination: value_objects.Address
     customer_details: value_objects.CustomerDetails
     order_status: enums.OrderStatus
-    shipping_details: value_objects.ShippingDetails
+    order_id: Optional[str] = None
+    shipping_details: Optional[value_objects.ShippingDetails] = None
     line_items: List[LineItem] = None
     payment_details: Optional[value_objects.PaymentDetails] = None
     cancellation_reason: Optional[str] = None
@@ -79,6 +79,10 @@ class Order:
         if self.vendor_name and self.vendor_name != line_item.vendor.name:
             raise exceptions.InvalidOrderOperation("Vendor mismatch between order and line item.")
 
+    def generate_order_id(self):
+        if self.order_status != enums.OrderStatus.DRAFT:
+            raise exceptions.InvalidOrderOperation("Only draft order can generate order id.")
+        return f"ORD-{uuid.uuid4().hex[:8].upper()}"
 
     def update_modified_date(self):
         self.date_modified = datetime.now()

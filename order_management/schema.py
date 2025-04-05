@@ -173,6 +173,28 @@ class SelectShippingOptionMutation(relay.ClientIDMutation):
 
         return cls(order=OrderResponseType(**response_dto.model_dump()))
 
+class CheckoutItemsMutation(relay.ClientIDMutation):
+    class Input:
+        customer_details = graphene.Field(CustomerDetailsInput, required=True)
+        shipping_address = graphene.Field(AddressInput, required=True)
+        line_items = graphene.List(LineItemInput, required=True)
+
+    order = graphene.Field(OrderResponseType)
+
+    @classmethod
+    def mutate_and_get_payload(cls, root, info, **input):
+        try:
+            command = commands.CheckoutItemsCommand.model_validate(input)
+            order = message_bus.handle(command, unit_of_work.DjangoOrderUnitOfWork())
+            response_dto = helpers.get_order_response_dto(order, success=True, message="Cart items successfully checkout.")
+
+        except (exceptions.InvalidOrderOperation, ValueError) as e:
+            response_dto = helpers.handle_invalid_order_operation(e)
+        except Exception as e:
+            response_dto = helpers.handle_unexpected_error(f"Unexpected error during cart items checking out {e}")
+
+        return cls(order=OrderResponseType(**response_dto.model_dump()))
+
 # ===========
 # Query resolvere here
 # ==========

@@ -9,6 +9,11 @@ from ddd.order_management.infrastructure import order_dtos
 class Command(BaseModel, frozen=True):
     pass
 
+class CheckoutItemsCommand(Command):
+    customer_details: order_dtos.CustomerDetailsDTO
+    shipping_address: order_dtos.AddressDTO
+    line_items: List[order_dtos.LineItemDTO]
+
 class PlaceOrderCommand(Command):
     #order_id: str
     customer_details: order_dtos.CustomerDetailsDTO

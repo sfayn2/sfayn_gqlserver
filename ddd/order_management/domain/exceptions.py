@@ -1,22 +1,21 @@
+class InvalidOrderOperation(Exception):
+    pass
 
 class InvalidStatusTransitionError(Exception):
     pass
 
-class InvalidOrderOperation(Exception):
-    pass
-
-class InvalidOfferOperation(Exception):
+class InvalidOfferOperation(InvalidOrderOperation):
     pass
 
 
-class InvalidPaymentOperation(Exception):
+class InvalidPaymentOperation(InvalidOrderOperation):
     pass
 
-class InvalidTaxOperation(Exception):
+class InvalidTaxOperation(InvalidOrderOperation):
     pass
 
-class InvalidShippingOption(Exception):
+class InvalidShippingOption(InvalidOrderOperation):
     pass
 
-class InvalidVendorDetails(Exception):
+class InvalidVendorDetails(InvalidOrderOperation):
     pass
