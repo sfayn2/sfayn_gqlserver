@@ -36,11 +36,10 @@ class ConfirmOrderMutation(relay.ClientIDMutation):
     def mutate_and_get_payload(cls, root, info, **input):
         try:
             command = commands.ConfirmOrderCommand.model_validate(input)
-            payment_gateway_factory = payments_adapter.PaymentGatewayFactory(command.payment_method)
             order = message_bus.handle(
                     command, 
                     unit_of_work.DjangoOrderUnitOfWork(), 
-                    dependencies={"payment_gateway_factory": payment_gateway_factory}
+                    dependencies={"payment_gateway_factory": payments_adapter.PaymentGatewayFactory() }
                 )
 
             #placed order status only in Pending; once payment is confirmed ; webhook will trigger and call api to confirm order
