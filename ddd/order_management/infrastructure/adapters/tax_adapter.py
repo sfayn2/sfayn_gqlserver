@@ -3,13 +3,10 @@ from abc import ABC, abstractmethod
 from typing import Optional
 from decimal import Decimal
 from ddd.order_management.domain import value_objects, models
-
-class TaxStrategy(ABC):
-    def apply(self, order: models.Order) -> value_objects.TaxResult:
-        raise NotImplementedError("Subclasses must implement this method")
+from ddd.order_management.application import ports
 
 #Singapore Tax
-class SingaporeTaxStrategy(TaxStrategy):
+class SingaporeTaxStrategy(ports.TaxStrategyAbstract):
     GST_RATE = 0.09
 
     def apply(self, order: models.Order):
@@ -20,7 +17,7 @@ class SingaporeTaxStrategy(TaxStrategy):
             return value_objects.TaxResult(amount=tax_amount, desc=desc)
 
 
-class USStateTaxStrategy(TaxStrategy):
+class USStateTaxStrategy(ports.TaxStrategyAbstract):
     STATE_TAX_RATES = {
         "CA": 0.075,
         "NY": 0.04,
@@ -40,3 +37,5 @@ TAX_STRATEGIES = [
     SingaporeTaxStrategy(),
     USStateTaxStrategy()
 ]
+
+#TODO tax factory ??

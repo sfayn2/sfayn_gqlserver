@@ -181,6 +181,7 @@ class Order:
         self.raise_event(event)
 
     def apply_offers(self, offer_service: offer_service.OfferStrategyService):
+        #TODO: need to refactorl should only dependent on abstraction no implementation
         if self.order_status != enums.OrderStatus.DRAFT:
             raise exceptions.InvalidTaxOperation("Only draft order can apply offers (Free shipping, Free gifts, etc)")
         if self.offer_details:
@@ -190,6 +191,7 @@ class Order:
         offer_service.apply_offers(self)
 
     def apply_taxes(self, tax_strategies: List[tax_service.TaxStrategy]):
+        #TODO: need to refactorl should only dependent on abstraction no implementation
         if self.order_status != enums.OrderStatus.DRAFT:
             raise exceptions.InvalidTaxOperation("Only draft order can calculate taxes.")
         if not self.destination:

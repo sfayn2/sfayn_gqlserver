@@ -6,35 +6,13 @@ from abc import ABC, abstractmethod
 from typing import Tuple, List, Dict, Union
 from ddd.order_management.domain import enums, exceptions, models, value_objects, repositories
 from decimal import Decimal
+from ddd.order_management.application import ports
 
-# ==========================
-# Offer Strategy Contract
-# =================
-class OfferStrategy(ABC):
-    def __init__(self, strategy: value_objects.OfferStrategy):
-        self.strategy = strategy
-
-    @abstractmethod
-    def apply(self, order: models.Order):
-        raise NotImplementedError("Subclasses must implement this method")
-
-    def validate_coupon(self, order: models.Order):
-        #reuse if the offer is based on coupon
-        for coupon in order.coupons:
-            if self.strategy.required_coupon == True and coupon in [item for item in self.strategy.coupons]:
-                return True
-        return False
-
-    def validate_minimum_quantity(self, order:models.Order):
-        return self.strategy.conditions and self.strategy.conditions.get("minimum_quantity") and (sum(item.order_quantity for item in order.line_items) >= self.strategy.conditions.get("minimum_quantity"))
-
-    def validate_minimum_order_total(self, order:models.Order):
-        return self.strategy.conditions and self.strategy.conditions.get("minimum_order_total") and (order.total_amount.amount >= self.strategy.conditions.get("minimum_order_total"))
 
 # =========================
 # Offer Strategies
 # ====================
-class PercentageDiscountStrategy(OfferStrategy):
+class PercentageDiscountStrategy(ports.OfferStrategyAbstract):
 
     #apply on order
     def apply(self, order: models.Order):
@@ -54,7 +32,7 @@ class PercentageDiscountStrategy(OfferStrategy):
                     )
                 return f"{self.strategy.name} | {','.join(discounted_items)} )"
 
-class FreeGiftOfferStrategy(OfferStrategy):
+class FreeGiftOfferStrategy(ports.OfferStrategyAbstract):
 
     def apply(self, order: models.Order):
         free_gifts = []
@@ -75,7 +53,7 @@ class FreeGiftOfferStrategy(OfferStrategy):
                 )
                 return f"{self.strategy.name} | {','.join(free_gifts)}"
     
-class FreeShippingOfferStrategy(OfferStrategy):
+class FreeShippingOfferStrategy(ports.OfferStrategyAbstract):
 
     def apply(self, order: models.Order):
         currency = order.currency
@@ -93,7 +71,7 @@ class FreeShippingOfferStrategy(OfferStrategy):
 
 
 
-class PercentageDiscountCouponOfferStrategy(OfferStrategy):
+class PercentageDiscountCouponOfferStrategy(ports.OfferStrategyAbstract):
 
     def apply(self, order: models.Order):
         total_discount = 0
@@ -131,9 +109,9 @@ OFFER_STRATEGIES = {
 # Offer Strategy Service
 # ==================
 
-class OfferStrategyService:        
+class OfferStrategyService(ports.OfferStrategyServiceAbstract):        
 
-    def __init__(self, vendor_repository: repositories.VendorRepository):
+    def __init__(self, vendor_repository: repositories.VendorAbstract):
         self.vendor_repository = vendor_repository
 
     def apply_offers(self, order: models.Order):
