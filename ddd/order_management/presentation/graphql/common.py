@@ -8,8 +8,7 @@ from ddd.order_management.application import (
   )
 from ddd.order_management.domain import exceptions
 from ddd.order_management.infrastructure import logging, order_dtos
-from ddd.order_management.infrastructure.adapters import payments_adapter
-from ddd.order_management.domain import models, value_objects, enums
+from ddd.order_management.domain import models, value_objects
 
 logger = logging.get_logger(__name__)
 
@@ -71,16 +70,3 @@ class BaseOrderMutation(relay.ClientIDMutation):
             response_dto = handle_unexpected_error(f"{cls.exception_message} {e}")
 
         return cls(order=object_types.OrderResponseType(**response_dto.model_dump()))
-
-class PaymentGatewayFactory:
-
-    @staticmethod
-    def get_payment_gateway(payment_method: enums.PaymentMethod):
-        gateways = {
-            enums.PaymentMethod.PAYPAL: payments_adapter.PaypalPaymentGatewayAdapter(),
-            enums.PaymentMethod.STRIPE: payments_adapter.StripePaymentGatewayAdapter()
-        }
-        if payment_method not in gateways:
-            raise ValueError(f"Unsupport payment gateway {payment_method}")
-
-        return gateways[payment_method]

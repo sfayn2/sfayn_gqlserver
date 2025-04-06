@@ -4,7 +4,7 @@ from ddd.order_management.application import (
     message_bus, commands, unit_of_work, queries
   )
 from ddd.order_management.domain import exceptions
-from ddd.order_management.presentation.graphql import object_types, input_types, common
+from ddd.order_management.presentation.graphql import object_types, input_types, common, factories
 
 # ==========================
 # Mutations 
@@ -35,7 +35,7 @@ class ConfirmOrderMutation(relay.ClientIDMutation):
     def mutate_and_get_payload(cls, root, info, **input):
         try:
             command = commands.ConfirmOrderCommand.model_validate(input)
-            payment_service = common.PaymentGatewayFactory(command.payment_method)
+            payment_service = factories.PaymentGatewayFactory(command.payment_method)
             order = message_bus.handle(
                     command, 
                     unit_of_work.DjangoOrderUnitOfWork(), 
