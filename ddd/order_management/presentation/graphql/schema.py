@@ -5,6 +5,7 @@ from ddd.order_management.application import (
   )
 from ddd.order_management.domain import exceptions
 from ddd.order_management.presentation.graphql import object_types, input_types, common, factories
+from ddd.order_management.infrastructure.adapters import payments_adapter
 
 # ==========================
 # Mutations 
@@ -35,11 +36,11 @@ class ConfirmOrderMutation(relay.ClientIDMutation):
     def mutate_and_get_payload(cls, root, info, **input):
         try:
             command = commands.ConfirmOrderCommand.model_validate(input)
-            payment_service = factories.PaymentGatewayFactory(command.payment_method)
+            payment_gateway_factory = payments_adapter.PaymentGatewayFactory(command.payment_method)
             order = message_bus.handle(
                     command, 
                     unit_of_work.DjangoOrderUnitOfWork(), 
-                    dependencies={"payment_service": payment_service}
+                    dependencies={"payment_gateway_factory": payment_gateway_factory}
                 )
 
             #placed order status only in Pending; once payment is confirmed ; webhook will trigger and call api to confirm order

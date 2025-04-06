@@ -17,12 +17,13 @@ def handle_place_order(command: commands.PlaceOrderCommand, uow: unit_of_work.Dj
 
         return placed_order
 
-def handle_confirm_order(command: commands.ConfirmOrderCommand, uow: unit_of_work.DjangoOrderUnitOfWork, payment_service: ports.PaymentGatewayAbstract):
+def handle_confirm_order(command: commands.ConfirmOrderCommand, uow: unit_of_work.DjangoOrderUnitOfWork, payment_gateway_factory: ports.PaymentGatewayFactoryAbstract):
     with uow:
 
         order = uow.order.get(order_id=command.order_id)
 
-        payment_details = payment_service.get_payment_details(command.transaction_id)
+        payment_gateway = payment_gateway_factory.get_payment_gateway(command.payment_method)
+        payment_details = payment_gateway.get_payment_details(command.transaction_id)
 
         confirmed_order = order_service.confirm_order(
             order=order,

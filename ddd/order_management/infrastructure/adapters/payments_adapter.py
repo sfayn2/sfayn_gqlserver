@@ -86,3 +86,15 @@ class StripePaymentGatewayAdapter(ports.PaymentGatewayAbstract):
         ).to_domain()
 
     
+class PaymentGatewayFactory(ports.PaymentGatewayFactoryAbstract):
+
+    @staticmethod
+    def get_payment_gateway(payment_method: enums.PaymentMethod) -> ports.PaymentGatewayAbstract:
+        gateways = {
+            enums.PaymentMethod.PAYPAL: PaypalPaymentGatewayAdapter(),
+            enums.PaymentMethod.STRIPE: StripePaymentGatewayAdapter()
+        }
+        if payment_method not in gateways:
+            raise ValueError(f"Unsupport payment gateway {payment_method}")
+
+        return gateways[payment_method]
