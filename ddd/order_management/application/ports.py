@@ -11,6 +11,6 @@ class PaymentGatewayAbstract(ABC):
 class PaymentGatewayFactoryAbstract(ABC):
 
     @abstractmethod
-    def get_payment_gateway(self, payment_method: enums.PaymentMethod):
+    def get_payment_gateway(self, payment_method: enums.PaymentMethod) -> PaymentGatewayAbstract:
         raise NotImplementedError("Subclasses must implement this method")
 
