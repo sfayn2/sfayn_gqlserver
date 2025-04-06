@@ -5,7 +5,7 @@ from ddd.order_management.application import (
   )
 from ddd.order_management.domain import exceptions
 from ddd.order_management.presentation.graphql import object_types, input_types, common, factories
-from ddd.order_management.infrastructure.adapters import payments_adapter
+from ddd.order_management.infrastructure.adapters import payments_adapter, shipping_option_adapter
 
 # ==========================
 # Mutations 
@@ -73,6 +73,7 @@ class SelectShippingOptionMutation(common.BaseOrderMutation):
     command_class = commands.SelectShippingOptionCommand
     success_message = "Order successfully selected shipping option."
     exception_message = "Unexpected error during shipping option selection"
+    dependencies = {"shipping_option_service": shipping_option_adapter.ShippingOptionStrategyService }
 
 
 class CheckoutItemsMutation(common.BaseOrderMutation):
@@ -94,7 +95,8 @@ class Query(graphene.ObjectType):
     shipping_options_by_order_id = graphene.List(input_types.ShippingDetailsType, order_id=graphene.String(required=True))
     def resolve_shipping_options_by_order_id(root, info, order_id):
         query = queries.ShippingOptionsQuery(order_id=order_id)
-        shipping_options = message_bus.handle(query, unit_of_work.DjangoOrderUnitOfWork())
+        dependencies = {"shipping_option_service": shipping_option_adapter.ShippingOptionStrategyService }
+        shipping_options = message_bus.handle(query, unit_of_work.DjangoOrderUnitOfWork(), dependencies=dependencies)
         response_dto = common.get_shipping_options_response_dto(shipping_options)
 
         return response_dto

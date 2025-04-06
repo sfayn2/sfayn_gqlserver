@@ -17,7 +17,12 @@ def handle_place_order(command: commands.PlaceOrderCommand, uow: unit_of_work.Dj
 
         return placed_order
 
-def handle_confirm_order(command: commands.ConfirmOrderCommand, uow: unit_of_work.DjangoOrderUnitOfWork, payment_gateway_factory: ports.PaymentGatewayFactoryAbstract):
+def handle_confirm_order(
+        command: commands.ConfirmOrderCommand, 
+        uow: unit_of_work.DjangoOrderUnitOfWork, 
+        payment_gateway_factory: ports.PaymentGatewayFactoryAbstract
+    ):
+
     with uow:
 
         order = uow.order.get(order_id=command.order_id)
@@ -36,25 +41,32 @@ def handle_confirm_order(command: commands.ConfirmOrderCommand, uow: unit_of_wor
         return confirmed_order
 
 
-def handle_shipping_options(query: queries.ShippingOptionsQuery, uow: unit_of_work.DjangoOrderUnitOfWork):
+def handle_shipping_options(
+        query: queries.ShippingOptionsQuery, 
+        uow: unit_of_work.DjangoOrderUnitOfWork,
+        shipping_option_service: ports.ShippingOptionStrategyServiceAbstract):
     with uow:
 
         order = uow.order.get(order_id=query.order_id)
 
         shipping_options = order_service.get_shipping_options(
-            shipping_option_service=shipping_option_service.ShippingOptionStrategyService(uow.vendor),
+            shipping_option_service=shipping_option_service(uow.vendor),
             order=order
         )
 
         return shipping_options
 
-def handle_select_shipping_option(command: commands.SelectShippingOption, uow: unit_of_work.DjangoOrderUnitOfWork):
+def handle_select_shipping_option(
+        command: commands.SelectShippingOption, 
+        uow: unit_of_work.DjangoOrderUnitOfWork,
+        shipping_option_service: ports.ShippingOptionStrategyServiceAbstract
+        ):
     with uow:
 
         order = uow.order.get(order_id=command.order_id)
 
         available_shipping_options = order_service.get_shipping_options(
-            shipping_option_service=shipping_option_service.ShippingOptionStrategyService(uow.vendor),
+            shipping_option_service=shipping_option_service(uow.vendor),
             order=order
         )
 
