@@ -1,7 +1,7 @@
 from ddd.order_management.domain import repositories, exceptions
 from customer_management import models as django_customer_models
 
-class DjangoCustomerRepository(repositories.CustomerRepository):
+class DjangoCustomerRepositoryImpl(repositories.CustomerAbstract):
 
     def get_customer_details(self, customer_id: str):
         customer_details = django_customer_models.Customer.objects.filter(

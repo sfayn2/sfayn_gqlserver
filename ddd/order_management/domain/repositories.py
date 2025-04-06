@@ -3,7 +3,7 @@ import uuid
 from abc import ABC, abstractmethod
 from ddd.order_management.domain import models
 
-class OrderRepository(ABC):
+class OrderAbstract(ABC):
 
     def __init__(self):
         self.seen = [] #track loaded entities for event collection
@@ -16,13 +16,13 @@ class OrderRepository(ABC):
     def get(self, order_id: str) -> models.Order:
         raise NotImplementedError("Subclasses must implement this method")
 
-class CustomerRepository(ABC):
+class CustomerAbstract(ABC):
 
     @abstractmethod
     def get_customer_details(self, customer_id: str):
         raise NotImplementedError("Subclasses must implement this method")
 
-class VendorRepository(ABC):
+class VendorAbstract(ABC):
 
     @abstractmethod
     def get_offers(self):
@@ -35,10 +35,3 @@ class VendorRepository(ABC):
     @abstractmethod
     def get_shipping_options(self):
         raise NotImplementedError("Subclasses must implement this method")
-
-class PaymentGatewayRepository(ABC):
-
-    @abstractmethod
-    def get_payment_details(self):
-        raise NotImplementedError("Subclasses must implement this method")
-

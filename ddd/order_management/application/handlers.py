@@ -1,7 +1,7 @@
 import uuid
 from decimal import Decimal
 from datetime import datetime
-from ddd.order_management.application import commands, unit_of_work, helpers, queries
+from ddd.order_management.application import commands, unit_of_work, queries, ports
 from ddd.order_management.domain import models, events, value_objects, enums, exceptions
 from ddd.order_management.domain.services import order_service, offer_service, tax_service, shipping_option_service
 
@@ -17,13 +17,12 @@ def handle_place_order(command: commands.PlaceOrderCommand, uow: unit_of_work.Dj
 
         return placed_order
 
-def handle_confirm_order(command: commands.ConfirmOrderCommand, uow: unit_of_work.DjangoOrderUnitOfWork):
+def handle_confirm_order(command: commands.ConfirmOrderCommand, uow: unit_of_work.DjangoOrderUnitOfWork, payment_service: ports.PaymentGatewayAbstract):
     with uow:
 
         order = uow.order.get(order_id=command.order_id)
 
-        payment_gateway = uow.payments.get_payment_gateway(command.payment_method)
-        payment_details = payment_gateway.get_payment_details(command.transaction_id)
+        payment_details = payment_service.get_payment_details(command.transaction_id)
 
         confirmed_order = order_service.confirm_order(
             order=order,

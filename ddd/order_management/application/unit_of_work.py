@@ -1,14 +1,13 @@
 from abc import ABC, abstractmethod
 from typing import TypeVar, List
 from django.db import transaction
-from ddd.order_management.domain import repositories
-from ddd.order_management.infrastructure import (
+from ddd.order_management.infrastructure.adapters import (
     django_customer_repository, 
     django_order_repository, 
-    django_vendor_repository
+    django_vendor_repository,
+    payments_adapter
 )
 from ddd.order_management.application import message_bus
-from ddd.order_management.infrastructure.adapters import payments_impl
 
 T = TypeVar("T")
 
@@ -34,11 +33,9 @@ class DjangoOrderUnitOfWork(AbstractUnitOfWork):
     #make sure to call uow within block statement
     #to trigger this
     def __init__(self):
-        self.order = django_order_repository.DjangoOrderRepository()
-        self.customer = django_customer_repository.DjangoCustomerRepository()
-        self.vendor = django_vendor_repository.DjangoVendorRepository()
-
-        self.payments = payments_impl.PaymentGatewayFactory
+        self.order = django_order_repository.DjangoOrderRepositoryImpl()
+        self.customer = django_customer_repository.DjangoCustomerRepositoryImpl()
+        self.vendor = django_vendor_repository.DjangoVendorRepositoryImpl()
 
         self.event_publisher = message_bus
         self._events = []

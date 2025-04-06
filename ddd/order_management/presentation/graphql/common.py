@@ -8,7 +8,8 @@ from ddd.order_management.application import (
   )
 from ddd.order_management.domain import exceptions
 from ddd.order_management.infrastructure import logging, order_dtos
-from ddd.order_management.domain import models, value_objects
+from ddd.order_management.infrastructure.adapters import payments_adapter
+from ddd.order_management.domain import models, value_objects, enums
 
 logger = logging.get_logger(__name__)
 
@@ -48,18 +49,19 @@ def get_shipping_options_response_dto(shipping_options: List[value_objects.Shipp
     return [order_dtos.ShippingDetailsDTO.from_domain(option) for option in shipping_options]
 
 
-class BaseMutation(relay.ClientIDMutation):
+class BaseOrderMutation(relay.ClientIDMutation):
     order = graphene.Field(object_types.OrderResponseType)
 
     command_class = None
     success_message = None
     exception_message = None
+    dependencies = None
 
     @classmethod
     def mutate_and_get_payload(cls, root, info, **input):
         try:
-            command = cls.PlaceOrderCommand.model_validate(input)
-            order = message_bus.handle(command, unit_of_work.DjangoOrderUnitOfWork())
+            command = cls.command_class.model_validate(input)
+            order = message_bus.handle(command, unit_of_work.DjangoOrderUnitOfWork(), dependencies=cls.dependencies)
             #placed order status only in Pending; once payment is confirmed ; webhook will trigger and call api to confirm order
             response_dto = get_order_response_dto(order, success=True, message=cls.success_message)
 
@@ -69,3 +71,16 @@ class BaseMutation(relay.ClientIDMutation):
             response_dto = handle_unexpected_error(f"{cls.exception_message} {e}")
 
         return cls(order=object_types.OrderResponseType(**response_dto.model_dump()))
+
+class PaymentGatewayFactory:
+
+    @staticmethod
+    def get_payment_gateway(payment_method: enums.PaymentMethod):
+        gateways = {
+            enums.PaymentMethod.PAYPAL: payments_adapter.PaypalPaymentGatewayAdapter(),
+            enums.PaymentMethod.STRIPE: payments_adapter.StripePaymentGatewayAdapter()
+        }
+        if payment_method not in gateways:
+            raise ValueError(f"Unsupport payment gateway {payment_method}")
+
+        return gateways[payment_method]

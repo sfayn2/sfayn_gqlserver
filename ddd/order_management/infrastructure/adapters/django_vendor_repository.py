@@ -5,7 +5,7 @@ from ddd.order_management.domain import repositories, enums, value_objects, exce
 from vendor_management import models as django_vendor_models
 from ddd.order_management.infrastructure import order_dtos
 
-class DjangoVendorRepository(repositories.VendorRepository):
+class DjangoVendorRepositoryImpl(repositories.VendorAbstract):
 
     def get_offers(self, vendor_name: str):
         offers = django_vendor_models.Offer.objects.filter(vendor__name=vendor_name, is_active=True).prefetch_related("coupon").values()

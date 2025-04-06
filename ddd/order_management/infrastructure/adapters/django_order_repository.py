@@ -2,7 +2,7 @@ from ddd.order_management.domain import repositories, models, exceptions
 from order_management import models as django_models
 from ddd.order_management.infrastructure import order_dtos
 
-class DjangoOrderRepository(repositories.OrderRepository):
+class DjangoOrderRepositoryImpl(repositories.OrderAbstract):
     def get(self, order_id):
         django_order = django_models.Order.objects.get(order_id=order_id)
         order = order_dtos.OrderDTO.from_django_model(django_order).to_domain()

@@ -17,28 +17,29 @@ QUERY_HANDLERS = {
 EVENT_HANDLERS = {
 }
 
-def handle(message: Union[commands.Command, queries.Query, events.DomainEvent], uow: unit_of_work.DjangoOrderUnitOfWork):
+def handle(message: Union[commands.Command, queries.Query, events.DomainEvent], uow: unit_of_work.DjangoOrderUnitOfWork, dependencies: None):
     """ dispatch message to appropriate handler(s) """
     if isinstance(message, commands.Command):
         handler = COMMAND_HANDLERS.get(type(message))
         if not handler:
             raise ValueError(f"No handler registered for command: {type(message)}")
-        results = handler(message, uow)
+        results = handler(message, uow, **dependencies)
         return results
     elif isinstance(message, queries.Query):
         handler = QUERY_HANDLERS.get(type(message))
         if not handler:
             raise ValueError(f"No handler registered for query: {type(message)}")
-        results = handler(message, uow)
+        results = handler(message, uow, **dependencies)
         return results
     elif isinstance(message, events.DomainEvent):
         handlers = EVENT_HANDLERS.get(type(message), [])
         for handler in handlers:
-            handler(message, uow)
+            handler(message, uow, **dependencies)
     else:
         raise ValueError(f"Unknown message type {type(message)}")
 
 def publish(event, uow):
+    #TODO how to pass dependencies like service?
     # handle the event locally by triggering event handlers
     handlers = EVENT_HANDLERS.get(type(event), [])
     for handler in handlers:

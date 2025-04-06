@@ -1,11 +1,12 @@
+from __future__ import annotations
 import requests
 from decimal import Decimal
-from ddd.order_management.domain import repositories, value_objects, enums
-from ddd.order_management.infrastructure import order_dtos
 from django.conf import settings
+from ddd.order_management.domain import value_objects, enums
+from ddd.order_management.infrastructure import order_dtos
 from ddd.order_management.application import ports
 
-class PaypalPaymentGatewayImpl(ports.PaymentGatewayAbstract):
+class PaypalPaymentGatewayAdapter(ports.PaymentGatewayAbstract):
 
     def get_payment_details(self, transaction_id: str) -> value_objects.PaymentDetails:
         url = f"{settings.PAYPAL_BASE_URL}/v1/checkout/orders/{transaction_id}"
@@ -46,7 +47,7 @@ class PaypalPaymentGatewayImpl(ports.PaymentGatewayAbstract):
             status=paypal_response.get("status")
         ).to_domain()
 
-class StripePaymentGatewayImpl(ports.PaymentGatewayAbstract):
+class StripePaymentGatewayAdapter(ports.PaymentGatewayAbstract):
 
     def get_payment_details(self, transaction_id: str):
         return self._retrieve_payment_intent(transaction_id=transaction_id)
@@ -85,16 +86,3 @@ class StripePaymentGatewayImpl(ports.PaymentGatewayAbstract):
         ).to_domain()
 
     
-
-class PaymentGatewayFactory:
-
-    @staticmethod
-    def get_payment_gateway(payment_method: enums.PaymentMethod):
-        gateways = {
-            enums.PaymentMethod.PAYPAL: PaypalPaymentGatewayImpl(),
-            enums.PaymentMethod.STRIPE: StripePaymentGatewayImpl()
-        }
-        if payment_method not in gateways:
-            raise ValueError(f"Unsupport payment gateway {payment_method}")
-
-        return gateways[payment_method]
