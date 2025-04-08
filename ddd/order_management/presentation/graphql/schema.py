@@ -1,7 +1,8 @@
+from ddd.order_management.infrastructure.adapters import unit_of_work
 import graphene
 from graphene import relay
 from ddd.order_management.application import (
-    message_bus, commands, unit_of_work, queries
+    message_bus, commands, queries
   )
 from ddd.order_management.domain import exceptions
 from ddd.order_management.presentation.graphql import object_types, input_types, common, factories

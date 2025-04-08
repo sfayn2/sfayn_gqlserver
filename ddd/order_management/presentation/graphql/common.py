@@ -1,10 +1,11 @@
+from ddd.order_management.infrastructure.adapters import unit_of_work
 import graphene
 from graphene import relay
 from dataclasses import asdict
 from typing import List
 from order_management.graphql import object_types, input_types
 from ddd.order_management.application import (
-    message_bus, unit_of_work, dtos
+    message_bus, dtos
   )
 from ddd.order_management.domain import exceptions
 from ddd.order_management.infrastructure import logging, order_dtos

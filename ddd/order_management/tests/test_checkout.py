@@ -1,6 +1,6 @@
 import uuid
 import os
-from ddd.order_management.infrastructure import unit_of_work
+from ddd.order_management.infrastructure.adapters import unit_of_work
 import pytest
 import json
 from datetime import datetime

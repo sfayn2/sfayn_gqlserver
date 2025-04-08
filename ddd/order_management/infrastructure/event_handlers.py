@@ -1,5 +1,6 @@
 from ddd.order_management.domain import events
-from ddd.order_management.infrastructure import unit_of_work, email_service, logging_service
+from ddd.order_management.infrastructure import email_service, logging_service
+from ddd.order_management.infrastructure.adapters import unit_of_work
 
 def handle_logged_order(
         event: events.OrderCancelled, 
