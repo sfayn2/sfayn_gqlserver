@@ -111,3 +111,19 @@ class UnitOfWorkAbstract(ABC):
     @abstractmethod
     def rollback(self):
         raise NotImplementedError("Subclasses must implement this method")
+
+# ===
+# Email Service
+# ===
+class EmailServiceAbstract:
+    @abstractmethod
+    def send_email(self, message: str):
+        raise NotImplementedError("Subclasses must implement this method")
+
+# ===
+# Log service
+# ==
+class LoggingServiceAbstract:
+    @abstractmethod
+    def log(self, message: str):
+        raise NotImplementedError("Subclasses must implement this method")

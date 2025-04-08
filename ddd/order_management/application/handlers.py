@@ -2,7 +2,7 @@ import uuid
 from decimal import Decimal
 from datetime import datetime
 from ddd.order_management.application import commands, queries, ports
-from ddd.order_management.domain.services import order_service, offer_service, tax_service, shipping_option_service
+from ddd.order_management.domain.services import order_service
 
 def handle_place_order(
         command: commands.PlaceOrderCommand, 
@@ -31,6 +31,7 @@ def handle_confirm_order(
         payment_gateway = payment_gateway_factory.get_payment_gateway(command.payment_method)
         payment_details = payment_gateway.get_payment_details(command.transaction_id)
 
+        #TODO order service should be injectable?
         confirmed_order = order_service.confirm_order(
             order=order,
             payment_details=payment_details
