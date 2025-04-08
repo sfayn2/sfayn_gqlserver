@@ -1,35 +1,14 @@
 from abc import ABC, abstractmethod
-from typing import TypeVar, List
 from django.db import transaction
 from ddd.order_management.infrastructure.adapters import (
     django_customer_repository, 
     django_order_repository, 
     django_vendor_repository,
-    payments_adapter
 )
-from ddd.order_management.application import message_bus
+from ddd.order_management.infrastructure import event_bus
+from ddd.order_management.domain import repositories
 
-T = TypeVar("T")
-
-class AbstractUnitOfWork(ABC):
-
-    def __enter__(self) -> T:
-        return self
-
-    def __exit__(self, *args):
-        self.rollback()
-
-    @abstractmethod
-    def commit(self):
-        raise NotImplementedError
-
-    @abstractmethod
-    def rollback(self):
-        raise NotImplementedError
-
-
-
-class DjangoOrderUnitOfWork(AbstractUnitOfWork):
+class DjangoOrderUnitOfWork(repositories.UnitOfWorkAbstract):
     #make sure to call uow within block statement
     #to trigger this
     def __init__(self):
@@ -37,7 +16,7 @@ class DjangoOrderUnitOfWork(AbstractUnitOfWork):
         self.customer = django_customer_repository.DjangoCustomerRepositoryImpl()
         self.vendor = django_vendor_repository.DjangoVendorRepositoryImpl()
 
-        self.event_publisher = message_bus
+        self.event_publisher = event_bus
         self._events = []
 
     def __enter__(self):
@@ -69,7 +48,6 @@ class DjangoOrderUnitOfWork(AbstractUnitOfWork):
 
     def _publish_events(self):
         for event in self._events:
-            #TODO
             print(f"Publish event : {event}")
             self.event_publisher.publish(event, self)
 

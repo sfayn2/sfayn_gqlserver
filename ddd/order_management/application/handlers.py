@@ -1,11 +1,13 @@
 import uuid
 from decimal import Decimal
 from datetime import datetime
-from ddd.order_management.application import commands, unit_of_work, queries, ports
-from ddd.order_management.domain import models, events, value_objects, enums, exceptions
+from ddd.order_management.application import commands, queries, ports
 from ddd.order_management.domain.services import order_service, offer_service, tax_service, shipping_option_service
+from ddd.order_management.domain import repositories
 
-def handle_place_order(command: commands.PlaceOrderCommand, uow: unit_of_work.DjangoOrderUnitOfWork):
+def handle_place_order(
+        command: commands.PlaceOrderCommand, 
+        uow: repositories.UnitOfWorkAbstract):
     with uow:
 
         order = uow.order.get(order_id=command.order_id)
@@ -19,7 +21,7 @@ def handle_place_order(command: commands.PlaceOrderCommand, uow: unit_of_work.Dj
 
 def handle_confirm_order(
         command: commands.ConfirmOrderCommand, 
-        uow: unit_of_work.DjangoOrderUnitOfWork, 
+        uow: repositories.UnitOfWorkAbstract, 
         payment_gateway_factory: ports.PaymentGatewayFactoryAbstract
     ):
 
@@ -43,7 +45,7 @@ def handle_confirm_order(
 
 def handle_shipping_options(
         query: queries.ShippingOptionsQuery, 
-        uow: unit_of_work.DjangoOrderUnitOfWork,
+        uow: repositories.UnitOfWorkAbstract,
         shipping_option_service: ports.ShippingOptionStrategyServiceAbstract):
     with uow:
 
@@ -58,7 +60,7 @@ def handle_shipping_options(
 
 def handle_select_shipping_option(
         command: commands.SelectShippingOption, 
-        uow: unit_of_work.DjangoOrderUnitOfWork,
+        uow: repositories.UnitOfWorkAbstract,
         shipping_option_service: ports.ShippingOptionStrategyServiceAbstract
         ):
     with uow:
@@ -80,7 +82,9 @@ def handle_select_shipping_option(
 
         return order_w_shipping_option
 
-def handle_checkout_items(command: commands.CheckoutItemsCommand, uow: unit_of_work.DjangoOrderUnitOfWork):
+def handle_checkout_items(
+        command: commands.CheckoutItemsCommand, 
+        uow: repositories.UnitOfWorkAbstract):
     with uow:
 
         draft_order = order_service.draft_order(

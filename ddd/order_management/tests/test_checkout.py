@@ -1,12 +1,13 @@
 import uuid
 import os
+from ddd.order_management.infrastructure import unit_of_work
 import pytest
 import json
 from datetime import datetime
 from unittest import mock
 from decimal import Decimal
 
-from ddd.order_management.application import message_bus, unit_of_work, dtos
+from ddd.order_management.application import message_bus, dtos
 from ddd.order_management.application import commands
 from ddd.order_management.domain import enums, value_objects, models
 
