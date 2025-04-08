@@ -1,7 +1,8 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from typing import List
+from typing import List, TypeVar
 from ddd.order_management.domain import enums, value_objects, models, repositories
+T = TypeVar("T")
 
 # ========
 # Payment contract
@@ -90,4 +91,23 @@ class OfferStrategyServiceAbstract:
 class TaxStrategyAbstract(ABC):
     @abstractmethod
     def apply(self, order: models.Order) -> value_objects.TaxResult:
+        raise NotImplementedError("Subclasses must implement this method")
+
+# ===
+# UOW
+# ===
+class UnitOfWorkAbstract(ABC):
+
+    def __enter__(self) -> T:
+        return self
+
+    def __exit__(self, *args):
+        self.rollback()
+
+    @abstractmethod
+    def commit(self):
+        raise NotImplementedError("Subclasses must implement this method")
+
+    @abstractmethod
+    def rollback(self):
         raise NotImplementedError("Subclasses must implement this method")

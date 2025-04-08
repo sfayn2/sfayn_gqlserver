@@ -1,10 +1,8 @@
 from __future__ import annotations
 import uuid
-from typing import TypeVar
 from abc import ABC, abstractmethod
 from ddd.order_management.domain import models
 
-T = TypeVar("T")
 
 class OrderAbstract(ABC):
 
@@ -38,20 +36,4 @@ class VendorAbstract(ABC):
 
     @abstractmethod
     def get_shipping_options(self):
-        raise NotImplementedError("Subclasses must implement this method")
-
-class UnitOfWorkAbstract(ABC):
-
-    def __enter__(self) -> T:
-        return self
-
-    def __exit__(self, *args):
-        self.rollback()
-
-    @abstractmethod
-    def commit(self):
-        raise NotImplementedError("Subclasses must implement this method")
-
-    @abstractmethod
-    def rollback(self):
         raise NotImplementedError("Subclasses must implement this method")
