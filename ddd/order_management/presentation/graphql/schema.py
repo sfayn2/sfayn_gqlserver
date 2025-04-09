@@ -2,14 +2,13 @@ from ddd.order_management.infrastructure.adapters import unit_of_work
 import graphene
 from graphene import relay
 from ddd.order_management.application import (
-    message_bus, commands, queries
+    message_bus, commands, order_service, queries
   )
 from ddd.order_management.domain import exceptions
 from ddd.order_management.presentation.graphql import object_types, input_types, common, factories
 from ddd.order_management.infrastructure.adapters import (
     payments_adapter, 
     shipping_option_adapter,
-    order_service,
     tax_adapter
 )
 

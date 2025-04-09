@@ -2,7 +2,7 @@ import uuid
 from decimal import Decimal
 from datetime import datetime
 from ddd.order_management.application import commands, queries, ports
-from ddd.order_management.domain import domain_service
+from ddd.order_management.domain import domain_service, events
 
 def handle_place_order(
         command: commands.PlaceOrderCommand, 
@@ -102,6 +102,21 @@ def handle_checkout_items(
         return draft_order
 
 
+
+def handle_logged_order(
+        event: events.OrderCancelled, 
+        uow: ports.UnitOfWorkAbstract, 
+        logging_service: ports.LoggingServiceAbstract):
+
+    logging_service.log(f"Order has been canceled {event.order_id}")
+
+def handle_email_canceled_order(
+        event: events.OrderCancelled, 
+        uow: ports.UnitOfWorkAbstract, 
+        email_service: ports.EmailServiceAbstract):
+
+    msg = f"Order has been canceled {event.order_id}"
+    email_service.send_email(msg)
 
         
 
