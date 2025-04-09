@@ -2,7 +2,7 @@ import uuid
 from decimal import Decimal
 from datetime import datetime
 from ddd.order_management.application import commands, queries, ports
-from ddd.order_management.domain.services import order_service
+from ddd.order_management.domain import domain_service
 
 def handle_place_order(
         command: commands.PlaceOrderCommand, 
@@ -21,7 +21,8 @@ def handle_place_order(
 def handle_confirm_order(
         command: commands.ConfirmOrderCommand, 
         uow: ports.UnitOfWorkAbstract, 
-        payment_gateway_factory: ports.PaymentGatewayFactoryAbstract
+        payment_gateway_factory: ports.PaymentGatewayFactoryAbstract,
+        order_service: domain_service.OrderServiceAbstract
     ):
 
     with uow:
@@ -31,7 +32,6 @@ def handle_confirm_order(
         payment_gateway = payment_gateway_factory.get_payment_gateway(command.payment_method)
         payment_details = payment_gateway.get_payment_details(command.transaction_id)
 
-        #TODO order service should be injectable?
         confirmed_order = order_service.confirm_order(
             order=order,
             payment_details=payment_details
@@ -46,7 +46,8 @@ def handle_confirm_order(
 def handle_shipping_options(
         query: queries.ShippingOptionsQuery, 
         uow: ports.UnitOfWorkAbstract,
-        shipping_option_service: ports.ShippingOptionStrategyServiceAbstract):
+        shipping_option_service: ports.ShippingOptionStrategyServiceAbstract,
+        order_service: domain_service.OrderServiceAbstract):
     with uow:
 
         order = uow.order.get(order_id=query.order_id)
@@ -61,7 +62,8 @@ def handle_shipping_options(
 def handle_select_shipping_option(
         command: commands.SelectShippingOption, 
         uow: ports.UnitOfWorkAbstract,
-        shipping_option_service: ports.ShippingOptionStrategyServiceAbstract
+        shipping_option_service: ports.ShippingOptionStrategyServiceAbstract,
+        order_service: domain_service.OrderServiceAbstract
         ):
     with uow:
 
@@ -84,7 +86,8 @@ def handle_select_shipping_option(
 
 def handle_checkout_items(
         command: commands.CheckoutItemsCommand, 
-        uow: ports.UnitOfWorkAbstract):
+        uow: ports.UnitOfWorkAbstract,
+        order_service: domain_service.OrderServiceAbstract):
     with uow:
 
         draft_order = order_service.draft_order(

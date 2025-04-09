@@ -41,7 +41,7 @@ class ShippingOptionStrategyAbstract(ABC):
         """
         raise NotImplementedError("Subclasses must implement this method")
 
-class ShippingOptionStrategyServiceAbstract:
+class ShippingOptionStrategyServiceAbstract(ABC):
 
     def __init__(self, vendor_repository: repositories.VendorAbstract):
         self.vendor_repository = vendor_repository
@@ -74,7 +74,7 @@ class OfferStrategyAbstract(ABC):
     def validate_minimum_order_total(self, order:models.Order):
         return self.strategy.conditions and self.strategy.conditions.get("minimum_order_total") and (order.total_amount.amount >= self.strategy.conditions.get("minimum_order_total"))
 
-class OfferStrategyServiceAbstract:        
+class OfferStrategyServiceAbstract(ABC):        
 
     def __init__(self, vendor_repository: repositories.VendorAbstract):
         self.vendor_repository = vendor_repository
@@ -115,7 +115,7 @@ class UnitOfWorkAbstract(ABC):
 # ===
 # Email Service
 # ===
-class EmailServiceAbstract:
+class EmailServiceAbstract(ABC):
     @abstractmethod
     def send_email(self, message: str):
         raise NotImplementedError("Subclasses must implement this method")
@@ -123,7 +123,7 @@ class EmailServiceAbstract:
 # ===
 # Log service
 # ==
-class LoggingServiceAbstract:
+class LoggingServiceAbstract(ABC):
     @abstractmethod
     def log(self, message: str):
         raise NotImplementedError("Subclasses must implement this method")

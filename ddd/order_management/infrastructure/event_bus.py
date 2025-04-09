@@ -1,6 +1,11 @@
 from typing import Union
-from ddd.order_management.domain import events, repositories
-from ddd.order_management.infrastructure import event_handlers, email_service, logging_service
+from ddd.order_management.domain import events
+from ddd.order_management.application import ports
+from ddd.order_management.infrastructure import event_handlers
+from ddd.order_management.infrastructure.adapters import (
+    email_service, 
+    logging_service
+)
 
 
 EVENT_HANDLERS = {
@@ -10,7 +15,7 @@ EVENT_HANDLERS = {
         ]
 }
 
-def publish(event: events.DomainEvent, uow: repositories.UnitOfWorkAbstract):
+def publish(event: events.DomainEvent, uow: ports.UnitOfWorkAbstract):
     # handle the event locally by triggering event handlers
     handlers = EVENT_HANDLERS.get(type(event), [])
     for handler in handlers:

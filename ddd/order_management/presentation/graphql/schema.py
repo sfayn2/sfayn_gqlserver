@@ -6,7 +6,11 @@ from ddd.order_management.application import (
   )
 from ddd.order_management.domain import exceptions
 from ddd.order_management.presentation.graphql import object_types, input_types, common, factories
-from ddd.order_management.infrastructure.adapters import payments_adapter, shipping_option_adapter
+from ddd.order_management.infrastructure.adapters import (
+    payments_adapter, 
+    shipping_option_adapter,
+    order_service
+)
 
 # ==========================
 # Mutations 
@@ -34,7 +38,10 @@ class ConfirmOrderMutation(common.BaseOrderMutation):
     command_class = commands.ConfirmOrderCommand
     success_message = "Order successfully confirmed."
     exception_message = "Unexpected error during order confirmation."
-    dependencies = {"payment_gateway_factory": payments_adapter.PaymentGatewayFactory() }
+    dependencies = {
+        "payment_gateway_factory": payments_adapter.PaymentGatewayFactory(),
+        "order_service": order_service.OrderService()
+    }
 
 #class ConfirmOrderMutation(relay.ClientIDMutation):
 #    class Input:
@@ -74,7 +81,10 @@ class SelectShippingOptionMutation(common.BaseOrderMutation):
     command_class = commands.SelectShippingOptionCommand
     success_message = "Order successfully selected shipping option."
     exception_message = "Unexpected error during shipping option selection"
-    dependencies = {"shipping_option_service": shipping_option_adapter.ShippingOptionStrategyService }
+    dependencies = {
+        "shipping_option_service": shipping_option_adapter.ShippingOptionStrategyService,
+        "order_service": order_service.OrderService()
+    }
 
 
 class CheckoutItemsMutation(common.BaseOrderMutation):
@@ -96,7 +106,10 @@ class Query(graphene.ObjectType):
     shipping_options_by_order_id = graphene.List(input_types.ShippingDetailsType, order_id=graphene.String(required=True))
     def resolve_shipping_options_by_order_id(root, info, order_id):
         query = queries.ShippingOptionsQuery(order_id=order_id)
-        dependencies = {"shipping_option_service": shipping_option_adapter.ShippingOptionStrategyService }
+        dependencies = {
+            "shipping_option_service": shipping_option_adapter.ShippingOptionStrategyService,
+            "order_service": order_service.OrderService()
+        }
         shipping_options = message_bus.handle(query, unit_of_work.DjangoOrderUnitOfWork(), dependencies=dependencies)
         response_dto = common.get_shipping_options_response_dto(shipping_options)
 
