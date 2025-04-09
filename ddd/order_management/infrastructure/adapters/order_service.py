@@ -31,6 +31,7 @@ class OrderService(domain_service.OrderServiceAbstract):
             customer_details: value_objects.CustomerDetails,
             shipping_address: value_objects.Address,
             line_items: List[models.LineItem],
+            tax_service: ports.TaxStrategyAbstract
     ) -> models.Order:
         order = models.Order(
             order_status=enums.OrderStatus.DRAFT,
@@ -42,8 +43,7 @@ class OrderService(domain_service.OrderServiceAbstract):
         order.generate_order_id()
         order.update_line_items(line_items)
         
-        #TODO?
-        #order.apply_taxes(tax_service.TAX_STRATEGIES)
+        order.apply_taxes(tax_service.TAX_STRATEGIES)
 
         order.calculate_final_amount()
         

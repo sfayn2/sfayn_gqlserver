@@ -9,7 +9,8 @@ from ddd.order_management.presentation.graphql import object_types, input_types,
 from ddd.order_management.infrastructure.adapters import (
     payments_adapter, 
     shipping_option_adapter,
-    order_service
+    order_service,
+    tax_adapter
 )
 
 # ==========================
@@ -40,7 +41,8 @@ class ConfirmOrderMutation(common.BaseOrderMutation):
     exception_message = "Unexpected error during order confirmation."
     dependencies = {
         "payment_gateway_factory": payments_adapter.PaymentGatewayFactory(),
-        "order_service": order_service.OrderService()
+        "order_service": order_service.OrderService(),
+        "tax_service": tax_adapter
     }
 
 #class ConfirmOrderMutation(relay.ClientIDMutation):
