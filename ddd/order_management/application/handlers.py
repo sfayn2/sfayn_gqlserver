@@ -2,7 +2,7 @@ import uuid
 from typing import List, Union
 from decimal import Decimal
 from datetime import datetime
-from ddd.order_management.application import commands, mappers, queries, ports, dtos
+from ddd.order_management.application import mappers, commands, queries, ports, dtos
 from ddd.order_management.domain import domain_service, events, exceptions
 
 def handle_invalid_order_operation(err):
@@ -29,17 +29,20 @@ def handle_place_order(
     try:
         with uow:
 
-            order = uow.order.get(order_id=command.order_id)
+            order = mappers.OrderMapper.to_domain(
+                uow.order.get(order_id=command.order_id)
+            )
 
             placed_order = order.place_order()
             placed_order_dto =  mappers.OrderResponseMapper.to_dto(
-                placed_order, 
-                success=True, 
-                message="Order successfully placed order."
+                placed_order
             )
 
-            uow.order.save(placed_order)
+            uow.order.save(placed_order_dto)
             uow.commit()
+
+            placed_order_dto.success = True
+            placed_order_dto.message = "Order successfully placed order."
 
     except (exceptions.InvalidOrderOperation, ValueError) as e:
         placed_order_dto = handle_invalid_order_operation(e)
@@ -60,7 +63,9 @@ def handle_confirm_order(
 
         with uow:
 
-            order = uow.order.get(order_id=command.order_id)
+            order = mappers.OrderMapper.to_domain(
+                uow.order.get(order_id=command.order_id)
+            )
 
             payment_gateway = payment_gateway_factory.get_payment_gateway(command.payment_method)
             payment_details = payment_gateway.get_payment_details(command.transaction_id)
@@ -69,14 +74,13 @@ def handle_confirm_order(
                 order=order,
                 payment_details=payment_details
             )
-            confirmed_order_dto = mappers.OrderResponseMapper.to_dto(
-                confirmed_order, 
-                success=True, 
-                message="Order successfully confirmed."
-            )
 
-            uow.order.save(confirmed_order)
+            confirmed_order_dto = mappers.OrderResponseMapper.to_dto(confirmed_order)
+            uow.order.save(confirmed_order_dto)
             uow.commit()
+                
+            confirmed_order_dto.success = True, 
+            confirmed_order_dto.message = "Order successfully confirmed."
 
 
     except (exceptions.InvalidOrderOperation, ValueError) as e:
@@ -95,7 +99,9 @@ def handle_shipping_options(
         order_service: domain_service.OrderServiceAbstract) -> List[dtos.ShippingDetailsDTO]:
     with uow:
 
-        order = uow.order.get(order_id=query.order_id)
+        order = mappers.OrderMapper.to_domain(
+            uow.order.get(order_id=query.order_id)
+        )
 
         shipping_options = order_service.get_shipping_options(
             shipping_option_service=shipping_option_service(uow.vendor),
@@ -115,7 +121,9 @@ def handle_select_shipping_option(
     try:
         with uow:
 
-            order = uow.order.get(order_id=command.order_id)
+            order = mappers.OrderMapper.to_domain(
+                uow.order.get(order_id=command.order_id)
+            )
 
             available_shipping_options = order_service.get_shipping_options(
                 shipping_option_service=shipping_option_service(uow.vendor),
@@ -128,13 +136,14 @@ def handle_select_shipping_option(
                                         )
 
             order_w_shipping_option_dto = mappers.OrderResponseMapper.to_dto(
-                order_w_shipping_option, 
-                success=True, 
-                message = "Order successfully selected shipping option."
+                order_w_shipping_option
             )
 
-            uow.order.save(order_w_shipping_option)
+            uow.order.save(order_w_shipping_option_dto)
             uow.commit()
+
+            order_w_shipping_option_dto.success = True, 
+            order_w_shipping_option_dto.message = "Order successfully selected shipping option."
 
     except (exceptions.InvalidOrderOperation, ValueError) as e:
         order_w_shipping_option_dto = handle_invalid_order_operation(e)
@@ -152,18 +161,19 @@ def handle_checkout_items(
     with uow:
 
         draft_order = order_service.draft_order(
-            customer_details=command.customer_details.to_domain(),
-            shipping_address=command.shipping_address.to_domain(),
-            line_items=[item.to_domain() for item in command.line_items],
+            customer_details=mappers.CustomerDetailsMapper.to_domain(command.customer_details),
+            shipping_address=mappers.AddressMapper.to_domain(command.shipping_address),
+            line_items=[mappers.LineItemMapper.to_domain(item) for item in command.line_items],
         )
         draft_order_dto = mappers.OrderResponseMapper.to_dto(
-            draft_order, 
-            success=True, 
-            message = "Cart items successfully checkout."
+            draft_order
         )
 
-        uow.order.save(draft_order)
+        uow.order.save(draft_order_dto)
         uow.commit()
+
+        draft_order_dto.success = True, 
+        draft_order_dto.message = "Cart items successfully checkout."
 
         return draft_order_dto
 

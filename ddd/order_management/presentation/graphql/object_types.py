@@ -30,3 +30,23 @@ class OrderResponseType(graphene.ObjectType):
     total_discounts_fee = graphene.Field(MoneyType)
     final_amount = graphene.Field(MoneyType)
 
+class OrderType(graphene.ObjectType):
+    order_id: graphene.String()
+    date_created: datetime 
+    destination: AddressDTO
+    line_items: List[LineItemDTO]
+    customer_details: Optional[CustomerDetailsDTO]
+    shipping_details: Optional[ShippingDetailsDTO]
+    payment_details: Optional[PaymentDetailsDTO]
+    cancellation_reason: Optional[str]
+    total_discounts_fee: Optional[MoneyDTO]
+    offer_details: Optional[List[str]]
+    tax_details: Optional[List[str]]
+    tax_amount: Optional[MoneyDTO]
+    total_amount: Optional[MoneyDTO]
+    final_amount: Optional[MoneyDTO]
+    shipping_reference: Optional[str] = Field(json_schema_extra=AliasChoices('shipping_tracking_reference', 'shipping_reference'))
+    coupons: Optional[List[CouponDTO]]
+    order_status: enums.OrderStatus
+    currency: str
+    date_modified: Optional[datetime]

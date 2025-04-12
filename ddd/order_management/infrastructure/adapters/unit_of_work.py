@@ -5,7 +5,7 @@ from ddd.order_management.infrastructure.adapters import (
     django_order_repository, 
     django_vendor_repository,
 )
-from ddd.order_management.infrastructure import event_bus
+from ddd.order_management.infrastructure import event_bus, mappers
 from ddd.order_management.application import ports
 
 class DjangoOrderUnitOfWork(ports.UnitOfWorkAbstract):
@@ -43,6 +43,7 @@ class DjangoOrderUnitOfWork(ports.UnitOfWorkAbstract):
 
         for entity in self.order.seen:
             if hasattr(entity, "_events"):
+                #TODO conver seen to_domain; but uow need to move to application?
                 self._events.extend(entity._events) #append not override
                 entity._events.clear() #prevent duplicate processing
 
