@@ -1,28 +1,52 @@
 import uuid
-from typing import List
+from typing import List, Union
 from decimal import Decimal
 from datetime import datetime
-from ddd.order_management.application import commands, queries, ports, mapper, dtos
-from ddd.order_management.domain import domain_service, events
+from ddd.order_management.application import commands, mappers, queries, ports, dtos
+from ddd.order_management.domain import domain_service, events, exceptions
+
+def handle_invalid_order_operation(err):
+    #TODO handle logger
+    #logger.error(f"{err}")
+    response_dto = dtos.ResponseDTO(
+        success=False,
+        message=str(err)
+    )
+    return response_dto
+
+def handle_unexpected_error(err_details):
+    #TODO log err details but dont return in results
+    #logger.error(f"{err_details}", exc_info=True)
+    response_dto = dtos.ResponseDTO(
+        success=False,
+        message="An unexpected error occured. Please contact support."
+    )
+    return response_dto
 
 def handle_place_order(
         command: commands.PlaceOrderCommand, 
-        uow: ports.UnitOfWorkAbstract) -> dtos.OrderResponseDTO:
-    with uow:
+        uow: ports.UnitOfWorkAbstract) -> Union[dtos.OrderResponseDTO, dtos.ResponseDTO]:
+    try:
+        with uow:
 
-        order = uow.order.get(order_id=command.order_id)
+            order = uow.order.get(order_id=command.order_id)
 
-        placed_order = order.place_order()
-        placed_order_dto =  mapper.OrderResponseMapper.to_dto(
-            placed_order, 
-            success=True, 
-            message="Order successfully placed order."
-        )
+            placed_order = order.place_order()
+            placed_order_dto =  mappers.OrderResponseMapper.to_dto(
+                placed_order, 
+                success=True, 
+                message="Order successfully placed order."
+            )
 
-        uow.order.save(placed_order)
-        uow.commit()
+            uow.order.save(placed_order)
+            uow.commit()
 
-        return placed_order_dto
+    except (exceptions.InvalidOrderOperation, ValueError) as e:
+        placed_order_dto = handle_invalid_order_operation(e)
+    except Exception as e:
+        placed_order_dto = handle_unexpected_error(f"Unexpected error during place order {e}")
+
+    return placed_order_dto
 
 
 def handle_confirm_order(
@@ -30,29 +54,37 @@ def handle_confirm_order(
         uow: ports.UnitOfWorkAbstract, 
         payment_gateway_factory: ports.PaymentGatewayFactoryAbstract,
         order_service: domain_service.OrderServiceAbstract
-    ) -> dtos.OrderResponseDTO:
+    ) -> Union[dtos.OrderResponseDTO, dtos.ResponseDTO]:
 
-    with uow:
+    try:
 
-        order = uow.order.get(order_id=command.order_id)
+        with uow:
 
-        payment_gateway = payment_gateway_factory.get_payment_gateway(command.payment_method)
-        payment_details = payment_gateway.get_payment_details(command.transaction_id)
+            order = uow.order.get(order_id=command.order_id)
 
-        confirmed_order = order_service.confirm_order(
-            order=order,
-            payment_details=payment_details
-        )
-        confirmed_order_dto = mapper.OrderResponseMapper.to_dto(
-            confirmed_order, 
-            success=True, 
-            message="Order successfully confirmed."
-        )
+            payment_gateway = payment_gateway_factory.get_payment_gateway(command.payment_method)
+            payment_details = payment_gateway.get_payment_details(command.transaction_id)
 
-        uow.order.save(confirmed_order)
-        uow.commit()
+            confirmed_order = order_service.confirm_order(
+                order=order,
+                payment_details=payment_details
+            )
+            confirmed_order_dto = mappers.OrderResponseMapper.to_dto(
+                confirmed_order, 
+                success=True, 
+                message="Order successfully confirmed."
+            )
 
-        return confirmed_order_dto
+            uow.order.save(confirmed_order)
+            uow.commit()
+
+
+    except (exceptions.InvalidOrderOperation, ValueError) as e:
+        confirmed_order_dto = handle_invalid_order_operation(e)
+    except Exception as e:
+        confirmed_order_dto = handle_unexpected_error(f"Unexpected error during order confirmation. {e}")
+
+    return confirmed_order_dto
 
 
 
@@ -70,7 +102,7 @@ def handle_shipping_options(
             order=order
         )
 
-        shipping_options_dto = mapper.ShippingOptionsResponseMapper.to_dtos(shipping_options)
+        shipping_options_dto = mappers.ShippingOptionsResponseMapper.to_dtos(shipping_options)
 
         return shipping_options_dto
 
@@ -79,31 +111,37 @@ def handle_select_shipping_option(
         uow: ports.UnitOfWorkAbstract,
         shipping_option_service: ports.ShippingOptionStrategyServiceAbstract,
         order_service: domain_service.OrderServiceAbstract
-        ) -> dtos.OrderResponseDTO:
-    with uow:
+        ) -> Union[dtos.OrderResponseDTO, dtos.ResponseDTO]:
+    try:
+        with uow:
 
-        order = uow.order.get(order_id=command.order_id)
+            order = uow.order.get(order_id=command.order_id)
 
-        available_shipping_options = order_service.get_shipping_options(
-            shipping_option_service=shipping_option_service(uow.vendor),
-            order=order
-        )
+            available_shipping_options = order_service.get_shipping_options(
+                shipping_option_service=shipping_option_service(uow.vendor),
+                order=order
+            )
 
-        order_w_shipping_option = order.select_shipping_option(
-                                        command.shipping_details, 
-                                        available_shipping_options
-                                    )
+            order_w_shipping_option = order.select_shipping_option(
+                                            command.shipping_details, 
+                                            available_shipping_options
+                                        )
 
-        order_w_shipping_option_dto = mapper.OrderResponseMapper.to_dto(
-            order_w_shipping_option, 
-            success=True, 
-            message = "Order successfully selected shipping option."
-        )
+            order_w_shipping_option_dto = mappers.OrderResponseMapper.to_dto(
+                order_w_shipping_option, 
+                success=True, 
+                message = "Order successfully selected shipping option."
+            )
 
-        uow.order.save(order_w_shipping_option)
-        uow.commit()
+            uow.order.save(order_w_shipping_option)
+            uow.commit()
 
-        return order_w_shipping_option_dto
+    except (exceptions.InvalidOrderOperation, ValueError) as e:
+        order_w_shipping_option_dto = handle_invalid_order_operation(e)
+    except Exception as e:
+        order_w_shipping_option_dto = handle_unexpected_error(f"Unexpected error during cart items checkout. {e}")
+
+    return order_w_shipping_option_dto
 
 
 
@@ -118,7 +156,7 @@ def handle_checkout_items(
             shipping_address=command.shipping_address.to_domain(),
             line_items=[item.to_domain() for item in command.line_items],
         )
-        draft_order_dto = mapper.OrderResponseMapper.to_dto(
+        draft_order_dto = mappers.OrderResponseMapper.to_dto(
             draft_order, 
             success=True, 
             message = "Cart items successfully checkout."
