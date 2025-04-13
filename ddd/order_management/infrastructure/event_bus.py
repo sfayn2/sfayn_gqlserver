@@ -1,18 +1,9 @@
-from typing import Union
+from typing import Dict, List
+from ddd.order_management.application import ports
 from ddd.order_management.domain import events
-from ddd.order_management.application import ports, handlers
-from ddd.order_management.infrastructure.adapters import (
-    email_service, 
-    logging_service
-)
 
-
-EVENT_HANDLERS = {
-    events.OrderCancelled: [
-        lambda event, uow: handlers.handle_logged_order(event, uow, logging_service=logging_service.LoggingService()),
-        lambda event, uow: handlers.handle_email_canceled_order(event, uow, email_service=email_service.EmailService())
-        ]
-}
+#TODO: make sure bootstrap.py is called upfront to register event handlers(ex. manage.py ? or apps.py? )
+EVENT_HANDLERS: Dict[events.DomainEvent, List] = {}
 
 def publish(event: events.DomainEvent, uow: ports.UnitOfWorkAbstract):
     # handle the event locally by triggering event handlers
