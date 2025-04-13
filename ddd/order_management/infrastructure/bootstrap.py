@@ -3,7 +3,10 @@ from ddd.order_management.domain import events
 from ddd.order_management.infrastructure import event_bus
 from ddd.order_management.infrastructure.adapters import (
     email_service, 
-    logging_service
+    logging_service,
+    payments_adapter,
+    tax_adapter,
+    shipping_option_adapter
 )
 from ddd.order_management.application.handlers import (
     place_order,
@@ -14,10 +17,12 @@ from ddd.order_management.application.handlers import (
     event_handlers
 )
 
-from ddd.order_management.application import commands, message_bus, queries
+from ddd.order_management.application import commands, message_bus, queries, order_service
 
 
 #Depending on the framework arch this might be inside manage.py , app.py, or main.py ?
+#if project grows, breakdown handlers by feature
+
 def register_event_handlers():
     event_bus.EVENT_HANDLERS.update({
         events.OrderCancelled: [
@@ -26,15 +31,26 @@ def register_event_handlers():
             ]
     })
 
+
 def register_command_handlers():
     message_bus.COMMAND_HANDLERS.update({
         commands.PlaceOrderCommand: place_order.handle_place_order,
-        commands.ConfirmOrderCommand: confirm_order.handle_confirm_order,
-        commands.SelectShippingOptionCommand: select_shipping_option.handle_select_shipping_option,
+        commands.ConfirmOrderCommand: lambda command, uow: confirm_order.handle_confirm_order(command, uow, {
+            "payment_gateway_factory": payments_adapter.PaymentGatewayFactory(),
+            "order_service": order_service.OrderService(),
+            "tax_service": tax_adapter
+        }),
+        commands.SelectShippingOptionCommand: lambda command, uow: select_shipping_option.handle_select_shipping_option(command, uow, {
+            "shipping_option_service": shipping_option_adapter.ShippingOptionStrategyService,
+            "order_service": order_service.OrderService()
+        }),
         commands.CheckoutItemsCommand: checkout_items.handle_checkout_items,
     })
 
 def register_query_handlers():
     message_bus.QUERY_HANDLERS.update({
-        queries.ShippingOptionsQuery: get_shipping_options.handle_shipping_options
+        queries.ShippingOptionsQuery: lambda query, uow: get_shipping_options.handle_shipping_options(query, uow, {
+            "shipping_option_service": shipping_option_adapter.ShippingOptionStrategyService,
+            "order_service": order_service.OrderService()
+        })
     })

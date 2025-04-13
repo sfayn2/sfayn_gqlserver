@@ -43,16 +43,10 @@ class ConfirmOrderMutation(relay.ClientIDMutation):
 
     order = graphene.Field(object_types.OrderResponseType)
 
-    dependencies = {
-        "payment_gateway_factory": payments_adapter.PaymentGatewayFactory(),
-        "order_service": order_service.OrderService(),
-        "tax_service": tax_adapter
-    }
-
     @classmethod
     def mutate_and_get_payload(cls, root, info, **input):
         command = commands.ConfirmOrderCommand.model_validate(input)
-        confirmed_order = message_bus.handle(command, unit_of_work.DjangoOrderUnitOfWork(), dependencies=cls.dependencies)
+        confirmed_order = message_bus.handle(command, unit_of_work.DjangoOrderUnitOfWork())
         return cls(order=object_types.OrderResponseType(**confirmed_order.model_dump()))
 
 class SelectShippingOptionMutation(relay.ClientIDMutation):
@@ -64,15 +58,10 @@ class SelectShippingOptionMutation(relay.ClientIDMutation):
     #TODO: should return Shipping details response
     order = graphene.Field(object_types.OrderResponseType)
 
-    dependencies = {
-        "shipping_option_service": shipping_option_adapter.ShippingOptionStrategyService,
-        "order_service": order_service.OrderService()
-    }
-
     @classmethod
     def mutate_and_get_payload(cls, root, info, **input):
         command = commands.SelectShippingOptionCommand.model_validate(input)
-        shipping_option = message_bus.handle(command, unit_of_work.DjangoOrderUnitOfWork(), dependencies=cls.dependencies)
+        shipping_option = message_bus.handle(command, unit_of_work.DjangoOrderUnitOfWork())
         return cls(order=object_types.OrderResponseType(**shipping_option.model_dump()))
 
 
@@ -83,13 +72,11 @@ class CheckoutItemsMutation(relay.ClientIDMutation):
         line_items = graphene.List(input_types.LineItemInput, required=True)
 
     order = graphene.Field(object_types.OrderResponseType)
-    dependencies = None
-
 
     @classmethod
     def mutate_and_get_payload(cls, root, info, **input):
         command = commands.CheckoutItemsCommand.model_validate(input)
-        draft_order = message_bus.handle(command, unit_of_work.DjangoOrderUnitOfWork(), dependencies=cls.dependencies)
+        draft_order = message_bus.handle(command, unit_of_work.DjangoOrderUnitOfWork())
         return cls(order=object_types.OrderResponseType(**draft_order.model_dump()))
 
 # ===========
@@ -101,11 +88,7 @@ class Query(graphene.ObjectType):
     shipping_options_by_order_id = graphene.List(input_types.ShippingDetailsType, order_id=graphene.String(required=True))
     def resolve_shipping_options_by_order_id(root, info, order_id):
         query = queries.ShippingOptionsQuery(order_id=order_id)
-        dependencies = {
-            "shipping_option_service": shipping_option_adapter.ShippingOptionStrategyService,
-            "order_service": order_service.OrderService()
-        }
-        shipping_options = message_bus.handle(query, unit_of_work.DjangoOrderUnitOfWork(), dependencies=dependencies)
+        shipping_options = message_bus.handle(query, unit_of_work.DjangoOrderUnitOfWork())
 
         return shipping_options
 
