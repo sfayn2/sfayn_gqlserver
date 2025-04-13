@@ -2,26 +2,16 @@ import uuid
 from typing import List, Union
 from decimal import Decimal
 from datetime import datetime
-from ddd.order_management.application import mappers, commands, queries, ports, dtos
+from ddd.order_management.application import (
+    mappers, 
+    commands, 
+    queries, 
+    ports, 
+    dtos, 
+    shared
+)
 from ddd.order_management.domain import domain_service, events, exceptions
 
-def handle_invalid_order_operation(err):
-    #TODO handle logger
-    #logger.error(f"{err}")
-    response_dto = dtos.ResponseDTO(
-        success=False,
-        message=str(err)
-    )
-    return response_dto
-
-def handle_unexpected_error(err_details):
-    #TODO log err details but dont return in results
-    #logger.error(f"{err_details}", exc_info=True)
-    response_dto = dtos.ResponseDTO(
-        success=False,
-        message="An unexpected error occured. Please contact support."
-    )
-    return response_dto
 
 def handle_place_order(
         command: commands.PlaceOrderCommand, 
@@ -45,9 +35,9 @@ def handle_place_order(
             placed_order_dto.message = "Order successfully placed order."
 
     except (exceptions.InvalidOrderOperation, ValueError) as e:
-        placed_order_dto = handle_invalid_order_operation(e)
+        placed_order_dto = shared.handle_invalid_order_operation(e)
     except Exception as e:
-        placed_order_dto = handle_unexpected_error(f"Unexpected error during place order {e}")
+        placed_order_dto = shared.handle_unexpected_error(f"Unexpected error during place order {e}")
 
     return placed_order_dto
 
@@ -84,9 +74,9 @@ def handle_confirm_order(
 
 
     except (exceptions.InvalidOrderOperation, ValueError) as e:
-        confirmed_order_dto = handle_invalid_order_operation(e)
+        confirmed_order_dto = shared.handle_invalid_order_operation(e)
     except Exception as e:
-        confirmed_order_dto = handle_unexpected_error(f"Unexpected error during order confirmation. {e}")
+        confirmed_order_dto = shared.handle_unexpected_error(f"Unexpected error during order confirmation. {e}")
 
     return confirmed_order_dto
 
@@ -141,9 +131,9 @@ def handle_select_shipping_option(
             uow.commit()
 
     except (exceptions.InvalidOrderOperation, ValueError) as e:
-        order_w_shipping_option_dto = handle_invalid_order_operation(e)
+        order_w_shipping_option_dto = shared.handle_invalid_order_operation(e)
     except Exception as e:
-        order_w_shipping_option_dto = handle_unexpected_error(f"Unexpected error during cart items checkout. {e}")
+        order_w_shipping_option_dto = shared.handle_unexpected_error(f"Unexpected error during cart items checkout. {e}")
 
     return order_w_shipping_option_dto
 
