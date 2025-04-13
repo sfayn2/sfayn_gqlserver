@@ -1,13 +1,13 @@
 
-from typing import Union, Dict, Callable
+from typing import Union, Dict, Callable, Any
 from ddd.order_management.application import commands, queries
 from ddd.order_management.domain import repositories
 
-COMMAND_HANDLERS: Dict[commands.Command, Callable] = {}
+COMMAND_HANDLERS: Dict[commands.Command, Callable[..., Any]] = {}
 
-QUERY_HANDLERS: Dict[queries.Query, Callable] = {}
+QUERY_HANDLERS: Dict[queries.Query, Callable[..., Any]] = {}
 
-def handle(message: Union[commands.Command, queries.Query], uow: repositories.UnitOfWorkAbstract, dependencies: None):
+def handle(message: Union[commands.Command, queries.Query], uow: repositories.UnitOfWorkAbstract, **dependencies):
     """ dispatch message to appropriate handler(s) """
     if isinstance(message, commands.Command):
         handler = COMMAND_HANDLERS.get(type(message))

@@ -35,22 +35,28 @@ def register_event_handlers():
 def register_command_handlers():
     message_bus.COMMAND_HANDLERS.update({
         commands.PlaceOrderCommand: place_order.handle_place_order,
-        commands.ConfirmOrderCommand: lambda command, uow: confirm_order.handle_confirm_order(command, uow, {
-            "payment_gateway_factory": payments_adapter.PaymentGatewayFactory(),
-            "order_service": order_service.OrderService(),
-            "tax_service": tax_adapter
-        }),
-        commands.SelectShippingOptionCommand: lambda command, uow: select_shipping_option.handle_select_shipping_option(command, uow, {
-            "shipping_option_service": shipping_option_adapter.ShippingOptionStrategyService,
-            "order_service": order_service.OrderService()
-        }),
+        commands.ConfirmOrderCommand: lambda command, uow: confirm_order.handle_confirm_order(
+            command, 
+            uow,
+            payment_gateway_factory=payments_adapter.PaymentGatewayFactory(),
+            order_service=order_service.OrderService(),
+            tax_service=tax_adapter
+        ),
+        commands.SelectShippingOptionCommand: lambda command, uow: select_shipping_option.handle_select_shipping_option(
+            command, 
+            uow,
+            shipping_option_service=shipping_option_adapter.ShippingOptionStrategyService,
+            order_service=order_service.OrderService()
+        ),
         commands.CheckoutItemsCommand: checkout_items.handle_checkout_items,
     })
 
 def register_query_handlers():
     message_bus.QUERY_HANDLERS.update({
-        queries.ShippingOptionsQuery: lambda query, uow: get_shipping_options.handle_shipping_options(query, uow, {
-            "shipping_option_service": shipping_option_adapter.ShippingOptionStrategyService,
-            "order_service": order_service.OrderService()
-        })
+        queries.ShippingOptionsQuery: lambda query, uow: get_shipping_options.handle_shipping_options(
+            query, 
+            uow,
+            shipping_option_service=shipping_option_adapter.ShippingOptionStrategyService,
+            order_service=order_service.OrderService()
+        ),
     })
