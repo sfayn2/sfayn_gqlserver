@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Union, List
 from ddd.order_management.application import (
     mappers, 
     commands, 

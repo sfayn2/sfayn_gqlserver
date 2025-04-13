@@ -15,20 +15,18 @@ def handle_place_order(
     try:
         with uow:
 
-            order = mappers.OrderMapper.to_domain(
-                uow.order.get(order_id=command.order_id)
-            )
+            order = uow.order.get(order_id=command.order_id)
 
             placed_order = order.place_order()
             placed_order_dto =  mappers.OrderResponseMapper.to_dto(
-                placed_order
+                order=placed_order,
+                success=True,
+                message="Order successfully placed order."
             )
 
-            uow.order.save(placed_order_dto)
+            uow.order.save(placed_order)
             uow.commit()
 
-            placed_order_dto.success = True
-            placed_order_dto.message = "Order successfully placed order."
 
     except (exceptions.InvalidOrderOperation, ValueError) as e:
         placed_order_dto = shared.handle_invalid_order_operation(e)
