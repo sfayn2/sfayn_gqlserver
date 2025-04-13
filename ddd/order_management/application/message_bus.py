@@ -1,27 +1,11 @@
 
-from typing import Union
-from ddd.order_management.application import commands, handlers1, queries
-from ddd.order_management.application.handlers import (
-    place_order,
-    confirm_order,
-    select_shipping_option,
-    checkout_items,
-    get_shipping_options
-)
+from typing import Union, Dict, Callable
+from ddd.order_management.application import commands, queries
 from ddd.order_management.domain import repositories
 
+COMMAND_HANDLERS: Dict[commands.Command, Callable] = {}
 
-COMMAND_HANDLERS = {
-    commands.PlaceOrderCommand: place_order.handle_place_order,
-    commands.ConfirmOrderCommand: confirm_order.handle_confirm_order,
-    commands.SelectShippingOptionCommand: select_shipping_option.handle_select_shipping_option,
-    commands.CheckoutItemsCommand: checkout_items.handle_checkout_items,
-}
-
-QUERY_HANDLERS = {
-    queries.ShippingOptionsQuery: get_shipping_options.handle_shipping_options
-}
-
+QUERY_HANDLERS: Dict[queries.Query, Callable] = {}
 
 def handle(message: Union[commands.Command, queries.Query], uow: repositories.UnitOfWorkAbstract, dependencies: None):
     """ dispatch message to appropriate handler(s) """
