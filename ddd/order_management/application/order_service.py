@@ -2,9 +2,9 @@ from datetime import datetime
 from typing import List
 from ddd.order_management.application import ports
 from ddd.order_management.domain import (
-    domain_service, 
+    domain_service,
+    models,
     value_objects, 
-    models, 
     exceptions,
     enums
     )

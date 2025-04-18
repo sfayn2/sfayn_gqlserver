@@ -6,7 +6,7 @@ from decimal import Decimal
 from pydantic import BaseModel, Field, AliasChoices, parse_obj_as
 from dataclasses import asdict
 from typing import List, Optional, Tuple
-from ddd.order_management.domain import value_objects, models, enums
+from ddd.order_management.domain import models, value_objects, enums
 from vendor_management import models as django_vendor_models
 
 class CouponDTO(BaseModel):

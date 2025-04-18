@@ -1,4 +1,4 @@
-from ddd.order_management.domain import repositories, models, exceptions
+from ddd.order_management.domain import models, repositories, exceptions
 from order_management import models as django_models
 from ddd.order_management.infrastructure import infra_mappers
 from ddd.order_management.application import mappers as application_mappers

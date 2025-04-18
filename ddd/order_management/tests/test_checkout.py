@@ -9,7 +9,7 @@ from decimal import Decimal
 
 from ddd.order_management.application import message_bus, dtos
 from ddd.order_management.application import commands
-from ddd.order_management.domain import enums, value_objects, models
+from ddd.order_management.domain import enums, models, value_objects
 
 @pytest.fixture
 def mock_uow():
