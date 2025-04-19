@@ -5,7 +5,8 @@ from decimal import Decimal
 from typing import List, Optional, Tuple
 from dataclasses import dataclass, field
 from ddd.order_management.domain import value_objects, enums, exceptions, events
-from ddd.order_management.domain.services import offer_service, tax_service
+from ddd.order_management.domain.services.tax_strategies import ports as tax_ports
+from ddd.order_management.domain.services.offer_strategies import ports as offer_ports
 
 @dataclass
 class LineItem:
@@ -180,8 +181,7 @@ class Order:
 
         self.raise_event(event)
 
-    def apply_offers(self, offer_service: offer_service.OfferStrategyService):
-        #TODO: need to refactorl should only dependent on abstraction no implementation
+    def apply_offers(self, offer_service: offer_ports.OfferStrategyServiceAbstract):
         if self.order_status != enums.OrderStatus.DRAFT:
             raise exceptions.InvalidTaxOperation("Only draft order can apply offers (Free shipping, Free gifts, etc)")
         if self.offer_details:
@@ -190,8 +190,7 @@ class Order:
             raise exceptions.InvalidOfferOperation("Only when shipping option is selected.")
         offer_service.apply_offers(self)
 
-    def apply_taxes(self, tax_strategies: List[tax_service.TaxStrategy]):
-        #TODO: need to refactorl should only dependent on abstraction no implementation
+    def apply_taxes(self, tax_strategies: List[tax_ports.TaxStrategyAbstract]):
         if self.order_status != enums.OrderStatus.DRAFT:
             raise exceptions.InvalidTaxOperation("Only draft order can calculate taxes.")
         if not self.destination:
