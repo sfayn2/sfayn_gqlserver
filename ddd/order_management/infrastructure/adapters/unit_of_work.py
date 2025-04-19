@@ -6,9 +6,9 @@ from ddd.order_management.infrastructure.adapters import (
     django_vendor_repository,
 )
 from ddd.order_management.infrastructure import event_bus, infra_mappers
-from ddd.order_management.application import ports
+from ddd.order_management.domain import repositories
 
-class DjangoOrderUnitOfWork(ports.UnitOfWorkAbstract):
+class DjangoOrderUnitOfWork(repositories.UnitOfWorkAbstract):
     #make sure to call uow within block statement
     #to trigger this
     def __init__(self):

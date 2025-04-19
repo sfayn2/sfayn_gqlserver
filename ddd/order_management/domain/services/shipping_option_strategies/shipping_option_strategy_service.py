@@ -4,7 +4,8 @@ from ddd.order_management.domain import (
     repositories,
     models,
     enums,
-    value_objects
+    value_objects,
+    exceptions
     )
 
 from ddd.order_management.domain.services.shipping_option_strategies import (
@@ -45,6 +46,10 @@ class ShippingOptionStrategyService(ports.ShippingOptionStrategyServiceAbstract)
                         delivery_time=option.strategy.delivery_time,
                         cost=cost)
                 )
+
+        if not options:
+            raise exceptions.InvalidShippingOption(f"No available shipping options.")
+
         return options
 
     def _fetch_valid_options(self, vendor_name: str):
@@ -58,3 +63,18 @@ class ShippingOptionStrategyService(ports.ShippingOptionStrategyServiceAbstract)
             )
 
         return valid_shipping_options
+
+
+#class ShippingAvailableOptionService:
+#
+#    @staticmethod
+#    def get_shipping_options(
+#            shipping_option_service: ports.ShippingOptionStrategyServiceAbstract, 
+#            order: models.Order) -> List[value_objects.ShippingDetails]:
+#
+#        shipping_options = shipping_option_service.get_shipping_options(order=order)
+#
+#        if not shipping_options:
+#            raise exceptions.InvalidShippingOption(f"No available shipping options.")
+#
+#        return shipping_options

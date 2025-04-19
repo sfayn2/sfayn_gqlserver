@@ -1,12 +1,13 @@
 
 from ddd.order_management.domain import events
+from ddd.order_management.domain.services.tax_strategies import tax_strategy_service
+from ddd.order_management.domain.services.order import order_service
+from ddd.order_management.domain.services.shipping_option_strategies import shipping_option_strategy_service
 from ddd.order_management.infrastructure import event_bus
 from ddd.order_management.infrastructure.adapters import (
     email_service, 
     logging_service,
-    payments_adapter,
-    tax_adapter,
-    shipping_option_adapter
+    payments_adapter
 )
 from ddd.order_management.application.handlers import (
     place_order,
@@ -42,19 +43,19 @@ def register_command_handlers():
             uow,
             payment_gateway_factory=payments_adapter.PaymentGatewayFactory(),
             order_service=order_service.OrderService(),
-            tax_service=tax_adapter
+            tax_service=tax_strategy_service.TaxStrategyService()
         ),
         commands.SelectShippingOptionCommand: lambda command, uow: select_shipping_option.handle_select_shipping_option(
             command, 
             uow,
-            shipping_option_service=shipping_option_adapter.ShippingOptionStrategyService,
+            shipping_option_service=shipping_option_strategy_service.ShippingOptionStrategyService,
             order_service=order_service.OrderService()
         ),
         commands.CheckoutItemsCommand: lambda command, uow: checkout_items.handle_checkout_items(
             command,
             uow,
             order_service=order_service.OrderService(),
-            tax_service=tax_adapter
+            tax_service=tax_strategy_service.TaxStrategyService()
         ),
     })
 
@@ -63,7 +64,7 @@ def register_query_handlers():
         queries.ShippingOptionsQuery: lambda query, uow: get_shipping_options.handle_shipping_options(
             query, 
             uow,
-            shipping_option_service=shipping_option_adapter.ShippingOptionStrategyService,
+            shipping_option_service=shipping_option_strategy_service.ShippingOptionStrategyService,
             order_service=order_service.OrderService()
         ),
     })

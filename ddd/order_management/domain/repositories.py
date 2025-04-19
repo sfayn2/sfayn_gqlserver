@@ -37,3 +37,22 @@ class VendorAbstract(ABC):
     @abstractmethod
     def get_shipping_options(self):
         raise NotImplementedError("Subclasses must implement this method")
+
+# ===
+# UOW
+# ===
+class UnitOfWorkAbstract(ABC):
+
+    def __enter__(self) -> T:
+        return self
+
+    def __exit__(self, *args):
+        self.rollback()
+
+    @abstractmethod
+    def commit(self):
+        raise NotImplementedError("Subclasses must implement this method")
+
+    @abstractmethod
+    def rollback(self):
+        raise NotImplementedError("Subclasses must implement this method")

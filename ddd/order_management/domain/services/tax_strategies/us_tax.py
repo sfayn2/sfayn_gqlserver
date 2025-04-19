@@ -8,7 +8,7 @@ class USStateTaxStrategy(ports.TaxStrategyAbstract):
         "TX": 0.0625
     }
 
-    def apply(self, order: models.Order):
+    def calculate_tax(self, order: models.Order):
         if order.destination.country.lower() == "united states":
             state = order.destination.state
             state_tax_rate = self.STATE_TAX_RATES.get(state, 0)

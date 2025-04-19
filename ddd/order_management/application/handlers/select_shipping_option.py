@@ -6,21 +6,20 @@ from ddd.order_management.application import (
     dtos, 
     shared
 )
-from ddd.order_management.domain import domain_service, events, exceptions
+from ddd.order_management.domain import exceptions
+from ddd.order_management.domain.services.shipping_option_strategies import ports as shipping_option_ports
 
 def handle_select_shipping_option(
         command: commands.SelectShippingOption, 
         uow: ports.UnitOfWorkAbstract,
-        shipping_option_service: ports.ShippingOptionStrategyServiceAbstract,
-        order_service: domain_service.OrderServiceAbstract
+        shipping_option_service: shipping_option_ports.ShippingOptionStrategyServiceAbstract,
         ) -> Union[dtos.OrderResponseDTO, dtos.ResponseDTO]:
     try:
         with uow:
 
             order = uow.order.get(order_id=command.order_id)
 
-            available_shipping_options = order_service.get_shipping_options(
-                shipping_option_service=shipping_option_service(uow.vendor),
+            available_shipping_options = shipping_option_service(uow.vendor).get_shipping_options(
                 order=order
             )
 

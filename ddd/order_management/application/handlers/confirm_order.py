@@ -6,13 +6,14 @@ from ddd.order_management.application import (
     dtos, 
     shared
 )
-from ddd.order_management.domain import domain_service, events, exceptions
+from ddd.order_management.domain import events, exceptions
+from ddd.order_management.domain.services.order import ports as order_ports
 
 def handle_confirm_order(
         command: commands.ConfirmOrderCommand, 
         uow: ports.UnitOfWorkAbstract, 
         payment_gateway_factory: ports.PaymentGatewayFactoryAbstract,
-        order_service: domain_service.OrderServiceAbstract
+        order_service: order_ports.OrderServiceAbstract
     ) -> Union[dtos.OrderResponseDTO, dtos.ResponseDTO]:
 
     try:

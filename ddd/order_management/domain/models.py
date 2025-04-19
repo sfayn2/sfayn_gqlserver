@@ -190,7 +190,7 @@ class Order:
             raise exceptions.InvalidOfferOperation("Only when shipping option is selected.")
         offer_service.apply_offers(self)
 
-    def apply_taxes(self, tax_strategies: List[tax_ports.TaxStrategyAbstract]):
+    def apply_taxes(self, tax_amount: value_objects.Money, tax_details: List[str]):
         if self.order_status != enums.OrderStatus.DRAFT:
             raise exceptions.InvalidTaxOperation("Only draft order can calculate taxes.")
         if not self.destination:
@@ -202,21 +202,11 @@ class Order:
         if self.sub_total.amount == 0:
             raise #Skip tax for zero subtotal
 
-        tax_amount = value_objects.Money.default()
-        tax_details = []
-
-        for tax_strategy in tax_strategies:
-            tax_results = tax_strategy.apply(self)
-            if tax_results:
-                tax_details.append(tax_results.desc)
-                tax_amount.add(tax_results.amount)
-
         if tax_amount.amount < Decimal("0"):
             raise exceptions.InvalidTaxOperation("Tax amount cannot be negative.")
 
         self.tax_amount = tax_amount
         self.tax_details = tax_details
-
 
     def update_payment_details(self, payment_details: value_objects.PaymentDetails):
         if not payment_details:

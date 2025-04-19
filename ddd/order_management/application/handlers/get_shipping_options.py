@@ -7,13 +7,14 @@ from ddd.order_management.application import (
     shared,
     queries
 )
-from ddd.order_management.domain import domain_service, events, exceptions
+from ddd.order_management.domain.services.order import ports as order_ports
+from ddd.order_management.domain.services.shipping_option_strategies import ports as shipping_option_ports
 
 def handle_shipping_options(
         query: queries.ShippingOptionsQuery, 
         uow: ports.UnitOfWorkAbstract,
-        shipping_option_service: ports.ShippingOptionStrategyServiceAbstract,
-        order_service: domain_service.OrderServiceAbstract) -> List[dtos.ShippingDetailsDTO]:
+        shipping_option_service: shipping_option_ports.ShippingOptionStrategyServiceAbstract,
+        order_service: order_ports.OrderServiceAbstract) -> List[dtos.ShippingDetailsDTO]:
     with uow:
 
         order = uow.order.get(order_id=query.order_id)
