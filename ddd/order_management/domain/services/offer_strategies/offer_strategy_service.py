@@ -18,12 +18,12 @@ from ddd.order_management.domain.services.offer_strategies import (
 # ===============
 
 # when adding new offer need to map the strategy
-#OFFER_STRATEGIES = {
-#    enums.OfferType.PERCENTAGE_DISCOUNT: percentage_discount.PercentageDiscountStrategy,
-#    enums.OfferType.FREE_GIFT: free_gifts.FreeGiftOfferStrategy,
-#    enums.OfferType.COUPON_PERCENTAGE_DISCOUNT: percentage_discount_by_coupon.PercentageDiscountCouponOfferStrategy,
-#    enums.OfferType.FREE_SHIPPING: free_shipping.FreeShippingOfferStrategy
-#}
+DEFAULT_OFFER_STRATEGIES = {
+    enums.OfferType.PERCENTAGE_DISCOUNT: percentage_discount.PercentageDiscountStrategy,
+    enums.OfferType.FREE_GIFT: free_gifts.FreeGiftOfferStrategy,
+    enums.OfferType.COUPON_PERCENTAGE_DISCOUNT: percentage_discount_by_coupon.PercentageDiscountCouponOfferStrategy,
+    enums.OfferType.FREE_SHIPPING: free_shipping.FreeShippingOfferStrategy
+}
 OFFER_STRATEGIES = Dict[enums.OfferType, ports.OfferStrategyAbstract]
 
 # ================
@@ -32,7 +32,7 @@ OFFER_STRATEGIES = Dict[enums.OfferType, ports.OfferStrategyAbstract]
 
 class OfferStrategyService(ports.OfferStrategyServiceAbstract):        
 
-    def __init__(self, vendor_repository: repositories.VendorAbstract, offers: OFFER_STRATEGIES):
+    def __init__(self, vendor_repository: repositories.VendorAbstract, offers: OFFER_STRATEGIES = DEFAULT_OFFER_STRATEGIES):
         self.vendor_repository = vendor_repository
         self.offer_strategies = offers
 

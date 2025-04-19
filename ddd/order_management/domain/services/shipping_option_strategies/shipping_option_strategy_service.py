@@ -20,18 +20,18 @@ from ddd.order_management.domain.services.shipping_option_strategies import (
 # ===============
 
 # when adding new options strategy need to map the strategy
-#SHIPPING_OPTIONS_STRATEGIES = {
-#    enums.ShippingMethod.STANDARD: standard_shipping.StandardShippingStrategy,
-#    enums.ShippingMethod.EXPRESS: express_shipping.ExpressShippingStrategy,
-#    enums.ShippingMethod.LOCAL_PICKUP: local_pickup_shipping.LocalPickupShippingStrategy,
-#    enums.ShippingMethod.FREE_SHIPPING: free_shipping.FreeShippingStrategy
-#}
+DEFAULT_SHIPPING_OPTIONS_STRATEGIES = {
+    enums.ShippingMethod.STANDARD: standard_shipping.StandardShippingStrategy,
+    enums.ShippingMethod.EXPRESS: express_shipping.ExpressShippingStrategy,
+    enums.ShippingMethod.LOCAL_PICKUP: local_pickup_shipping.LocalPickupShippingStrategy,
+    enums.ShippingMethod.FREE_SHIPPING: free_shipping.FreeShippingStrategy
+}
 SHIPPING_OPTIONS_STRATEGIES = Dict[enums.ShippingMethod, ports.ShippingOptionStrategyAbstract]
 
 
 class ShippingOptionStrategyService(ports.ShippingOptionStrategyServiceAbstract):
 
-    def __init__(self, vendor_repository: repositories.VendorRepository, shipping_options_strategy: SHIPPING_OPTIONS_STRATEGIES):
+    def __init__(self, vendor_repository: repositories.VendorRepository, shipping_options_strategy: SHIPPING_OPTIONS_STRATEGIES = DEFAULT_SHIPPING_OPTIONS_STRATEGIES):
         self.vendor_repository = vendor_repository
         self.shipping_options_strategy = shipping_options_strategy
 
