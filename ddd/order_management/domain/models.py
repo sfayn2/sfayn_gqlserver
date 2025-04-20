@@ -208,6 +208,8 @@ class Order:
         self.tax_amount = tax_amount
         self.tax_details = tax_details
 
+        self.calculate_final_amount()
+
     def update_payment_details(self, payment_details: value_objects.PaymentDetails):
         if not payment_details:
             raise exceptions.InvalidOrderOperation("Payment details cannot be none.")
