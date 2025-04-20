@@ -1,16 +1,14 @@
 import ast
-from typing import List
 from ddd.order_management.domain import value_objects, models
-from ddd.order_management.application import dtos, mappers
 from vendor_management import models as django_vendor_models
 
 class CouponMapper:
 
     @staticmethod
-    def to_domain(coupon_code) -> dtos.CouponDTO:
+    def to_domain(coupon_code) -> value_objects.Coupon:
         #only care on coupon code & load the rest of attrs value from db
         django_coupon = django_vendor_models.Coupon.objects.filter(coupon_code=coupon_code).values().first()
-        return dtos.CouponDTO(**django_coupon)
+        return value_objects.Coupon(**django_coupon)
 
 class LineItemMapper:
 
@@ -64,38 +62,38 @@ class LineItemMapper:
 class OrderMapper:
 
     @staticmethod
-    def to_django(order_dto: dtos.OrderDTO):
+    def to_django(order: models.Order):
         return {
-            'order_id': order_dto.order_id,
+            'order_id': order.order_id,
             'defaults': {
-                    'date_created': order_dto.date_created,
-                    'delivery_street': order_dto.destination.street,
-                    'delivery_city': order_dto.destination.city,
-                    'delivery_postal': order_dto.destination.postal,
-                    'delivery_country': order_dto.destination.country, 
-                    'delivery_state': order_dto.destination.state, 
-                    'customer_first_name': order_dto.customer_details.first_name, 
-                    'customer_last_name': order_dto.customer_details.last_name, 
-                    'customer_email': order_dto.customer_details.email if order_dto.customer_details else None, 
-                    'shipping_method': order_dto.shipping_details.method.value if order_dto.shipping_details else None, 
-                    'shipping_delivery_time': order_dto.shipping_details.delivery_time if order_dto.shipping_details else None,
-                    'shipping_cost': order_dto.shipping_details.cost.amount if order_dto.shipping_details else None,
-                    'shipping_tracking_reference': order_dto.shipping_reference,
-                    'payment_method': order_dto.payment_details.method.value if order_dto.payment_details else None,
-                    'payment_reference': order_dto.payment_details.transaction_id if order_dto.payment_details else None,
-                    'payment_amount': order_dto.payment_details.paid_amount.amount if order_dto.payment_details else None, 
-                    'cancellation_reason': order_dto.cancellation_reason, 
-                    'total_discounts_fee': order_dto.total_discounts_fee.amount if order_dto.total_discounts_fee else None, 
-                    'offer_details': order_dto.offer_details if order_dto.offer_details else [],
-                    'tax_details': order_dto.tax_details if order_dto.tax_details else [], 
-                    'tax_amount': order_dto.tax_amount.amount if order_dto.tax_amount else None, 
-                    'total_amount': order_dto.total_amount.amount if order_dto.total_amount else None, 
-                    'final_amount': order_dto.final_amount.amount if order_dto.final_amount else None, 
-                    'shipping_tracking_reference': order_dto.shipping_reference, 
-                    'coupons': [coupon.coupon_code for coupon in order_dto.coupons], 
-                    'order_status': order_dto.order_status.value, 
-                    'currency': order_dto.currency,
-                    'date_modified': order_dto.date_modified
+                    'date_created': order.date_created,
+                    'delivery_street': order.destination.street,
+                    'delivery_city': order.destination.city,
+                    'delivery_postal': order.destination.postal,
+                    'delivery_country': order.destination.country, 
+                    'delivery_state': order.destination.state, 
+                    'customer_first_name': order.customer_details.first_name, 
+                    'customer_last_name': order.customer_details.last_name, 
+                    'customer_email': order.customer_details.email if order.customer_details else None, 
+                    'shipping_method': order.shipping_details.method.value if order.shipping_details else None, 
+                    'shipping_delivery_time': order.shipping_details.delivery_time if order.shipping_details else None,
+                    'shipping_cost': order.shipping_details.cost.amount if order.shipping_details else None,
+                    'shipping_tracking_reference': order.shipping_reference,
+                    'payment_method': order.payment_details.method.value if order.payment_details else None,
+                    'payment_reference': order.payment_details.transaction_id if order.payment_details else None,
+                    'payment_amount': order.payment_details.paid_amount.amount if order.payment_details else None, 
+                    'cancellation_reason': order.cancellation_reason, 
+                    'total_discounts_fee': order.total_discounts_fee.amount if order.total_discounts_fee else None, 
+                    'offer_details': order.offer_details if order.offer_details else [],
+                    'tax_details': order.tax_details if order.tax_details else [], 
+                    'tax_amount': order.tax_amount.amount if order.tax_amount else None, 
+                    'total_amount': order.total_amount.amount if order.total_amount else None, 
+                    'final_amount': order.final_amount.amount if order.final_amount else None, 
+                    'shipping_tracking_reference': order.shipping_reference, 
+                    'coupons': [coupon.coupon_code for coupon in order.coupons], 
+                    'order_status': order.order_status.value, 
+                    'currency': order.currency,
+                    'date_modified': order.date_modified
                 }
         }
 
@@ -117,7 +115,7 @@ class OrderMapper:
             payment_details=value_objects.PaymentDetails(
                 method=django_order_object.payment_method,
                 transaction_id=django_order_object.payment_reference,
-                paid_amount=dtos.MoneyDTO(
+                paid_amount=value_objects.Money(
                     amount=django_order_object.payment_amount,
                     currency=django_order_object.currency
                 )
