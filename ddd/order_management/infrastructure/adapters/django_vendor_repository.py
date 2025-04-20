@@ -3,7 +3,7 @@ from datetime import datetime
 from typing import List
 from ddd.order_management.domain import repositories, enums, value_objects, exceptions
 from vendor_management import models as django_vendor_models
-from ddd.order_management.infrastructure import order_dtos
+from ddd.order_management.infrastructure import infra_mappers
 
 class DjangoVendorRepositoryImpl(repositories.VendorAbstract):
 
@@ -16,9 +16,9 @@ class DjangoVendorRepositoryImpl(repositories.VendorAbstract):
 
         final_offers = []
         for offer in offer_list:
-            offer_dto = order_dtos.OfferStrategyDTO(**offer)
+            offer_dto =  infra_mappers.OfferStrategyMapper.to_dto(offer)
             try:
-                final_offers.append(offer_dto.to_domain())
+                final_offers.append(infra_mappers.OfferStrategyMapper.to_domain(offer_dto))
             except (exceptions.InvalidOfferOperation, ValueError) as e:
                 #TODO send notification for invalid offer?
                 print(f"DjangoVendorRepository.get_offer exception > {str(e)}")
@@ -37,9 +37,9 @@ class DjangoVendorRepositoryImpl(repositories.VendorAbstract):
         final_opts = []
         for option in shipping_options.values():
             option.pop("id")
-            ship_opt_dto = order_dtos.ShippingOptionStrategyDTO.from_django_filter(option)
+            ship_opt_dto = infra_mappers.ShippingOptionStrategyMapper.to_dto(option)
             try:
-                final_opts.append(ship_opt_dto.to_domain())
+                final_opts.append(infra_mappers.ShippingOptionStrategyMapper.to_domain(ship_opt_dto))
             except (ValueError) as e:
                 print(f"DjangoVendorRepository.get_shipping_options exception > {str(e)}")
                 continue

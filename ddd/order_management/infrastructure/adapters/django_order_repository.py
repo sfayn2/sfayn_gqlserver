@@ -7,7 +7,7 @@ from ddd.order_management.application import mappers as application_mappers
 class DjangoOrderRepositoryImpl(repositories.OrderAbstract):
     def get(self, order_id) -> models.Order:
         django_order = django_models.Order.objects.get(order_id=order_id)
-        order_dto = infra_mappers.OrderMapper.from_django_model(django_order)
+        order_dto = infra_mappers.OrderMapper.to_dto(django_order)
         order_domain = application_mappers.OrderMapper.to_domain(order_dto)
         self.seen.append(order_domain) #Track Entitry for Uow
         return order_domain

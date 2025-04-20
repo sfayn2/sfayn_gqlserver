@@ -2,7 +2,8 @@ import pytest
 from datetime import datetime
 from unittest import mock
 from decimal import Decimal
-from ddd.order_management.infrastructure import django_order_repository, order_dtos
+from ddd.order_management.infrastructure import django_order_repository
+from ddd.order_management.application import dtos
 from ddd.order_management.domain import models, value_objects, enums
 
 @pytest.fixture
@@ -139,7 +140,7 @@ def domain_order(domain_line_item):
     )
 
 def test_line_item_dto_from_django_model(mock_django_line_item):
-    dto = order_dtos.LineItemDTO.from_django_model(mock_django_line_item)
+    dto = order_dtos__.LineItemDTO.from_django_model(mock_django_line_item)
     assert dto.product_sku == mock_django_line_item.product_sku
     assert dto.product_name == mock_django_line_item.product_name
     assert dto.options["color"] == "red"
@@ -147,14 +148,14 @@ def test_line_item_dto_from_django_model(mock_django_line_item):
 
 
 def test_order_dto_from_django_model(mock_django_order):
-    dto = order_dtos.OrderDTO.from_django_model(mock_django_order)
+    dto = order_dtos__.OrderDTO.from_django_model(mock_django_order)
     assert dto.order_id == mock_django_order.order_id
     assert dto.destination.city == mock_django_order.delivery_city
     assert len(dto.line_items) == 1
     assert dto.line_items[0].product_name == mock_django_order.line_items.all()[0].product_name
 
 def test_order_dto_to_domain(domain_order):
-    dto = order_dtos.OrderDTO.from_domain(domain_order)
+    dto = order_dtos__.OrderDTO.from_domain(domain_order)
     domain = dto.to_domain()
 
     assert domain.order_id == domain_order.order_id
@@ -163,7 +164,7 @@ def test_order_dto_to_domain(domain_order):
     assert domain.line_items[0].product_name == domain_order.line_items[0].product_name
 
 def test_get_order(mock_django_order):
-    mock_django_order2 = order_dtos.OrderDTO.from_django_model(mock_django_order)
+    mock_django_order2 = order_dtos__.OrderDTO.from_django_model(mock_django_order)
     mock_to_domain = mock_django_order2.to_domain()
     with mock.patch("order_management.models.Order.objects.get", return_value=mock_django_order) as mock_get:
         

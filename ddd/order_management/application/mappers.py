@@ -57,6 +57,7 @@ class MoneyMapper:
     def to_domain(money_dto: dtos.MoneyDTO) -> value_objects.Money:
         return value_objects.Money(**money_dto.model_dump())
 
+
 class CouponMapper:
     @staticmethod
     def to_domain(coupon_dto: dtos.CouponDTO) -> value_objects.Coupon:

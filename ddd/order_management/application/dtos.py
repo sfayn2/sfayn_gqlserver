@@ -3,8 +3,7 @@ from pydantic import BaseModel, Field, AliasChoices, parse_obj_as
 from datetime import datetime
 from decimal import Decimal
 from typing import Optional, List, Tuple
-from ddd.order_management.domain import enums
-from ddd.order_management.infrastructure import order_dtos
+from ddd.order_management.domain import enums, value_objects
 
 
 class ResponseDTO(BaseModel):
@@ -98,6 +97,28 @@ class OrderDTO(BaseModel):
     order_status: enums.OrderStatus
     currency: str
     date_modified: Optional[datetime]
+
+class OfferStrategyDTO(BaseModel):
+    offer_type: enums.OfferType
+    name: str
+    discount_value: int | Decimal
+    conditions: str
+    required_coupon: bool
+    coupons: Optional[List[CouponDTO]]
+    stackable: bool
+    priority: int
+    start_date: datetime
+    end_date: datetime
+    is_active: bool
+
+class ShippingOptionStrategyDTO(BaseModel):
+    name: enums.ShippingMethod
+    delivery_time: str
+    conditions: dict
+    base_cost: MoneyDTO
+    flat_rate: MoneyDTO
+    currency: str
+    is_active: bool
 
 class OfferStrategyDTO(BaseModel):
     offer_type: enums.OfferType

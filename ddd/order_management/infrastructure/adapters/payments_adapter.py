@@ -3,8 +3,7 @@ import requests
 from decimal import Decimal
 from django.conf import settings
 from ddd.order_management.domain import value_objects, enums
-from ddd.order_management.infrastructure import order_dtos
-from ddd.order_management.application import ports
+from ddd.order_management.application import ports, dtos
 
 class PaypalPaymentGatewayAdapter(ports.PaymentGatewayAbstract):
 
@@ -33,13 +32,13 @@ class PaypalPaymentGatewayAdapter(ports.PaymentGatewayAbstract):
         purchase_units = paypal_response.get("purchase_units")
 
         #TODO need to loop thru?
-        paypal_paid_amount = order_dtos.MoneyDTO(
+        paypal_paid_amount = dtos.MoneyDTO(
             #amount=sum(Decimal(purchase_unit["amount"]["total"]) for purchase_unit in purchase_units),
             amount=Decimal(purchase_units[0]["amount"]["total"]),
             currency=purchase_units[0]["amount"]["currency"]
         )
 
-        return order_dtos.PaymentDetailsDTO(
+        return dtos.PaymentDetailsDTO(
             method=enums.PaymentMethod.PAYPAL,
             paid_amount=paypal_paid_amount,
             transaction_id=paypal_response.get("id"),
@@ -77,7 +76,7 @@ class StripePaymentGatewayAdapter(ports.PaymentGatewayAbstract):
         stripe_order_id = "ORD-232" #TODO
 
 
-        return order_dtos.PaymentDetailsDTO(
+        return dtos.PaymentDetailsDTO(
             method=enums.PaymentMethod.STRIPE,
             paid_amount=stripe_paid_amount,
             transaction_id=transaction_id,

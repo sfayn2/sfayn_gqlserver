@@ -383,36 +383,36 @@ class OrderDTO(BaseModel):
 
 
 
-class OfferStrategyDTO(BaseModel):
-    offer_type: enums.OfferType
-    name: str
-    discount_value: int | Decimal
-    conditions: str
-    required_coupon: bool
-    coupons: Optional[List[CouponDTO]]
-    stackable: bool
-    priority: int
-    start_date: datetime
-    end_date: datetime
-    is_active: bool
-
-    def to_domain(self) -> value_objects.OfferStrategy:
-
-        #first coupon is invalid and second is valid should not stop processing Offer, hence, skipping error
-        coupons = []
-        for item in self.coupons:
-            try:
-                coupons.append(item.to_domain())
-            except:
-                #TODO: add logger
-                continue
-
-        return value_objects.OfferStrategy(
-            **self.model_dump(exclude={"coupons", "conditions"}),
-            conditions=ast.literal_eval(self.conditions),
-            coupons=coupons
-        )
-
+#class OfferStrategyDTO(BaseModel):
+#    offer_type: enums.OfferType
+#    name: str
+#    discount_value: int | Decimal
+#    conditions: str
+#    required_coupon: bool
+#    coupons: Optional[List[CouponDTO]]
+#    stackable: bool
+#    priority: int
+#    start_date: datetime
+#    end_date: datetime
+#    is_active: bool
+#
+#    def to_domain(self) -> value_objects.OfferStrategy:
+#
+#        #first coupon is invalid and second is valid should not stop processing Offer, hence, skipping error
+#        coupons = []
+#        for item in self.coupons:
+#            try:
+#                coupons.append(item.to_domain())
+#            except:
+#                #TODO: add logger
+#                continue
+#
+#        return value_objects.OfferStrategy(
+#            **self.model_dump(exclude={"coupons", "conditions"}),
+#            conditions=ast.literal_eval(self.conditions),
+#            coupons=coupons
+#        )
+#
 
 class ShippingOptionStrategyDTO(BaseModel):
     name: enums.ShippingMethod

@@ -4,7 +4,6 @@ from typing import List, TYPE_CHECKING
 from dataclasses import dataclass
 from pydantic import BaseModel
 from ddd.order_management.domain import value_objects, enums
-from ddd.order_management.infrastructure import order_dtos
 
 if TYPE_CHECKING:
     from ddd.order_management.domain import models
