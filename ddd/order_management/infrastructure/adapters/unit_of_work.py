@@ -5,7 +5,7 @@ from ddd.order_management.infrastructure.adapters import (
     django_order_repository, 
     django_vendor_repository,
 )
-from ddd.order_management.infrastructure import event_bus, infra_mappers
+from ddd.order_management.infrastructure import django_mappers, event_bus
 from ddd.order_management.domain import repositories
 
 class DjangoOrderUnitOfWork(repositories.UnitOfWorkAbstract):

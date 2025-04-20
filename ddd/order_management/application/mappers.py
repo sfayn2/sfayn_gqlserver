@@ -124,7 +124,7 @@ class OrderMapper:
             line_items=line_items,
             customer_details=CustomerDetailsMapper.to_domain(order_dto.customer_details),
             shipping_details=ShippingDetailsMapper.to_domain(order_dto.shipping_details) if order_dto.shipping_details else None,
-            payment_details=PaymentDetailsMapper.to_domain(order_dto.payment_details) if self.payment_details else None,
+            payment_details=PaymentDetailsMapper.to_domain(order_dto.payment_details) if order_dto.payment_details else None,
             cancellation_reason=order_dto.cancellation_reason,
             total_discounts_fee=MoneyMapper.to_domain(order_dto.total_discounts_fee),
             offer_details=order_dto.offer_details,

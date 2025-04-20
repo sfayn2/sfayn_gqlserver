@@ -1,7 +1,8 @@
 from __future__ import annotations
 import uuid
+from typing import List
 from abc import ABC, abstractmethod
-from ddd.order_management.domain import models
+from ddd.order_management.domain import models, value_objects
 
 
 class OrderAbstract(ABC):
@@ -27,7 +28,7 @@ class CustomerAbstract(ABC):
 class VendorAbstract(ABC):
 
     @abstractmethod
-    def get_offers(self):
+    def get_offers(self) -> List[value_objects.OfferStrategy]:
         raise NotImplementedError("Subclasses must implement this method")
 
     #@abstractmethod
@@ -35,7 +36,7 @@ class VendorAbstract(ABC):
     #    raise NotImplementedError("Subclasses must implement this method")
 
     @abstractmethod
-    def get_shipping_options(self):
+    def get_shipping_options(self) -> List[value_objects.ShippingOptionStrategy]:
         raise NotImplementedError("Subclasses must implement this method")
 
 # ===
