@@ -1,2 +1,2 @@
-from .line_item import *
-from .order_agg import *
+from .line_item import LineItem
+from .order_agg import Order
