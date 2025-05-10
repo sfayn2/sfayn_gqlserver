@@ -3,7 +3,7 @@ import requests
 from decimal import Decimal
 from django.conf import settings
 from ddd.order_management.domain import value_objects, enums
-from ddd.order_management.application import ports, dtos
+from ddd.order_management.application import ports
 
 class PaypalPaymentGatewayAdapter(ports.PaymentGatewayAbstract):
 
@@ -32,19 +32,19 @@ class PaypalPaymentGatewayAdapter(ports.PaymentGatewayAbstract):
         purchase_units = paypal_response.get("purchase_units")
 
         #TODO need to loop thru?
-        paypal_paid_amount = dtos.MoneyDTO(
+        paypal_paid_amount = value_objects.Money(
             #amount=sum(Decimal(purchase_unit["amount"]["total"]) for purchase_unit in purchase_units),
             amount=Decimal(purchase_units[0]["amount"]["total"]),
             currency=purchase_units[0]["amount"]["currency"]
         )
 
-        return dtos.PaymentDetailsDTO(
+        return value_objects.PaymentDetails(
             method=enums.PaymentMethod.PAYPAL,
             paid_amount=paypal_paid_amount,
             transaction_id=paypal_response.get("id"),
             order_id=purchase_units[0].get("custom"),
             status=paypal_response.get("status")
-        ).to_domain()
+        )
 
 class StripePaymentGatewayAdapter(ports.PaymentGatewayAbstract):
 
@@ -76,13 +76,13 @@ class StripePaymentGatewayAdapter(ports.PaymentGatewayAbstract):
         stripe_order_id = "ORD-232" #TODO
 
 
-        return dtos.PaymentDetailsDTO(
+        return value_objects.PaymentDetails(
             method=enums.PaymentMethod.STRIPE,
             paid_amount=stripe_paid_amount,
             transaction_id=transaction_id,
             order_id=stripe_order_id,
             status=stripe_payment_status
-        ).to_domain()
+        )
 
     
 class PaymentGatewayFactory(ports.PaymentGatewayFactoryAbstract):
