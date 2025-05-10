@@ -54,5 +54,5 @@ def register_query_handlers():
 
 def register():
     register_event_handlers()
-    register_command_handlers
+    register_command_handlers()
     register_query_handlers()
