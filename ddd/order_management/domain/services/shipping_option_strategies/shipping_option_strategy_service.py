@@ -32,7 +32,7 @@ SHIPPING_OPTIONS_STRATEGIES = Dict[enums.ShippingMethod, ports.ShippingOptionStr
 
 class ShippingOptionStrategyService(ports.ShippingOptionStrategyServiceAbstract):
 
-    def __init__(self, vendor_repository: repositories.VendorRepository, shipping_options_strategy: SHIPPING_OPTIONS_STRATEGIES = DEFAULT_SHIPPING_OPTIONS_STRATEGIES):
+    def __init__(self, vendor_repository: repositories.VendorAbstract, shipping_options_strategy: SHIPPING_OPTIONS_STRATEGIES = DEFAULT_SHIPPING_OPTIONS_STRATEGIES):
         self.vendor_repository = vendor_repository
         self.shipping_options_strategy = shipping_options_strategy
 

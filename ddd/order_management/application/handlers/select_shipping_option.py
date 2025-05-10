@@ -6,12 +6,12 @@ from ddd.order_management.application import (
     dtos, 
     shared
 )
-from ddd.order_management.domain import exceptions
+from ddd.order_management.domain import exceptions, repositories
 from ddd.order_management.domain.services.shipping_option_strategies import ports as shipping_option_ports
 
 def handle_select_shipping_option(
-        command: commands.SelectShippingOption, 
-        uow: ports.UnitOfWorkAbstract,
+        command: commands.SelectShippingOptionCommand, 
+        uow: repositories.UnitOfWorkAbstract,
         shipping_option_service: shipping_option_ports.ShippingOptionStrategyServiceAbstract,
         ) -> Union[dtos.OrderResponseDTO, dtos.ResponseDTO]:
     try:

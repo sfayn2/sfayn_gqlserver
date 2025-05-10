@@ -6,12 +6,12 @@ from ddd.order_management.application import (
     dtos, 
     shared
 )
-from ddd.order_management.domain import exceptions
+from ddd.order_management.domain import exceptions, repositories
 
 
 def handle_place_order(
         command: commands.PlaceOrderCommand, 
-        uow: ports.UnitOfWorkAbstract) -> Union[dtos.OrderResponseDTO, dtos.ResponseDTO]:
+        uow: repositories.UnitOfWorkAbstract) -> Union[dtos.OrderResponseDTO, dtos.ResponseDTO]:
     try:
         with uow:
 

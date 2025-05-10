@@ -1,12 +1,14 @@
 from datetime import datetime
-from typing import List
+from typing import List, TYPE_CHECKING
+
+from ddd.order_management.domain.services.order import ports
+
 from ddd.order_management.domain import (
     models,
     value_objects, 
     exceptions,
     enums
     )
-from ddd.order_management.domain.services.order import ports
 
 class OrderService(ports.OrderServiceAbstract):
     #Order life cycle

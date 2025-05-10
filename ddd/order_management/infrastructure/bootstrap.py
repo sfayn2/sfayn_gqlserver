@@ -51,3 +51,8 @@ def register_query_handlers():
             order_service=services.OrderService()
         ),
     })
+
+def register():
+    register_event_handlers()
+    register_command_handlers
+    register_query_handlers()

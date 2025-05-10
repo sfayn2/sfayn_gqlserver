@@ -1,7 +1,7 @@
 import pytz
 from datetime import datetime
 from ddd.order_management.domain import models, value_objects
-from ddd.order_management.domain.services.tax_strategies import ports
+from ddd.order_management.domain.services.shipping_option_strategies import ports
 
 def _get_current_time():
     return datetime.now(pytz.utc).time()

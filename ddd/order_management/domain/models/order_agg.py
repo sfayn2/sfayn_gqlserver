@@ -3,11 +3,13 @@ import uuid
 from decimal import Decimal
 from datetime import datetime
 from dataclasses import dataclass, field
-from typing import Optional, List, Tuple
+from typing import Optional, List, Tuple, TYPE_CHECKING
 from ddd.order_management.domain.models.line_item import LineItem
 from ddd.order_management.domain import enums, exceptions, events, value_objects
-from ddd.order_management.domain.services.tax_strategies import ports as tax_ports
-from ddd.order_management.domain.services.offer_strategies import ports as offer_ports
+
+if TYPE_CHECKING:
+    from ddd.order_management.domain.services.tax_strategies import ports as tax_ports
+    from ddd.order_management.domain.services.offer_strategies import ports as offer_ports
 
 @dataclass
 class Order:
