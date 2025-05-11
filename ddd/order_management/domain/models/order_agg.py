@@ -26,10 +26,10 @@ class Order:
     offer_details: Optional[List[str]] = field(default_factory=list)
     tax_details: Optional[List[str]] = field(default_factory=list)
     coupons: Optional[List[value_objects.Coupon]] = field(default_factory=list)
-    total_discounts_fee: value_objects.Money = value_objects.Money.default()
-    tax_amount: value_objects.Money = value_objects.Money.default()
-    total_amount: value_objects.Money = value_objects.Money.default()
-    final_amount: value_objects.Money = value_objects.Money.default()
+    total_discounts_fee: value_objects.Money = field(default_factory=lambda: value_objects.Money.default())
+    tax_amount: value_objects.Money = field(default_factory=lambda: value_objects.Money.default())
+    total_amount: value_objects.Money = field(default_factory=lambda: value_objects.Money.default())
+    final_amount: value_objects.Money = field(default_factory=lambda: value_objects.Money.default())
     date_modified: Optional[datetime] = None
     _events: List[events.DomainEvent] = field(default_factory=list, init=False)
 
