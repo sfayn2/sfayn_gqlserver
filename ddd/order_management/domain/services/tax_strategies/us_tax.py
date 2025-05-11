@@ -12,7 +12,7 @@ class USStateTaxStrategy(ports.TaxStrategyAbstract):
         if order.destination.country.lower() == "united states":
             state = order.destination.state
             state_tax_rate = self.STATE_TAX_RATES.get(state, 0)
-            tax_amount = order.sub_total.multiply(state_tax_rate)
-            desc = f"{state} State Tax ({state_tax_rate*100} %) | {order.tax_amount.amount} {order.tax_amount.currency}"
+            tax_amount = order.sub_total.multiply(state_tax_rate).format()
+            desc = f"{state} State Tax ({state_tax_rate*100} %) | {tax_amount.amount} {tax_amount.currency}"
 
             return value_objects.TaxResult(amount=tax_amount, desc=desc)

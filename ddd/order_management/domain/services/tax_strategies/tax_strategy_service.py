@@ -29,8 +29,7 @@ class TaxStrategyService(ports.TaxStrategyServiceAbstract):
             tax_results = tax_strategy.calculate_tax(order)
             if tax_results:
                 tax_details.append(tax_results.desc)
-                tax_amount.add(tax_results.amount)
-
+                tax_amount = tax_amount.add(tax_results.amount)
 
         return tax_amount, tax_details
 

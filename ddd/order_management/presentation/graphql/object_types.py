@@ -4,7 +4,7 @@ import graphene
 # Object Types
 # ====================
 class MoneyType(graphene.ObjectType):
-    amount = graphene.Float(required=True)
+    amount = graphene.Decimal(required=True)
     currency = graphene.String(required=True)
 
 class ShippingDetailsType(graphene.ObjectType):

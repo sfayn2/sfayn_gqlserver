@@ -5,9 +5,9 @@ from ddd.order_management.domain.services.tax_strategies import ports
 class SingaporeTaxStrategy(ports.TaxStrategyAbstract):
     GST_RATE = 0.09
 
-    def calculate_tax(self, order: models.Order):
+    def calculate_tax(self, order: models.Order) -> value_objects.TaxResult:
         if order.destination.country.lower() == "singapore":
-            tax_amount = order.sub_total.multiply(self.GST_RATE)
-            desc = f"GST ({self.GST_RATE*100} %) | {order.tax_amount.amount} {order.tax_amount.currency}"
+            tax_amount = order.sub_total.multiply(self.GST_RATE).format()
+            desc = f"GST ({self.GST_RATE*100} %) | {tax_amount.amount} {tax_amount.currency}"
 
             return value_objects.TaxResult(amount=tax_amount, desc=desc)

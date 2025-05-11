@@ -1,7 +1,7 @@
 from __future__ import annotations
 from dataclasses import dataclass
 from typing import Union
-from decimal import Decimal
+from decimal import Decimal, ROUND_HALF_UP
 
 @dataclass(frozen=True)
 class Money:
@@ -21,8 +21,8 @@ class Money:
             raise ValueError("Currency must be a valid 3 character ISO code.")
 
 
-    #def format(self) -> Money:
-    #    return Money(amount=Decimal(self.amount).quantize(Decimal("0.00"), rounding=ROUND_HALF_UP), currency=self.currency)
+    def format(self) -> Money:
+        return Money(amount=Decimal(self.amount).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP), currency=self.currency)
 
     def add(self, other: Money) -> Money:
         if self.currency != other.currency:
