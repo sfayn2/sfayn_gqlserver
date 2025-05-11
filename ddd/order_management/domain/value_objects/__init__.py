@@ -8,4 +8,5 @@ from .payment_details import PaymentDetails
 from .coupon import Coupon
 from .offer_strategy import OfferStrategy
 from .shipping_option_strategy import ShippingOptionStrategy
+from .tax_result import TaxResult
 

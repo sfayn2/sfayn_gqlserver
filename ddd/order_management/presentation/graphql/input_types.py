@@ -5,7 +5,7 @@ from graphene.types.generic import GenericScalar
 # Input Types
 # ====================
 class MoneyInput(graphene.InputObjectType):
-    amount = graphene.Float(required=True)
+    amount = graphene.Decimal(required=True)
     currency = graphene.String(required=True)
 
 class VendorDetailsInput(graphene.InputObjectType):
@@ -13,8 +13,8 @@ class VendorDetailsInput(graphene.InputObjectType):
     country = graphene.String(required=True)
 
 class PackageInput(graphene.InputObjectType):
-    weight = graphene.Float(required=True)
-    dimensions = graphene.List(graphene.Float, required=True)
+    weight = graphene.Decimal(required=True)
+    dimensions = graphene.List(graphene.Int, required=True)
 
 class LineItemInput(graphene.InputObjectType):
     product_sku = graphene.String(required=True)

@@ -25,6 +25,7 @@ def handle_checkout_items(
         total_tax, details = tax_service.calculate_all_taxes(draft_order)
         draft_order.apply_taxes(total_tax, details)
 
+
         draft_order_dto = mappers.OrderResponseMapper.to_dto(
             order=draft_order,
             success=True,

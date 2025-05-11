@@ -13,7 +13,7 @@ class OrderResponseMapper:
                 message=message,
                 tax_details=order.tax_details,
                 offer_details=order.offer_details,
-                shipping_details=asdict(order.shipping_details),
+                shipping_details=asdict(order.shipping_details) if order.shipping_details else None,
                 tax_amount=asdict(order.tax_amount),
                 total_discounts_fee=asdict(order.total_discounts_fee),
                 final_amount=asdict(order.final_amount)

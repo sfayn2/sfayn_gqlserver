@@ -7,6 +7,7 @@ class OrderAbstract(ABC):
 
     def __init__(self):
         #set to make it unique
+
         self.seen = set() #track loaded entities for event collection
 
     @abstractmethod

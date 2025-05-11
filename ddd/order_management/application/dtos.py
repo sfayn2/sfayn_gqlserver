@@ -64,7 +64,7 @@ class OrderResponseDTO(BaseModel):
     order_status: str
     success: bool
     message: str
-    shipping_details: ShippingDetailsDTO
+    shipping_details: Optional[ShippingDetailsDTO]
     tax_details: List[str]
     offer_details: List[str]
     tax_amount: MoneyDTO

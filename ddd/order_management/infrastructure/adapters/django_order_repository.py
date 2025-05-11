@@ -7,7 +7,7 @@ class DjangoOrderRepositoryImpl(repositories.OrderAbstract):
     def get(self, order_id) -> models.Order:
         django_order = django_models.Order.objects.get(order_id=order_id)
         order_domain = django_mappers.OrderMapper.to_domain(django_order)
-        self.seen.append(order_domain) #Track Entitry for Uow
+        self.seen.add(order_domain) #Track Entitry for Uow
         return order_domain
     
     def save(self, order: models.Order): 
@@ -18,4 +18,4 @@ class DjangoOrderRepositoryImpl(repositories.OrderAbstract):
             django_line_item = django_mappers.LineItemMapper.to_django(order.order_id, line_item)
             django_models.OrderLine.objects.update_or_create(**django_line_item)
 
-        self.seen.append(order) #Track Entitry for Uow
+        self.seen.add(order) #Track Entitry for Uow

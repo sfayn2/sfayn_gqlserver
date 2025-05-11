@@ -15,8 +15,8 @@ from ddd.order_management.domain.services.tax_strategies import (
 )
 
 DEFAULT_TAX_STRATEGIES = [
-    singapore_tax,
-    us_tax
+    singapore_tax.SingaporeTaxStrategy(),
+    us_tax.USStateTaxStrategy()
 ]
 
 class TaxStrategyService(ports.TaxStrategyServiceAbstract):

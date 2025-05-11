@@ -43,7 +43,7 @@ class Order:
     def generate_order_id(self):
         if self.order_status != enums.OrderStatus.DRAFT:
             raise exceptions.InvalidOrderOperation("Only draft order can generate order id.")
-        return f"ORD-{uuid.uuid4().hex[:8].upper()}"
+        self.order_id = f"ORD-{uuid.uuid4().hex[:8].upper()}"
 
     def update_modified_date(self):
         self.date_modified = datetime.now()
@@ -271,7 +271,7 @@ class Order:
 
     @property
     def sub_total(self):
-        return self.total_amount.subtract(self.total_discounts_fee).add(self.shipping_details.cost if self.shipping_details else value_objects.Money(0, self.currency))
+        return self.total_amount.subtract(self.total_discounts_fee).add(self.shipping_details.cost if self.shipping_details else value_objects.Money(Decimal("0"), self.currency))
 
     def calculate_final_amount(self):
         if self.order_status != enums.OrderStatus.DRAFT:
@@ -307,3 +307,9 @@ class Order:
         if not self.line_items[0].vendor.country:
             raise exceptions.InvalidOrderOperation("Vendor country is missing, its crucial in determining domestic shipment.")
         return self.line_items[0].vendor.country
+
+    def __hash__(self):
+        return hash(self.order_id)
+
+    def __eq__(self, other):
+        return isinstance(other, Order) and self.order_id == other.order_id
