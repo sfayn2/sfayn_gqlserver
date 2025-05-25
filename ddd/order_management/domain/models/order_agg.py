@@ -19,13 +19,13 @@ class Order:
     order_status: enums.OrderStatus
     order_id: Optional[str] = None
     shipping_details: Optional[value_objects.ShippingDetails] = None
-    line_items: List[LineItem] = None
+    line_items: List[LineItem] = field(default_factory=list)
     payment_details: Optional[value_objects.PaymentDetails] = None
     cancellation_reason: Optional[str] = None
     shipping_reference: Optional[str] = None
-    offer_details: Optional[List[str]] = field(default_factory=list)
-    tax_details: Optional[List[str]] = field(default_factory=list)
-    coupons: Optional[List[value_objects.Coupon]] = field(default_factory=list)
+    offer_details: List[str] = field(default_factory=list)
+    tax_details: List[str] = field(default_factory=list)
+    coupons: List[value_objects.Coupon] = field(default_factory=list)
     total_discounts_fee: value_objects.Money = field(default_factory=lambda: value_objects.Money.default())
     tax_amount: value_objects.Money = field(default_factory=lambda: value_objects.Money.default())
     total_amount: value_objects.Money = field(default_factory=lambda: value_objects.Money.default())
@@ -49,23 +49,29 @@ class Order:
         self.date_modified = datetime.now()
 
     def add_line_item(self, line_item: LineItem) -> None:
-        if not line_item:
-            raise ValueError("Please provide line item to add.")
-        if self.order_status != enums.OrderStatus.DRAFT:
-            raise exceptions.InvalidOrderOperation("Only draft order can add line item.")
+        if not self.line_items:
+            raise exceptions.InvalidOrderOperation("Please provide line item to add.")
         if line_item.is_free_gift and line_item.product_price.amount > 0:
             raise exceptions.InvalidOrderOperation("Free gifts must have a price of zero.")
+        if self.order_status != enums.OrderStatus.DRAFT:
+            raise exceptions.InvalidOrderOperation("Only draft order can add line item.")
 
         self._validate_line_item(line_item)
 
-        self.line_items.add(line_item)
+        if line_item in self.line_items:
+            raise exceptions.InvalidOrderOperation(f"Line item with SKU {line_item.product_sku} already exists.")
+
+        self.line_items.append(line_item)
         self._update_totals()
 
     def remove_line_item(self, line_item: LineItem) -> None:
-        if not line_item:
-            raise ValueError("Line item does not exists in the order.")
+        if not self.line_items:
+            raise exceptions.InvalidOrderOperation("Please provide line item to remove.")
+        if line_item not in self.line_items:
+            raise exceptions.InvalidOrderOperation("No line items exist in the order to remove.")
         if self.order_status != enums.OrderStatus.DRAFT:
             raise exceptions.InvalidOrderOperation("Only draft order can remove line items.")
+
         self.line_items.remove(line_item)
         self._update_totals()
 

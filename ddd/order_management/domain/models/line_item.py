@@ -44,3 +44,11 @@ class LineItem:
     @property
     def total_weight(self) -> Decimal:
         return self.package.weight * self.order_quantity
+
+    def __eq__(self, other):
+        if not isintance(other, LineItem):
+            return False
+        return self.product_sku == other.product_sku and self.vendor == other.vendor
+
+    def __hash__(self):
+        return hash(self.product_sku, self.vendor)
