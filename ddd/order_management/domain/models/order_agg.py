@@ -77,10 +77,10 @@ class Order:
 
     def update_line_items(self, line_items: List[LineItem]) -> None:
         if not line_items:
-            raise exceptions.InvalidOrderOperation("Line items cannot be none.")
+            raise exceptions.InvalidOrderOperation("Please provide line items to update.")
         if self.order_status != enums.OrderStatus.DRAFT:
             raise exceptions.InvalidOrderOperation("Only draft order can update line items.")
-        self.line_items =line_items
+        self.line_items = line_items
         self._update_totals()
 
     def update_shipping_details(self, shipping_details: value_objects.ShippingDetails) -> None:
@@ -147,16 +147,32 @@ class Order:
 
         self.raise_event(event)
 
-    def apply_offers(self, offer_service: offer_ports.OfferStrategyServiceAbstract):
+    def apply_offer_results(self, offer_results: List[value_objects.OfferResult]):
         if self.order_status != enums.OrderStatus.DRAFT:
             raise exceptions.InvalidTaxOperation("Only draft order can apply offers (Free shipping, Free gifts, etc)")
         if self.offer_details:
             raise exceptions.InvalidTaxOperation("Offers have already been applied.")
         if not self.shipping_details:
             raise exceptions.InvalidOfferOperation("Only when shipping option is selected.")
-        offer_service.apply_offers(self)
 
-    def apply_taxes(self, tax_amount: value_objects.Money, tax_details: List[str]):
+        total_discount = value_objects.Money.default()
+        offer_details = []
+
+        for result in offer_results:
+            if result.discounts_fee:
+                total_discount = total_discount.add(result.discounts_fee)
+            if result.free_shipping:
+                order.update_shipping_details(
+                        order.shipping_details.update_cost(value_objects.Money.default())
+                    )
+            if result.free_gifts:
+                order.add_line_item(result.free_gifts)
+
+            offer_details.append(result.desc)
+
+        order.update_total_discounts_fee(total_discount)
+
+    def apply_tax_results(self, tax_results: List[value_objects.TaxResult]):
         if self.order_status != enums.OrderStatus.DRAFT:
             raise exceptions.InvalidTaxOperation("Only draft order can calculate taxes.")
         if not self.destination:
@@ -168,10 +184,17 @@ class Order:
         if self.sub_total.amount == 0:
             raise #Skip tax for zero subtotal
 
+        tax_amount = value_objects.Money.default()
+        tax_details = []
+
+        for result in tax_results:
+            tax_amount = tax_amount.add(result.amount)
+            tax_details.append(result.desc)
+
         if tax_amount.amount < Decimal("0"):
             raise exceptions.InvalidTaxOperation("Tax amount cannot be negative.")
 
-        self.tax_amount = tax_amount
+        self.tax_amount = tax_amount.format()
         self.tax_details = tax_details
 
         self.calculate_final_amount()

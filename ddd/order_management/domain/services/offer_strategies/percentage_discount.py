@@ -14,10 +14,13 @@ class PercentageDiscountStrategy(ports.OfferStrategyAbstract):
             if eligible_products and (item.product_name in eligible_products):
                 total_discount += item.total_price * (self.strategy.discount_value / 100)
                 discounted_items.append(item.product_name)
-                order.update_total_discounts_fee(
-                        value_objects.Money(
+                total_discounts_fee = value_objects.Money(
                             amount=total_discount,
                             currency=currency
                         )
-                    )
-                return f"{self.strategy.name} | {','.join(discounted_items)} )"
+
+                return value_objects.OfferResult(
+                    name=self.strategy.name,
+                    desc=f"{self.strategy.name} | {','.join(discounted_items)} )"
+                    discounts_fee=total_discounts_fee
+                )

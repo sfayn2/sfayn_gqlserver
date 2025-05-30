@@ -23,15 +23,17 @@ class TaxStrategyService(ports.TaxStrategyServiceAbstract):
 
     def calculate_all_taxes(self, order: models.Order, tax_strategies: List[ports.TaxStrategyAbstract] = DEFAULT_TAX_STRATEGIES) -> Tuple[value_objects.Money, List[str]]:
         tax_amount = value_objects.Money.default()
-        tax_details = []
+        tax_results = []
 
         for tax_strategy in tax_strategies:
-            tax_results = tax_strategy.calculate_tax(order)
-            if tax_results:
-                tax_details.append(tax_results.desc)
-                tax_amount = tax_amount.add(tax_results.amount)
+            res = tax_strategy.calculate_tax(order)
+            if res:
+                tax_results.append(res)
+                #tax_details.append(tax_results.desc)
+                #tax_amount = tax_amount.add(tax_results.amount)
 
-        return tax_amount, tax_details
+        #return tax_amount.format(), tax_details
+        return tax_results
 
             
 

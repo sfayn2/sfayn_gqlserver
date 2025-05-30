@@ -20,6 +20,10 @@ class PercentageDiscountCouponOfferStrategy(ports.OfferStrategyAbstract):
                         )
                     discounted_items.append(item.product_sku)
 
-                    order.update_total_discounts_fee(total_discount)
+                    #order.update_total_discounts_fee(total_discount)
 
-                    return f"{self.strategy.name} | {','.join(discounted_items)} | {total_discount.amount} {total_discount.currency}"
+                    return value_objects.OfferResult(
+                        name=self.strategy.name,
+                        desc=f"{self.strategy.name} | {','.join(discounted_items)} | {total_discount.amount} {total_discount.currency}",
+                        discounts_fee=total_discount
+                    )

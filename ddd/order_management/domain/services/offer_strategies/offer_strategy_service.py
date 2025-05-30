@@ -38,14 +38,15 @@ class OfferStrategyService(ports.OfferStrategyServiceAbstract):
 
     def apply_offers(self, order: models.Order):
         available_offers = self._fetch_valid_offers(order.vendor_name)
-        offer_details = []
+        offer_results = []
         for strategy in available_offers:
             res = strategy.apply(order)
             if res:
-                offer_details.append(res)
+                offer_results.append(res)
 
-        if offer_details:
-            order.update_offer_details(offer_details)
+        #if offer_details:
+        #    order.update_offer_details(offer_details)
+        return offer_results
 
     def _fetch_valid_offers(self, vendor_name: str):
         #The assumption is all Offers are auto applied (except those w Coupons)

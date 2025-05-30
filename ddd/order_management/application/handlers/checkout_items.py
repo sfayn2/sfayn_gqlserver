@@ -22,8 +22,8 @@ def handle_checkout_items(
             line_items=[mappers.LineItemMapper.to_domain(item) for item in command.line_items],
         )
 
-        total_tax, details = tax_service.calculate_all_taxes(draft_order)
-        draft_order.apply_taxes(total_tax, details)
+        tax_results = tax_service.calculate_all_taxes(draft_order)
+        draft_order.apply_tax_results(tax_results)
 
 
         draft_order_dto = mappers.OrderResponseMapper.to_dto(

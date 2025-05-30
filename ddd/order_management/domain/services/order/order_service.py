@@ -45,14 +45,14 @@ class OrderService(ports.OrderServiceAbstract):
         order.generate_order_id()
         order.update_line_items(line_items)
 
-        #TODO do this in application handler
-        #order.apply_taxes(
-        #    tax_amount=tax_amount, 
-        #    tax_details=tax_details
-        #)
-
         order.calculate_final_amount()
         
+        return order
+
+    def place_order(self, order: models.Order) -> models.Order:
+
+        order.place_order()
+
         return order
 
 

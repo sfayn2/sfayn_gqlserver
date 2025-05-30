@@ -9,12 +9,16 @@ class FreeShippingOfferStrategy(ports.OfferStrategyAbstract):
         currency = order.currency
         #if self.validate_minimum_order_total(order) and self.validate_coupon(order):
         if self.validate_minimum_order_total(order):
-            zero_shipping_cost = value_objects.Money(
-                amount=Decimal("0"),
-                currency=currency
-            )
-            order.update_shipping_details(
-                    order.shipping_details.update_cost(zero_shipping_cost)
-                )
+            #zero_shipping_cost = value_objects.Money(
+            #    amount=Decimal("0"),
+            #    currency=currency
+            #)
+            #order.update_shipping_details(
+            #        order.shipping_details.update_cost(zero_shipping_cost)
+            #    )
 
-            return f"{self.strategy.name} | 0 {currency}"
+            return value_objects.OfferResult(
+                name=self.strategy.name,
+                desc=f"{self.strategy.name} | 0 {currency}",
+                free_shipping=True
+            )

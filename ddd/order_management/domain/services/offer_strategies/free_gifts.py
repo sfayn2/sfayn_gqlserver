@@ -10,10 +10,10 @@ class FreeGiftOfferStrategy(ports.OfferStrategyAbstract):
         gift_products = self.strategy.conditions.get("gift_products")
         if self.validate_minimum_quantity(order):
             for free_product in gift_products:
-                free_gifts.append(free_product)
+                #free_gifts.append(free_product)
 
                 # add free product gifts
-                order.add_line_item(
+                free_gifts.append(
                     value_objects.LineItem(
                         product_sku=free_product.get('sku'),
                         product_price=value_objects.Money(0, currency),
@@ -21,4 +21,9 @@ class FreeGiftOfferStrategy(ports.OfferStrategyAbstract):
                         is_free_gift=True
                     )
                 )
-                return f"{self.strategy.name} | {','.join(free_gifts)}"
+
+            return value_objects.OfferResult(
+                name=self.strategy.name,
+                desc=f"{self.strategy.name} | {','.join(free_gifts)}",
+                free_gifts=free_gifts
+            )

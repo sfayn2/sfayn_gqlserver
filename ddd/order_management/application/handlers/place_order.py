@@ -7,17 +7,31 @@ from ddd.order_management.application import (
     shared
 )
 from ddd.order_management.domain import exceptions, repositories
+from ddd.order_management.domain.services.order import ports as order_ports
+from ddd.order_management.domain.services.tax_strategies import ports as tax_ports
+from ddd.order_management.domain.services. import ports as tax_ports
+from ddd.order_management.domain.services.offer_strategies import ports as offer_ports
 
 
 def handle_place_order(
         command: commands.PlaceOrderCommand, 
+        order_service: order_ports.OrderServiceAbstract,
+        tax_service:  tax_ports.TaxStrategyServiceAbstract,
+        offer_service:  offer_ports.OfferStrategyServiceAbstract,
         uow: repositories.UnitOfWorkAbstract) -> Union[dtos.OrderResponseDTO, dtos.ResponseDTO]:
     try:
         with uow:
 
             order = uow.order.get(order_id=command.order_id)
 
-            placed_order = order.place_order()
+            placed_order = order_service.place_order(order)
+
+            offer_results = offer_service.apply_offers(placed_order)
+            placed_order.apply_offer_results(offer_results)
+
+            tax_results = tax_service.calculate_all_taxes(placed_order)
+            placed_order.apply_tax_results(tax_results)
+
             placed_order_dto =  mappers.OrderResponseMapper.to_dto(
                 order=placed_order,
                 success=True,
