@@ -20,7 +20,13 @@ def register_event_handlers():
 
 def register_command_handlers():
     message_bus.COMMAND_HANDLERS.update({
-        commands.PlaceOrderCommand: handlers.handle_place_order,
+        commands.PlaceOrderCommand: lambda command, uow: handlers.handle_place_order(
+            command,
+            uow,
+            order_service=services.OrderService(),
+            tax_service=services.TaxStrategyService()
+            offer_service=services.OfferStrategyService()
+        ),
         commands.ConfirmOrderCommand: lambda command, uow: handlers.handle_confirm_order(
             command, 
             uow,
