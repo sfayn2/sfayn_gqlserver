@@ -9,6 +9,9 @@ class CouponMapper:
         #only care on coupon code & load the rest of attrs value from db
         django_coupon = django_vendor_models.Coupon.objects.filter(coupon_code=coupon_code)
         if django_coupon.exists():
-            django_coupon2 = django_coupon.values().first()
-            django_coupon2.pop("id")
-            return value_objects.Coupon(**django_coupon2)
+            return value_objects.Coupon(
+                coupon_code=django_coupon.values_list("coupon_code", flat=True)[0],
+                start_date=django_coupon.values_list("start_date", flat=True)[0],
+                end_date=django_coupon.values_list("end_date", flat=True)[0],
+                is_active=django_coupon.values_list("is_active", flat=True)[0],
+            )
