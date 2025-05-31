@@ -51,8 +51,7 @@ def register_query_handlers():
         queries.ShippingOptionsQuery: lambda query, uow: handlers.handle_shipping_options(
             query=query, 
             uow=uow,
-            shipping_option_service=services.ShippingOptionStrategyService,
-            order_service=services.OrderService()
+            shipping_option_service=services.ShippingOptionStrategyService
         ),
     })
 
