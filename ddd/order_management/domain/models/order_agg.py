@@ -147,7 +147,7 @@ class Order:
 
         self.raise_event(event)
 
-    def apply_offer_results(self, offer_results: List[value_objects.OfferResult]):
+    def apply_offers(self, offers: List[offer_ports.OfferStrategyAbstract]):
         if self.order_status != enums.OrderStatus.DRAFT:
             raise exceptions.InvalidTaxOperation("Only draft order can apply offers (Free shipping, Free gifts, etc)")
         if self.offer_details:
@@ -155,22 +155,15 @@ class Order:
         if not self.shipping_details:
             raise exceptions.InvalidOfferOperation("Only when shipping option is selected.")
 
-        total_discount = value_objects.Money.default()
         offer_details = []
+        for strategy in offers:
+            res = strategy.apply()
+            if res:
+                offer_details.append(res)
 
-        for result in offer_results:
-            if result.discounts_fee:
-                total_discount = total_discount.add(result.discounts_fee)
-            if result.free_shipping:
-                order.update_shipping_details(
-                        order.shipping_details.update_cost(value_objects.Money.default())
-                    )
-            if result.free_gifts:
-                order.add_line_item(result.free_gifts)
+        if offer_details:
+            order.update_offer_details(offer_details)
 
-            offer_details.append(result.desc)
-
-        order.update_total_discounts_fee(total_discount)
 
     def apply_tax_results(self, tax_results: List[value_objects.TaxResult]):
         if self.order_status != enums.OrderStatus.DRAFT:

@@ -4,16 +4,16 @@ from ddd.order_management.domain.services.offer_strategies import ports
 
 class FreeGiftOfferStrategy(ports.OfferStrategyAbstract):
 
-    def apply(self, order: models.Order):
+    def apply(self):
         free_gifts = []
         currency = order.currency
         gift_products = self.strategy.conditions.get("gift_products")
         if self.validate_minimum_quantity(order):
             for free_product in gift_products:
-                #free_gifts.append(free_product)
+                free_gifts.append(free_product)
 
                 # add free product gifts
-                free_gifts.append(
+                order.add_line_item(
                     value_objects.LineItem(
                         product_sku=free_product.get('sku'),
                         product_price=value_objects.Money(0, currency),
@@ -22,8 +22,10 @@ class FreeGiftOfferStrategy(ports.OfferStrategyAbstract):
                     )
                 )
 
-            return value_objects.OfferResult(
-                name=self.strategy.name,
-                desc=f"{self.strategy.name} | {','.join(free_gifts)}",
-                free_gifts=free_gifts
-            )
+            return f"{self.strategy.name} | {','.join(free_gifts)}"
+
+            #return value_objects.OfferResult(
+            #    name=self.strategy.name,
+            #    desc=f"{self.strategy.name} | {','.join(free_gifts)}",
+            #    free_gifts=free_gifts
+            #)

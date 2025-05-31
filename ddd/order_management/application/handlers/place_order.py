@@ -26,8 +26,8 @@ def handle_place_order(
 
             placed_order = order_service.place_order(order)
 
-            offer_results = offer_service.apply_offers(placed_order)
-            placed_order.apply_offer_results(offer_results)
+            offers = offer_service.get_final_offers(placed_order)
+            placed_order.apply_offers(offers)
 
             tax_results = tax_service.calculate_all_taxes(placed_order)
             placed_order.apply_tax_results(tax_results)

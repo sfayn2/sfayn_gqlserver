@@ -36,19 +36,23 @@ class OfferStrategyService(ports.OfferStrategyServiceAbstract):
         self.vendor_repository = vendor_repository
         self.offer_strategies = offers
 
-    def apply_offers(self, order: models.Order):
-        available_offers = self._fetch_valid_offers(order.vendor_name)
-        offer_results = []
+    def get_final_offers(self, order: models.Order):
+        available_offers = self._fetch_valid_offers(order.vendor_name, order)
+        final_offers = []
+        #offer_results = []
         for strategy in available_offers:
-            res = strategy.apply(order)
-            if res:
-                offer_results.append(res)
+            final_offers.append(strategy)
+            #res = strategy.apply(order)
+            #if res:
+            #    offer_results.append(res)
 
         #if offer_details:
         #    order.update_offer_details(offer_details)
-        return offer_results
+        #return offer_results
 
-    def _fetch_valid_offers(self, vendor_name: str):
+        return final_offers
+
+    def _fetch_valid_offers(self, vendor_name: str, order: models.Order):
         #The assumption is all Offers are auto applied (except those w Coupons)
         vendor_offers = self.vendor_repository.get_offers(vendor_name)
         valid_offers = []
@@ -60,7 +64,7 @@ class OfferStrategyService(ports.OfferStrategyServiceAbstract):
 
             offer_strategy_class = self.offer_strategies.get(offer.offer_type)
             valid_offers.append(
-                offer_strategy_class(offer)
+                offer_strategy_class(offer, order)
             )
 
             if offer.stackable == False:
