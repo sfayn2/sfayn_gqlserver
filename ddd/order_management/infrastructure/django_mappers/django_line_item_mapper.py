@@ -1,4 +1,5 @@
 import ast
+from decimal import Decimal
 from ddd.order_management.domain import value_objects, models
 
 class LineItemMapper:
@@ -42,8 +43,12 @@ class LineItemMapper:
             ),
             order_quantity=django_line_item.order_quantity,
             package=value_objects.Package(
-                weight=django_line_item.package_weight,
-                dimensions=[django_line_item.package_length, django_line_item.package_width, django_line_item.package_height] 
+                weight=Decimal(django_line_item.package_weight),
+                dimensions=(
+                    int(django_line_item.package_length), 
+                    int(django_line_item.package_width), 
+                    int(django_line_item.package_height)
+                ) 
             ),
             is_free_gift=django_line_item.is_free_gift,
             is_taxable=django_line_item.is_taxable

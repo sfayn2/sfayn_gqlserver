@@ -49,10 +49,10 @@ class OrderService(ports.OrderServiceAbstract):
         
         return order
 
-    def place_order(self, order: models.Order) -> models.Order:
+    #def place_order(self, order: models.Order) -> models.Order:
 
-        order.place_order()
+    #    order.place_order()
 
-        return order
+    #    return order
 
 

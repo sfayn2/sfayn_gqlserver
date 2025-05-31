@@ -131,6 +131,8 @@ class Order:
 
         self.raise_event(event)
 
+        return self
+
     def confirm_order(self, payment_verified: bool):
         if self.order_status != enums.OrderStatus.PENDING:
             raise exceptions.InvalidOrderOperation("Only pending orders can be confirmed.")
@@ -147,7 +149,7 @@ class Order:
 
         self.raise_event(event)
 
-    def apply_offers(self, offers: List[offer_ports.OfferStrategyAbstract]):
+    def apply_applicable_offers(self, offers: List[offer_ports.OfferStrategyAbstract]):
         if self.order_status != enums.OrderStatus.DRAFT:
             raise exceptions.InvalidTaxOperation("Only draft order can apply offers (Free shipping, Free gifts, etc)")
         if self.offer_details:
@@ -162,7 +164,7 @@ class Order:
                 offer_details.append(res)
 
         if offer_details:
-            order.update_offer_details(offer_details)
+            self.update_offer_details(offer_details)
 
 
     def apply_tax_results(self, tax_results: List[value_objects.TaxResult]):
@@ -170,8 +172,11 @@ class Order:
             raise exceptions.InvalidTaxOperation("Only draft order can calculate taxes.")
         if not self.destination:
             raise exceptions.InvalidTaxOperation("Shipping address is required for tax calculation.")
-        if self.tax_details:
-            raise exceptions.InvalidTaxOperation("Taxes have already been applied.")
+
+        # No harm to recalculate
+        #if self.tax_details:
+        #    raise exceptions.InvalidTaxOperation("Taxes have already been applied.")
+
         if not any(item.is_taxable for item in self.line_items):
             return #Skip tax if no taxable items
         if self.sub_total.amount == 0:

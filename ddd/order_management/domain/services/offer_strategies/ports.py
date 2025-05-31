@@ -37,5 +37,5 @@ class OfferStrategyServiceAbstract(ABC):
         self.vendor_repository = vendor_repository
 
     @abstractmethod
-    def apply_offers(self, order: models.Order):
+    def evaluate_applicable_offers(self, order: models.Order):
         raise NotImplementedError("Subclasses must implement this method")

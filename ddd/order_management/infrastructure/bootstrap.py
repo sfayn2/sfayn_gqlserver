@@ -12,8 +12,8 @@ from ddd.order_management.application import commands, message_bus, queries
 def register_event_handlers():
     event_bus.EVENT_HANDLERS.update({
         events.OrderCancelled: [
-            lambda event, uow: event_handlers.handle_logged_order(event, uow, logging_service=adapters.LoggingService()),
-            lambda event, uow: event_handlers.handle_email_canceled_order(event, uow, email_service=adapters.EmailService())
+            lambda event, uow: event_handlers.handle_logged_order(event=event, uow=uow, logging_service=adapters.LoggingService()),
+            lambda event, uow: event_handlers.handle_email_canceled_order(event=event, uow=uow, email_service=adapters.EmailService())
             ]
     })
 
@@ -21,28 +21,27 @@ def register_event_handlers():
 def register_command_handlers():
     message_bus.COMMAND_HANDLERS.update({
         commands.PlaceOrderCommand: lambda command, uow: handlers.handle_place_order(
-            command,
-            uow,
-            order_service=services.OrderService(),
-            tax_service=services.TaxStrategyService()
-            offer_service=services.OfferStrategyService()
+            command=command,
+            uow=uow,
+            tax_service=services.TaxStrategyService(),
+            offer_service=services.OfferStrategyService(uow.vendor)
         ),
         commands.ConfirmOrderCommand: lambda command, uow: handlers.handle_confirm_order(
-            command, 
-            uow,
+            command=command, 
+            uow=uow,
             payment_gateway_factory=adapters.PaymentGatewayFactory(),
             order_service=services.OrderService(),
             tax_service=services.TaxStrategyService()
         ),
         commands.SelectShippingOptionCommand: lambda command, uow: handlers.handle_select_shipping_option(
-            command, 
-            uow,
+            command=command, 
+            uow=uow,
             shipping_option_service=services.ShippingOptionStrategyService,
             order_service=services.OrderService()
         ),
         commands.CheckoutItemsCommand: lambda command, uow: handlers.handle_checkout_items(
-            command,
-            uow,
+            command=command,
+            uow=uow,
             order_service=services.OrderService(),
             tax_service=services.TaxStrategyService()
         ),
@@ -51,8 +50,8 @@ def register_command_handlers():
 def register_query_handlers():
     message_bus.QUERY_HANDLERS.update({
         queries.ShippingOptionsQuery: lambda query, uow: handlers.handle_shipping_options(
-            query, 
-            uow,
+            query=query, 
+            uow=uow,
             shipping_option_service=services.ShippingOptionStrategyService,
             order_service=services.OrderService()
         ),

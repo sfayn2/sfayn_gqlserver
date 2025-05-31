@@ -1,5 +1,5 @@
 import ast
-from ddd.order_management.domain import value_objects, models
+from ddd.order_management.domain import value_objects, models, enums
 from ddd.order_management.infrastructure.django_mappers.django_line_item_mapper import LineItemMapper
 from ddd.order_management.infrastructure.django_mappers.django_coupon_mapper import CouponMapper
 
@@ -72,7 +72,7 @@ class OrderMapper:
             destination=value_objects.Address(
                 street=django_order_object.delivery_street,
                 city=django_order_object.delivery_city,
-                postal=django_order_object.delivery_postal,
+                postal=int(django_order_object.delivery_postal),
                 country=django_order_object.delivery_country,
                 state=django_order_object.delivery_state
             ),
@@ -106,45 +106,7 @@ class OrderMapper:
                 currency=django_order_object.currency
             ),
             shipping_reference=django_order_object.shipping_tracking_reference,
-            coupons=[CouponMapper.to_domain(item) for item in ast.literal_eval(django_order_object.coupons)],
-            currency=django_order_object.currency,
-            order_status=django_order_object.order_status
+            coupons=[CouponMapper.to_domain(item) for item in ast.literal_eval(django_order_object.coupons) if CouponMapper.to_domain(item)],
+            order_status=enums.OrderStatus(django_order_object.order_status)
         )
 
-class OfferStrategyMapper:
-
-    @staticmethod
-    def to_domain(django_filter_results) -> value_objects.OfferStrategy:
-        #first coupon is invalid and second is valid should not stop processing Offer, hence, skipping error
-        coupons = []
-        for item in django_filter_results.coupons:
-            try:
-                coupons.append(value_objects.Coupon(**item))
-            except:
-                #TODO: add logger
-                continue
-        
-        conditions = django_filter_results.conditions
-        django_filter_results.pop("coupons")
-        django_filter_results.pop("conditions")
-
-        return value_objects.OfferStrategy(
-            **django_filter_results,
-            conditions=ast.literal_eval(conditions),
-            coupons=coupons
-        )
-
-
-class ShippingOptionStrategyMapper:
-
-    @staticmethod
-    def to_domain(django_filter_results) -> value_objects.ShippingOptionStrategy:
-        return value_objects.ShippingOptionStrategy(
-            name=django_filter_results.get("name"),
-            delivery_time=django_filter_results.get("delivery_time"),
-            conditions=django_filter_results.get("conditions"),
-            base_cost=value_objects.Money(django_filter_results.get("base_cost")),
-            flat_rate=value_objects.Money(django_filter_results.get("flat_rate")),
-            currency=django_filter_results.get("currency"),
-            is_active=django_filter_results.get("is_active")
-        )

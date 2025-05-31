@@ -22,10 +22,5 @@ class FreeGiftOfferStrategy(ports.OfferStrategyAbstract):
                     )
                 )
 
-            return f"{self.strategy.name} | {','.join(free_gifts)}"
-
-            #return value_objects.OfferResult(
-            #    name=self.strategy.name,
-            #    desc=f"{self.strategy.name} | {','.join(free_gifts)}",
-            #    free_gifts=free_gifts
-            #)
+            if free_gifts:
+                return f"{self.strategy.name} | {','.join(free_gifts)}"

@@ -7,22 +7,21 @@ class PercentageDiscountStrategy(ports.OfferStrategyAbstract):
     #apply on order
     def apply(self):
         total_discount = 0
-        currency = order.currency
+        currency = self.order.currency
         discounted_items = []
         eligible_products = self.strategy.conditions.get("eligible_products")
-        for item in self.order.line_items:
-            if eligible_products and (item.product_name in eligible_products):
-                total_discount += item.total_price * (self.strategy.discount_value / 100)
-                discounted_items.append(item.product_name)
-                total_discounts_fee = value_objects.Money(
-                            amount=total_discount,
-                            currency=currency
+        required_coupon = self.strategy.conditions.get("required_coupon")
+        if required_coupon == False:
+            for item in self.order.line_items:
+                if eligible_products and item.product_sku in eligible_products:
+                    if total_discount == 0:
+                        total_discount = item.total_price.multiply(self.strategy.discount_value / 100)
+                    else:
+                        total_discount = total_discount.add(
+                            item.total_price.multiply(self.strategy.discount_value / 100)
                         )
-                self.order.update_total_discounts_fee(total_discounts_fee)
+                    discounted_items.append(item.product_sku)
 
-        return f"{self.strategy.name} | {','.join(discounted_items)} )"
-                #return value_objects.OfferResult(
-                #    name=self.strategy.name,
-                #    desc=f"{self.strategy.name} | {','.join(discounted_items)} )"
-                #    discounts_fee=total_discounts_fee
-                #)
+            if discounted_items:
+                self.order.update_total_discounts_fee(total_discount.format())
+                return f"{self.strategy.name} | {','.join(discounted_items)} | {total_discount.format().amount}"

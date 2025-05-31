@@ -14,7 +14,6 @@ from ddd.order_management.domain.services.offer_strategies import ports as offer
 
 def handle_place_order(
         command: commands.PlaceOrderCommand, 
-        order_service: order_ports.OrderServiceAbstract,
         tax_service:  tax_ports.TaxStrategyServiceAbstract,
         offer_service:  offer_ports.OfferStrategyServiceAbstract,
         uow: repositories.UnitOfWorkAbstract) -> Union[dtos.OrderResponseDTO, dtos.ResponseDTO]:
@@ -23,13 +22,14 @@ def handle_place_order(
 
             order = uow.order.get(order_id=command.order_id)
 
-            placed_order = order_service.place_order(order)
+            offers = offer_service.evaluate_applicable_offers(order)
+            order.apply_applicable_offers(offers)
 
-            offers = offer_service.get_final_offers(placed_order)
-            placed_order.apply_offers(offers)
+            tax_results = tax_service.calculate_all_taxes(order)
+            order.apply_tax_results(tax_results)
 
-            tax_results = tax_service.calculate_all_taxes(placed_order)
-            placed_order.apply_tax_results(tax_results)
+            placed_order = order.place_order()
+
 
             placed_order_dto =  mappers.OrderResponseMapper.to_dto(
                 order=placed_order,

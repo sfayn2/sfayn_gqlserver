@@ -36,8 +36,8 @@ class OfferStrategyService(ports.OfferStrategyServiceAbstract):
         self.vendor_repository = vendor_repository
         self.offer_strategies = offers
 
-    def get_final_offers(self, order: models.Order):
-        available_offers = self._fetch_valid_offers(order.vendor_name, order)
+    def evaluate_applicable_offers(self, order: models.Order):
+        available_offers = self._fetch_valid_offers(order)
         final_offers = []
         #offer_results = []
         for strategy in available_offers:
@@ -52,9 +52,9 @@ class OfferStrategyService(ports.OfferStrategyServiceAbstract):
 
         return final_offers
 
-    def _fetch_valid_offers(self, vendor_name: str, order: models.Order):
+    def _fetch_valid_offers(self, order: models.Order):
         #The assumption is all Offers are auto applied (except those w Coupons)
-        vendor_offers = self.vendor_repository.get_offers(vendor_name)
+        vendor_offers = self.vendor_repository.get_offers(order.vendor_name)
         valid_offers = []
 
         #sorted by "priority" in descending order
