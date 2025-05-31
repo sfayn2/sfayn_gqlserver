@@ -8,7 +8,7 @@ class FreeGiftOfferStrategy(ports.OfferStrategyAbstract):
         free_gifts = []
         currency = order.currency
         gift_products = self.strategy.conditions.get("gift_products")
-        if self.validate_minimum_quantity(order):
+        if self.validate_minimum_quantity():
             for free_product in gift_products:
                 free_gifts.append(free_product)
 

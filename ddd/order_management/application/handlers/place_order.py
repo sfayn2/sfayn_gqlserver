@@ -9,7 +9,6 @@ from ddd.order_management.application import (
 from ddd.order_management.domain import exceptions, repositories
 from ddd.order_management.domain.services.order import ports as order_ports
 from ddd.order_management.domain.services.tax_strategies import ports as tax_ports
-from ddd.order_management.domain.services. import ports as tax_ports
 from ddd.order_management.domain.services.offer_strategies import ports as offer_ports
 
 
