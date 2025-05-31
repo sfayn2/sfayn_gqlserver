@@ -265,7 +265,7 @@ class Order:
         for option in shipping_options:
             if option == shipping_option:
                 self.update_shipping_details(option)
-                return
+                return self
         raise exceptions.InvalidOrderOperation(f"Shipping option not supported: {shipping_option}")
 
     def _update_totals(self):

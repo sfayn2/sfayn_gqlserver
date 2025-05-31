@@ -24,8 +24,8 @@ def handle_select_shipping_option(
             )
 
             order_w_shipping_option = order.select_shipping_option(
-                                            command.shipping_details, 
-                                            available_shipping_options
+                                            shipping_option=mappers.ShippingDetailsMapper.to_domain(command.shipping_details),
+                                            shipping_options=available_shipping_options
                                         )
 
             order_w_shipping_option_dto = mappers.OrderResponseMapper.to_dto(

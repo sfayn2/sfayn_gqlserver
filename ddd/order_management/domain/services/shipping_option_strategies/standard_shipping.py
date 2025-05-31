@@ -7,7 +7,7 @@ class StandardShippingStrategy(ports.ShippingOptionStrategyAbstract):
         """
             Only allow packages under 30kg + Domestic shipping
         """
-        return order.total_weight <= self.strategy.conditions.get("min_package_weight") and not order.destination.is_international(order.vendor_country)
+        return order.total_weight <= self.strategy.conditions.get("max_weight") and not order.destination.is_international(order.vendor_country)
 
     def calculate_cost(self, order: models.Order) -> value_objects.Money:
         """

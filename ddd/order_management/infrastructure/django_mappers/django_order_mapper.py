@@ -46,7 +46,7 @@ class OrderMapper:
         shipping_details = None
         if django_order_object.shipping_method:
             shipping_details=value_objects.ShippingDetails(
-                method=django_order_object.shipping_method,
+                method=enums.ShippingMethod(django_order_object.shipping_method),
                 delivery_time=django_order_object.shipping_delivery_time,
                 cost=value_objects.Money(
                     amount=django_order_object.shipping_cost,

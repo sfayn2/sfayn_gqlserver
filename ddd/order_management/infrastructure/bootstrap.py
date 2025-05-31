@@ -36,8 +36,7 @@ def register_command_handlers():
         commands.SelectShippingOptionCommand: lambda command, uow: handlers.handle_select_shipping_option(
             command=command, 
             uow=uow,
-            shipping_option_service=services.ShippingOptionStrategyService,
-            order_service=services.OrderService()
+            shipping_option_service=services.ShippingOptionStrategyService
         ),
         commands.CheckoutItemsCommand: lambda command, uow: handlers.handle_checkout_items(
             command=command,
