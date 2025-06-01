@@ -1,3 +1,4 @@
+from __future__ import annotations
 from typing import Union, List
 from ddd.order_management.application import (
     mappers, 
@@ -7,14 +8,14 @@ from ddd.order_management.application import (
     shared,
     queries
 )
-from ddd.order_management.domain import repositories
-from ddd.order_management.domain.services.order import ports as order_ports
-from ddd.order_management.domain.services.shipping_option_strategies import ports as shipping_option_ports
+#from ddd.order_management.domain import repositories
+#from ddd.order_management.domain.services.order import ports as order_ports
+#from ddd.order_management.domain.services.shipping_option_strategies import ports as shipping_option_ports
 
 def handle_shipping_options(
         query: queries.ShippingOptionsQuery, 
-        uow: repositories.UnitOfWorkAbstract,
-        shipping_option_service: shipping_option_ports.ShippingOptionStrategyServiceAbstract) -> List[dtos.ShippingDetailsDTO]:
+        uow: UnitOfWorkAbstract,
+        shipping_option_service: ShippingOptionStrategyServiceAbstract) -> List[dtos.ShippingDetailsDTO]:
     with uow:
 
         order = uow.order.get(order_id=query.order_id)

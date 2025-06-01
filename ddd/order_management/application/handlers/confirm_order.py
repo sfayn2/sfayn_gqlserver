@@ -1,3 +1,4 @@
+from __future__ import annotations
 from typing import Union
 from ddd.order_management.application import (
     mappers, 
@@ -6,14 +7,13 @@ from ddd.order_management.application import (
     dtos, 
     shared
 )
-from ddd.order_management.domain import repositories, exceptions
-from ddd.order_management.domain.services.order import ports as order_ports
+from ddd.order_management.domain import exceptions
 
 def handle_confirm_order(
         command: commands.ConfirmOrderCommand, 
-        uow: repositories.UnitOfWorkAbstract, 
-        payment_gateway_factory: ports.PaymentGatewayFactoryAbstract,
-        order_service: order_ports.OrderServiceAbstract
+        uow: UnitOfWorkAbstract, 
+        payment_gateway_factory: PaymentGatewayFactoryAbstract,
+        order_service: OrderServiceAbstract
     ) -> Union[dtos.OrderResponseDTO, dtos.ResponseDTO]:
 
     try:

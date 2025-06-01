@@ -1,4 +1,5 @@
-from typing import Union
+from __future__ import annotations
+from typing import Union, TYPE_CHECKING
 from ddd.order_management.application import (
     mappers, 
     commands, 
@@ -6,17 +7,19 @@ from ddd.order_management.application import (
     dtos, 
     shared
 )
-from ddd.order_management.domain import exceptions, repositories
-from ddd.order_management.domain.services.order import ports as order_ports
-from ddd.order_management.domain.services.tax_strategies import ports as tax_ports
-from ddd.order_management.domain.services.offer_strategies import ports as offer_ports
+from ddd.order_management.domain import exceptions
+#if TYPE_CHECKING:
+#    from ddd.order_management.domain import repositories
+#    from ddd.order_management.domain.services.order import ports as order_ports
+#    from ddd.order_management.domain.services.tax_strategies import ports as tax_ports
+#    from ddd.order_management.domain.services.offer_strategies import ports as offer_ports
 
 
 def handle_place_order(
         command: commands.PlaceOrderCommand, 
-        tax_service:  tax_ports.TaxStrategyServiceAbstract,
-        offer_service:  offer_ports.OfferStrategyServiceAbstract,
-        uow: repositories.UnitOfWorkAbstract) -> Union[dtos.OrderResponseDTO, dtos.ResponseDTO]:
+        tax_service:  TaxStrategyServiceAbstract,
+        offer_service:  OfferStrategyServiceAbstract,
+        uow: UnitOfWorkAbstract) -> Union[dtos.OrderResponseDTO, dtos.ResponseDTO]:
     try:
         with uow:
 

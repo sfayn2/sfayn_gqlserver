@@ -1,3 +1,4 @@
+from __future__ import annotations
 from typing import Union
 from ddd.order_management.application import (
     mappers, 
@@ -6,13 +7,12 @@ from ddd.order_management.application import (
     dtos, 
     shared
 )
-from ddd.order_management.domain import exceptions, repositories
-from ddd.order_management.domain.services.shipping_option_strategies import ports as shipping_option_ports
+from ddd.order_management.domain import exceptions
 
 def handle_select_shipping_option(
         command: commands.SelectShippingOptionCommand, 
-        uow: repositories.UnitOfWorkAbstract,
-        shipping_option_service: shipping_option_ports.ShippingOptionStrategyServiceAbstract,
+        uow: UnitOfWorkAbstract,
+        shipping_option_service: ShippingOptionStrategyServiceAbstract,
         ) -> Union[dtos.OrderResponseDTO, dtos.ResponseDTO]:
     try:
         with uow:

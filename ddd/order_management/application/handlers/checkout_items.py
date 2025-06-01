@@ -1,3 +1,4 @@
+from __future__ import annotations
 from typing import Union, TYPE_CHECKING
 from ddd.order_management.application import (
     mappers, 
@@ -5,15 +6,15 @@ from ddd.order_management.application import (
     dtos, 
 )
 
-from ddd.order_management.domain import repositories
-from ddd.order_management.domain.services.order import ports as order_ports
-from ddd.order_management.domain.services.tax_strategies import ports as tax_ports
+#from ddd.order_management.domain import repositories
+#from ddd.order_management.domain.services.order import ports as order_ports
+#from ddd.order_management.domain.services.tax_strategies import ports as tax_ports
 
 def handle_checkout_items(
         command: commands.CheckoutItemsCommand, 
-        uow: repositories.UnitOfWorkAbstract,
-        tax_service:  tax_ports.TaxStrategyServiceAbstract,
-        order_service: order_ports.OrderServiceAbstract) -> dtos.OrderResponseDTO:
+        uow: UnitOfWorkAbstract,
+        tax_service:  TaxStrategyServiceAbstract,
+        order_service: OrderServiceAbstract) -> dtos.OrderResponseDTO:
     with uow:
 
         draft_order = order_service.create_draft_order(
