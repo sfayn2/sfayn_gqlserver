@@ -8,22 +8,20 @@ from ddd.order_management.application import (
     shared
 )
 from ddd.order_management.domain import exceptions
-#if TYPE_CHECKING:
-#    from ddd.order_management.domain import repositories
-#    from ddd.order_management.domain.services.order import ports as order_ports
-#    from ddd.order_management.domain.services.tax_strategies import ports as tax_ports
-#    from ddd.order_management.domain.services.offer_strategies import ports as offer_ports
 
 
 def handle_place_order(
         command: commands.PlaceOrderCommand, 
         tax_service:  TaxStrategyServiceAbstract,
         offer_service:  OfferStrategyServiceAbstract,
+        stock_validation_service: StockValidationServiceAbstract,
         uow: UnitOfWorkAbstract) -> Union[dtos.OrderResponseDTO, dtos.ResponseDTO]:
     try:
         with uow:
 
             order = uow.order.get(order_id=command.order_id)
+
+            stock_validation_service.ensure_items_in_stock(order.line_items)
 
             offers = offer_service.evaluate_applicable_offers(order)
             order.apply_applicable_offers(offers)

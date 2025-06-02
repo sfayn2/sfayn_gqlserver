@@ -24,7 +24,8 @@ def register_command_handlers():
             command=command,
             uow=uow,
             tax_service=services.TaxStrategyService(),
-            offer_service=services.OfferStrategyService(uow.vendor)
+            offer_service=services.OfferStrategyService(uow.vendor),
+            stock_validation_service=adapters.DjangoStockValidationServiceAdapter()
         ),
         commands.ConfirmOrderCommand: lambda command, uow: handlers.handle_confirm_order(
             command=command, 
