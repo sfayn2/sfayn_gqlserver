@@ -16,6 +16,9 @@ class CheckoutItemsCommand(Command):
 
 class PlaceOrderCommand(Command):
     order_id: str
+    
+class MarkAsShippedOrderCommand(Command):
+    order_id: str
 
 class ConfirmOrderCommand(Command):
     order_id: str

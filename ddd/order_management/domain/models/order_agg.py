@@ -206,6 +206,7 @@ class Order:
             raise exceptions.InvalidOrderOperation("Only confirm order can mark as shipped.")
         self.order_status = enums.OrderStatus.SHIPPED
         self.update_modified_date()
+        return self
 
     def cancel_order(self, cancellation_reason: str):
         if not self.order_status in (enums.OrderStatus.PENDING, enums.OrderStatus.CONFIRMED):
