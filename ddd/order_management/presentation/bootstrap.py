@@ -20,6 +20,17 @@ def register_event_handlers():
 
 def register_command_handlers():
     message_bus.COMMAND_HANDLERS.update({
+        commands.CheckoutItemsCommand: lambda command, uow: handlers.handle_checkout_items(
+            command=command,
+            uow=uow,
+            order_service=services.OrderService(),
+            tax_service=services.TaxStrategyService()
+        ),
+        commands.SelectShippingOptionCommand: lambda command, uow: handlers.handle_select_shipping_option(
+            command=command, 
+            uow=uow,
+            shipping_option_service=services.ShippingOptionStrategyService
+        ),
         commands.PlaceOrderCommand: lambda command, uow: handlers.handle_place_order(
             command=command,
             uow=uow,
@@ -34,16 +45,13 @@ def register_command_handlers():
             order_service=services.OrderService(),
             stock_validation_service=adapters.DjangoStockValidationServiceAdapter()
         ),
-        commands.SelectShippingOptionCommand: lambda command, uow: handlers.handle_select_shipping_option(
-            command=command, 
-            uow=uow,
-            shipping_option_service=services.ShippingOptionStrategyService
-        ),
-        commands.CheckoutItemsCommand: lambda command, uow: handlers.handle_checkout_items(
+        commands.MarkAsShippedOrderCommand: lambda command, uow: handlers.handle_mark_as_shipped(
             command=command,
-            uow=uow,
-            order_service=services.OrderService(),
-            tax_service=services.TaxStrategyService()
+            uow=uow
+        ),
+        commands.AddShippingTrackingReferenceCommand: lambda command, uow: handlers.handle_add_shipping_tracking_reference(
+            command=command,
+            uow=uow
         ),
     })
 

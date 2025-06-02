@@ -20,6 +20,10 @@ class PlaceOrderCommand(Command):
 class MarkAsShippedOrderCommand(Command):
     order_id: str
 
+class AddShippingTrackingReferenceCommand(Command):
+    order_id: str
+    shipping_reference: str
+
 class ConfirmOrderCommand(Command):
     order_id: str
     transaction_id: str

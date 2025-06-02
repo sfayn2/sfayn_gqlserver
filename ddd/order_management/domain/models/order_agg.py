@@ -230,6 +230,8 @@ class Order:
             raise exceptions.InvalidOrderOperation("Only shipped order can add tracking reference.")
         self.shipping_reference = shipping_reference
 
+        return self
+
     def update_offer_details(self, offer_details: List[str]):
         if self.order_status != enums.OrderStatus.DRAFT:
             raise exceptions.InvalidTaxOperation("Only draft order can update offer details.")

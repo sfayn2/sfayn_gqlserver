@@ -21,7 +21,7 @@ def handle_mark_as_shipped(
             shipped_order = order.mark_as_shipped()
 
             shipped_order_dto =  mappers.OrderResponseMapper.to_dto(
-                order=placed_order,
+                order=shipped_order,
                 success=True,
                 message="Order successfully mark as shipped."
             )
