@@ -1,3 +1,4 @@
-from .email_abstract import EmailServiceAbstract
-from .logging_abstract import LoggingServiceAbstract
+from .email_abstract import EmailAbstract
+from .logging_abstract import LoggingAbstract
 from .payment_abstract import PaymentGatewayAbstract, PaymentGatewayFactoryAbstract
+from .stock_validation_service_abstract import StockValidationServiceAbstract

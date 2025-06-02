@@ -12,8 +12,8 @@ from ddd.order_management.application import commands, message_bus, queries
 def register_event_handlers():
     event_bus.EVENT_HANDLERS.update({
         events.OrderCancelled: [
-            lambda event, uow: event_handlers.handle_logged_order(event=event, uow=uow, logging_service=adapters.LoggingService()),
-            lambda event, uow: event_handlers.handle_email_canceled_order(event=event, uow=uow, email_service=adapters.EmailService())
+            lambda event, uow: event_handlers.handle_logged_order(event=event, uow=uow, logging=adapters.LoggingAdapter()),
+            lambda event, uow: event_handlers.handle_email_canceled_order(event=event, uow=uow, email=adapters.EmailAdapter())
             ]
     })
 
@@ -29,9 +29,9 @@ def register_command_handlers():
         commands.ConfirmOrderCommand: lambda command, uow: handlers.handle_confirm_order(
             command=command, 
             uow=uow,
-            payment_gateway_factory=adapters.PaymentGatewayFactory(),
+            payment_gateway_factory=adapters.PaymentGatewayFactoryAdapter(),
             order_service=services.OrderService(),
-            tax_service=services.TaxStrategyService()
+            stock_validation_service=adapters.DjangoStockValidationServiceAdapter()
         ),
         commands.SelectShippingOptionCommand: lambda command, uow: handlers.handle_select_shipping_option(
             command=command, 

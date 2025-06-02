@@ -13,7 +13,8 @@ def handle_confirm_order(
         command: commands.ConfirmOrderCommand, 
         uow: UnitOfWorkAbstract, 
         payment_gateway_factory: PaymentGatewayFactoryAbstract,
-        order_service: OrderServiceAbstract
+        order_service: OrderServiceAbstract,
+        stock_validation_service: StockValidationServiceAbstract
     ) -> Union[dtos.OrderResponseDTO, dtos.ResponseDTO]:
 
     try:
@@ -21,6 +22,8 @@ def handle_confirm_order(
         with uow:
 
             order = uow.order.get(order_id=command.order_id)
+
+            stock_validation_service.ensure_items_in_stock(order.line_items)
 
             payment_gateway = payment_gateway_factory.get_payment_gateway(command.payment_method)
             payment_details = payment_gateway.get_payment_details(command.transaction_id)

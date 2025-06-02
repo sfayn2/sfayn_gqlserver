@@ -85,7 +85,7 @@ class StripePaymentGatewayAdapter(ports.PaymentGatewayAbstract):
         )
 
     
-class PaymentGatewayFactory(ports.PaymentGatewayFactoryAbstract):
+class PaymentGatewayFactoryAdapter(ports.PaymentGatewayFactoryAbstract):
 
     def get_payment_gateway(self, payment_method: enums.PaymentMethod) -> ports.PaymentGatewayAbstract:
         gateways = {

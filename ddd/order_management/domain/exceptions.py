@@ -1,6 +1,7 @@
 class InvalidOrderOperation(Exception):
     pass
 
+
 class InvalidStatusTransitionError(Exception):
     pass
 
@@ -18,4 +19,7 @@ class InvalidShippingOption(InvalidOrderOperation):
     pass
 
 class InvalidVendorDetails(InvalidOrderOperation):
+    pass
+
+class OutOfStockException(InvalidOrderOperation):
     pass

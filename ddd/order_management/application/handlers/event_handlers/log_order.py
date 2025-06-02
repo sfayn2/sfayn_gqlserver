@@ -1,11 +1,12 @@
+from __future__ import annotations
 from ddd.order_management.application import (
     ports, 
 )
-from ddd.order_management.domain import events, repositories
+from ddd.order_management.domain import events
 
 def handle_logged_order(
         event: events.OrderCancelled, 
         uow: repositories.UnitOfWorkAbstract, 
-        logging_service: ports.LoggingServiceAbstract):
+        logging: LoggingAbstract):
 
-    logging_service.log(f"Order has been canceled {event.order_id}")
+    logging.log(f"Order has been canceled {event.order_id}")
