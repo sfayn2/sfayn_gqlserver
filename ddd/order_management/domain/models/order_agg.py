@@ -7,9 +7,6 @@ from typing import Optional, List, Tuple, TYPE_CHECKING
 from ddd.order_management.domain.models.line_item import LineItem
 from ddd.order_management.domain import enums, exceptions, events, value_objects
 
-if TYPE_CHECKING:
-    from ddd.order_management.domain.services.tax_strategies import ports as tax_ports
-    from ddd.order_management.domain.services.offer_strategies import ports as offer_ports
 
 @dataclass
 class Order:
@@ -149,7 +146,7 @@ class Order:
 
         self.raise_event(event)
 
-    def apply_applicable_offers(self, offers: List[offer_ports.OfferStrategyAbstract]):
+    def apply_applicable_offers(self, offers: List[OfferStrategyAbstract]):
         if self.order_status != enums.OrderStatus.DRAFT:
             raise exceptions.InvalidTaxOperation("Only draft order can apply offers (Free shipping, Free gifts, etc)")
         if self.offer_details:
