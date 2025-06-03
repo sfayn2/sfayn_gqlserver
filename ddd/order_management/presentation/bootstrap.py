@@ -53,6 +53,11 @@ def register_command_handlers():
             command=command,
             uow=uow
         ),
+        commands.AddCouponCommand: lambda command, uow: handlers.handle_add_coupon(
+            command=command,
+            uow=uow,
+            coupon_validation=adapters.DjangoCouponValidationAdapter()
+        ),
     })
 
 def register_query_handlers():

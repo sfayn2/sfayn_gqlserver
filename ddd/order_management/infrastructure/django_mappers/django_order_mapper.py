@@ -54,6 +54,11 @@ class OrderMapper:
                 )
             )
 
+        for item in django_order_object.line_items.all():
+            if item.vendor:
+                vendor_details = item.vendor
+                break
+
         payment_details = None
         if django_order_object.payment_method:
             payment_details=value_objects.PaymentDetails(
@@ -106,7 +111,7 @@ class OrderMapper:
                 currency=django_order_object.currency
             ),
             shipping_reference=django_order_object.shipping_tracking_reference,
-            coupons=[CouponMapper.to_domain(item) for item in ast.literal_eval(django_order_object.coupons) if CouponMapper.to_domain(item)],
+            coupons=[CouponMapper.to_domain(item, vendor_details.name) for item in ast.literal_eval(django_order_object.coupons) if CouponMapper.to_domain(item)],
             order_status=enums.OrderStatus(django_order_object.order_status)
         )
 

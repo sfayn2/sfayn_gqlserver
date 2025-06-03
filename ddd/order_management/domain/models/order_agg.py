@@ -237,7 +237,7 @@ class Order:
             raise exceptions.InvalidTaxOperation("Only draft order can update offer details.")
         self.offer_details = offer_details
 
-    def apply_coupon(self, coupon: value_objects.Coupon):
+    def apply_valid_coupon(self, coupon: value_objects.Coupon):
         if not coupon:
             raise exceptions.InvalidOrderOperation("Coupon cannot be none.")
         if self.order_status != enums.OrderStatus.DRAFT:

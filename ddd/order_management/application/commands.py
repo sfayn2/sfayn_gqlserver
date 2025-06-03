@@ -24,6 +24,10 @@ class AddShippingTrackingReferenceCommand(Command):
     order_id: str
     shipping_reference: str
 
+class AddCouponCommand(Command):
+    order_id: str
+    coupon_code: str
+
 class ConfirmOrderCommand(Command):
     order_id: str
     transaction_id: str

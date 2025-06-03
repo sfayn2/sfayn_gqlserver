@@ -13,14 +13,14 @@ from ddd.order_management.presentation.graphql import object_types
 class AddShippingTrackingReferenceMutation(relay.ClientIDMutation):
     class Input:
         order_id = graphene.String()
-        shipping_reference = graphene.String()
+        coupon_code = graphene.String()
 
     order = graphene.Field(object_types.OrderResponseType)
 
     @classmethod
     def mutate_and_get_payload(cls, root, info, **input):
-        command = commands.AddShippingTrackingReferenceCommand.model_validate(input)
-        order_w_shipping_reference = message_bus.handle(command, adapters.unit_of_work.DjangoOrderUnitOfWork())
+        command = commands.AddCouponCommand.model_validate(input)
+        order_w_coupon = message_bus.handle(command, adapters.unit_of_work.DjangoOrderUnitOfWork())
 
-        return cls(order=object_types.OrderResponseType(**order_w_shipping_reference.model_dump()))
+        return cls(order=object_types.OrderResponseType(**order_w_coupon.model_dump()))
 
