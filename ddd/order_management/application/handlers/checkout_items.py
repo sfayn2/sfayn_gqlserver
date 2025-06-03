@@ -6,10 +6,6 @@ from ddd.order_management.application import (
     dtos, 
 )
 
-#from ddd.order_management.domain import repositories
-#from ddd.order_management.domain.services.order import ports as order_ports
-#from ddd.order_management.domain.services.tax_strategies import ports as tax_ports
-
 def handle_checkout_items(
         command: commands.CheckoutItemsCommand, 
         uow: UnitOfWorkAbstract,

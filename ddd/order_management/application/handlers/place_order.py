@@ -29,16 +29,15 @@ def handle_place_order(
             tax_results = tax_service.calculate_all_taxes(order)
             order.apply_tax_results(tax_results)
 
-            placed_order = order.place_order()
-
+            order.place_order()
 
             placed_order_dto =  mappers.OrderResponseMapper.to_dto(
-                order=placed_order,
+                order=order,
                 success=True,
                 message="Order successfully placed order."
             )
 
-            uow.order.save(placed_order)
+            uow.order.save(order)
             uow.commit()
 
 

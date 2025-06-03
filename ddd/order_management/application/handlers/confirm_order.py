@@ -34,7 +34,7 @@ def handle_confirm_order(
             )
 
             confirmed_order_dto = mappers.OrderResponseMapper.to_dto(
-                confirmed_order,
+                order=confirmed_order,
                 success=True,
                 message="Order successfully confirmed."
             )

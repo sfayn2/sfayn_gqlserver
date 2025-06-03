@@ -17,16 +17,15 @@ def handle_mark_as_shipped(
         with uow:
 
             order = uow.order.get(order_id=command.order_id)
-
-            shipped_order = order.mark_as_shipped()
+            order.mark_as_shipped()
 
             shipped_order_dto =  mappers.OrderResponseMapper.to_dto(
-                order=shipped_order,
+                order=order,
                 success=True,
                 message="Order successfully mark as shipped."
             )
 
-            uow.order.save(shipped_order)
+            uow.order.save(order)
             uow.commit()
 
 

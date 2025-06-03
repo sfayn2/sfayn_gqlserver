@@ -128,8 +128,6 @@ class Order:
 
         self.raise_event(event)
 
-        return self
-
     def confirm_order(self, payment_verified: bool):
         if self.order_status != enums.OrderStatus.PENDING:
             raise exceptions.InvalidOrderOperation("Only pending orders can be confirmed.")
@@ -206,7 +204,6 @@ class Order:
             raise exceptions.InvalidOrderOperation("Only confirm order can mark as shipped.")
         self.order_status = enums.OrderStatus.SHIPPED
         self.update_modified_date()
-        return self
 
     def cancel_order(self, cancellation_reason: str):
         if not self.order_status in (enums.OrderStatus.PENDING, enums.OrderStatus.CONFIRMED):
@@ -228,9 +225,10 @@ class Order:
     def add_shipping_tracking_reference(self, shipping_reference: str):
         if self.order_status != enums.OrderStatus.SHIPPED:
             raise exceptions.InvalidOrderOperation("Only shipped order can add tracking reference.")
-        self.shipping_reference = shipping_reference
+        if not self.shipping_reference.startswith("http"):
+            raise exceptions.InvalidOrderOperation("The Shipping tracking reference url is invalid.")
 
-        return self
+        self.shipping_reference = shipping_reference
 
     def update_offer_details(self, offer_details: List[str]):
         if self.order_status != enums.OrderStatus.DRAFT:
