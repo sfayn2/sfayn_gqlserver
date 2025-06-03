@@ -3,10 +3,13 @@ from typing import List
 from ddd.order_management.application import ports
 from ddd.order_management.infrastructure import django_mappers
 from ddd.order_management.domain import exceptions
+from vendor_management import models as django_vendor_models
 
 class DjangoCouponValidationAdapter(ports.CouponValidationAbstract):
 
-    def ensure_coupon_still_valid(self, coupon_code: str, vendor_name: str) -> None:
-        return django_mappers.CouponMapper.to_domain(coupon_code=coupon_code, vendor_name=vendora_name)
+    def ensure_coupon_is_valid(self, coupon_code: str, vendor_id: str) -> None:
+        django_coupon = django_vendor_models.Coupon.objects.filter(coupon_code=item, offer__vendor__vendor_id=vendor_id)
+        if django_coupon.exists():
+            return django_mappers.CouponMapper.to_domain(django_coupon)
 
 

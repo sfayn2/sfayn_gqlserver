@@ -18,9 +18,9 @@ def handle_add_coupon(
         with uow:
 
             order = uow.order.get(order_id=command.order_id)
-            valid_coupon  = coupon_validation.ensure_coupon_still_valid(
+            valid_coupon  = coupon_validation.ensure_coupon_is_valid(
                     coupon_code=command.coupon_code, 
-                    vendor_name=order.vendor_name
+                    vendor_id=order.vendor_id
                 )
             order.apply_valid_coupon(coupon=valid_coupon)
 

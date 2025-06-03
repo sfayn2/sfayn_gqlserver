@@ -1,7 +1,7 @@
 import ast
 from ddd.order_management.domain import value_objects, models, enums
-from ddd.order_management.infrastructure.django_mappers.django_line_item_mapper import LineItemMapper
-from ddd.order_management.infrastructure.django_mappers.django_coupon_mapper import CouponMapper
+from ddd.order_management.infrastructure import django_mappers
+from vendor_management import models as django_vendor_models
 
 class OrderMapper:
 
@@ -59,6 +59,12 @@ class OrderMapper:
                 vendor_details = item.vendor
                 break
 
+        django_coupons = []
+        for item in ast.literal_eval(django_order_object.coupons):
+            django_coupon = django_vendor_models.Coupon.objects.filter(coupon_code=item, offer__vendor__id=vendor_details.id)
+            if django_coupon.exists():
+                django_coupons.append(django_mappers.CouponMapper.to_domain(django_coupon))
+
         payment_details = None
         if django_order_object.payment_method:
             payment_details=value_objects.PaymentDetails(
@@ -82,7 +88,7 @@ class OrderMapper:
                 state=django_order_object.delivery_state
             ),
             line_items=[
-                LineItemMapper.to_domain(item) for item in django_order_object.line_items.all()
+                django_mappers.LineItemMapper.to_domain(item) for item in django_order_object.line_items.all()
             ],
             customer_details=value_objects.CustomerDetails(
                 first_name=django_order_object.customer_first_name,
@@ -111,7 +117,7 @@ class OrderMapper:
                 currency=django_order_object.currency
             ),
             shipping_reference=django_order_object.shipping_tracking_reference,
-            coupons=[CouponMapper.to_domain(item, vendor_details.name) for item in ast.literal_eval(django_order_object.coupons) if CouponMapper.to_domain(item)],
+            coupons=django_coupons,
             order_status=enums.OrderStatus(django_order_object.order_status)
         )
 

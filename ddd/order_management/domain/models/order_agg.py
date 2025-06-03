@@ -34,13 +34,13 @@ class Order:
         if self.currency != line_item.product_price.currency:
             raise exceptions.InvalidOrderOperation("Currency mismatch between order and line item.")
 
-        if self.vendor_name and self.vendor_name != line_item.vendor.name:
+        if self.vendor_id and self.vendor_id != line_item.vendor.id:
             raise exceptions.InvalidOrderOperation("Vendor mismatch between order and line item.")
 
     def generate_order_id(self):
         if self.order_status != enums.OrderStatus.DRAFT:
             raise exceptions.InvalidOrderOperation("Only draft order can generate order id.")
-        self.order_id = f"ORD-{uuid.uuid4().hex[:8].upper()}"
+        self.order_id = f"ORD-{uuid.uuid4().hex[:12].upper()}"
 
     def update_modified_date(self):
         self.date_modified = datetime.now()
@@ -112,7 +112,7 @@ class Order:
         if any(item.product_price.currency != self.line_items[0].product_price.currency for item in self.line_items):
             raise exceptions.InvalidOrderOperation("All line items must have the same currency.")
 
-        if len(set(item.vendor.name for item in self.line_items)) > 1:
+        if len(set(item.vendor.id for item in self.line_items)) > 1:
             raise exceptions.InvalidOrderOperation("All line items must belong to the same vendor.")
 
         if not self.shipping_details:
@@ -320,6 +320,11 @@ class Order:
     def currency(self) -> str:
         #assuming invariants
         return self.line_items[0].product_price.currency
+
+    @property
+    def vendor_id(self) -> uuid.UUID:
+        #assuming invariant
+        return self.line_items[0].vendor.id
 
     @property
     def vendor_name(self) -> str:

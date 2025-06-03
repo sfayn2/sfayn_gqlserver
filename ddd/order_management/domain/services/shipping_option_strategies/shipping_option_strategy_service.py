@@ -1,3 +1,4 @@
+import uuid
 from typing import List, Dict
 
 from ddd.order_management.domain import (
@@ -38,7 +39,7 @@ class ShippingOptionStrategyService(ports.ShippingOptionStrategyServiceAbstract)
 
     def get_shipping_options(self, order: models.Order) -> List[value_objects.ShippingDetails]:
         options = []
-        for option in self._fetch_valid_options(vendor_name=order.vendor_name):
+        for option in self._fetch_valid_options(vendor_id=order.vendor_id):
             if option.is_eligible(order):
                 cost = option.calculate_cost(order)
                 options.append(value_objects.ShippingDetails(
@@ -52,8 +53,8 @@ class ShippingOptionStrategyService(ports.ShippingOptionStrategyServiceAbstract)
 
         return options
 
-    def _fetch_valid_options(self, vendor_name: str):
-        vendor_shipping_options = self.vendor_repository.get_shipping_options(vendor_name=vendor_name)
+    def _fetch_valid_options(self, vendor_id: uuid.UUID):
+        vendor_shipping_options = self.vendor_repository.get_shipping_options(vendor_id=vendor_id)
         valid_shipping_options = []
 
         for option in vendor_shipping_options:

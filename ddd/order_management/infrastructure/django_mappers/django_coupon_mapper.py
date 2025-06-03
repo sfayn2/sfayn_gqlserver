@@ -5,13 +5,10 @@ from vendor_management import models as django_vendor_models
 class CouponMapper:
 
     @staticmethod
-    def to_domain(coupon_code: str, vendor_name: str) -> value_objects.Coupon:
-        #only care on coupon code & load the rest of attrs value from db
-        django_coupon = django_vendor_models.Coupon.objects.filter(coupon_code=coupon_code, offer__vendor__name=vendor_name)
-        if django_coupon.exists():
-            return value_objects.Coupon(
-                coupon_code=django_coupon.values_list("coupon_code", flat=True)[0],
-                start_date=django_coupon.values_list("start_date", flat=True)[0],
-                end_date=django_coupon.values_list("end_date", flat=True)[0],
-                is_active=django_coupon.values_list("is_active", flat=True)[0],
-            )
+    def to_domain(django_coupon) -> value_objects.Coupon:
+        return value_objects.Coupon(
+            coupon_code=django_coupon.values_list("coupon_code", flat=True)[0],
+            start_date=django_coupon.values_list("start_date", flat=True)[0],
+            end_date=django_coupon.values_list("end_date", flat=True)[0],
+            is_active=django_coupon.values_list("is_active", flat=True)[0],
+        )

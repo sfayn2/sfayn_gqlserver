@@ -1,3 +1,4 @@
+import uuid
 from dataclasses import dataclass
 from ddd.order_management.domain import value_objects
 from decimal import Decimal

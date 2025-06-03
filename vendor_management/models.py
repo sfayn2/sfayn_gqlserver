@@ -1,10 +1,12 @@
+import uuid
 from django.db import models
 from django.conf import settings
 from decimal import Decimal
 
 # Create your models here.
 class Vendor(models.Model):
-    name = models.CharField(max_length=200, primary_key=True)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False) #uuid for global unique id
+    name = models.CharField(max_length=200)
     country = models.CharField(max_length=50, help_text="Can use to determine if the order is domestic compared w destination")
     is_active = models.BooleanField(default=True, help_text="To quickly control whether the is valid")
     date_created = models.DateTimeField(auto_now_add=True)
