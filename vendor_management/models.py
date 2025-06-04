@@ -5,7 +5,7 @@ from decimal import Decimal
 
 # Create your models here.
 class Vendor(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False) #uuid for global unique id
+    id = models.UUIDField(primary_key=True, editable=True) #uuid for global unique id
     name = models.CharField(max_length=200)
     country = models.CharField(max_length=50, help_text="Can use to determine if the order is domestic compared w destination")
     is_active = models.BooleanField(default=True, help_text="To quickly control whether the is valid")

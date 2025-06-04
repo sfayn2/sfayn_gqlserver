@@ -63,7 +63,7 @@ class Product(models.Model):
     category = models.ManyToManyField("product_catalog.Category", blank=True, related_name="cat2product") 
     tag = models.ManyToManyField("product_catalog.Tag", related_name="tag2product", blank=True) 
     status = models.CharField(max_length=25, blank=True, null=True, choices=enums.ProductStatus.choices, default=enums.ProductStatus.DRAFT) 
-    vendor = models.ForeignKey(Group, on_delete=models.CASCADE, related_name="vendor2product", help_text="Vendor name associated w this product")
+    vendor_id = models.UUIDField(editable=True) #uuid for global unique id
     brand = models.CharField(max_length=100, null=True, blank=True)
     package_weight = models.CharField(max_length=100, null=True, blank=True, help_text="value can be estimated package weight or based on historic data?")
     package_length = models.CharField(max_length=100, null=True, blank=True, help_text="value can be estimated package weight or based on historic data?")
@@ -74,11 +74,11 @@ class Product(models.Model):
     date_modified = models.DateTimeField(auto_now=True) 
 
     class Meta:
-        unique_together = ("name", "vendor") #prevent duplicate product per vendor
+        unique_together = ("name", "vendor_id") #prevent duplicate product per vendor
 
 
     def __str__(self):
-        return f"{self.name} (Vendor name: {self.vendor.name})"
+        return f"{self.name} | {vendor_id}"
 
     def to_domain(self):
         variants = [

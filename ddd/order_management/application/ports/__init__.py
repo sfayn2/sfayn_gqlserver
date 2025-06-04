@@ -2,3 +2,4 @@ from .email_abstract import EmailAbstract
 from .logging_abstract import LoggingAbstract
 from .payment_abstract import PaymentGatewayAbstract, PaymentGatewayFactoryAbstract
 from .stock_validation_service_abstract import StockValidationServiceAbstract
+from .products_vendor_validation_service_abstract import ProductsVendorValidationServiceAbstract

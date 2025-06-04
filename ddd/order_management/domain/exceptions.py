@@ -23,3 +23,6 @@ class InvalidVendorDetails(InvalidOrderOperation):
 
 class OutOfStockException(InvalidOrderOperation):
     pass
+
+class VendorNotFoundException(InvalidOrderOperation):
+    pass

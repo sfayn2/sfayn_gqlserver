@@ -1,4 +1,5 @@
 from __future__ import annotations
+import uuid
 from abc import ABC, abstractmethod
 
 # ========
@@ -7,5 +8,5 @@ from abc import ABC, abstractmethod
 class CouponValidationAbstract(ABC):
 
     @abstractmethod
-    def ensure_coupon_still_valid(self, coupon_code: str) -> None:
+    def ensure_coupon_is_valid(self, coupon_code: str, vendor_id: uuid.UUID) -> Union[None, value_objects.Coupon]:
         raise NotImplementedError("Subclasses must implement this method")

@@ -24,7 +24,8 @@ def register_command_handlers():
             command=command,
             uow=uow,
             order_service=services.OrderService(),
-            tax_service=services.TaxStrategyService()
+            tax_service=services.TaxStrategyService(),
+            product_vendor_validation_service=adapters.ProductVendorValidationServiceAdapter()
         ),
         commands.SelectShippingOptionCommand: lambda command, uow: handlers.handle_select_shipping_option(
             command=command, 
