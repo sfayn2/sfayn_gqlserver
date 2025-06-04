@@ -33,8 +33,8 @@ class AddressDTO(BaseModel):
 
 class VendorDetailsDTO(BaseModel):
     vendor_id: uuid.UUID
-    name: str
-    country: str
+    name: Optional[str] = None
+    country: Optional[str] = None
 
 class PackageDTO(BaseModel):
     weight: Decimal
