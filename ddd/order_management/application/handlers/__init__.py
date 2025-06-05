@@ -3,3 +3,13 @@ from .confirm_order import handle_confirm_order
 from .get_shipping_options import handle_shipping_options
 from .place_order import handle_place_order
 from .select_shipping_option import handle_select_shipping_option
+from .add_coupon import handle_add_coupon
+from .add_shipping_tracking_reference import handle_add_shipping_tracking_reference
+from .apply_applicable_offers import handle_apply_applicable_offers
+from .apply_tax_results import handle_apply_tax_results
+from .email_canceled_order import handle_email_canceled_order
+from .get_order import handle_get_order
+from .log_order import handle_logged_order
+from .mark_as_shipped import handle_mark_as_shipped
+
+
