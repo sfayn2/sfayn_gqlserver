@@ -13,10 +13,10 @@ class SelectShippingOptionMutation(relay.ClientIDMutation):
 
 
     #TODO: should return Shipping details response
-    order = graphene.Field(object_types.OrderResponseType)
+    result = graphene.Field(object_types.ResponseType)
 
     @classmethod
     def mutate_and_get_payload(cls, root, info, **input):
         command = commands.SelectShippingOptionCommand.model_validate(input)
-        shipping_option = message_bus.handle(command, adapters.unit_of_work.DjangoOrderUnitOfWork())
-        return cls(order=object_types.OrderResponseType(**shipping_option.model_dump()))
+        result = message_bus.handle(command, adapters.unit_of_work.DjangoOrderUnitOfWork())
+        return cls(order=object_types.ResponseType(**result.model_dump()))

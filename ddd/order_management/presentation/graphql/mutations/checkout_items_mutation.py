@@ -12,10 +12,10 @@ class CheckoutItemsMutation(relay.ClientIDMutation):
         shipping_address = graphene.Field(input_types.AddressInput, required=True)
         line_items = graphene.List(input_types.LineItemInput, required=True)
 
-    order = graphene.Field(object_types.OrderResponseType)
+    result = graphene.Field(object_types.ResponseType)
 
     @classmethod
     def mutate_and_get_payload(cls, root, info, **input):
         command = commands.CheckoutItemsCommand.model_validate(input)
-        draft_order = message_bus.handle(command, adapters.unit_of_work.DjangoOrderUnitOfWork())
-        return cls(order=object_types.OrderResponseType(**draft_order.model_dump()))
+        result = message_bus.handle(command, adapters.unit_of_work.DjangoOrderUnitOfWork())
+        return cls(result=object_types.OrderResponseType(**result.model_dump()))

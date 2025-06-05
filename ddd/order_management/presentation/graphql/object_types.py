@@ -29,3 +29,7 @@ class OrderResponseType(graphene.ObjectType):
     tax_amount  = graphene.Field(MoneyType)
     total_discounts_fee = graphene.Field(MoneyType)
     final_amount = graphene.Field(MoneyType)
+
+class ResponseType(graphene.ObjectType):
+    success = graphene.Boolean()
+    message = graphene.String()

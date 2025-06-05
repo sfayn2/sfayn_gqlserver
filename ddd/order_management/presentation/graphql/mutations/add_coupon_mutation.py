@@ -15,12 +15,12 @@ class AddShippingTrackingReferenceMutation(relay.ClientIDMutation):
         order_id = graphene.String()
         coupon_code = graphene.String()
 
-    order = graphene.Field(object_types.OrderResponseType)
+    result = graphene.Field(object_types.ResponseType)
 
     @classmethod
     def mutate_and_get_payload(cls, root, info, **input):
         command = commands.AddCouponCommand.model_validate(input)
-        order_w_coupon = message_bus.handle(command, adapters.unit_of_work.DjangoOrderUnitOfWork())
+        result = message_bus.handle(command, adapters.unit_of_work.DjangoOrderUnitOfWork())
 
-        return cls(order=object_types.OrderResponseType(**order_w_coupon.model_dump()))
+        return cls(result=object_types.ResponseType(**result.model_dump()))
 
