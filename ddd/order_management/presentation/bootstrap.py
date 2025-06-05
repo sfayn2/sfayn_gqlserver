@@ -11,7 +11,7 @@ from ddd.order_management.application import commands, message_bus, queries
 
 def register_event_handlers():
     event_bus.EVENT_HANDLERS.update({
-        events.OrderCancelled: [
+        events.OrderCancelledEvent: [
                 lambda event, uow: handlers.handle_logged_order(
                     event=event, 
                     uow=uow, 
@@ -23,14 +23,14 @@ def register_event_handlers():
                     email=adapters.EmailAdapter()
                 )
             ],
-        events.OrderPlaced: [
+        events.OrderPlacedEvent: [
                 lambda event, uow: handlers.handle_apply_applicable_offers(
                     event=event, 
                     uow=uow, 
                     offer_service=services.OfferStrategyService(uow.vendor)
                 )
             ],
-        events.OfferApplied: [
+        events.OfferAppliedEvent: [
                 lambda event, uow: handlers.handle_apply_tax_results(
                     event=event, 
                     uow=uow, 

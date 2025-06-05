@@ -12,33 +12,33 @@ class DomainEvent(ABC):
     pass
 
 @dataclass
-class OrderPlaced(DomainEvent):
+class OrderPlacedEvent(DomainEvent):
     order_id: str
     order_status: enums.OrderStatus
 
 @dataclass
-class OrderConfirmed(DomainEvent):
+class OrderConfirmedEvent(DomainEvent):
     order_id: str
     order_status: enums.OrderStatus
 
 @dataclass
-class OrderShipped(DomainEvent):
+class OrderShippedEvent(DomainEvent):
     order_id: str
 
 @dataclass
-class OrderCancelled(DomainEvent):
+class OrderCancelledEvent(DomainEvent):
     order_id: str
 
 @dataclass
-class OrderCompleted(DomainEvent):
+class OrderCompletedEvent(DomainEvent):
     order_id: str
 
 @dataclass
-class PaymentApplied(DomainEvent):
+class PaymentAppliedEvent(DomainEvent):
     order_id: str
     amount: value_objects.Money
 
 @dataclass
-class OffersApplied(DomainEvent):
+class OffersAppliedEvent(DomainEvent):
     order_id: str
     order_status: enums.OrderStatus

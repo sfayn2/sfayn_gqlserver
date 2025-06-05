@@ -121,7 +121,7 @@ class Order:
         self.order_status = enums.OrderStatus.PENDING
         self.update_modified_date()
 
-        event = events.OrderPlaced(
+        event = events.OrderPlacedEvent(
             order_id=self.order_id,
             order_status=self.order_status,
         )
@@ -137,7 +137,7 @@ class Order:
         self.order_status = enums.OrderStatus.CONFIRMED
         self.update_modified_date()
 
-        event = events.OrderConfirmed(
+        event = events.OrderConfirmedEvent(
             order_id=self.order_id,
             order_status=self.order_status,
         )
@@ -161,7 +161,7 @@ class Order:
         if offer_details:
             self.update_offer_details(offer_details)
 
-        event = events.OffersApplied(
+        event = events.OffersAppliedEvent(
             order_id=self.order_id,
             order_status=self.order_status,
         )

@@ -10,3 +10,6 @@ class Query(BaseModel, frozen=True):
 
 class ShippingOptionsQuery(Query):
     order_id: str
+
+class OrderQuery(Query):
+    order_id: str
