@@ -1,24 +1,34 @@
 class InvalidOrderOperation(Exception):
     pass
 
-
-class InvalidStatusTransitionError(Exception):
+class MoneyException(InvalidOrderOperation):
     pass
 
-class InvalidOfferOperation(InvalidOrderOperation):
+class AddressException(InvalidOrderOperation):
     pass
 
-
-class InvalidPaymentOperation(InvalidOrderOperation):
+class CouponException(InvalidOrderOperation):
     pass
 
-class InvalidTaxOperation(InvalidOrderOperation):
+class CustomerDetailsException(InvalidOrderOperation):
     pass
 
-class InvalidShippingOption(InvalidOrderOperation):
+class OfferStrategyException(InvalidOrderOperation):
     pass
 
-class InvalidVendorDetails(InvalidOrderOperation):
+class PackageException(InvalidOrderOperation):
+    pass
+
+class PaymentDetailsException(InvalidOrderOperation):
+    pass
+
+class ShippingDetailsException(InvalidOrderOperation):
+    pass
+
+class VendorDetailsException(InvalidOrderOperation):
+    pass
+
+class ShippingOptionStrategyException(InvalidOrderOperation):
     pass
 
 class OutOfStockException(InvalidOrderOperation):

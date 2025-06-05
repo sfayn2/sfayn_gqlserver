@@ -18,7 +18,7 @@ class DjangoVendorRepositoryImpl(repositories.VendorAbstract):
         for offer in offer_list:
             try:
                 final_offers.append(django_mappers.OfferStrategyMapper.to_domain(offer))
-            except (exceptions.InvalidOfferOperation, ValueError) as e:
+            except exceptions.OfferStrategyException as e:
                 #TODO send notification for invalid offer?
                 print(f"DjangoVendorRepository.get_offer exception > {str(e)}")
                 continue

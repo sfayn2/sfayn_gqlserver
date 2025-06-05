@@ -1,5 +1,6 @@
 from __future__ import annotations
 from dataclasses import dataclass
+from ddd.order_management.domain import exceptions
 
 @dataclass(frozen=True)
 class Address:
@@ -12,9 +13,9 @@ class Address:
 
     def __post_init__(self):
         if not self.street or not self.city or not self.postal or not self.state:
-            raise ValueError("Address fields (street, city, postal, country, state) cannot be empty.")
+            raise exceptions.AddressException("Address fields (street, city, postal, country, state) cannot be empty.")
         if not isinstance(self.postal, int) or self.postal <= 0:
-            raise ValueError(f"Invalid postal code {self.postal}. It must be a positive integer.")
+            raise exceptions.AddressException(f"Invalid postal code {self.postal}. It must be a positive integer.")
         #TODO: validate country & state?
 
     def is_international(self, origin_country: str) -> bool:

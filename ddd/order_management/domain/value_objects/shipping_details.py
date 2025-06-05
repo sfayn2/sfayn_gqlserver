@@ -1,7 +1,7 @@
 from __future__ import annotations
 from dataclasses import dataclass
 from decimal import Decimal
-from ddd.order_management.domain import enums
+from ddd.order_management.domain import enums, exceptions
 from .money import Money
 
 
@@ -16,19 +16,19 @@ class ShippingDetails:
 
     def __post_init__(self):
         if not self.method:
-            raise ValueError("Shipping method is required.")
+            raise exceptions.ShippingDetailsException("Shipping method is required.")
 
         if not self.cost:
-            raise ValueError("Shipping cost is required.")
+            raise exceptions.ShippingDetailsException("Shipping cost is required.")
 
         if not self.delivery_time:
-            raise ValueError("Delivery time is required.")
+            raise exceptions.ShippingDetailsException("Delivery time is required.")
 
         if not self.method.value in [item.value for item in enums.ShippingMethod]:
-            raise ValueError(f"Shipping method {self.method.value} not supported.")
+            raise exceptions.ShippingDetailsException(f"Shipping method {self.method.value} not supported.")
 
         if self.cost and self.cost.amount < Decimal("0"):
-            raise ValueError("Shipping cost cannot be negative.")
+            raise exceptions.ShippingDetailsException("Shipping cost cannot be negative.")
 
         
     #make use of order.update_shipping_details to take effect

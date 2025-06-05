@@ -1,5 +1,6 @@
 from __future__ import annotations
 from dataclasses import dataclass
+from ddd.order_management.domain import exceptions
 
 #right now only for Gues customer
 @dataclass(frozen=True)    
@@ -10,5 +11,5 @@ class CustomerDetails:
 
     def __post_init__(self):
         if not self.first_name or not self.last_name or not self.email:
-            raise ValueError("Customer details are incomplete.")
+            raise exceptions.CustomerDetailsException("Customer details are incomplete.")
         #TODO: validate email

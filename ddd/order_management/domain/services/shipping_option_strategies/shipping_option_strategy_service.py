@@ -49,7 +49,7 @@ class ShippingOptionStrategyService(ports.ShippingOptionStrategyServiceAbstract)
                 )
 
         if not options:
-            raise exceptions.InvalidShippingOption(f"No available shipping options.")
+            raise exceptions.InvalidOrderOperation(f"No available shipping options.")
 
         return options
 
@@ -76,6 +76,6 @@ class ShippingOptionStrategyService(ports.ShippingOptionStrategyServiceAbstract)
 #        shipping_options = shipping_option_service.get_shipping_options(order=order)
 #
 #        if not shipping_options:
-#            raise exceptions.InvalidShippingOption(f"No available shipping options.")
+#            raise exceptions.InvalidOrderOperation(f"No available shipping options.")
 #
 #        return shipping_options
