@@ -5,7 +5,7 @@ from ddd.order_management.application import (
 from ddd.order_management.domain import events
 
 def handle_logged_order(
-        event: events.OrderCancelled, 
+        event: events.DomainEvent, 
         uow: repositories.UnitOfWorkAbstract, 
         logging: LoggingAbstract):
 

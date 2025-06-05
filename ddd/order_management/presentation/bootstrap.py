@@ -12,8 +12,30 @@ from ddd.order_management.application import commands, message_bus, queries
 def register_event_handlers():
     event_bus.EVENT_HANDLERS.update({
         events.OrderCancelled: [
-            lambda event, uow: event_handlers.handle_logged_order(event=event, uow=uow, logging=adapters.LoggingAdapter()),
-            lambda event, uow: event_handlers.handle_email_canceled_order(event=event, uow=uow, email=adapters.EmailAdapter())
+                lambda event, uow: handlers.handle_logged_order(
+                    event=event, 
+                    uow=uow, 
+                    logging=adapters.LoggingAdapter()
+                ),
+                lambda event, uow: handlers.handle_email_canceled_order(
+                    event=event, 
+                    uow=uow, 
+                    email=adapters.EmailAdapter()
+                )
+            ],
+        events.OrderPlaced: [
+                lambda event, uow: handlers.handle_apply_applicable_offers(
+                    event=event, 
+                    uow=uow, 
+                    offer_service=services.OfferStrategyService(uow.vendor)
+                )
+            ],
+        events.OfferApplied: [
+                lambda event, uow: handlers.handle_apply_tax_results(
+                    event=event, 
+                    uow=uow, 
+                    tax_service=services.TaxStrategyService()
+                )
             ]
     })
 
@@ -35,8 +57,6 @@ def register_command_handlers():
         commands.PlaceOrderCommand: lambda command, uow: handlers.handle_place_order(
             command=command,
             uow=uow,
-            tax_service=services.TaxStrategyService(),
-            offer_service=services.OfferStrategyService(uow.vendor),
             stock_validation_service=adapters.DjangoStockValidationServiceAdapter()
         ),
         commands.ConfirmOrderCommand: lambda command, uow: handlers.handle_confirm_order(

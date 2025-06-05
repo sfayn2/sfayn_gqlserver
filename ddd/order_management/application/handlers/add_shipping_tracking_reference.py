@@ -12,27 +12,24 @@ from ddd.order_management.domain import exceptions
 
 def handle_add_shipping_tracking_reference(
         command: commands.AddShippingTrackingReferenceCommand, 
-        uow: UnitOfWorkAbstract) -> Union[dtos.OrderResponseDTO, dtos.ResponseDTO]:
+        uow: UnitOfWorkAbstract) -> dtos.ResponseDTO:
     try:
         with uow:
 
             order = uow.order.get(order_id=command.order_id)
             order.add_shipping_tracking_reference(shipping_reference=command.shipping_reference)
 
-            order_w_shipping_reference_dto =  mappers.OrderResponseMapper.to_dto(
-                order=order,
-                success=True,
-                message="Order successfully added shipping tracking reference."
-            )
-
             uow.order.save(order)
             uow.commit()
 
+            return dtos.ResponseDTO(
+                success=True,
+                message="Order successfully add shipping tracking reference."
+            )
 
-    except (exceptions.InvalidOrderOperation, ValueError) as e:
-        order_w_shipping_reference_dto = shared.handle_invalid_order_operation(e)
+    except exceptions.InvalidOrderOperation as e:
+        return shared.handle_invalid_order_operation(e)
     except Exception as e:
-        order_w_shipping_reference_dto = shared.handle_unexpected_error(f"Unexpected error during add shipping tracking reference {e}")
+        return shared.handle_unexpected_error(e)
 
-    return order_w_shipping_reference_dto
 

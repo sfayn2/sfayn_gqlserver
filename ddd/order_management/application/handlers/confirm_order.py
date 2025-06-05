@@ -15,7 +15,7 @@ def handle_confirm_order(
         payment_gateway_factory: PaymentGatewayFactoryAbstract,
         order_service: OrderServiceAbstract,
         stock_validation_service: StockValidationServiceAbstract
-    ) -> Union[dtos.OrderResponseDTO, dtos.ResponseDTO]:
+    ) -> dtos.ResponseDTO:
 
     try:
 
@@ -33,20 +33,15 @@ def handle_confirm_order(
                 payment_details=payment_details
             )
 
-            confirmed_order_dto = mappers.OrderResponseMapper.to_dto(
-                order=confirmed_order,
+            uow.order.save(confirmed_order)
+            uow.commit()
+
+            return dtos.ResponseDTO(
                 success=True,
                 message="Order successfully confirmed."
             )
-            uow.order.save(confirmed_order)
-            uow.commit()
-                
-
-
-    except (exceptions.InvalidOrderOperation, ValueError) as e:
-        confirmed_order_dto = shared.handle_invalid_order_operation(e)
+    except exceptions.InvalidOrderOperation as e:
+        return shared.handle_invalid_order_operation(e)
     except Exception as e:
-        confirmed_order_dto = shared.handle_unexpected_error(f"Unexpected error during order confirmation. {e}")
-
-    return confirmed_order_dto
+        return shared.handle_unexpected_error(e)
 

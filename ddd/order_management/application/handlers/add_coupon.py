@@ -13,7 +13,7 @@ from ddd.order_management.domain import exceptions
 def handle_add_coupon(
         command: commands.AddCouponCommand, 
         coupon_validation: CouponValidationAbstract,
-        uow: UnitOfWorkAbstract) -> Union[dtos.OrderResponseDTO, dtos.ResponseDTO]:
+        uow: UnitOfWorkAbstract) -> dtos.ResponseDTO:
     try:
         with uow:
 
@@ -24,20 +24,18 @@ def handle_add_coupon(
                 )
             order.apply_valid_coupon(coupon=valid_coupon)
 
-            order_w_coupon_dto =  mappers.OrderResponseMapper.to_dto(
-                order=order,
+            uow.order.save(order)
+            uow.commit()
+
+            return dtos.ResponseDTO(
                 success=True,
                 message="Order successfully add coupon."
             )
 
-            uow.order.save(order)
-            uow.commit()
 
-
-    except (exceptions.InvalidOrderOperation, ValueError) as e:
-        order_w_coupon_dto = shared.handle_invalid_order_operation(e)
+    except exceptions.InvalidOrderOperation as e:
+        return shared.handle_invalid_order_operation(e)
     except Exception as e:
-        order_w_coupon_dto = shared.handle_unexpected_error(f"Unexpected error during add coupon {e}")
+        return shared.handle_unexpected_error(e)
 
-    return order_w_coupon_dto
 

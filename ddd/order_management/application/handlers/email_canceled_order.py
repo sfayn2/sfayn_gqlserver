@@ -5,7 +5,7 @@ from ddd.order_management.application import (
 from ddd.order_management.domain import events
 
 def handle_email_canceled_order(
-        event: events.OrderCancelled, 
+        event: events.DomainEvent, 
         uow: UnitOfWorkAbstract, 
         email: EmailAbstract):
 

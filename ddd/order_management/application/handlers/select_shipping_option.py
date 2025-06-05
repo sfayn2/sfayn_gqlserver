@@ -13,7 +13,7 @@ def handle_select_shipping_option(
         command: commands.SelectShippingOptionCommand, 
         uow: UnitOfWorkAbstract,
         shipping_option_service: ShippingOptionStrategyServiceAbstract,
-        ) -> Union[dtos.OrderResponseDTO, dtos.ResponseDTO]:
+        ) -> dtos.ResponseDTO:
     try:
         with uow:
 
@@ -28,18 +28,16 @@ def handle_select_shipping_option(
                                             shipping_options=available_shipping_options
                                         )
 
-            order_w_shipping_option_dto = mappers.OrderResponseMapper.to_dto(
-                order=order_w_shipping_option,
+            uow.order.save(order_w_shipping_option)
+            uow.commit()
+
+            return dtos.ResponseDTO(
                 success=True,
                 message="Order successfully selected shipping option."
             )
 
-            uow.order.save(order_w_shipping_option)
-            uow.commit()
-
-    except (exceptions.InvalidOrderOperation, ValueError) as e:
-        order_w_shipping_option_dto = shared.handle_invalid_order_operation(e)
+    except exceptions.InvalidOrderOperation as e:
+        return shared.handle_invalid_order_operation(e)
     except Exception as e:
-        order_w_shipping_option_dto = shared.handle_unexpected_error(f"Unexpected error during cart items checkout. {e}")
+        return shared.handle_unexpected_error(e)
 
-    return order_w_shipping_option_dto

@@ -11,7 +11,7 @@ def handle_checkout_items(
         uow: UnitOfWorkAbstract,
         tax_service:  TaxStrategyServiceAbstract,
         product_vendor_validation_service: ProductVendorValidationServiceAbstract,
-        order_service: OrderServiceAbstract) -> dtos.OrderResponseDTO:
+        order_service: OrderServiceAbstract) -> dtos.ResponseDTO:
     try:
         with uow:
 
@@ -30,20 +30,18 @@ def handle_checkout_items(
             tax_results = tax_service.calculate_all_taxes(draft_order)
             draft_order.apply_tax_results(tax_results)
 
-            draft_order_dto = mappers.OrderResponseMapper.to_dto(
-                order=draft_order,
+            uow.order.save(draft_order)
+            uow.commit()
+
+            return dtos.ResponseDTO(
                 success=True,
                 message="Cart items successfully checkout."
             )
 
-            uow.order.save(draft_order)
-            uow.commit()
-
-    except (exceptions.InvalidOrderOperation) as e:
-        draft_order_dto = shared.handle_invalid_order_operation(e)
+    except exceptions.InvalidOrderOperation as e:
+        return shared.handle_invalid_order_operation(e)
     except Exception as e:
-        draft_order_dto = shared.handle_unexpected_error(f"Unexpected error during checkout {e}")
+        return shared.handle_unexpected_error(e)
 
-    return draft_order_dto
 
 

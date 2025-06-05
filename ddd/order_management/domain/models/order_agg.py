@@ -161,6 +161,13 @@ class Order:
         if offer_details:
             self.update_offer_details(offer_details)
 
+        event = events.OffersApplied(
+            order_id=self.order_id,
+            order_status=self.order_status,
+        )
+
+        self.raise_event(event)
+
 
     def apply_tax_results(self, tax_results: List[value_objects.TaxResult]):
         if self.order_status != enums.OrderStatus.DRAFT:

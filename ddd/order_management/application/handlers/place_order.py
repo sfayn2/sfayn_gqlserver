@@ -15,7 +15,7 @@ def handle_place_order(
         tax_service:  TaxStrategyServiceAbstract,
         offer_service:  OfferStrategyServiceAbstract,
         stock_validation_service: StockValidationServiceAbstract,
-        uow: UnitOfWorkAbstract) -> Union[dtos.OrderResponseDTO, dtos.ResponseDTO]:
+        uow: UnitOfWorkAbstract) -> dtos.ResponseDTO:
     try:
         with uow:
 
@@ -31,20 +31,17 @@ def handle_place_order(
 
             order.place_order()
 
-            placed_order_dto =  mappers.OrderResponseMapper.to_dto(
-                order=order,
+            uow.order.save(order)
+            uow.commit()
+
+            return dtos.ResponseDTO(
                 success=True,
                 message="Order successfully placed order."
             )
 
-            uow.order.save(order)
-            uow.commit()
 
-
-    except (exceptions.InvalidOrderOperation, ValueError) as e:
-        placed_order_dto = shared.handle_invalid_order_operation(e)
+    except exceptions.InvalidOrderOperation as e:
+        return shared.handle_invalid_order_operation(e)
     except Exception as e:
-        placed_order_dto = shared.handle_unexpected_error(f"Unexpected error during place order {e}")
-
-    return placed_order_dto
+        return shared.handle_unexpected_error(e)
 

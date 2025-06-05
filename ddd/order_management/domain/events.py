@@ -37,3 +37,8 @@ class OrderCompleted(DomainEvent):
 class PaymentApplied(DomainEvent):
     order_id: str
     amount: value_objects.Money
+
+@dataclass
+class OffersApplied(DomainEvent):
+    order_id: str
+    order_status: enums.OrderStatus

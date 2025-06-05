@@ -12,27 +12,24 @@ from ddd.order_management.domain import exceptions
 
 def handle_mark_as_shipped(
         command: commands.MarkAsShippedOrderCommand, 
-        uow: UnitOfWorkAbstract) -> Union[dtos.OrderResponseDTO, dtos.ResponseDTO]:
+        uow: UnitOfWorkAbstract) -> dtos.ResponseDTO:
     try:
         with uow:
 
             order = uow.order.get(order_id=command.order_id)
             order.mark_as_shipped()
 
-            shipped_order_dto =  mappers.OrderResponseMapper.to_dto(
-                order=order,
-                success=True,
-                message="Order successfully mark as shipped."
-            )
-
             uow.order.save(order)
             uow.commit()
 
+            return dtos.ResponseDTO(
+                success=True,
+                message="Cart items successfully mark as shipped."
+            )
 
-    except (exceptions.InvalidOrderOperation, ValueError) as e:
-        shipped_order_dto = shared.handle_invalid_order_operation(e)
+
+    except exceptions.InvalidOrderOperation as e:
+        return shared.handle_invalid_order_operation(e)
     except Exception as e:
-        shipped_order_dto = shared.handle_unexpected_error(f"Unexpected error during shipped order {e}")
-
-    return shipped_order_dto
+        return shared.handle_unexpected_error(e)
 
