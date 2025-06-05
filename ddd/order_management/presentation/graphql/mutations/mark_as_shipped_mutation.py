@@ -21,5 +21,5 @@ class MarkAsShippedMutation(relay.ClientIDMutation):
         command = commands.MarkAsShippedOrderCommand.model_validate(input)
         result = message_bus.handle(command, adapters.unit_of_work.DjangoOrderUnitOfWork())
 
-        return cls(result=object_types.OrderResponseType(**result.model_dump()))
+        return cls(result=object_types.ResponseType(**result.model_dump()))
 

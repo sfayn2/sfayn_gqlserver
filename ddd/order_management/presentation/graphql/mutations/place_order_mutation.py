@@ -22,5 +22,5 @@ class PlaceOrderMutation(relay.ClientIDMutation):
         result = message_bus.handle(command, adapters.unit_of_work.DjangoOrderUnitOfWork())
         #placed order status only in Pending; once payment is confirmed ; webhook will trigger and call api to confirm order
 
-        return cls(result=object_types.OrderResponseType(**result.model_dump()))
+        return cls(result=object_types.ResponseType(**result.model_dump()))
 

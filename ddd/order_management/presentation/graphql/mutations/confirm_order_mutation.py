@@ -23,4 +23,4 @@ class ConfirmOrderMutation(relay.ClientIDMutation):
     def mutate_and_get_payload(cls, root, info, **input):
         command = commands.ConfirmOrderCommand.model_validate(input)
         result = message_bus.handle(command, adapters.unit_of_work.DjangoOrderUnitOfWork())
-        return cls(result=object_types.OrderResponseType(**result.model_dump()))
+        return cls(result=object_types.ResponseType(**result.model_dump()))
