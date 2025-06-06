@@ -36,7 +36,6 @@ class OrderService(ports.OrderServiceAbstract):
             line_items: List[models.LineItem]
     ) -> models.Order:
         order = models.Order(
-            order_status=enums.OrderStatus.DRAFT,
             date_created=datetime.now(),
             customer_details=customer_details,
             destination=shipping_address
@@ -45,7 +44,7 @@ class OrderService(ports.OrderServiceAbstract):
         order.generate_order_id()
         order.update_line_items(line_items)
 
-        order.calculate_final_amount()
+        order.mark_as_draft()
         
         return order
 

@@ -24,14 +24,17 @@ class OrderConfirmedEvent(DomainEvent):
 @dataclass
 class OrderShippedEvent(DomainEvent):
     order_id: str
+    order_status: enums.OrderStatus
 
 @dataclass
-class OrderCancelledEvent(DomainEvent):
+class OrderCanceledEvent(DomainEvent):
     order_id: str
+    order_status: enums.OrderStatus
 
 @dataclass
 class OrderCompletedEvent(DomainEvent):
     order_id: str
+    order_status: enums.OrderStatus
 
 @dataclass
 class PaymentAppliedEvent(DomainEvent):
@@ -40,5 +43,10 @@ class PaymentAppliedEvent(DomainEvent):
 
 @dataclass
 class OffersAppliedEvent(DomainEvent):
+    order_id: str
+    order_status: enums.OrderStatus
+
+@dataclass
+class OrderDraftEvent(DomainEvent):
     order_id: str
     order_status: enums.OrderStatus

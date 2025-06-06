@@ -9,7 +9,6 @@ from ddd.order_management.application import (
 def handle_checkout_items(
         command: commands.CheckoutItemsCommand, 
         uow: UnitOfWorkAbstract,
-        tax_service:  TaxStrategyServiceAbstract,
         product_vendor_validation_service: ProductVendorValidationServiceAbstract,
         order_service: OrderServiceAbstract) -> dtos.ResponseDTO:
     try:
@@ -26,9 +25,6 @@ def handle_checkout_items(
                 shipping_address=shipping_address,
                 line_items=line_items
             )
-
-            tax_results = tax_service.calculate_all_taxes(draft_order)
-            draft_order.apply_tax_results(tax_results)
 
             uow.order.save(draft_order)
             uow.commit()

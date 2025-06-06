@@ -13,7 +13,7 @@ class Order:
     date_created: datetime
     destination: value_objects.Address
     customer_details: value_objects.CustomerDetails
-    order_status: enums.OrderStatus
+    order_status: Optional[enums.OrderStatus] = None
     order_id: Optional[str] = None
     shipping_details: Optional[value_objects.ShippingDetails] = None
     line_items: List[LineItem] = field(default_factory=list)
@@ -212,12 +212,39 @@ class Order:
         self.order_status = enums.OrderStatus.SHIPPED
         self.update_modified_date()
 
+        event = events.OrderShippedEvent(
+            order_id=self.order_id,
+            order_status=self.order_status,
+        )
+
+        self.raise_event(event)
+
+    def mark_as_draft(self):
+        if self.order_status != None:
+            raise exceptions.InvalidOrderOperation("Only checkout order can mark as draft.")
+        self.order_status = enums.OrderStatus.DRAFT
+        self.update_modified_date()
+
+        event = events.OrderDraftEvent(
+            order_id=self.order_id,
+            order_status=self.order_status,
+        )
+
+        self.raise_event(event)
+
     def cancel_order(self, cancellation_reason: str):
         if not self.order_status in (enums.OrderStatus.PENDING, enums.OrderStatus.CONFIRMED):
             raise exceptions.InvalidOrderOperation("Cannot cancel a completed or already cancelled order or shipped order")
         self.order_status = enums.OrderStatus.CANCELLED
         self.cancellation_reason = cancellation_reason
         self.update_modified_date()
+
+        event = events.OrderCanceledEvent(
+            order_id=self.order_id,
+            order_status=self.order_status,
+        )
+
+        self.raise_event(event)
     
     def mark_as_completed(self):
         if self.order_status != enums.OrderStatus.SHIPPED:
@@ -228,6 +255,13 @@ class Order:
 
         self.order_status = enums.OrderStatus.COMPLETED
         self.update_modified_date()
+
+        event = events.OrderCompletedEvent(
+            order_id=self.order_id,
+            order_status=self.order_status,
+        )
+
+        self.raise_event(event)
 
     def add_shipping_tracking_reference(self, shipping_reference: str):
         if self.order_status != enums.OrderStatus.SHIPPED:
@@ -283,23 +317,6 @@ class Order:
         if self.order_status != enums.OrderStatus.DRAFT:
             raise exceptions.InvalidOrderOperation("Only draft order can update total discount fees.")
         self.total_discounts_fee = total_discounts
-
-    #def reset_order_details(self):
-    #    #reset offers free shipping + discounts + free gifts
-    #    self.update_shipping_details(
-    #            self.shipping_details.reset_cost()
-    #        )
-    #    self.update_total_discounts_fee(
-    #            self.total_discounts_fee.reset_amount()
-    #        )
-    #    self.update_tax_amount(
-    #        value_objects.Money(
-    #            amount=0,
-    #            currency=self.currency
-    #        )
-    #    )
-    #    self._update_totals()
-    #    #TODO: reset free gifts??
 
     @property
     def sub_total(self):

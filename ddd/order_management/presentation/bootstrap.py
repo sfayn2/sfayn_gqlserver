@@ -11,7 +11,7 @@ from ddd.order_management.application import commands, message_bus, queries
 
 def register_event_handlers():
     event_bus.EVENT_HANDLERS.update({
-        events.OrderCancelledEvent: [
+        events.OrderCanceledEvent: [
                 lambda event, uow: handlers.handle_logged_order(
                     event=event, 
                     uow=uow, 
@@ -36,6 +36,13 @@ def register_event_handlers():
                     uow=uow, 
                     tax_service=services.TaxStrategyService()
                 )
+            ],
+        events.OrderDraftEvent: [
+                lambda event, uow: handlers.handle_apply_tax_results(
+                    event=event, 
+                    uow=uow, 
+                    tax_service=services.TaxStrategyService()
+                )
             ]
     })
 
@@ -46,7 +53,6 @@ def register_command_handlers():
             command=command,
             uow=uow,
             order_service=services.OrderService(),
-            tax_service=services.TaxStrategyService(),
             product_vendor_validation_service=adapters.ProductVendorValidationServiceAdapter()
         ),
         commands.SelectShippingOptionCommand: lambda command, uow: handlers.handle_select_shipping_option(
