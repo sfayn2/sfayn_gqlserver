@@ -19,7 +19,7 @@ def handle_shipping_options(
         order = uow.order.get(order_id=query.order_id)
 
         vendor_shipping_options = vendor.get_shipping_options(vendor_id=order.vendor_id)
-        available_shipping_options = shipping_option_service.get_available_shipping_options(
+        available_shipping_options = shipping_option_service.get_applicable_shipping_options(
             order=order
             vendor_shipping_options=vendor_shipping_options
         )
