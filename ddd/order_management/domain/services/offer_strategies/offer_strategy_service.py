@@ -32,29 +32,18 @@ OFFER_STRATEGIES = Dict[enums.OfferType, ports.OfferStrategyAbstract]
 
 class OfferStrategyService(ports.OfferStrategyServiceAbstract):        
 
-    def __init__(self, vendor_repository: repositories.VendorAbstract, offers: OFFER_STRATEGIES = DEFAULT_OFFER_STRATEGIES):
-        self.vendor_repository = vendor_repository
+    def __init__(self, offers: OFFER_STRATEGIES = DEFAULT_OFFER_STRATEGIES):
+        #self.vendor_repository = vendor_repository
         self.offer_strategies = offers
 
-    def evaluate_applicable_offers(self, order: models.Order):
-        available_offers = self._fetch_valid_offers(order)
-        final_offers = []
-        #offer_results = []
-        for strategy in available_offers:
-            final_offers.append(strategy)
-            #res = strategy.apply(order)
-            #if res:
-            #    offer_results.append(res)
+    def evaluate_applicable_offers(
+                self, 
+                order: models.Order, 
+                vendor_offers: List[value_objects.OfferStrategy]
+            ) -> List[ports.OfferStrategyAbstract]:
 
-        #if offer_details:
-        #    order.update_offer_details(offer_details)
-        #return offer_results
-
-        return final_offers
-
-    def _fetch_valid_offers(self, order: models.Order):
         #The assumption is all Offers are auto applied (except those w Coupons)
-        vendor_offers = self.vendor_repository.get_offers(order.vendor_id)
+        #vendor_offers = self.vendor_repository.get_offers(order.vendor_id)
         valid_offers = []
 
         #sorted by "priority" in descending order
@@ -71,4 +60,8 @@ class OfferStrategyService(ports.OfferStrategyServiceAbstract):
                 #make sure offers already ordered based on highest priority, so checking stackable is enough
                 return valid_offers
 
-        return valid_offers
+        final_offers = []
+        for strategy in valid_offers:
+            final_offers.append(strategy)
+
+        return final_offers

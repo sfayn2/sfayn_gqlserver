@@ -27,7 +27,8 @@ def register_event_handlers():
                 lambda event, uow: handlers.handle_apply_applicable_offers(
                     event=event, 
                     uow=uow, 
-                    offer_service=services.OfferStrategyService(uow.vendor)
+                    vendor=adapters.DjangoVendorRepositoryImpl(),
+                    offer_service=services.OfferStrategyService()
                 )
             ],
         events.OfferAppliedEvent: [

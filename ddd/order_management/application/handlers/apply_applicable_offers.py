@@ -7,6 +7,7 @@ from ddd.order_management.domain import events
 def handle_apply_applicable_offers(
         event: events.DomainEvent, 
         offer_service:  OfferStrategyServiceAbstract,
+        vendor: VendorAbstract,
         uow: UnitOfWorkAbstract):
 
     try:
@@ -14,8 +15,14 @@ def handle_apply_applicable_offers(
 
             order = uow.order.get(order_id=event.order_id)
 
-            offers = offer_service.evaluate_applicable_offers(order)
-            order.apply_applicable_offers(offers)
+            #if to evolve to async event; we can just pass event.vendor_offers coming from other bounded context?
+            #evaluated_offers = offer_service.evaluate_applicable_offers(order, event.vendor_offers)
+
+            # Sync event
+            vendor_offers = vendor.get_offers(order.vendor_id)
+            applicable_offers = offer_service.evaluate_applicable_offers(order, vendor_offers)
+
+            order.apply_applicable_offers(applicable_offers)
 
             uow.order.save(order)
             uow.commit()
