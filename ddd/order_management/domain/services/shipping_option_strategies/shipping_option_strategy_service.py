@@ -33,13 +33,25 @@ SHIPPING_OPTIONS_STRATEGIES = Dict[enums.ShippingMethod, ports.ShippingOptionStr
 
 class ShippingOptionStrategyService(ports.ShippingOptionStrategyServiceAbstract):
 
-    def __init__(self, vendor_repository: repositories.VendorAbstract, shipping_options_strategy: SHIPPING_OPTIONS_STRATEGIES = DEFAULT_SHIPPING_OPTIONS_STRATEGIES):
-        self.vendor_repository = vendor_repository
+    def __init__(self, shipping_options_strategy: SHIPPING_OPTIONS_STRATEGIES = DEFAULT_SHIPPING_OPTIONS_STRATEGIES):
         self.shipping_options_strategy = shipping_options_strategy
 
-    def get_shipping_options(self, order: models.Order) -> List[value_objects.ShippingDetails]:
+    def get_applicable_shipping_options(
+                self, 
+                order: models.Order, 
+                vendor_shipping_options: List[value_objects.ShippingOptionStrategy]
+            ) -> List[value_objects.ShippingDetails]:
+
+        valid_shipping_options = []
+
+        for option in vendor_shipping_options:
+            ship_opt_strategy_class = self.shipping_options_strategy.get(option.name)
+            valid_shipping_options.append(
+                ship_opt_strategy_class(option)
+            )
+
         options = []
-        for option in self._fetch_valid_options(vendor_id=order.vendor_id):
+        for option in valid_shipping_options:
             if option.is_eligible(order):
                 cost = option.calculate_cost(order)
                 options.append(value_objects.ShippingDetails(
@@ -53,29 +65,3 @@ class ShippingOptionStrategyService(ports.ShippingOptionStrategyServiceAbstract)
 
         return options
 
-    def _fetch_valid_options(self, vendor_id: uuid.UUID):
-        vendor_shipping_options = self.vendor_repository.get_shipping_options(vendor_id=vendor_id)
-        valid_shipping_options = []
-
-        for option in vendor_shipping_options:
-            ship_opt_strategy_class = self.shipping_options_strategy.get(option.name)
-            valid_shipping_options.append(
-                ship_opt_strategy_class(option)
-            )
-
-        return valid_shipping_options
-
-
-#class ShippingAvailableOptionService:
-#
-#    @staticmethod
-#    def get_shipping_options(
-#            shipping_option_service: ports.ShippingOptionStrategyServiceAbstract, 
-#            order: models.Order) -> List[value_objects.ShippingDetails]:
-#
-#        shipping_options = shipping_option_service.get_shipping_options(order=order)
-#
-#        if not shipping_options:
-#            raise exceptions.InvalidOrderOperation(f"No available shipping options.")
-#
-#        return shipping_options
