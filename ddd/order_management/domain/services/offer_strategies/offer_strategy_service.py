@@ -58,7 +58,8 @@ class OfferStrategyService(ports.OfferStrategyServiceAbstract):
 
             if offer.stackable == False:
                 #make sure offers already ordered based on highest priority, so checking stackable is enough
-                return valid_offers
+                break
+                #return valid_offers
 
         final_offers = []
         for strategy in valid_offers:
