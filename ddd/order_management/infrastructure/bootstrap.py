@@ -28,11 +28,11 @@ def register_event_handlers():
                 lambda event, uow: handlers.handle_apply_applicable_offers(
                     event=event, 
                     uow=uow, 
-                    vendor=adapters.DjangoVendorRepositoryImpl(),
+                    vendor_snapshot=adapters.DjangoVendorRepositoryImpl(),
                     offer_service=services.OfferStrategyService()
                 )
             ],
-        "order_management.events.OfferAppliedEvent": [
+        "order_management.events.OrderOfferAppliedEvent": [
                 lambda event, uow: handlers.handle_apply_tax_results(
                     event=event, 
                     uow=uow, 

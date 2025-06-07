@@ -16,6 +16,10 @@ class DomainEvent(ABC):
     def to_dict(self) -> dict:
         return asdict(self)
 
+    @classmethod
+    def from_dict(cls, data: dict) -> DomainEvent:
+        return cls(**data)
+
 
 
 @dataclass
@@ -23,70 +27,37 @@ class OrderPlacedEvent(DomainEvent):
     order_id: str
     order_status: enums.OrderStatus
 
-    @classmethod
-    def from_dict(cls, data: dict) -> OrderPlacedEvent:
-        return cls(**data)
-
-
 @dataclass
 class OrderConfirmedEvent(DomainEvent):
     order_id: str
     order_status: enums.OrderStatus
-
-    @classmethod
-    def from_dict(cls, data: dict) -> OrderConfirmedEvent:
-        return cls(**data)
 
 @dataclass
 class OrderShippedEvent(DomainEvent):
     order_id: str
     order_status: enums.OrderStatus
 
-    @classmethod
-    def from_dict(cls, data: dict) -> OrderShippedEvent:
-        return cls(**data)
-
 @dataclass
 class OrderCanceledEvent(DomainEvent):
     order_id: str
     order_status: enums.OrderStatus
-
-    @classmethod
-    def from_dict(cls, data: dict) -> OrderCanceledEvent:
-        return cls(**data)
 
 @dataclass
 class OrderCompletedEvent(DomainEvent):
     order_id: str
     order_status: enums.OrderStatus
 
-    @classmethod
-    def from_dict(cls, data: dict) -> OrderCompletedEvent:
-        return cls(**data)
-
 @dataclass
-class PaymentAppliedEvent(DomainEvent):
+class OrderPaymentAppliedEvent(DomainEvent):
     order_id: str
     amount: value_objects.Money
 
-    @classmethod
-    def from_dict(cls, data: dict) -> PaymentAppliedEvent:
-        return cls(**data)
-
 @dataclass
-class OffersAppliedEvent(DomainEvent):
+class OrderOffersAppliedEvent(DomainEvent):
     order_id: str
     order_status: enums.OrderStatus
-
-    @classmethod
-    def from_dict(cls, data: dict) -> OffersAppliedEvent:
-        return cls(**data)
 
 @dataclass
 class OrderDraftEvent(DomainEvent):
     order_id: str
     order_status: enums.OrderStatus
-
-    @classmethod
-    def from_dict(cls, data: dict) -> OrderDraftEvent:
-        return cls(**data)

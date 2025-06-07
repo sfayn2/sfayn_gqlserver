@@ -161,7 +161,7 @@ class Order:
         if offer_details:
             self.update_offer_details(offer_details)
 
-        event = events.OffersAppliedEvent(
+        event = events.OrderOffersAppliedEvent(
             order_id=self.order_id,
             order_status=self.order_status,
         )

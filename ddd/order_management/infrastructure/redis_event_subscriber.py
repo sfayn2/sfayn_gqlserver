@@ -3,6 +3,7 @@ import asyncio
 import redis.asyncio as aioredis
 from ddd.order_management.infrastructure.event_bus import EVENT_HANDLERS
 
+#TODO make use of redis stream if we really want to evolve to full microservice?
 redis_client = aioredis.from_url('redis://localhost:6379', decode_responses=True)
 
 async def redis_event_subscribe(event_types: list[str]):

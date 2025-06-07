@@ -1,6 +1,7 @@
 import json
 import redis
 
+#TODO make use of redis stream if we really want to evolve to full microservice?
 redis_client = redis.Redis.from_url('redis://localhost:6379', decode_responses=True)
 
 def redis_event_publish(self, event: events.DomainEvent, uow: repositories.UnitOfWorkAbstract):
