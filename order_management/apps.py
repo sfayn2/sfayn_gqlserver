@@ -6,6 +6,6 @@ class OrderManagementConfig(AppConfig):
     name = 'order_management'
 
     def ready(self):
-        from ddd.order_management.presentation import bootstrap
+        from ddd.order_management.infrastructure import bootstrap
         bootstrap.register()
 

@@ -43,7 +43,6 @@ class DjangoOrderUnitOfWork(repositories.UnitOfWorkAbstract):
 
         for entity in self.order.seen:
             if hasattr(entity, "_events"):
-                #TODO conver seen to_domain; but uow need to move to application?
                 self._events.extend(entity._events) #append not override
                 entity._events.clear() #prevent duplicate processing
 

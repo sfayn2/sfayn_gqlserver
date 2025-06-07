@@ -9,9 +9,10 @@ from ddd.order_management.application import commands, message_bus, queries
 #Depending on the framework arch this might be inside manage.py , app.py, or main.py ?
 #if project grows, breakdown handlers by feature
 
+
 def register_event_handlers():
     event_bus.EVENT_HANDLERS.update({
-        events.OrderCanceledEvent: [
+        "order_management.events.OrderCanceledEvent": [
                 lambda event, uow: handlers.handle_logged_order(
                     event=event, 
                     uow=uow, 
@@ -23,7 +24,7 @@ def register_event_handlers():
                     email=adapters.EmailAdapter()
                 )
             ],
-        events.OrderPlacedEvent: [
+        "order_management.events.OrderPlacedEvent": [
                 lambda event, uow: handlers.handle_apply_applicable_offers(
                     event=event, 
                     uow=uow, 
@@ -31,14 +32,14 @@ def register_event_handlers():
                     offer_service=services.OfferStrategyService()
                 )
             ],
-        events.OfferAppliedEvent: [
+        "order_management.events.OfferAppliedEvent": [
                 lambda event, uow: handlers.handle_apply_tax_results(
                     event=event, 
                     uow=uow, 
                     tax_service=services.TaxStrategyService()
                 )
             ],
-        events.OrderDraftEvent: [
+        "order_management.events.OrderDraftEvent": [
                 lambda event, uow: handlers.handle_apply_tax_results(
                     event=event, 
                     uow=uow, 
