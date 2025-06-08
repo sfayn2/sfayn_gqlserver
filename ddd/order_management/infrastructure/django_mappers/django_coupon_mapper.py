@@ -1,6 +1,5 @@
 import ast
 from ddd.order_management.domain import value_objects, models
-from vendor_management import models as django_vendor_models
 
 class CouponMapper:
 

@@ -1,7 +1,7 @@
 import ast
 from ddd.order_management.domain import value_objects, models, enums
 from ddd.order_management.infrastructure import django_mappers
-from vendor_management import models as django_vendor_models
+from order_management import models as django_snapshots
 
 class OrderMapper:
 
@@ -61,9 +61,9 @@ class OrderMapper:
 
         django_coupons = []
         for item in ast.literal_eval(django_order_object.coupons):
-            django_coupon = django_vendor_models.Coupon.objects.filter(coupon_code=item, offer__vendor__id=vendor_details.id)
-            if django_coupon.exists():
-                django_coupons.append(django_mappers.CouponMapper.to_domain(django_coupon))
+            vendor_coupon_snapshot = django_snapshots.VendorCouponSnapshot.objects.filter(coupon_code=item, vendor_offer_snapshot__vendor__id=vendor_details.id)
+            if vendor_coupon_snapshot.exists():
+                django_coupons.append(django_mappers.CouponMapper.to_domain(vendor_coupon_snapshot))
 
         payment_details = None
         if django_order_object.payment_method:

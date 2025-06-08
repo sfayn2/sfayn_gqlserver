@@ -1,10 +1,10 @@
 from ddd.order_management.domain import repositories, exceptions
-from customer_management import models as django_customer_models
+from order_management import models as django_snapshots
 
 class DjangoCustomerRepositoryImpl(repositories.CustomerAbstract):
 
     def get_customer_details(self, customer_id: str):
-        customer_details = django_customer_models.Customer.objects.filter(
+        customer_details = django_snapshots.CustomerDetailsSnapshot.objects.filter(
             customer_id=customer_id, 
             addresses__address_type="shipping", 
             addresses__is_default=True

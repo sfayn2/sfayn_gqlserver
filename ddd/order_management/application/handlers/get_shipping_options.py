@@ -20,7 +20,7 @@ def handle_shipping_options(
 
         vendor_shipping_options = vendor.get_shipping_options(vendor_id=order.vendor_id)
         available_shipping_options = shipping_option_service.get_applicable_shipping_options(
-            order=order
+            order=order,
             vendor_shipping_options=vendor_shipping_options
         )
 

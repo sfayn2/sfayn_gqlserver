@@ -1,8 +1,9 @@
-from typing import Dict, Callable, Any
+from typing import Dict, Callable, Any, List
 from ddd.order_management.domain import (
     repositories,
     models,
-    enums
+    enums,
+    value_objects
     )
 
 from ddd.order_management.domain.services.offer_strategies import (
