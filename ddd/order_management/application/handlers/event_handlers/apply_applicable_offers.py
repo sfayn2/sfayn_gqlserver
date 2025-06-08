@@ -7,7 +7,7 @@ from ddd.order_management.domain import events
 def handle_apply_applicable_offers(
         event: events.DomainEvent, 
         offer_service:  OfferStrategyServiceAbstract,
-        vendor_snapshot: VendorAbstract,
+        vendor: VendorAbstract,
         uow: UnitOfWorkAbstract):
 
     try:
@@ -15,7 +15,7 @@ def handle_apply_applicable_offers(
 
             order = uow.order.get(order_id=event.order_id)
 
-            vendor_offers = vendor_snapshot.get_offers(order.vendor_id)
+            vendor_offers = vendor.get_offers(order.vendor_id)
             applicable_offers = offer_service.evaluate_applicable_offers(order, vendor_offers)
 
             order.apply_applicable_offers(applicable_offers)
