@@ -61,7 +61,7 @@ class OrderMapper:
 
         django_coupons = []
         for item in ast.literal_eval(django_order_object.coupons):
-            vendor_coupon_snapshot = django_snapshots.VendorCouponSnapshot.objects.filter(coupon_code=item, vendor_offer_snapshot__vendor__id=vendor_details.id)
+            vendor_coupon_snapshot = django_snapshots.VendorCouponSnapshot.objects.filter(coupon_code=item, vendoroffersnapshot__vendor__id=vendor_details.id)
             if vendor_coupon_snapshot.exists():
                 django_coupons.append(django_mappers.CouponMapper.to_domain(vendor_coupon_snapshot))
 
