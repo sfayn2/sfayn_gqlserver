@@ -1,0 +1,1 @@
+from .fake_vendor_offer_provider_adapter import FakeVendorOffersProviderAdapter

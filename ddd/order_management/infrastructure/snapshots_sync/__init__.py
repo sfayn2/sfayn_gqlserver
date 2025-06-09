@@ -1,0 +1,1 @@
+from .django_vendor_offer_snapshot_service import DjangoVendorOfferSnapshotSync

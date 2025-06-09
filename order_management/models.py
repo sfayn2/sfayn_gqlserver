@@ -151,7 +151,7 @@ class OrderLine(models.Model):
     )
 
     class Meta:
-        unique_together = ("product_sku", "order_id")
+        unique_together = ("product_sku", "order")
 
     def __str__(self):
         return f"{self.order.order_id} | {self.product_name} (SKU: {self.product_sku}) | Quantity: {self.order_quantity} | Total: {self.product_price * self.order_quantity} {self.product_currency}"
@@ -161,7 +161,7 @@ class OrderLine(models.Model):
 # for Vendor Snapshots
 #==============
 class VendorDetailsSnapshot(models.Model):
-    id = models.UUIDField(primary_key=True, editable=True) #uuid for global unique id
+    vendor_id = models.UUIDField()
     name = models.CharField(max_length=200)
     country = models.CharField(max_length=50, help_text="Can use to determine if the order is domestic compared w destination")
     is_active = models.BooleanField(default=True, help_text="To quickly control whether the is valid")
@@ -171,6 +171,7 @@ class VendorDetailsSnapshot(models.Model):
         return f"{self.id} | {self.name} | IsActive: {self.is_active} | {self.last_update_dt}"
 
 class VendorCouponSnapshot(models.Model):
+    coupon_id = models.UUIDField()
     coupon_code = models.CharField(max_length=50, help_text="e.g WELCOME25")
     start_date = models.DateTimeField(help_text="Only valid on start of this date")
     end_date = models.DateTimeField(help_text="Only valid on before end date")
@@ -181,7 +182,7 @@ class VendorCouponSnapshot(models.Model):
         return f"{self.coupon_code} | Validity: {self.start_date} - {self.end_date} | Active: {self.is_active} | LastUpdate: {self.last_update_dt}"
 
 class VendorOfferSnapshot(models.Model):
-    vendor = models.ForeignKey(VendorDetailsSnapshot, on_delete=models.CASCADE, related_name="vendor_offers_snapshot")
+    vendor_id = models.UUIDField()
     name = models.CharField(max_length=255)
     offer_type = models.CharField(max_length=50, choices=enums.OfferType.choices)
     discount_value = models.DecimalField(
@@ -207,7 +208,7 @@ class VendorOfferSnapshot(models.Model):
 
 
 class VendorShippingOptionSnapshot(models.Model):
-    vendor = models.ForeignKey(VendorDetailsSnapshot, on_delete=models.CASCADE, related_name="vendor_shipping_options_snapshot")
+    vendor_id = models.UUIDField()
     name = models.CharField(max_length=255, help_text="ex. Standard")
 
     #for future fullfilmmemt requirement?
@@ -238,8 +239,8 @@ class VendorShippingOptionSnapshot(models.Model):
         return f"{self.name} | {self.delivery_time} | {self.conditions} | LastUpdate: {self.last_update_dt}"
 
 class VendorProductSnapshot(models.Model):
-    product_id = models.UUIDField(primary_key=True, editable=True) #uuid for global unique id
-    vendor_id = models.UUIDField(editable=True) #uuid for global unique id
+    product_id = models.UUIDField()
+    vendor_id = models.UUIDField()
     product_sku = models.CharField(max_length=50)
     product_name = models.CharField(max_length=255)
     product_category = models.CharField(max_length=100, help_text="some countries uses category to calculate tax")
@@ -251,10 +252,10 @@ class VendorProductSnapshot(models.Model):
     package_length = models.CharField(max_length=100, null=True, blank=True, help_text="value should be coming from product itself or to fill in later once it goes to warehouse fulfillment? ")
     package_width = models.CharField(max_length=100, null=True, blank=True, help_text="value should be coming from product itself or to fill in later once it goes to warehouse fulfillment?")
     package_height = models.CharField(max_length=100, null=True, blank=True, help_text="value should be coming from product itself or to fill in later once it goes to warehouse fulfillment?")
-    last_update_dt = models.DateTimeField(auto_now=True) 
 
     class Meta:
-        unique_together = ("product_sku", "vendor_id") #prevent duplicate product per vendor
+        unique_together = ('product_sku', 'vendor_id') #ensure one default per addres type
+
 
 #===========================
 # For Customer snapshot
@@ -267,7 +268,7 @@ class CustomerDetailsSnapshot(models.Model):
     )
 
     #allows us t odecouple the customer data from User model?
-    customer_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False) #uuid for external integration
+    customer_id = models.UUIDField()
     last_update_dt = models.DateTimeField(auto_now=True) 
 
     def __str__(self):
@@ -279,11 +280,12 @@ class CustomerAddressSnapshot(models.Model):
         ('shipping', 'Shipping'),
     )
 
-    customer = models.ForeignKey(
-        CustomerDetailsSnapshot,
-        related_name="customer_address_snapshot",
-        on_delete=models.CASCADE
-    )
+    customer_id = models.UUIDField()
+    #customer = models.ForeignKey(
+    #    CustomerDetailsSnapshot,
+    #    related_name="customer_address_snapshot",
+    #    on_delete=models.CASCADE
+    #)
 
     address_type = models.CharField(
         max_length=10,
@@ -302,4 +304,4 @@ class CustomerAddressSnapshot(models.Model):
         return f"{self.address_type.capitalize()} Address: {self.street}, {self.city}, {self.country}"
 
     class Meta:
-        unique_together = ('customer', 'address_type', 'is_default') #ensure one default per addres type
+        unique_together = ('customer_id', 'address_type', 'is_default') #ensure one default per addres type

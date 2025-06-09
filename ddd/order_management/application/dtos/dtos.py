@@ -120,25 +120,3 @@ class ShippingOptionStrategyDTO(BaseModel):
     flat_rate: MoneyDTO
     currency: str
     is_active: bool
-
-class OfferStrategyDTO(BaseModel):
-    offer_type: enums.OfferType
-    name: str
-    discount_value: int | Decimal
-    conditions: str
-    required_coupon: bool
-    coupons: Optional[List[CouponDTO]]
-    stackable: bool
-    priority: int
-    start_date: datetime
-    end_date: datetime
-    is_active: bool
-
-class ShippingOptionStrategyDTO(BaseModel):
-    name: enums.ShippingMethod
-    delivery_time: str
-    conditions: dict
-    base_cost: MoneyDTO
-    flat_rate: MoneyDTO
-    currency: str
-    is_active: bool

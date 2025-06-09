@@ -43,7 +43,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sites',
     'graphene_django',
-    'product_catalog',
     'order_management',
 ]
 
