@@ -13,6 +13,6 @@ class DjangoVendorOfferSnapshotSync:
         offers = self.vendor_offer_provider.get_all_offers()
         for offer in offers:
             django_snapshots.VendorOfferSnapshot.create(**offers.model_dump())
-            coupons = self.vendor_offer_provider.get_coupons_for_offer(offer)
+            coupons = self.vendor_offer_provider.get_coupons_for_offer(offer.vendor_id)
             for coupon in coupons:
                 django_snapshots.VendorCouponSnapshot.create(**coupon.model_dump())

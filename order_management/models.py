@@ -171,7 +171,7 @@ class VendorDetailsSnapshot(models.Model):
         return f"{self.id} | {self.name} | IsActive: {self.is_active} | {self.last_update_dt}"
 
 class VendorCouponSnapshot(models.Model):
-    coupon_id = models.UUIDField()
+    vendor_id = models.UUIDField()
     coupon_code = models.CharField(max_length=50, help_text="e.g WELCOME25")
     start_date = models.DateTimeField(help_text="Only valid on start of this date")
     end_date = models.DateTimeField(help_text="Only valid on before end date")

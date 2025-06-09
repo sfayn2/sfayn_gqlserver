@@ -7,12 +7,14 @@ from ddd.order_management.domain import enums, value_objects
 from ddd.order_management.application.dtos.dtos import MoneyDTO
 
 class VendorCouponSnapshotDTO(BaseModel):
+    vendor_id: uuid.UUID
     coupon_code: str
     start_date: Optional[datetime] = None
     end_date: Optional[datetime] = None
     is_active: Optional[bool] = None
 
 class VendorOfferSnapshotDTO(BaseModel):
+    vendor_id: uuid.UUID
     offer_type: enums.OfferType
     name: str
     discount_value: int | Decimal
@@ -26,6 +28,7 @@ class VendorOfferSnapshotDTO(BaseModel):
     is_active: bool
 
 class VendorShippingOptionSnapshotDTO(BaseModel):
+    vendor_id: uuid.UUID
     name: enums.ShippingMethod
     delivery_time: str
     conditions: dict
