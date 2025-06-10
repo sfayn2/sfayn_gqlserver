@@ -8,7 +8,7 @@ from ddd.order_management.doman import enums
 from ddd.order_management.application import ports, dtos
 
 
-class FakeVendorOffersProviderAdapter(ports.VendorOfferProviderAbstract):
+class FakeVendorOfferSnapshotAdapter(ports.VendorOfferSnapshotAbstract):
 
     def get_all_offers(self) -> List[dtos.VendorOfferSnapshotDTO]:
         #TODO rest api here

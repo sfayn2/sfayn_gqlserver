@@ -3,7 +3,7 @@ from order_management import models as django_snapshots
 
 
 class DjangoVendorOfferSnapshotSync:
-    def __init__(self, vendor_offer_provider: VendorOfferProviderAbstract):
+    def __init__(self, vendor_offer_provider: VendorOfferSnapshotAbstract):
         self.vendor_offer_provider = vendor_offer_provider
 
     def sync(self):
