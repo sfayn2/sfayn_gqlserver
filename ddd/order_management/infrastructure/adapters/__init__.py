@@ -6,6 +6,7 @@ from .django_stock_validation_service_adapter import DjangoStockValidationServic
 from .django_vendor_repository import DjangoVendorRepositoryImpl
 from .email_adapter import EmailAdapter
 from .fake_vendor_offer_snapshot_adapter import FakeVendorOfferSnapshotAdapter
+from .fake_vendor_product_snapshot_adapter import FakeVendorProductSnapshotAdapter
 from .logging_adapter import LoggingAdapter
 from .payments_adapter import PaymentGatewayFactoryAdapter
 from .unit_of_work import DjangoOrderUnitOfWork

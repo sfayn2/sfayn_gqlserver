@@ -3,7 +3,7 @@ from ddd.order_management.infrastructure import snapshots_sync, adapters
 
 class VendorOfferSnapshotSyncCommand(BaseCommand):
     def handle(self, *args, **kwargs):
-        provider = adapters.FakeVendorOffersAdapter()
+        provider = adapters.FakeVendorOfferAdapter()
         django_vendor_offer_snapshot = snapshots_sync.DjangoVendorOfferSnapshotSync(provider)
         django_vendor_offer_snapshot.sync()
 

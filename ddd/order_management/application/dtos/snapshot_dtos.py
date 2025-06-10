@@ -36,3 +36,18 @@ class VendorShippingOptionSnapshotDTO(BaseModel):
     flat_rate: MoneyDTO
     currency: str
     is_active: bool
+
+class VendorProductSnapshotDTO(BaseModel):
+    product_id: uuid.UUID
+    vendor_id: uuid.UUID
+    product_sku: str
+    product_name: str
+    product_category: str
+    options: dict
+    product_price: MoneyDTO
+    stock: int
+    product_currency: str
+    package_weight: Decimal
+    package_length: int
+    package_width: int
+    package_height: int
