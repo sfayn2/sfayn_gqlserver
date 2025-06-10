@@ -11,4 +11,4 @@ class DjangoVendorProductSnapshotSync:
 
         products = self.vendor_product_provider.get_all_products()
         for product in products:
-            django_snapshots.VendorProductSnapshot.create(**product.model_dump())
+            django_snapshots.VendorProductSnapshot.objects.create(**product.model_dump())

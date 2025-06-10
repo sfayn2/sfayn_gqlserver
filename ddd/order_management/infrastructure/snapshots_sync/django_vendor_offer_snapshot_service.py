@@ -12,7 +12,8 @@ class DjangoVendorOfferSnapshotSync:
 
         offers = self.vendor_offer_provider.get_all_offers()
         for offer in offers:
-            django_snapshots.VendorOfferSnapshot.create(**offers.model_dump())
+            #TODO will not work w coupons many to many relationship
+            django_snapshots.VendorOfferSnapshot.objects.create(**offer.model_dump())
             coupons = self.vendor_offer_provider.get_coupons_for_offer(offer.vendor_id)
             for coupon in coupons:
-                django_snapshots.VendorCouponSnapshot.create(**coupon.model_dump())
+                django_snapshots.VendorCouponSnapshot.objects.create(**coupon.model_dump())

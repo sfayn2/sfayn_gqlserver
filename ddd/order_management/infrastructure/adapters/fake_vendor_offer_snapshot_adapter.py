@@ -4,7 +4,7 @@ from typing import List
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from decimal import Decimal
-from ddd.order_management.doman import enums
+from ddd.order_management.domain import enums
 from ddd.order_management.application import ports, dtos
 
 
@@ -15,16 +15,16 @@ class FakeVendorOfferSnapshotAdapter(ports.VendorOfferSnapshotAbstract):
         return [
             dtos.VendorOfferSnapshotDTO(
                 vendor_id=uuid.uuid4(),
-                offer_type=enums.OfferType["percentage_discount"],
+                offer_type=enums.OfferType.PERCENTAGE_DISCOUNT,
                 name="10% Off",
                 discount_value="10",
-                conditions={""},
+                conditions={"eligible_products": ["SKU1"]},
                 required_coupon=False,
-                coupons=None,
+                coupon=None,
                 stackable=True,
                 priority=1,
                 start_date=datetime.now(),
-                end_date=datetime.now() + relativedelta(years=1)
+                end_date=datetime.now() + relativedelta(years=1),
                 is_active=True
             )
         ]
@@ -37,7 +37,7 @@ class FakeVendorOfferSnapshotAdapter(ports.VendorOfferSnapshotAbstract):
                 vendor_id=vendor_id,
                 coupon_code="WELCOME25",
                 start_date=datetime.now(),
-                end_date=datetime.now() + relativedelta(years=1)
+                end_date=datetime.now() + relativedelta(years=1),
                 is_active=True
             )
         ]

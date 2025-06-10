@@ -18,9 +18,9 @@ class VendorOfferSnapshotDTO(BaseModel):
     offer_type: enums.OfferType
     name: str
     discount_value: int | Decimal
-    conditions: str
+    conditions: dict
     required_coupon: bool
-    coupons: Optional[List[VendorCouponSnapshotDTO]]
+    coupon: Optional[List[VendorCouponSnapshotDTO]] = None
     stackable: bool
     priority: int
     start_date: datetime
@@ -44,7 +44,7 @@ class VendorProductSnapshotDTO(BaseModel):
     product_name: str
     product_category: str
     options: dict
-    product_price: MoneyDTO
+    product_price: Decimal
     stock: int
     product_currency: str
     package_weight: Decimal

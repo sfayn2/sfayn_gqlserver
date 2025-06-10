@@ -1,1 +1,2 @@
 from .django_vendor_offer_snapshot_service import DjangoVendorOfferSnapshotSync
+from .django_vendor_product_snapshot_service import DjangoVendorProductSnapshotSync

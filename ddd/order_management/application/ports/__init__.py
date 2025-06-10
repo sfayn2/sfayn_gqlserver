@@ -5,3 +5,4 @@ from .payment_abstract import PaymentGatewayAbstract, PaymentGatewayFactoryAbstr
 from .products_vendor_validation_service_abstract import ProductsVendorValidationServiceAbstract
 from .stock_validation_service_abstract import StockValidationServiceAbstract
 from .vendor_offer_snapshot_abstract import VendorOfferSnapshotAbstract
+from .vendor_product_snapshot_abstract import VendorProductSnapshotAbstract
