@@ -1,4 +1,5 @@
 from __future__ import annotations
+import pytz
 import uuid
 from typing import List
 from datetime import datetime
@@ -15,29 +16,29 @@ class FakeVendorOfferSnapshotAdapter(ports.VendorOfferSnapshotAbstract):
         return [
             dtos.VendorOfferSnapshotDTO(
                 vendor_id=uuid.uuid4(),
+                offer_id=uuid.uuid4(),
                 offer_type=enums.OfferType.PERCENTAGE_DISCOUNT,
                 name="10% Off",
                 discount_value="10",
                 conditions={"eligible_products": ["SKU1"]},
                 required_coupon=False,
-                coupon=None,
                 stackable=True,
                 priority=1,
-                start_date=datetime.now(),
-                end_date=datetime.now() + relativedelta(years=1),
+                start_date=datetime.now(pytz.utc),
+                end_date=datetime.now(pytz.utc) + relativedelta(years=1),
                 is_active=True
             )
         ]
 
 
-    def get_coupons_for_offers(vendor_id: uuid.UUID) -> List[dtos.VendorCouponSnapshotDTO]:
+    def get_coupons_for_offers(self, offer_id: uuid.UUID) -> List[dtos.VendorCouponSnapshotDTO]:
         #TODO rest api here
         return [
             dtos.VendorCouponSnapshotDTO(
-                vendor_id=vendor_id,
+                offer_id=offer_id,
                 coupon_code="WELCOME25",
-                start_date=datetime.now(),
-                end_date=datetime.now() + relativedelta(years=1),
+                start_date=datetime.now(pytz.utc),
+                end_date=datetime.now(pytz.utc) + relativedelta(years=1),
                 is_active=True
             )
         ]

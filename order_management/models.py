@@ -171,7 +171,7 @@ class VendorDetailsSnapshot(models.Model):
         return f"{self.id} | {self.name} | IsActive: {self.is_active} | {self.last_update_dt}"
 
 class VendorCouponSnapshot(models.Model):
-    vendor_id = models.UUIDField()
+    offer_id = models.UUIDField()
     coupon_code = models.CharField(max_length=50, help_text="e.g WELCOME25")
     start_date = models.DateTimeField(help_text="Only valid on start of this date")
     end_date = models.DateTimeField(help_text="Only valid on before end date")
@@ -183,6 +183,7 @@ class VendorCouponSnapshot(models.Model):
 
 class VendorOfferSnapshot(models.Model):
     vendor_id = models.UUIDField()
+    offer_id = models.UUIDField()
     name = models.CharField(max_length=255)
     offer_type = models.CharField(max_length=50, choices=enums.OfferType.choices)
     discount_value = models.DecimalField(
@@ -195,7 +196,6 @@ class VendorOfferSnapshot(models.Model):
     stackable = models.BooleanField(default=False, help_text="Set to True, To combine w other stackable")
     priority = models.PositiveIntegerField(default=0, help_text="The highest number will be prioritized on multistack or single stack")
     required_coupon = models.BooleanField(default=False, help_text="Set to True, To make use of coupons to apply")
-    coupon = models.ManyToManyField(VendorCouponSnapshot, blank=True, help_text="Provide a coupons to manually apply for this offer.")
     start_date = models.DateTimeField(help_text="Only valid on start of this date; To ignore if required_coupon is True", blank=True, null=True)
     end_date = models.DateTimeField(help_text="Only valid on before end date; To ignore if required_coupon is True", blank=True, null=True)
     is_active = models.BooleanField(default=False, help_text="To quickly control whether this offer is still valid")

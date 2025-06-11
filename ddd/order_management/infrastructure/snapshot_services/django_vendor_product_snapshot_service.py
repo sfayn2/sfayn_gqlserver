@@ -2,7 +2,7 @@ from __future__ import annotations
 from order_management import models as django_snapshots
 
 
-class DjangoVendorProductSnapshotSync:
+class DjangoVendorProductSnapshotSyncService:
     def __init__(self, vendor_product_provider: VendorProductSnapshotAbstract):
         self.vendor_product_provider = vendor_product_provider
 

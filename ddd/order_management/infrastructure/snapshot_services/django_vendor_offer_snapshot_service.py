@@ -2,7 +2,7 @@ from __future__ import annotations
 from order_management import models as django_snapshots
 
 
-class DjangoVendorOfferSnapshotSync:
+class DjangoVendorOfferSnapshotSyncService:
     def __init__(self, vendor_offer_provider: VendorOfferSnapshotAbstract):
         self.vendor_offer_provider = vendor_offer_provider
 
@@ -12,8 +12,7 @@ class DjangoVendorOfferSnapshotSync:
 
         offers = self.vendor_offer_provider.get_all_offers()
         for offer in offers:
-            #TODO will not work w coupons many to many relationship
             django_snapshots.VendorOfferSnapshot.objects.create(**offer.model_dump())
-            coupons = self.vendor_offer_provider.get_coupons_for_offer(offer.vendor_id)
+            coupons = self.vendor_offer_provider.get_coupons_for_offers(offer.offer_id)
             for coupon in coupons:
                 django_snapshots.VendorCouponSnapshot.objects.create(**coupon.model_dump())
