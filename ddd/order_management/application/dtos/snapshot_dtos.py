@@ -32,8 +32,8 @@ class VendorShippingOptionSnapshotDTO(BaseModel):
     name: enums.ShippingMethod
     delivery_time: str
     conditions: dict
-    base_cost: MoneyDTO
-    flat_rate: MoneyDTO
+    base_cost: Decimal
+    flat_rate: Decimal
     currency: str
     is_active: bool
 
