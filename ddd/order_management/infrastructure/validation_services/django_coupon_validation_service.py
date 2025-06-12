@@ -6,7 +6,7 @@ from ddd.order_management.infrastructure import django_mappers
 from ddd.order_management.domain import exceptions
 from order_management import models as django_snapshots
 
-class DjangoCouponValidationAdapter(ports.CouponValidationAbstract):
+class DjangoCouponValidationService(ports.CouponValidationServiceAbstract):
 
     def ensure_coupon_is_valid(self, coupon_code: str, vendor_id: uuid.UUID) -> Union[None, value_objects.Coupon]:
         vendor_coupon_snapshot = django_snapshots.VendorCouponSnapshot.objects.filter(coupon_code=item, vendoroffersnapshot__vendor__id=vendor_id)

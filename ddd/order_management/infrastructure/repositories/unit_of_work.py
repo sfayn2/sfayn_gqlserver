@@ -1,20 +1,15 @@
 from abc import ABC, abstractmethod
 from django.db import transaction
-from ddd.order_management.infrastructure.adapters import (
-    django_customer_repository, 
-    django_order_repository, 
-    django_vendor_repository,
-)
-from ddd.order_management.infrastructure import django_mappers, event_bus
+from ddd.order_management.infrastructure import django_mappers, event_bus, repositories as impl_repositories
 from ddd.order_management.domain import repositories
 
 class DjangoOrderUnitOfWork(repositories.UnitOfWorkAbstract):
     #make sure to call uow within block statement
     #to trigger this
     def __init__(self):
-        self.order = django_order_repository.DjangoOrderRepositoryImpl()
-        self.customer = django_customer_repository.DjangoCustomerRepositoryImpl()
-        self.vendor = django_vendor_repository.DjangoVendorRepositoryImpl()
+        self.order = impl_repositories.DjangoOrderRepositoryImpl()
+        self.customer = impl_repositories.DjangoCustomerRepositoryImpl()
+        self.vendor = impl_repositories.DjangoVendorRepositoryImpl()
 
         self.event_publisher = event_bus
         self._events = []

@@ -12,7 +12,7 @@ from ddd.order_management.domain import exceptions
 def handle_confirm_order(
         command: commands.ConfirmOrderCommand, 
         uow: UnitOfWorkAbstract, 
-        payment_gateway_factory: PaymentGatewayFactoryAbstract,
+        payment_service: PaymentServiceAbstract,
         order_service: OrderServiceAbstract,
         stock_validation_service: StockValidationServiceAbstract
     ) -> dtos.ResponseDTO:
@@ -25,7 +25,7 @@ def handle_confirm_order(
 
             stock_validation_service.ensure_items_in_stock(order.line_items)
 
-            payment_gateway = payment_gateway_factory.get_payment_gateway(command.payment_method)
+            payment_gateway = payment_service.get_payment_gateway(command.payment_method)
             payment_details = payment_gateway.get_payment_details(command.transaction_id)
 
             confirmed_order = order_service.confirm_order(

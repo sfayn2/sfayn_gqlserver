@@ -5,7 +5,7 @@ from abc import ABC, abstractmethod
 # ========
 # Validate coupon contract
 # ==========
-class CouponValidationAbstract(ABC):
+class CouponValidationServiceAbstract(ABC):
 
     @abstractmethod
     def ensure_coupon_is_valid(self, coupon_code: str, vendor_id: uuid.UUID) -> Union[None, value_objects.Coupon]:

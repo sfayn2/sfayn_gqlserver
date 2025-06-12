@@ -6,7 +6,7 @@ from ddd.order_management.infrastructure import django_mappers
 from ddd.order_management.domain import exceptions
 from order_management import models as django_snapshots
 
-class DjangoProductsVendorValidationServiceAdapter(ports.ProductsVendorValidationServiceAbstract):
+class DjangoProductsVendorValidationService(ports.ProductsVendorValidationServiceAbstract):
 
     def ensure_line_items_vendor_is_valid(self, items: List[models.LineItem]) -> None:
         for item in items:

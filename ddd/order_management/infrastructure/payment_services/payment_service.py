@@ -5,7 +5,7 @@ from django.conf import settings
 from ddd.order_management.domain import value_objects, enums
 from ddd.order_management.application import ports
 
-class PaypalPaymentGatewayAdapter(ports.PaymentGatewayAbstract):
+class PaypalPaymentGateway(ports.PaymentGatewayAbstract):
 
     def get_payment_details(self, transaction_id: str) -> value_objects.PaymentDetails:
         url = f"{settings.PAYPAL_BASE_URL}/v1/checkout/orders/{transaction_id}"
@@ -46,7 +46,7 @@ class PaypalPaymentGatewayAdapter(ports.PaymentGatewayAbstract):
             status=paypal_response.get("status")
         )
 
-class StripePaymentGatewayAdapter(ports.PaymentGatewayAbstract):
+class StripePaymentGateway(ports.PaymentGatewayAbstract):
 
     def get_payment_details(self, transaction_id: str):
         return self._retrieve_payment_intent(transaction_id=transaction_id)
@@ -85,12 +85,12 @@ class StripePaymentGatewayAdapter(ports.PaymentGatewayAbstract):
         )
 
     
-class PaymentGatewayFactoryAdapter(ports.PaymentGatewayFactoryAbstract):
+class PaymentService(ports.PaymentServiceAbstract):
 
     def get_payment_gateway(self, payment_method: enums.PaymentMethod) -> ports.PaymentGatewayAbstract:
         gateways = {
-            enums.PaymentMethod.PAYPAL: PaypalPaymentGatewayAdapter(),
-            enums.PaymentMethod.STRIPE: StripePaymentGatewayAdapter()
+            enums.PaymentMethod.PAYPAL: PaypalPaymentGateway(),
+            enums.PaymentMethod.STRIPE: StripePaymentGateway()
         }
         if payment_method not in gateways:
             raise ValueError(f"Unsupport payment gateway {payment_method}")

@@ -4,7 +4,7 @@ from ddd.order_management.application import ports
 from order_management import models as django_snapshots
 from ddd.order_management.domain import exceptions
 
-class DjangoStockValidationServiceAdapter(ports.StockValidationServiceAbstract):
+class DjangoStockValidationService(ports.StockValidationServiceAbstract):
 
     def ensure_items_in_stock(self, items: List[models.LineItem]) -> None:
 

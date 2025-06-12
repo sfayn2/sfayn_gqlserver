@@ -1,6 +1,13 @@
 
-from ddd.order_management.domain import events, services
-from ddd.order_management.infrastructure import event_bus, adapters
+from ddd.order_management.domain import events, services as domain_services
+from ddd.order_management.infrastructure import (
+    event_bus, 
+    validation_services, 
+    email_services,
+    logging_services,
+    repositories,
+    payment_services
+)
 from ddd.order_management.application import handlers
 from ddd.order_management.application.handlers import event_handlers
 
@@ -16,34 +23,34 @@ def register_event_handlers():
                 lambda event, uow: handlers.handle_logged_order(
                     event=event, 
                     uow=uow, 
-                    logging=adapters.LoggingAdapter()
+                    logging=logging_services.LoggingService()
                 ),
                 lambda event, uow: handlers.handle_email_canceled_order(
                     event=event, 
                     uow=uow, 
-                    email=adapters.EmailAdapter()
+                    email=email_services.EmailService()
                 )
             ],
         "order_management.events.OrderPlacedEvent": [
                 lambda event, uow: handlers.handle_apply_applicable_offers(
                     event=event, 
                     uow=uow, 
-                    vendor=adapters.DjangoVendorRepositoryImpl(),
-                    offer_service=services.OfferStrategyService()
+                    vendor=repositories.DjangoVendorRepositoryImpl(),
+                    offer_service=domain_services.OfferStrategyService()
                 )
             ],
         "order_management.events.OrderOfferAppliedEvent": [
                 lambda event, uow: handlers.handle_apply_tax_results(
                     event=event, 
                     uow=uow, 
-                    tax_service=services.TaxStrategyService()
+                    tax_service=domain_services.TaxStrategyService()
                 )
             ],
         "order_management.events.OrderDraftEvent": [
                 lambda event, uow: handlers.handle_apply_tax_results(
                     event=event, 
                     uow=uow, 
-                    tax_service=services.TaxStrategyService()
+                    tax_service=domain_services.TaxStrategyService()
                 )
             ]
     })
@@ -54,25 +61,25 @@ def register_command_handlers():
         commands.CheckoutItemsCommand: lambda command, uow: handlers.handle_checkout_items(
             command=command,
             uow=uow,
-            order_service=services.OrderService(),
-            product_vendor_validation_service=adapters.ProductVendorValidationServiceAdapter()
+            order_service=domain_services.OrderService(),
+            product_vendor_validation_service=validation_services.ProductVendorValidationService()
         ),
         commands.SelectShippingOptionCommand: lambda command, uow: handlers.handle_select_shipping_option(
             command=command, 
             uow=uow,
-            shipping_option_service=services.ShippingOptionStrategyService
+            shipping_option_service=domain_services.ShippingOptionStrategyService
         ),
         commands.PlaceOrderCommand: lambda command, uow: handlers.handle_place_order(
             command=command,
             uow=uow,
-            stock_validation_service=adapters.DjangoStockValidationServiceAdapter()
+            stock_validation_service=validation_services.DjangoStockValidationService()
         ),
         commands.ConfirmOrderCommand: lambda command, uow: handlers.handle_confirm_order(
             command=command, 
             uow=uow,
-            payment_gateway_factory=adapters.PaymentGatewayFactoryAdapter(),
-            order_service=services.OrderService(),
-            stock_validation_service=adapters.DjangoStockValidationServiceAdapter()
+            payment_service=payment_services.PaymentService(),
+            order_service=domain_services.OrderService(),
+            stock_validation_service=validation_services.DjangoStockValidationService()
         ),
         commands.MarkAsShippedOrderCommand: lambda command, uow: handlers.handle_mark_as_shipped(
             command=command,
@@ -85,7 +92,7 @@ def register_command_handlers():
         commands.AddCouponCommand: lambda command, uow: handlers.handle_add_coupon(
             command=command,
             uow=uow,
-            coupon_validation=adapters.DjangoCouponValidationAdapter()
+            coupon_validation=validation_services.DjangoCouponValidationService()
         ),
     })
 
@@ -94,7 +101,7 @@ def register_query_handlers():
         queries.ShippingOptionsQuery: lambda query, uow: handlers.handle_shipping_options(
             query=query, 
             uow=uow,
-            shipping_option_service=services.ShippingOptionStrategyService
+            shipping_option_service=domain_services.ShippingOptionStrategyService
         ),
     })
 
