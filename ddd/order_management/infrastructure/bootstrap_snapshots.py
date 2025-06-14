@@ -14,3 +14,13 @@ def run_vendor_shippingoptions_snapshot_sync():
     provider = snapshot_services.FakeVendorShippingOptionSnapshotProvider()
     django_vendor_shippingoptions_snapshot = snapshot_services.DjangoVendorShippingOptionSnapshotSyncService(provider)
     django_vendor_shippingoptions_snapshot.sync()
+
+def run_customer_snapshot_sync():
+    provider = snapshot_services.FakeCustomerSnapshotProvider()
+    django_customer_snapshot = snapshot_services.DjangoCustomerSnapshotSyncService(provider)
+    django_customer_snapshot.sync()
+
+def run_user_auth_snapshot_sync():
+    provider = snapshot_services.FakeUserAuthorizationSnapshotProvider()
+    django_user_auth = snapshot_services.DjangoUserAuthorizationSnapshotSyncService(provider)
+    django_user_auth.sync()

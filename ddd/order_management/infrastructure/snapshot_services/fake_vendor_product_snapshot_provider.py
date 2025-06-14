@@ -26,7 +26,8 @@ class FakeVendorProductSnapshotProvider(ports.VendorProductSnapshotAbstract):
                 package_weight=Decimal("2.1"),
                 package_length=10,
                 package_width=10,
-                package_height=10
+                package_height=10,
+                is_active=True
             )
         ]
 

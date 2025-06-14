@@ -7,7 +7,8 @@ from order_management.models import (
     VendorShippingOptionSnapshot,
     VendorProductSnapshot,
     CustomerDetailsSnapshot,
-    CustomerAddressSnapshot
+    CustomerAddressSnapshot,
+    UserAuthorizationSnapshot
 )
 
 # Register your models here.
@@ -37,6 +38,9 @@ class CustomerDetailsSnapshotAdmin(admin.ModelAdmin):
 class CustomerAddressSnapshotAdmin(admin.ModelAdmin):
     pass
 
+class UserAuthorizationSnapshotAdmin(admin.ModelAdmin):
+    pass
+
 
 admin.site.register(Order, OrderAdmin)
 admin.site.register(OrderLine, OrderLineAdmin)
@@ -46,3 +50,4 @@ admin.site.register(VendorShippingOptionSnapshot, VendorShippingOptionSnapshotAd
 admin.site.register(VendorProductSnapshot, VendorProductSnapshotAdmin)
 admin.site.register(CustomerDetailsSnapshot, CustomerDetailsSnapshotAdmin)
 admin.site.register(CustomerAddressSnapshot, CustomerAddressSnapshotAdmin)
+admin.site.register(UserAuthorizationSnapshot, UserAuthorizationSnapshotAdmin)

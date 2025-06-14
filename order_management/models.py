@@ -252,6 +252,8 @@ class VendorProductSnapshot(models.Model):
     package_length = models.CharField(max_length=100, null=True, blank=True, help_text="value should be coming from product itself or to fill in later once it goes to warehouse fulfillment? ")
     package_width = models.CharField(max_length=100, null=True, blank=True, help_text="value should be coming from product itself or to fill in later once it goes to warehouse fulfillment?")
     package_height = models.CharField(max_length=100, null=True, blank=True, help_text="value should be coming from product itself or to fill in later once it goes to warehouse fulfillment?")
+    is_active = models.BooleanField(default=True)
+    last_update_dt = models.DateTimeField(auto_now=True) 
 
     class Meta:
         unique_together = ('product_sku', 'vendor_id') #ensure one default per addres type
@@ -261,18 +263,16 @@ class VendorProductSnapshot(models.Model):
 # For Customer snapshot
 #===================
 class CustomerDetailsSnapshot(models.Model):
-    user = models.OneToOneField(
-        User,
-        on_delete=models.CASCADE,
-        related_name="customer_details_snapshot"
-    )
-
-    #allows us t odecouple the customer data from User model?
     customer_id = models.UUIDField()
+    user_id = models.UUIDField(null=True, blank=True)
+    first_name = models.CharField(max_length=255)
+    last_name = models.CharField(max_length=255)
+    email = models.EmailField(max_length=255, blank=True, null=True)
+    is_active = models.BooleanField(default=True)
     last_update_dt = models.DateTimeField(auto_now=True) 
 
     def __str__(self):
-        return f"{self.user.email}"
+        return f"{self.customer_id} | {self.last_update_dt}"
 
 class CustomerAddressSnapshot(models.Model):
     ADDRESS_TYPE_CHOICES = (
@@ -281,11 +281,6 @@ class CustomerAddressSnapshot(models.Model):
     )
 
     customer_id = models.UUIDField()
-    #customer = models.ForeignKey(
-    #    CustomerDetailsSnapshot,
-    #    related_name="customer_address_snapshot",
-    #    on_delete=models.CASCADE
-    #)
 
     address_type = models.CharField(
         max_length=10,
@@ -298,6 +293,7 @@ class CustomerAddressSnapshot(models.Model):
     postal_code = models.CharField(max_length=20)
     country = models.CharField(max_length=100)
     is_default = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
     last_update_dt = models.DateTimeField(auto_now=True) 
 
     def __str__(self):
@@ -305,3 +301,16 @@ class CustomerAddressSnapshot(models.Model):
 
     class Meta:
         unique_together = ('customer_id', 'address_type', 'is_default') #ensure one default per addres type
+
+# =========
+# Authorization snapshot
+# =========
+class UserAuthorizationSnapshot(models.Model):
+    user_id = models.UUIDField()
+    permission_codename = models.CharField(max_length=255)
+    scope = models.CharField(max_length=150, help_text='ex. { "vendor_id": "v-1234" }')
+    is_active = models.BooleanField(default=True)
+    last_update_dt = models.DateTimeField(auto_now=True) 
+
+    class Meta:
+        unique_together = ('user_id', 'permission_codename', 'scope') 

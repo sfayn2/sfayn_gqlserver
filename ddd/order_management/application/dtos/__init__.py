@@ -18,5 +18,8 @@ from ddd.order_management.application.dtos.snapshot_dtos import (
     VendorCouponSnapshotDTO,
     VendorOfferSnapshotDTO,
     VendorShippingOptionSnapshotDTO,
-    VendorProductSnapshotDTO
+    VendorProductSnapshotDTO,
+    CustomerDetailsSnapshotDTO,
+    CustomerAddressSnapshotDTO,
+    UserAuthorizationSnapshotDTO
 )

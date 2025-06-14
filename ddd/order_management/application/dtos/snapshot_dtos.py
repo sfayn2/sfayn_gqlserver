@@ -51,3 +51,29 @@ class VendorProductSnapshotDTO(BaseModel):
     package_length: int
     package_width: int
     package_height: int
+    is_active: bool
+
+class CustomerDetailsSnapshotDTO(BaseModel):
+    customer_id: uuid.UUID
+    user_id: Optional[uuid.UUID] = None
+    first_name: str
+    last_name: str
+    email: str
+    is_active: bool
+
+class CustomerAddressSnapshotDTO(BaseModel):
+    customer_id: uuid.UUID
+    address_type: str
+    street: str
+    city: str
+    state: str
+    postal_code: int
+    country: str
+    is_default: bool
+    is_active: bool
+
+class UserAuthorizationSnapshotDTO(BaseModel):
+    user_id: uuid.UUID
+    permission_codename: str
+    scope: dict
+    is_active: bool
