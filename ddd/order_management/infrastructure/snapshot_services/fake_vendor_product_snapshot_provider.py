@@ -14,8 +14,8 @@ class FakeVendorProductSnapshotProvider(ports.VendorProductSnapshotAbstract):
         #TODO rest api here
         return [
             dtos.VendorProductSnapshotDTO(
-                product_id=uuid.uuid4(),
-                vendor_id=uuid.uuid4(),
+                product_id="p-234",
+                vendor_id="v-234",
                 product_sku="T-SHIRT-L",
                 product_name="T Shirt Large Size",
                 product_category="Men's T-Shirts",

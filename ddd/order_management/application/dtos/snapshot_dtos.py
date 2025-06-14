@@ -6,16 +6,23 @@ from typing import Optional, List, Tuple
 from ddd.order_management.domain import enums, value_objects
 from ddd.order_management.application.dtos.dtos import MoneyDTO
 
+class VendorDetailsSnapshotDTO(BaseModel):
+    vendor_id: str
+    name: str
+    country: str
+    is_active: bool
+
 class VendorCouponSnapshotDTO(BaseModel):
-    offer_id: uuid.UUID
+    vendor_id: str
+    offer_id: str
     coupon_code: str
     start_date: Optional[datetime] = None
     end_date: Optional[datetime] = None
     is_active: Optional[bool] = None
 
 class VendorOfferSnapshotDTO(BaseModel):
-    vendor_id: uuid.UUID
-    offer_id: uuid.UUID
+    vendor_id: str
+    offer_id: str
     offer_type: enums.OfferType
     name: str
     discount_value: int | Decimal
@@ -27,9 +34,12 @@ class VendorOfferSnapshotDTO(BaseModel):
     end_date: datetime
     is_active: bool
 
+    class Config:
+        use_enum_values = True
+
 class VendorShippingOptionSnapshotDTO(BaseModel):
-    vendor_id: uuid.UUID
-    name: enums.ShippingMethod
+    vendor_id: str
+    name: str
     delivery_time: str
     conditions: dict
     base_cost: Decimal
@@ -38,8 +48,8 @@ class VendorShippingOptionSnapshotDTO(BaseModel):
     is_active: bool
 
 class VendorProductSnapshotDTO(BaseModel):
-    product_id: uuid.UUID
-    vendor_id: uuid.UUID
+    product_id: str
+    vendor_id: str
     product_sku: str
     product_name: str
     product_category: str
@@ -54,15 +64,15 @@ class VendorProductSnapshotDTO(BaseModel):
     is_active: bool
 
 class CustomerDetailsSnapshotDTO(BaseModel):
-    customer_id: uuid.UUID
-    user_id: Optional[uuid.UUID] = None
+    customer_id: str
+    user_id: Optional[str] = None
     first_name: str
     last_name: str
     email: str
     is_active: bool
 
 class CustomerAddressSnapshotDTO(BaseModel):
-    customer_id: uuid.UUID
+    customer_id: str
     address_type: str
     street: str
     city: str
@@ -73,7 +83,7 @@ class CustomerAddressSnapshotDTO(BaseModel):
     is_active: bool
 
 class UserAuthorizationSnapshotDTO(BaseModel):
-    user_id: uuid.UUID
+    user_id: str
     permission_codename: str
     scope: dict
     is_active: bool

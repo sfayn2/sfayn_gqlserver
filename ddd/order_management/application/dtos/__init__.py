@@ -15,6 +15,7 @@ from ddd.order_management.application.dtos.dtos import (
     ShippingOptionStrategyDTO,
 )
 from ddd.order_management.application.dtos.snapshot_dtos import (
+    VendorDetailsSnapshotDTO,
     VendorCouponSnapshotDTO,
     VendorOfferSnapshotDTO,
     VendorShippingOptionSnapshotDTO,

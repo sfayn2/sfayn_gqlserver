@@ -161,17 +161,18 @@ class OrderLine(models.Model):
 # for Vendor Snapshots
 #==============
 class VendorDetailsSnapshot(models.Model):
-    vendor_id = models.UUIDField()
+    vendor_id = models.CharField(max_length=150)
     name = models.CharField(max_length=200)
     country = models.CharField(max_length=50, help_text="Can use to determine if the order is domestic compared w destination")
     is_active = models.BooleanField(default=True, help_text="To quickly control whether the is valid")
     last_update_dt = models.DateTimeField(auto_now=True) 
 
     def __str__(self):
-        return f"{self.id} | {self.name} | IsActive: {self.is_active} | {self.last_update_dt}"
+        return f"{self.vendor_id} | {self.name} | IsActive: {self.is_active} | {self.last_update_dt}"
 
 class VendorCouponSnapshot(models.Model):
-    offer_id = models.UUIDField()
+    vendor_id = models.CharField(max_length=150)
+    offer_id = models.CharField(max_length=150)
     coupon_code = models.CharField(max_length=50, help_text="e.g WELCOME25")
     start_date = models.DateTimeField(help_text="Only valid on start of this date")
     end_date = models.DateTimeField(help_text="Only valid on before end date")
@@ -182,8 +183,8 @@ class VendorCouponSnapshot(models.Model):
         return f"{self.coupon_code} | Validity: {self.start_date} - {self.end_date} | Active: {self.is_active} | LastUpdate: {self.last_update_dt}"
 
 class VendorOfferSnapshot(models.Model):
-    vendor_id = models.UUIDField()
-    offer_id = models.UUIDField()
+    vendor_id = models.CharField(max_length=150)
+    offer_id = models.CharField(max_length=150)
     name = models.CharField(max_length=255)
     offer_type = models.CharField(max_length=50, choices=enums.OfferType.choices)
     discount_value = models.DecimalField(
@@ -208,7 +209,7 @@ class VendorOfferSnapshot(models.Model):
 
 
 class VendorShippingOptionSnapshot(models.Model):
-    vendor_id = models.UUIDField()
+    vendor_id = models.CharField(max_length=150)
     name = models.CharField(max_length=255, help_text="ex. Standard")
 
     #for future fullfilmmemt requirement?
@@ -239,8 +240,8 @@ class VendorShippingOptionSnapshot(models.Model):
         return f"{self.name} | {self.delivery_time} | {self.conditions} | LastUpdate: {self.last_update_dt}"
 
 class VendorProductSnapshot(models.Model):
-    product_id = models.UUIDField()
-    vendor_id = models.UUIDField()
+    product_id = models.CharField(max_length=150)
+    vendor_id = models.CharField(max_length=150)
     product_sku = models.CharField(max_length=50)
     product_name = models.CharField(max_length=255)
     product_category = models.CharField(max_length=100, help_text="some countries uses category to calculate tax")
@@ -258,13 +259,16 @@ class VendorProductSnapshot(models.Model):
     class Meta:
         unique_together = ('product_sku', 'vendor_id') #ensure one default per addres type
 
+    def __str__(self):
+        return f"({self.vendor_id}) {self.product_sku} | {self.product_name} | {self.stock} | {self.is_active}"
+
 
 #===========================
 # For Customer snapshot
 #===================
 class CustomerDetailsSnapshot(models.Model):
-    customer_id = models.UUIDField()
-    user_id = models.UUIDField(null=True, blank=True)
+    customer_id = models.CharField(max_length=150)
+    user_id = models.CharField(max_length=150, null=True, blank=True)
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
     email = models.EmailField(max_length=255, blank=True, null=True)
@@ -272,7 +276,7 @@ class CustomerDetailsSnapshot(models.Model):
     last_update_dt = models.DateTimeField(auto_now=True) 
 
     def __str__(self):
-        return f"{self.customer_id} | {self.last_update_dt}"
+        return f"{self.customer_id} | {self.first_name} {self.last_name} | {self.email}"
 
 class CustomerAddressSnapshot(models.Model):
     ADDRESS_TYPE_CHOICES = (
@@ -280,7 +284,7 @@ class CustomerAddressSnapshot(models.Model):
         ('shipping', 'Shipping'),
     )
 
-    customer_id = models.UUIDField()
+    customer_id = models.CharField(max_length=150)
 
     address_type = models.CharField(
         max_length=10,
@@ -297,7 +301,7 @@ class CustomerAddressSnapshot(models.Model):
     last_update_dt = models.DateTimeField(auto_now=True) 
 
     def __str__(self):
-        return f"{self.address_type.capitalize()} Address: {self.street}, {self.city}, {self.country}"
+        return f"{self.customer_id} | {self.address_type.capitalize()} Address: {self.street}, {self.city}, {self.country}"
 
     class Meta:
         unique_together = ('customer_id', 'address_type', 'is_default') #ensure one default per addres type
@@ -306,7 +310,7 @@ class CustomerAddressSnapshot(models.Model):
 # Authorization snapshot
 # =========
 class UserAuthorizationSnapshot(models.Model):
-    user_id = models.UUIDField()
+    user_id = models.CharField(max_length=150)
     permission_codename = models.CharField(max_length=255)
     scope = models.CharField(max_length=150, help_text='ex. { "vendor_id": "v-1234" }')
     is_active = models.BooleanField(default=True)
@@ -314,3 +318,6 @@ class UserAuthorizationSnapshot(models.Model):
 
     class Meta:
         unique_together = ('user_id', 'permission_codename', 'scope') 
+
+    def __str__(self):
+        return f"{self.user_id} | {self.permission_codename} | {self.scope}"

@@ -9,5 +9,5 @@ class CustomerSnapshotAbstract(ABC):
         raise NotImplementedError("Subclasses must implement this method")
 
     @abstractmethod
-    def get_customer_address(self, customer_id: uuid.UUID) -> List[dtos.CustomerAddressSnapshotDTO]:
+    def get_customer_address(self, customer_id: str) -> List[dtos.CustomerAddressSnapshotDTO]:
         raise NotImplementedError("Subclasses must implement this method")

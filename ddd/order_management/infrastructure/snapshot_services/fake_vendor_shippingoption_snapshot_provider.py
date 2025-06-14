@@ -14,8 +14,8 @@ class FakeVendorShippingOptionSnapshotProvider(ports.VendorShippingOptionSnapsho
         #TODO rest api here
         return [
             dtos.VendorShippingOptionSnapshotDTO(
-                vendor_id=uuid.uuid4(),
-                name=enums.ShippingMethod.STANDARD,
+                vendor_id="v-234",
+                name="Standard",
                 delivery_time="2-3 Days",
                 conditions={"max_weight": 30},
                 base_cost=Decimal("5"),

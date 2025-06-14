@@ -9,5 +9,5 @@ class VendorOfferSnapshotAbstract(ABC):
         raise NotImplementedError("Subclasses must implement this method")
 
     @abstractmethod
-    def get_coupons_for_offers(self, offer_id: uuid.UUID) -> List[dtos.VendorCouponSnapshotDTO]:
+    def get_coupons_for_offers(self, offer_id: str) -> List[dtos.VendorCouponSnapshotDTO]:
         raise NotImplementedError("Subclasses must implement this method")

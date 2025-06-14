@@ -9,15 +9,15 @@ from ddd.order_management.domain import enums
 from ddd.order_management.application import ports, dtos
 
 
-class FakeUserAuthorizationSnapshotProvider(ports.UserAuthorizationSnapshotAbstract):
+class FakeVendorDetailsSnapshotProvider(ports.VendorDetailsSnapshotAbstract):
 
-    def get_all_users_auth(self) -> List[dtos.UserAuthorizationSnapshotDTO]:
+    def get_all_vendors(self) -> List[dtos.VendorDetailsSnapshotDTO]:
         #TODO rest api here
         return [
-            dtos.UserAuthorizationSnapshotDTO(
-                user_id=uuid.uuid4(),
-                permission_codename="place_order",
-                scope={"vendor_id": "v-123"},
+            dtos.VendorDetailsSnapshotDTO(
+                vendor_id="v-234",
+                name="Vendor1",
+                country="Country1",
                 is_active=True
             )
         ]

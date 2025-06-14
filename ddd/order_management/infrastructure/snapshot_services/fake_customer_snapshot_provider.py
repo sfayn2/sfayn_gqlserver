@@ -15,7 +15,7 @@ class FakeCustomerSnapshotProvider(ports.CustomerSnapshotAbstract):
         #TODO rest api here
         return [
             dtos.CustomerDetailsSnapshotDTO(
-                customer_id=uuid.uuid4(),
+                customer_id="c-234",
                 user_id=None,
                 first_name="John",
                 last_name="Doe",
@@ -25,7 +25,7 @@ class FakeCustomerSnapshotProvider(ports.CustomerSnapshotAbstract):
         ]
 
 
-    def get_customer_address(self, customer_id: uuid.UUID) -> List[dtos.CustomerAddressSnapshotDTO]:
+    def get_customer_address(self, customer_id: str) -> List[dtos.CustomerAddressSnapshotDTO]:
         #TODO rest api here
         return [
             dtos.CustomerAddressSnapshotDTO(

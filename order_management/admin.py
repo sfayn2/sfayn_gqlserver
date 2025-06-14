@@ -3,6 +3,7 @@ from order_management.models import (
     Order, 
     OrderLine,
     VendorDetailsSnapshot,
+    VendorCouponSnapshot,
     VendorOfferSnapshot,
     VendorShippingOptionSnapshot,
     VendorProductSnapshot,
@@ -21,6 +22,9 @@ class OrderLineAdmin(admin.ModelAdmin):
     pass
 
 class VendorDetailsSnapshotAdmin(admin.ModelAdmin):
+    pass
+
+class VendorCouponSnapshotAdmin(admin.ModelAdmin):
     pass
 
 class VendorOfferSnapshotAdmin(admin.ModelAdmin):
@@ -45,6 +49,7 @@ class UserAuthorizationSnapshotAdmin(admin.ModelAdmin):
 admin.site.register(Order, OrderAdmin)
 admin.site.register(OrderLine, OrderLineAdmin)
 admin.site.register(VendorDetailsSnapshot, VendorDetailsSnapshotAdmin)
+admin.site.register(VendorCouponSnapshot, VendorCouponSnapshotAdmin)
 admin.site.register(VendorOfferSnapshot, VendorOfferSnapshotAdmin)
 admin.site.register(VendorShippingOptionSnapshot, VendorShippingOptionSnapshotAdmin)
 admin.site.register(VendorProductSnapshot, VendorProductSnapshotAdmin)
