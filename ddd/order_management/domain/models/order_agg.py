@@ -348,7 +348,7 @@ class Order:
     @property
     def vendor_id(self) -> uuid.UUID:
         #assuming invariant
-        return self.line_items[0].vendor.id
+        return self.line_items[0].vendor.vendor_id
 
     @property
     def vendor_name(self) -> str:

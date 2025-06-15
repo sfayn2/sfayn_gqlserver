@@ -2,7 +2,7 @@ from __future__ import annotations
 from ddd.order_management.application import (
     ports, 
 )
-from ddd.order_management.domain import events
+from ddd.order_management.domain import events, exceptions
 
 def handle_apply_applicable_offers(
         event: events.DomainEvent, 

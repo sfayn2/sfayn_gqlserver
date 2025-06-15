@@ -7,7 +7,7 @@ EVENT_HANDLERS: Dict[str, List] = {}
 
 def publish(event: events.DomainEvent, **dependencies):
     # handle the event locally by triggering event handlers
-    handlers = EVENT_HANDLERS.get(event.event_type, [])
+    handlers = EVENT_HANDLERS.get(event.event_type(), [])
     for handler in handlers:
         handler(event, **dependencies)
 
