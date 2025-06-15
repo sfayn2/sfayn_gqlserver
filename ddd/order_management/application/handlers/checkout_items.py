@@ -1,9 +1,11 @@
 from __future__ import annotations
 from typing import Union, TYPE_CHECKING
+from ddd.order_management.domain import exceptions
 from ddd.order_management.application import (
     mappers, 
     commands, 
     dtos, 
+    shared
 )
 
 def handle_checkout_items(

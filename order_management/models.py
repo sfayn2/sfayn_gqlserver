@@ -117,7 +117,7 @@ class Order(models.Model):
         return f"Order {self.order_id} | {self.customer_first_name} {self.customer_last_name} | Status {self.order_status}  | Total: {self.final_amount} {self.currency}"
 
 class OrderLine(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False) #uuid for global unique id
+    #id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False) #uuid for global unique id
     order = models.ForeignKey(
         "order_management.Order", 
         on_delete=models.CASCADE,
@@ -126,7 +126,7 @@ class OrderLine(models.Model):
         blank=True
     )
 
-    vendor_id = models.UUIDField(editable=True) #uuid for global unique is
+    vendor_id = models.CharField(max_length=150)
     vendor_name = models.CharField(max_length=200, help_text="can use to check if product belongs to same vendor")
     vendor_country = models.CharField(max_length=200, help_text="can use to determine if shipping is domestic compared w shipping destination")
     product_sku = models.CharField(max_length=50)

@@ -1,6 +1,5 @@
 import graphene
 from graphene import relay
-from ddd.order_management.infrastructure import adapters
 from ddd.order_management.application import (
     message_bus, commands
   )
@@ -20,7 +19,7 @@ class AddShippingTrackingReferenceMutation(relay.ClientIDMutation):
     @classmethod
     def mutate_and_get_payload(cls, root, info, **input):
         command = commands.AddShippingTrackingReferenceCommand.model_validate(input)
-        result = message_bus.handle(command, adapters.unit_of_work.DjangoOrderUnitOfWork())
+        result = message_bus.handle(command)
 
         return cls(result=object_types.ResponseType(**result.model_dump()))
 

@@ -11,7 +11,7 @@ class LineItemMapper:
                 "order_id": order_id,
                 "defaults":  {
                     'product_name': line_item.product_name, 
-                    'vendor_id': line_item.vendor.id, 
+                    'vendor_id': line_item.vendor.vendor_id, 
                     'vendor_name': line_item.vendor.name, 
                     'vendor_country': line_item.vendor.country, 
                     'product_category': line_item.product_category, 
@@ -33,7 +33,7 @@ class LineItemMapper:
             product_sku=django_line_item.product_sku,
             product_name=django_line_item.product_name,
             vendor=value_objects.VendorDetails(
-                id=django_line_item.vendor_id,
+                vendor_id=django_line_item.vendor_id,
                 name=django_line_item.vendor_name,
                 country=django_line_item.vendor_country
             ),

@@ -6,7 +6,7 @@ from ddd.order_management.domain import enums, exceptions
 #TODO post-init validation is missing
 @dataclass(frozen=True) 
 class VendorDetails:
-    id: uuid.UUID
+    vendor_id: str
     name: str
     country: str
 

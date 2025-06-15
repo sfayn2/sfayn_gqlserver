@@ -2,3 +2,5 @@ from .checkout_items_mutation import CheckoutItemsMutation
 from .confirm_order_mutation import ConfirmOrderMutation
 from .place_order_mutation import PlaceOrderMutation
 from .select_shipping_option_mutation import SelectShippingOptionMutation
+from .mark_as_shipped_mutation import MarkAsShippedMutation
+from .add_shipping_tracking_reference_mutation import AddShippingTrackingReferenceMutation

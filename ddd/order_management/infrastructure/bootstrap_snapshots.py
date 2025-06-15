@@ -1,5 +1,14 @@
 from ddd.order_management.infrastructure import snapshot_services
 
+SYNC_TASKS = [
+    (
+        snapshot_services.DjangoVendorDetailsSnapshotSyncService
+        snapshot_services.FakeVendorDetailsSnapshotProvider,
+
+
+    )
+]
+
 def run_vendor_details_snapshot_sync():
     provider = snapshot_services.FakeVendorDetailsSnapshotProvider()
     django_vendor_details_snapshot = snapshot_services.DjangoVendorDetailsSnapshotSyncService(provider)

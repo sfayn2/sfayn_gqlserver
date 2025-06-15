@@ -1,11 +1,9 @@
 import graphene
-import product_catalog.schema
 from ddd.order_management.presentation.graphql import queries, mutations
 
 
 
 class Query(
-    product_catalog.schema.Query,
     queries.ShippingOptionsQuery
 ):
     pass

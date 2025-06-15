@@ -9,7 +9,7 @@ class MoneyInput(graphene.InputObjectType):
     currency = graphene.String(required=True)
 
 class VendorDetailsInput(graphene.InputObjectType):
-    id = graphene.UUID(required=True)
+    vendor_id = graphene.String(required=True)
     #name = graphene.String(required=True) #dummy only? it will still get from db
     #country = graphene.String(required=True) #dummy only it wil still get from db
 

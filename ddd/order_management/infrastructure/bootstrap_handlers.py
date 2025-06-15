@@ -20,36 +20,36 @@ from ddd.order_management.application import commands, message_bus, queries
 def register_event_handlers():
     event_bus.EVENT_HANDLERS.update({
         "order_management.events.OrderCanceledEvent": [
-                lambda event, uow: handlers.handle_logged_order(
+                lambda event: handlers.handle_logged_order(
                     event=event, 
-                    uow=uow, 
+                    uow=repositories.DjangoOrderUnitOfWork(),
                     logging=logging_services.LoggingService()
                 ),
-                lambda event, uow: handlers.handle_email_canceled_order(
+                lambda event: handlers.handle_email_canceled_order(
                     event=event, 
-                    uow=uow, 
+                    uow=repositories.DjangoOrderUnitOfWork(),
                     email=email_services.EmailService()
                 )
             ],
         "order_management.events.OrderPlacedEvent": [
-                lambda event, uow: handlers.handle_apply_applicable_offers(
+                lambda event: handlers.handle_apply_applicable_offers(
                     event=event, 
-                    uow=uow, 
+                    uow=repositories.DjangoOrderUnitOfWork(),
                     vendor=repositories.DjangoVendorRepositoryImpl(),
                     offer_service=domain_services.OfferStrategyService()
                 )
             ],
         "order_management.events.OrderOfferAppliedEvent": [
-                lambda event, uow: handlers.handle_apply_tax_results(
+                lambda event: handlers.handle_apply_tax_results(
                     event=event, 
-                    uow=uow, 
+                    uow=repositories.DjangoOrderUnitOfWork(),
                     tax_service=domain_services.TaxStrategyService()
                 )
             ],
         "order_management.events.OrderDraftEvent": [
-                lambda event, uow: handlers.handle_apply_tax_results(
+                lambda event: handlers.handle_apply_tax_results(
                     event=event, 
-                    uow=uow, 
+                    uow=repositories.DjangoOrderUnitOfWork(),
                     tax_service=domain_services.TaxStrategyService()
                 )
             ]
@@ -58,47 +58,47 @@ def register_event_handlers():
 
 def register_command_handlers():
     message_bus.COMMAND_HANDLERS.update({
-        commands.CheckoutItemsCommand: lambda command, uow: handlers.handle_checkout_items(
+        commands.CheckoutItemsCommand: lambda command: handlers.handle_checkout_items(
             command=command,
-            uow=uow,
+            uow=repositories.DjangoOrderUnitOfWork(),
             order_service=domain_services.OrderService(),
-            product_vendor_validation_service=validation_services.ProductVendorValidationService()
+            product_vendor_validation_service=validation_services.DjangoProductsVendorValidationService()
         ),
-        commands.SelectShippingOptionCommand: lambda command, uow: handlers.handle_select_shipping_option(
+        commands.SelectShippingOptionCommand: lambda command: handlers.handle_select_shipping_option(
             command=command, 
-            uow=uow,
+            uow=repositories.DjangoOrderUnitOfWork(),
             shipping_option_service=domain_services.ShippingOptionStrategyService
         ),
-        commands.PlaceOrderCommand: lambda command, uow: handlers.handle_place_order(
+        commands.PlaceOrderCommand: lambda command: handlers.handle_place_order(
             command=command,
-            uow=uow,
+            uow=repositories.DjangoOrderUnitOfWork(),
             stock_validation_service=validation_services.DjangoStockValidationService()
         ),
-        commands.ConfirmOrderCommand: lambda command, uow: handlers.handle_confirm_order(
+        commands.ConfirmOrderCommand: lambda command: handlers.handle_confirm_order(
             command=command, 
-            uow=uow,
+            uow=repositories.DjangoOrderUnitOfWork(),
             payment_service=payment_services.PaymentService(),
             order_service=domain_services.OrderService(),
             stock_validation_service=validation_services.DjangoStockValidationService()
         ),
-        commands.MarkAsShippedOrderCommand: lambda command, uow: handlers.handle_mark_as_shipped(
+        commands.MarkAsShippedOrderCommand: lambda command: handlers.handle_mark_as_shipped(
             command=command,
-            uow=uow
+            uow=repositories.DjangoOrderUnitOfWork()
         ),
-        commands.AddShippingTrackingReferenceCommand: lambda command, uow: handlers.handle_add_shipping_tracking_reference(
+        commands.AddShippingTrackingReferenceCommand: lambda command: handlers.handle_add_shipping_tracking_reference(
             command=command,
-            uow=uow
+            uow=repositories.DjangoOrderUnitOfWork()
         ),
-        commands.AddCouponCommand: lambda command, uow: handlers.handle_add_coupon(
+        commands.AddCouponCommand: lambda command: handlers.handle_add_coupon(
             command=command,
-            uow=uow,
+            uow=repositories.DjangoOrderUnitOfWork(),
             coupon_validation=validation_services.DjangoCouponValidationService()
         ),
     })
 
 def register_query_handlers():
     message_bus.QUERY_HANDLERS.update({
-        queries.ShippingOptionsQuery: lambda query, uow: handlers.handle_shipping_options(
+        queries.ShippingOptionsQuery: lambda query: handlers.handle_shipping_options(
             query=query, 
             uow=uow,
             shipping_option_service=domain_services.ShippingOptionStrategyService

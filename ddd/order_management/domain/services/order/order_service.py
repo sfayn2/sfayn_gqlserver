@@ -41,10 +41,9 @@ class OrderService(ports.OrderServiceAbstract):
             destination=shipping_address
         )
 
+        order.mark_as_draft()
         order.generate_order_id()
         order.update_line_items(line_items)
-
-        order.mark_as_draft()
         
         return order
 

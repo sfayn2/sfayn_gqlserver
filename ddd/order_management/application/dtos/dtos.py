@@ -32,7 +32,7 @@ class AddressDTO(BaseModel):
     state: str
 
 class VendorDetailsDTO(BaseModel):
-    vendor_id: uuid.UUID
+    vendor_id: str
     name: Optional[str] = None
     country: Optional[str] = None
 
