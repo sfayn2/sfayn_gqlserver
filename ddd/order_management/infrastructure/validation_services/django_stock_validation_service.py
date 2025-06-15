@@ -18,8 +18,8 @@ class DjangoStockValidationService(ports.StockValidationServiceAbstract):
 
     def _get_stocks(self, items: List[models.LineItem]):
         product_map = {
-            p.sku: p.stock
-            for p in django_snapshots.VendorProductSnapshot.objects.filter(product_sku__in=[item.product_sku for item in items], vendor_id=items[0].vendor_id)
+            p.product_sku: p.stock
+            for p in django_snapshots.VendorProductSnapshot.objects.filter(product_sku__in=[item.product_sku for item in items], vendor_id=items[0].vendor.vendor_id)
         }
 
         return product_map

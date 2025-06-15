@@ -55,8 +55,12 @@ class OrderMapper:
             )
 
         for item in django_order_object.line_items.all():
-            if item.vendor:
-                vendor_details = item.vendor
+            if item.vendor_id:
+                vendor_details = value_objects.VendorDetails(
+                    vendor_id=item.vendor_id,
+                    name=item.vendor_name,
+                    country=item.vendor_country
+                )
                 break
 
         django_coupons = []

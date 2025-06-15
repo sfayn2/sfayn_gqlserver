@@ -44,5 +44,5 @@ class DjangoOrderUnitOfWork(repositories.UnitOfWorkAbstract):
     def _publish_events(self):
         for event in self._events:
             print(f"Publish event : {event}")
-            self.event_publisher.publish(event, self)
+            self.event_publisher.publish(event)
 

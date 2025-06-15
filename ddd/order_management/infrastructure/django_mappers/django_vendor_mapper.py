@@ -7,7 +7,7 @@ class VendorDetailsMapper:
     @staticmethod
     def to_domain(django_vendor_details) -> value_objects.VendorDetails:
         return value_objects.VendorDetails(
-            id=django_vendor_details.values_list("id", flat=True)[0],
+            vendor_id=django_vendor_details.values_list("vendor_id", flat=True)[0],
             name=django_vendor_details.values_list("name", flat=True)[0],
             country=django_vendor_details.values_list("country", flat=True)[0]
         )

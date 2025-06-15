@@ -112,7 +112,7 @@ class Order:
         if any(item.product_price.currency != self.line_items[0].product_price.currency for item in self.line_items):
             raise exceptions.InvalidOrderOperation("All line items must have the same currency.")
 
-        if len(set(item.vendor.id for item in self.line_items)) > 1:
+        if len(set(item.vendor.vendor_id for item in self.line_items)) > 1:
             raise exceptions.InvalidOrderOperation("All line items must belong to the same vendor.")
 
         if not self.shipping_details:
