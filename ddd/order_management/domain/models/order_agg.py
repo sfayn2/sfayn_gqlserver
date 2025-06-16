@@ -145,8 +145,8 @@ class Order:
         self.raise_event(event)
 
     def apply_applicable_offers(self, offers: List[OfferStrategyAbstract]):
-        if self.order_status != enums.OrderStatus.DRAFT:
-            raise exceptions.InvalidOrderOperation("Only draft order can apply offers (Free shipping, Free gifts, etc)")
+        if self.order_status not in (enums.OrderStatus.DRAFT, enums.OrderStatus.PENDING):
+            raise exceptions.InvalidOrderOperation("Only draft/pending order can apply offers (Free shipping, Free gifts, etc)")
         if self.offer_details:
             raise exceptions.InvalidOrderOperation("Offers have already been applied.")
         if not self.shipping_details:
@@ -170,8 +170,8 @@ class Order:
 
 
     def apply_tax_results(self, tax_results: List[value_objects.TaxResult]):
-        if self.order_status != enums.OrderStatus.DRAFT:
-            raise exceptions.InvalidOrderOperation("Only draft order can calculate taxes.")
+        if self.order_status not in (enums.OrderStatus.DRAFT, enums.OrderStatus.PENDING):
+            raise exceptions.InvalidOrderOperation("Only draft/pending order can calculate taxes.")
         if not self.destination:
             raise exceptions.InvalidOrderOperation("Shipping address is required for tax calculation.")
 
@@ -198,6 +198,13 @@ class Order:
         self.tax_details = tax_details
 
         self.calculate_final_amount()
+
+        event = events.OrderTaxesAppliedEvent(
+            order_id=self.order_id,
+            order_status=self.order_status,
+        )
+
+        self.raise_event(event)
 
     def update_payment_details(self, payment_details: value_objects.PaymentDetails):
         if not payment_details:
@@ -323,7 +330,7 @@ class Order:
         return self.total_amount.subtract(self.total_discounts_fee).add(self.shipping_details.cost if self.shipping_details else value_objects.Money(Decimal("0"), self.currency))
 
     def calculate_final_amount(self):
-        if self.order_status != enums.OrderStatus.DRAFT:
+        if self.order_status not in (enums.OrderStatus.DRAFT, enums.OrderStatus.PENDING):
             raise exceptions.InvalidOrderOperation("Only draft order can calculate final amount.")
 
         #TODO revisit calculation

@@ -39,12 +39,19 @@ def register_event_handlers():
                     offer_service=domain_services.OfferStrategyService()
                 )
             ],
-        "order_management.events.OrderOfferAppliedEvent": [
+        "order_management.events.OrderOffersAppliedEvent": [
                 lambda event: handlers.handle_apply_tax_results(
                     event=event, 
                     uow=repositories.DjangoOrderUnitOfWork(),
                     tax_service=domain_services.TaxStrategyService()
                 )
+            ],
+        "order_management.events.OrderTaxesAppliedEvent": [
+                lambda event: handlers.handle_logged_order(
+                    event=event, 
+                    uow=repositories.DjangoOrderUnitOfWork(),
+                    logging=logging_services.LoggingService()
+                ),
             ],
         "order_management.events.OrderDraftEvent": [
                 lambda event: handlers.handle_apply_tax_results(

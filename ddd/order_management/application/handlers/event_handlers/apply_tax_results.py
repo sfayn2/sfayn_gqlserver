@@ -1,8 +1,9 @@
 from __future__ import annotations
 from ddd.order_management.application import (
     ports, 
+    shared
 )
-from ddd.order_management.domain import events
+from ddd.order_management.domain import events, exceptions
 
 def handle_apply_tax_results(
         event: events.DomainEvent, 
@@ -11,7 +12,6 @@ def handle_apply_tax_results(
 
     try:
         with uow:
-
             order = uow.order.get(order_id=event.order_id)
 
             tax_results = tax_service.calculate_all_taxes(order)
@@ -23,7 +23,9 @@ def handle_apply_tax_results(
     except exceptions.InvalidOrderOperation as e:
         #TODO logger.info?
         print(e)
+        raise e
     except Exception as e:
         # logger.exception?
         print(e)
+        raise e
 

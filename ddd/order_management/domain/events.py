@@ -61,3 +61,8 @@ class OrderOffersAppliedEvent(DomainEvent):
 class OrderDraftEvent(DomainEvent):
     order_id: str
     order_status: enums.OrderStatus
+
+@dataclass
+class OrderTaxesAppliedEvent(DomainEvent):
+    order_id: str
+    order_status: enums.OrderStatus

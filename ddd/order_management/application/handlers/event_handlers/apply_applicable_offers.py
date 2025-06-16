@@ -11,8 +11,8 @@ def handle_apply_applicable_offers(
         uow: UnitOfWorkAbstract):
 
     try:
-        with uow:
 
+        with uow:
             order = uow.order.get(order_id=event.order_id)
 
             vendor_offers = vendor.get_offers(order.vendor_id)
@@ -26,7 +26,9 @@ def handle_apply_applicable_offers(
     except exceptions.InvalidOrderOperation as e:
         #TODO logger.info?
         print(e)
+        raise e
     except Exception as e:
         # logger.exception?
         print(e)
+        raise e
 
