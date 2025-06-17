@@ -12,16 +12,15 @@ def handle_apply_applicable_offers(
 
     try:
 
-        with uow:
-            order = uow.order.get(order_id=event.order_id)
+        order = uow.order.get(order_id=event.order_id)
 
-            vendor_offers = vendor.get_offers(order.vendor_id)
-            applicable_offers = offer_service.evaluate_applicable_offers(order, vendor_offers)
+        vendor_offers = vendor.get_offers(order.vendor_id)
+        applicable_offers = offer_service.evaluate_applicable_offers(order, vendor_offers)
 
-            order.apply_applicable_offers(applicable_offers)
+        order.apply_applicable_offers(applicable_offers)
 
-            uow.order.save(order)
-            uow.commit()
+        uow.order.save(order)
+        uow.publish_events()
 
     except exceptions.InvalidOrderOperation as e:
         #TODO logger.info?

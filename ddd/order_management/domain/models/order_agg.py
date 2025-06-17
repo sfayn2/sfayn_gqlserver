@@ -158,6 +158,7 @@ class Order:
             if res:
                 offer_details.append(res)
 
+
         if offer_details:
             self.update_offer_details(offer_details)
 
@@ -279,8 +280,8 @@ class Order:
         self.shipping_reference = shipping_reference
 
     def update_offer_details(self, offer_details: List[str]):
-        if self.order_status != enums.OrderStatus.DRAFT:
-            raise exceptions.InvalidOrderOperation("Only draft order can update offer details.")
+        if self.order_status not in (enums.OrderStatus.DRAFT, enums.OrderStatus.PENDING):
+            raise exceptions.InvalidOrderOperation("Only draft/pending order can update offer details.")
         self.offer_details = offer_details
 
     def apply_valid_coupon(self, coupon: value_objects.Coupon):
@@ -321,8 +322,8 @@ class Order:
         )
 
     def update_total_discounts_fee(self, total_discounts: value_objects.Money):
-        if self.order_status != enums.OrderStatus.DRAFT:
-            raise exceptions.InvalidOrderOperation("Only draft order can update total discount fees.")
+        if self.order_status not in (enums.OrderStatus.DRAFT, enums.OrderStatus.PENDING):
+            raise exceptions.InvalidOrderOperation("Only draft/pending order can update total discount fees.")
         self.total_discounts_fee = total_discounts
 
     @property

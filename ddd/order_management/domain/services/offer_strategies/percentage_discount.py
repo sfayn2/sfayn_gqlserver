@@ -10,7 +10,7 @@ class PercentageDiscountStrategy(ports.OfferStrategyAbstract):
         currency = self.order.currency
         discounted_items = []
         eligible_products = self.strategy.conditions.get("eligible_products")
-        required_coupon = self.strategy.conditions.get("required_coupon")
+        required_coupon = self.strategy.required_coupon
         if required_coupon == False:
             for item in self.order.line_items:
                 if eligible_products and item.product_sku in eligible_products:

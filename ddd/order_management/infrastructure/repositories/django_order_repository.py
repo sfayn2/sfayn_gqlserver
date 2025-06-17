@@ -12,7 +12,7 @@ class DjangoOrderRepositoryImpl(repositories.OrderAbstract):
     
     def save(self, order: models.Order): 
         django_order = django_mappers.OrderMapper.to_django(order)
-        _, created = django_models.Order.objects.update_or_create(**django_order)
+        obj, created = django_models.Order.objects.update_or_create(**django_order)
 
         for line_item in order.line_items:
             django_line_item = django_mappers.LineItemMapper.to_django(order.order_id, line_item)

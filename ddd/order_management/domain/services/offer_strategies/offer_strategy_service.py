@@ -66,4 +66,5 @@ class OfferStrategyService(ports.OfferStrategyServiceAbstract):
         for strategy in valid_offers:
             final_offers.append(strategy)
 
+
         return final_offers

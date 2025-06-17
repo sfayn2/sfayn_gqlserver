@@ -27,8 +27,7 @@ class DjangoOrderUnitOfWork(repositories.UnitOfWorkAbstract):
 
     def commit(self):
         #do nothing since transaction.atomic() auto handle it
-        self._collect_events()
-        self._publish_events()
+        self.publish_events()
 
     def rollback(self):
         self.atomic.__exit__(Exception, Exception(), None)
@@ -45,4 +44,8 @@ class DjangoOrderUnitOfWork(repositories.UnitOfWorkAbstract):
         for event in self._events:
             print(f"Publish event : {event}")
             self.event_publisher.publish(event)
+    
+    def publish_events(self):
+        self._collect_events()
+        self._publish_events()
 

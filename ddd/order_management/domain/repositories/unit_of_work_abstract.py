@@ -16,3 +16,7 @@ class UnitOfWorkAbstract(ABC):
     @abstractmethod
     def rollback(self):
         raise NotImplementedError("Subclasses must implement this method")
+
+    @abstractmethod
+    def publish_events(self):
+        raise NotImplementedError("Subclasses must implement this method")

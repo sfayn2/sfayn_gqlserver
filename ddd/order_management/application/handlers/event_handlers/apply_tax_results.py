@@ -11,14 +11,13 @@ def handle_apply_tax_results(
         uow: UnitOfWorkAbstract):
 
     try:
-        with uow:
-            order = uow.order.get(order_id=event.order_id)
+        order = uow.order.get(order_id=event.order_id)
 
-            tax_results = tax_service.calculate_all_taxes(order)
-            order.apply_tax_results(tax_results)
+        tax_results = tax_service.calculate_all_taxes(order)
+        order.apply_tax_results(tax_results)
 
-            uow.order.save(order)
-            uow.commit()
+        uow.order.save(order)
+        uow.publish_events()
 
     except exceptions.InvalidOrderOperation as e:
         #TODO logger.info?

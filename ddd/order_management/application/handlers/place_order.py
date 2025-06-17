@@ -24,6 +24,7 @@ def handle_place_order(
             uow.order.save(order)
             uow.commit()
 
+            #TODO to check if commit is really success
             return dtos.ResponseDTO(
                 success=True,
                 message="Order successfully placed order."
