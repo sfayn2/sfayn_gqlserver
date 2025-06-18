@@ -20,43 +20,43 @@ from ddd.order_management.application import commands, message_bus, queries
 def register_event_handlers():
     event_bus.EVENT_HANDLERS.update({
         "order_management.events.OrderCanceledEvent": [
-                lambda event: handlers.handle_logged_order(
-                    event=event, 
-                    uow=repositories.DjangoOrderUnitOfWork(),
+                lambda event, uow: handlers.handle_logged_order(
+                    event=event,
+                    uow=uow,
                     logging=logging_services.LoggingService()
                 ),
-                lambda event: handlers.handle_email_canceled_order(
+                lambda event, uow: handlers.handle_email_canceled_order(
                     event=event, 
-                    uow=repositories.DjangoOrderUnitOfWork(),
+                    uow=uow,
                     email=email_services.EmailService()
                 )
             ],
         "order_management.events.OrderPlacedEvent": [
-                lambda event: handlers.handle_apply_applicable_offers(
+                lambda event, uow: handlers.handle_apply_applicable_offers(
                     event=event, 
-                    uow=repositories.DjangoOrderUnitOfWork(),
+                    uow=uow,
                     vendor=repositories.DjangoVendorRepositoryImpl(),
                     offer_service=domain_services.OfferStrategyService()
                 )
             ],
         "order_management.events.OrderOffersAppliedEvent": [
-                lambda event: handlers.handle_apply_tax_results(
+                lambda event, uow: handlers.handle_apply_tax_results(
                     event=event, 
-                    uow=repositories.DjangoOrderUnitOfWork(),
+                    uow=uow,
                     tax_service=domain_services.TaxStrategyService()
                 )
             ],
         "order_management.events.OrderTaxesAppliedEvent": [
-                lambda event: handlers.handle_logged_order(
+                lambda event, uow: handlers.handle_logged_order(
                     event=event, 
-                    uow=repositories.DjangoOrderUnitOfWork(),
+                    uow=uow,
                     logging=logging_services.LoggingService()
                 ),
             ],
         "order_management.events.OrderDraftEvent": [
-                lambda event: handlers.handle_apply_tax_results(
+                lambda event, uow: handlers.handle_apply_tax_results(
                     event=event, 
-                    uow=repositories.DjangoOrderUnitOfWork(),
+                    uow=uow,
                     tax_service=domain_services.TaxStrategyService()
                 )
             ]

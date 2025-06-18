@@ -17,7 +17,6 @@ def handle_apply_tax_results(
         order.apply_tax_results(tax_results)
 
         uow.order.save(order)
-        uow.publish_events()
 
     except exceptions.InvalidOrderOperation as e:
         #TODO logger.info?

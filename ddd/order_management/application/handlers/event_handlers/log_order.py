@@ -6,7 +6,7 @@ from ddd.order_management.domain import events
 
 def handle_logged_order(
         event: events.DomainEvent, 
-        uow: repositories.UnitOfWorkAbstract, 
+        uow: UnitOfWorkAbstract, 
         logging: LoggingAbstract):
 
     logging.log(f"Order has been canceled {event.order_id}")

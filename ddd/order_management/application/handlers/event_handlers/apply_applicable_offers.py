@@ -20,7 +20,7 @@ def handle_apply_applicable_offers(
         order.apply_applicable_offers(applicable_offers)
 
         uow.order.save(order)
-        uow.publish_events()
+
 
     except exceptions.InvalidOrderOperation as e:
         #TODO logger.info?

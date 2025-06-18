@@ -26,8 +26,7 @@ class DjangoOrderUnitOfWork(repositories.UnitOfWorkAbstract):
         super().__exit__(*args)
 
     def commit(self):
-        #do nothing since transaction.atomic() auto handle it
-        self.publish_events()
+        self._publish_events()
 
     def rollback(self):
         self.atomic.__exit__(Exception, Exception(), None)
@@ -38,14 +37,15 @@ class DjangoOrderUnitOfWork(repositories.UnitOfWorkAbstract):
         for entity in self.order.seen:
             if hasattr(entity, "_events"):
                 self._events.extend(entity._events) #append not override
-                entity._events.clear() #prevent duplicate processing
+
+        #prevent duplicate proces
+        self.order.seen = set()
+
 
     def _publish_events(self):
+        self._collect_events()
         for event in self._events:
             print(f"Publish event : {event}")
-            self.event_publisher.publish(event)
+            self.event_publisher.publish(event, self)
     
-    def publish_events(self):
-        self._collect_events()
-        self._publish_events()
 
