@@ -26,7 +26,11 @@ class DjangoOrderUnitOfWork(repositories.UnitOfWorkAbstract):
         super().__exit__(*args)
 
     def commit(self):
-        self._publish_events()
+        while True:
+            self._collect_events()
+            if not self._events:
+                break
+            self._publish_events()
 
     def rollback(self):
         self.atomic.__exit__(Exception, Exception(), None)
@@ -43,7 +47,6 @@ class DjangoOrderUnitOfWork(repositories.UnitOfWorkAbstract):
 
 
     def _publish_events(self):
-        self._collect_events()
         for event in self._events:
             print(f"Publish event : {event}")
             self.event_publisher.publish(event, self)

@@ -12,7 +12,5 @@ def publish(event: events.DomainEvent, uow: UnitOfWorkAbstract, **dependencies):
     for handler in handlers:
         handler(event, uow, **dependencies)
 
-        uow._publish_events() #ur ok w this?
-
     # TODO publish async event for external handler?
     #redis_event_publish(event=event, uow=uow)
