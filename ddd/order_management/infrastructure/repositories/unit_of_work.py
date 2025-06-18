@@ -15,15 +15,12 @@ class DjangoOrderUnitOfWork(repositories.UnitOfWorkAbstract):
         self._events = []
 
     def __enter__(self):
-
         self.atomic = transaction.atomic()
         self.atomic.__enter__()
-        return super().__enter__()
+        return self
 
-    def __exit__(self, *args):
-
-        self.atomic.__exit__(*args)
-        super().__exit__(*args)
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.atomic.__exit__(exc_type, exc_val, exc_tb)
 
     def commit(self):
         while True:
@@ -33,6 +30,7 @@ class DjangoOrderUnitOfWork(repositories.UnitOfWorkAbstract):
             self._publish_events()
 
     def rollback(self):
+        #can be used manually if needed
         self.atomic.__exit__(Exception, Exception(), None)
 
     def _collect_events(self):
@@ -43,7 +41,7 @@ class DjangoOrderUnitOfWork(repositories.UnitOfWorkAbstract):
                 self._events.extend(entity._events) #append not override
 
         #prevent duplicate proces
-        self.order.seen = set()
+        self.order.seen.clear()
 
 
     def _publish_events(self):
