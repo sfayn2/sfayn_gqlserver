@@ -38,8 +38,8 @@ class Order:
             raise exceptions.InvalidOrderOperation("Vendor mismatch between order and line item.")
 
     def generate_order_id(self):
-        if self.order_status != enums.OrderStatus.DRAFT:
-            raise exceptions.InvalidOrderOperation("Only draft order can generate order id.")
+        if self.order_id:
+            raise exceptions.InvalidOrderOperation("Order Id already generated.")
         self.order_id = f"ORD-{uuid.uuid4().hex[:12].upper()}"
 
     def update_modified_date(self):
@@ -146,7 +146,7 @@ class Order:
 
     def apply_applicable_offers(self, offers: List[OfferStrategyAbstract]):
         if self.order_status not in (enums.OrderStatus.DRAFT, enums.OrderStatus.PENDING):
-            raise exceptions.InvalidOrderOperation("Only draft/pending order can apply offers (Free shipping, Free gifts, etc)")
+            raise exceptions.InvalidOrderOperation("Only draft order can apply offers (Free shipping, Free gifts, etc)")
         if self.offer_details:
             raise exceptions.InvalidOrderOperation("Offers have already been applied.")
         if not self.shipping_details:
@@ -172,7 +172,7 @@ class Order:
 
     def apply_tax_results(self, tax_results: List[value_objects.TaxResult]):
         if self.order_status not in (enums.OrderStatus.DRAFT, enums.OrderStatus.PENDING):
-            raise exceptions.InvalidOrderOperation("Only draft/pending order can calculate taxes.")
+            raise exceptions.InvalidOrderOperation("Only draft order can calculate taxes.")
         if not self.destination:
             raise exceptions.InvalidOrderOperation("Shipping address is required for tax calculation.")
 
@@ -281,7 +281,7 @@ class Order:
 
     def update_offer_details(self, offer_details: List[str]):
         if self.order_status not in (enums.OrderStatus.DRAFT, enums.OrderStatus.PENDING):
-            raise exceptions.InvalidOrderOperation("Only draft/pending order can update offer details.")
+            raise exceptions.InvalidOrderOperation("Only draft order can update offer details.")
         self.offer_details = offer_details
 
     def apply_valid_coupon(self, coupon: value_objects.Coupon):
@@ -323,7 +323,7 @@ class Order:
 
     def update_total_discounts_fee(self, total_discounts: value_objects.Money):
         if self.order_status not in (enums.OrderStatus.DRAFT, enums.OrderStatus.PENDING):
-            raise exceptions.InvalidOrderOperation("Only draft/pending order can update total discount fees.")
+            raise exceptions.InvalidOrderOperation("Only draft order can update total discount fees.")
         self.total_discounts_fee = total_discounts
 
     @property

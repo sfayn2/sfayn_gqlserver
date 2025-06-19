@@ -29,6 +29,7 @@ class LineItemMapper:
             }
 
     def to_domain(django_line_item) -> models.LineItem:
+
         return models.LineItem(
             product_sku=django_line_item.product_sku,
             product_name=django_line_item.product_name,

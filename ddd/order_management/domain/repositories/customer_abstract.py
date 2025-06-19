@@ -7,3 +7,7 @@ class CustomerAbstract(ABC):
     @abstractmethod
     def get_customer_details(self, customer_id: str) -> value_objects.CustomerDetails:
         raise NotImplementedError("Subclasses must implement this method")
+
+    @abstractmethod
+    def get_shipping_address(self, customer_id: str) -> value_objects.CustomerDetails:
+        raise NotImplementedError("Subclasses must implement this method")

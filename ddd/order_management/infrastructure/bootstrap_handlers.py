@@ -31,7 +31,7 @@ def register_event_handlers():
                     email=email_services.EmailService()
                 )
             ],
-        "order_management.events.OrderPlacedEvent": [
+        "order_management.events.OrderShippingOptionSelectedEvent": [
                 lambda event, uow: handlers.handle_apply_applicable_offers(
                     event=event, 
                     uow=uow,
@@ -53,13 +53,6 @@ def register_event_handlers():
                     logging=logging_services.LoggingService()
                 ),
             ],
-        "order_management.events.OrderDraftEvent": [
-                lambda event, uow: handlers.handle_apply_tax_results(
-                    event=event, 
-                    uow=uow,
-                    tax_service=domain_services.TaxStrategyService()
-                )
-            ]
     })
 
 
@@ -68,6 +61,8 @@ def register_command_handlers():
         commands.CheckoutItemsCommand: lambda command: handlers.handle_checkout_items(
             command=command,
             uow=repositories.DjangoOrderUnitOfWork(),
+            customer_repo=repositories.DjangoCustomerRepositoryImpl(),
+            vendor_repo=repositories.DjangoVendorRepositoryImpl(),
             order_service=domain_services.OrderService(),
             product_vendor_validation_service=validation_services.DjangoProductsVendorValidationService()
         ),

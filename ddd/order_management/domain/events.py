@@ -52,13 +52,19 @@ class OrderPaymentAppliedEvent(DomainEvent):
     order_id: str
     amount: value_objects.Money
 
+
 @dataclass
-class OrderOffersAppliedEvent(DomainEvent):
+class OrderDraftEvent(DomainEvent):
     order_id: str
     order_status: enums.OrderStatus
 
 @dataclass
-class OrderDraftEvent(DomainEvent):
+class OrderShippingOptionSelectedEvent(DomainEvent):
+    order_id: str
+    order_status: enums.OrderStatus
+
+@dataclass
+class OrderOffersAppliedEvent(DomainEvent):
     order_id: str
     order_status: enums.OrderStatus
 

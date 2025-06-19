@@ -36,3 +36,6 @@ class OutOfStockException(InvalidOrderOperation):
 
 class VendorNotFoundException(InvalidOrderOperation):
     pass
+
+class VendorProductNotFoundException(InvalidOrderOperation):
+    pass

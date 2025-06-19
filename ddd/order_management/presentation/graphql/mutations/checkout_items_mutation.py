@@ -7,9 +7,9 @@ from ddd.order_management.presentation.graphql import object_types, input_types
 
 class CheckoutItemsMutation(relay.ClientIDMutation):
     class Input:
-        customer_details = graphene.Field(input_types.CustomerDetailsInput, required=True)
-        shipping_address = graphene.Field(input_types.AddressInput, required=True)
-        line_items = graphene.List(input_types.LineItemInput, required=True)
+        vendor_id = graphene.String(required=True)
+        customer_id = graphene.String(required=True)
+        product_skus = graphene.List(graphene.String, required=True)
 
     result = graphene.Field(object_types.ResponseType)
 

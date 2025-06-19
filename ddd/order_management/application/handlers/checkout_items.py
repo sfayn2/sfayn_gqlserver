@@ -11,14 +11,16 @@ from ddd.order_management.application import (
 def handle_checkout_items(
         command: commands.CheckoutItemsCommand, 
         uow: UnitOfWorkAbstract,
+        customer_repo: CustomerAbstract,
+        vendor_repo: VendorAbstract,
         product_vendor_validation_service: ProductVendorValidationServiceAbstract,
         order_service: OrderServiceAbstract) -> dtos.ResponseDTO:
     try:
         with uow:
 
-            customer_details = mappers.CustomerDetailsMapper.to_domain(command.customer_details)
-            shipping_address = mappers.AddressMapper.to_domain(command.shipping_address)
-            line_items = [mappers.LineItemMapper.to_domain(item) for item in command.line_items]
+            customer_details = customer_repo.get_customer_details(command.customer_id)
+            shipping_address = customer_repo.get_shipping_address(command.customer_id)
+            line_items = vendor_repo.get_line_items(command.vendor_id, command.product_skus)
 
             product_vendor_validation_service.ensure_line_items_vendor_is_valid(items=line_items)
 

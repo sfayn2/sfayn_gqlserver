@@ -1,6 +1,6 @@
 import uuid
 from abc import ABC
-from pydantic import BaseModel
+from pydantic import BaseModel, constr
 from typing import Union, List, Optional
 from datetime import datetime
 from ddd.order_management.application import dtos
@@ -10,9 +10,9 @@ class Command(BaseModel, frozen=True):
     pass
 
 class CheckoutItemsCommand(Command):
-    customer_details: dtos.CustomerDetailsDTO
-    shipping_address: dtos.AddressDTO
-    line_items: List[dtos.LineItemDTO]
+    customer_id: constr(min_length=1, strip_whitespace=True)
+    vendor_id: constr(min_length=1, strip_whitespace=True)
+    product_skus: List[str]
 
 class PlaceOrderCommand(Command):
     order_id: str
