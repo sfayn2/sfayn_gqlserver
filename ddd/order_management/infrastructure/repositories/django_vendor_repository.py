@@ -43,7 +43,9 @@ class DjangoVendorRepositoryImpl(repositories.VendorAbstract):
         return line_items
 
 
-    def get_offers(self, vendor_id: str) -> List[value_objects.OfferStrategy]:
+    def get_offers(
+        self, vendor_id: str
+    ) -> List[value_objects.OfferStrategy]:
         offers = django_snapshots.VendorOfferSnapshot.objects.filter(vendor_id=vendor_id, is_active=True).values()
         offer_list = [
             { **offer, "coupons": list(django_snapshots.VendorCouponSnapshot.objects.filter(offer_id=offer.get("offer_id")).values()) }
@@ -61,7 +63,9 @@ class DjangoVendorRepositoryImpl(repositories.VendorAbstract):
         return final_offers
 
 
-    def get_shipping_options(self, vendor_id: uuid.UUID) -> List[value_objects.ShippingOptionStrategy]:
+    def get_shipping_options(
+        self, vendor_id: uuid.UUID
+    ) -> List[value_objects.ShippingOptionStrategy]:
         shipping_options = django_snapshots.VendorShippingOptionSnapshot.objects.filter(vendor_id=vendor_id, is_active=True)
         final_opts = []
         for option in shipping_options.values():
