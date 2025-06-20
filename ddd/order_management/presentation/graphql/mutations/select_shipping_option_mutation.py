@@ -18,4 +18,4 @@ class SelectShippingOptionMutation(relay.ClientIDMutation):
     def mutate_and_get_payload(cls, root, info, **input):
         command = commands.SelectShippingOptionCommand.model_validate(input)
         result = message_bus.handle(command)
-        return cls(order=object_types.ResponseType(**result.model_dump()))
+        return cls(result=object_types.ResponseType(**result.model_dump()))

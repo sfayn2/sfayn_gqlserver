@@ -12,6 +12,7 @@ from ddd.order_management.domain import exceptions
 def handle_select_shipping_option(
         command: commands.SelectShippingOptionCommand, 
         uow: UnitOfWorkAbstract,
+        vendor_repo: VendorAbstract,
         shipping_option_service: ShippingOptionStrategyServiceAbstract,
         ) -> dtos.ResponseDTO:
     try:
@@ -19,8 +20,10 @@ def handle_select_shipping_option(
 
             order = uow.order.get(order_id=command.order_id)
 
-            available_shipping_options = shipping_option_service(uow.vendor).get_shipping_options(
-                order=order
+            vendor_shipping_options = vendor_repo.get_shipping_options(vendor_id=order.vendor_id)
+            available_shipping_options = shipping_option_service.get_applicable_shipping_options(
+                order=order,
+                vendor_shipping_options=vendor_shipping_options
             )
 
             order_w_shipping_option = order.select_shipping_option(

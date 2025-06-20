@@ -69,7 +69,8 @@ def register_command_handlers():
         commands.SelectShippingOptionCommand: lambda command: handlers.handle_select_shipping_option(
             command=command, 
             uow=repositories.DjangoOrderUnitOfWork(),
-            shipping_option_service=domain_services.ShippingOptionStrategyService
+            vendor_repo=repositories.DjangoVendorRepositoryImpl(),
+            shipping_option_service=domain_services.ShippingOptionStrategyService()
         ),
         commands.PlaceOrderCommand: lambda command: handlers.handle_place_order(
             command=command,
