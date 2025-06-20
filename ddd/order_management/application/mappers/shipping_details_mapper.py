@@ -5,7 +5,7 @@ from ddd.order_management.domain import models, value_objects
 class ShippingDetailsMapper:
 
     @staticmethod
-    def from_domain(shipping_details: value_objects.ShippingDetails) -> dtos.ShippingDetailsDTO:
+    def to_dto(shipping_details: value_objects.ShippingDetails) -> dtos.ShippingDetailsDTO:
         return dtos.ShippingDetailsDTO(**asdict(shipping_details))
 
     @staticmethod

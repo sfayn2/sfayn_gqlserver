@@ -9,4 +9,4 @@ class ShippingOptionsResponseMapper:
 
     @staticmethod
     def to_dtos(shipping_options: List[value_objects.ShippingDetails]) -> List[dtos.ShippingDetailsDTO]:
-        return [ShippingDetailsMapper.from_domain(option) for option in shipping_options]
+        return [ShippingDetailsMapper.to_dto(option) for option in shipping_options]
