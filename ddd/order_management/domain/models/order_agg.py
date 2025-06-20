@@ -274,7 +274,7 @@ class Order:
     def add_shipping_tracking_reference(self, shipping_reference: str):
         if self.order_status != enums.OrderStatus.SHIPPED:
             raise exceptions.InvalidOrderOperation("Only shipped order can add tracking reference.")
-        if not self.shipping_reference.startswith("http"):
+        if not shipping_reference.startswith("http"):
             raise exceptions.InvalidOrderOperation("The Shipping tracking reference url is invalid.")
 
         self.shipping_reference = shipping_reference
