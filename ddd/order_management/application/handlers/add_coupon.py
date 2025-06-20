@@ -12,13 +12,15 @@ from ddd.order_management.domain import exceptions
 
 def handle_add_coupon(
         command: commands.AddCouponCommand, 
-        coupon_validation: CouponValidationAbstract,
-        uow: UnitOfWorkAbstract) -> dtos.ResponseDTO:
+        coupon_validation_service: CouponValidationServiceAbstract,
+        uow: UnitOfWorkAbstract
+) -> dtos.ResponseDTO:
+
     try:
         with uow:
 
             order = uow.order.get(order_id=command.order_id)
-            valid_coupon  = coupon_validation.ensure_coupon_is_valid(
+            valid_coupon  = coupon_validation_service.ensure_coupon_is_valid(
                     coupon_code=command.coupon_code, 
                     vendor_id=order.vendor_id
                 )

@@ -69,6 +69,12 @@ class OrderOffersAppliedEvent(DomainEvent):
     order_status: enums.OrderStatus
 
 @dataclass
+class OrderCouponAppliedEvent(DomainEvent):
+    order_id: str
+    order_status: enums.OrderStatus
+
+
+@dataclass
 class OrderTaxesAppliedEvent(DomainEvent):
     order_id: str
     order_status: enums.OrderStatus

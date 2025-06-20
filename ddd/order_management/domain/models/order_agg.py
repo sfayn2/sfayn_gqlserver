@@ -291,6 +291,13 @@ class Order:
             raise exceptions.InvalidOrderOperation("Only draft order can apply coupon.")
         self.coupons.append(coupon)
 
+        event = events.OrderCouponAppliedEvent(
+            order_id=self.order_id,
+            order_status=self.order_status,
+        )
+
+        self.raise_event(event)
+
     def remove_coupon(self, coupon: value_objects.Coupon):
         if not coupon:
             raise exceptions.InvalidOrderOperation("Coupon cannot be none.")
