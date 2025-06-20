@@ -19,4 +19,3 @@ class DjangoOrderRepositoryImpl(repositories.OrderAbstract):
             django_models.OrderLine.objects.update_or_create(**django_line_item)
 
         self.seen.add(order) #Track Entitry for Uow
-        print(order)

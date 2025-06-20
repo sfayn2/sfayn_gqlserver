@@ -8,48 +8,43 @@ from ddd.order_management.infrastructure import django_mappers
 
 class DjangoVendorRepositoryImpl(repositories.VendorAbstract):
 
-    def get_line_items(self, vendor_id: str, product_skus_input: List[ProductSkuDTO]) -> List[models.LineItem]:
-        try:
-            django_vendor_details = django_snapshots.VendorDetailsSnapshot.objects.get(
+    def get_line_items(
+        self, vendor_id: str, product_skus_input: List[ProductSkuDTO]
+    ) -> List[models.LineItem]:
+        vendor_details = self._get_active_vendor_details(vendor_id)
+
+        product_sku_map = {sku.product_sku: sku.order_quantity for sku in product_skus_input}
+
+        available_products = list(django_snapshots.VendorProductSnapshot.objects.filter(
                 vendor_id=vendor_id, 
+                product_sku__in=product_sku_map.keys(),
                 is_active=True
             )
-        except django_snapshots.VendorDetailsSnapshot.DoesNotExist:
-            raise exceptions.VendorDetailsException(f"Vendor {vendor_id} Details not available")
-
-        product_skus = [item.product_sku for item in product_skus_input]
-
-        django_products = django_snapshots.VendorProductSnapshot.objects.filter(
-            vendor_id=vendor_id, 
-            product_sku__in=product_skus,
-            is_active=True
         )
 
-        if not django_products.exists():
-            raise exceptions.VendorProductNotFoundException(f"Vendor {vendor_id} Products {','.join(product_skus)} not available")
+        if not available_products:
+            raise exceptions.VendorProductNotFoundException(
+                f"Vendor {vendor_id} does not offer products: { ','.join(product_sku_map.keys()) } not available"
+            )
 
         line_items = []
-        for product in django_products:
-
+        for snapshot in available_products:
             #do this to fit w LineItemMapper expected fields
-            for product_sku_input in product_skus_input:
-                if product_sku_input.product_sku == product.product_sku:
-                    product.order_quantity = product_sku_input.order_quantity
-
-            product.vendor_name = django_vendor_details.name
-            product.vendor_country = django_vendor_details.country
-            product.is_free_gift = False
-            product.is_taxable = True
+            snapshot.order_quantity = product_sku_map.get(snapshot.product_sku)
+            snapshot.vendor_name = vendor_details.name
+            snapshot.vendor_country = vendor_details.country
+            snapshot.is_free_gift = False
+            snapshot.is_taxable = True
 
             line_items.append(
-                django_mappers.LineItemMapper.to_domain(product)
+                django_mappers.LineItemMapper.to_domain(snapshot)
             )
 
         return line_items
 
 
     def get_offers(self, vendor_id: str) -> List[value_objects.OfferStrategy]:
-        offers = django_snapshots.VendorOfferSnapshot.objects.filter(vendor_id=vendor_id, is_active=True).prefetch_related("coupon").values()
+        offers = django_snapshots.VendorOfferSnapshot.objects.filter(vendor_id=vendor_id, is_active=True).values()
         offer_list = [
             { **offer, "coupons": list(django_snapshots.VendorCouponSnapshot.objects.filter(offer_id=offer.get("offer_id")).values()) }
             for offer in offers
@@ -77,3 +72,15 @@ class DjangoVendorRepositoryImpl(repositories.VendorAbstract):
                 print(f"DjangoVendorRepository.get_shipping_options exception > {str(e)}")
                 continue
         return final_opts
+
+    def _get_active_vendor_details(self, vendor_id: str):
+        try:
+            return django_snapshots.VendorDetailsSnapshot.objects.get(
+                vendor_id=vendor_id, 
+                is_active=True
+            )
+        except django_snapshots.VendorDetailsSnapshot.DoesNotExist:
+            raise exceptions.VendorDetailsException(
+                f"Vendor details not found for vendor_id={vendor_id}"
+            )
+
