@@ -19,6 +19,9 @@ class ShippingDetailsDTO(BaseModel):
     delivery_time: str
     cost: MoneyDTO
 
+    class Config:
+        use_enum_values = True
+
 class CustomerDetailsDTO(BaseModel):
     first_name: str
     last_name: str

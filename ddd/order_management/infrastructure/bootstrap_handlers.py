@@ -100,10 +100,11 @@ def register_command_handlers():
 
 def register_query_handlers():
     message_bus.QUERY_HANDLERS.update({
-        queries.ShippingOptionsQuery: lambda query: handlers.handle_shipping_options(
+        queries.ShippingOptionsQuery: lambda query: handlers.handle_get_shipping_options(
             query=query, 
-            uow=uow,
-            shipping_option_service=domain_services.ShippingOptionStrategyService
+            uow=repositories.DjangoOrderUnitOfWork(),
+            vendor_repo=repositories.DjangoVendorRepositoryImpl(),
+            shipping_option_service=domain_services.ShippingOptionStrategyService()
         ),
     })
 

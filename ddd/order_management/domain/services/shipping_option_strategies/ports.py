@@ -30,5 +30,9 @@ class ShippingOptionStrategyServiceAbstract(ABC):
         self.vendor_repository = vendor_repository
 
     @abstractmethod
-    def get_shipping_options(self, order: models.Order) -> List[value_objects.ShippingDetails]:
+    def get_applicable_shipping_options(
+                self, 
+                order: models.Order, 
+                vendor_shipping_options: List[value_objects.ShippingOptionStrategy]
+            ) -> List[value_objects.ShippingDetails]:
         raise NotImplementedError("Subclasses must implement this method")

@@ -9,16 +9,18 @@ from ddd.order_management.application import (
     queries
 )
 
-def handle_shipping_options(
+def handle_get_shipping_options(
         query: queries.ShippingOptionsQuery, 
         uow: UnitOfWorkAbstract,
-        vendor: VendorAbstract,
-        shipping_option_service: ShippingOptionStrategyServiceAbstract) -> List[dtos.ShippingDetailsDTO]:
+        vendor_repo: VendorAbstract,
+        shipping_option_service: ShippingOptionStrategyServiceAbstract
+) -> List[dtos.ShippingDetailsDTO]:
+
     with uow:
 
         order = uow.order.get(order_id=query.order_id)
 
-        vendor_shipping_options = vendor.get_shipping_options(vendor_id=order.vendor_id)
+        vendor_shipping_options = vendor_repo.get_shipping_options(vendor_id=order.vendor_id)
         available_shipping_options = shipping_option_service.get_applicable_shipping_options(
             order=order,
             vendor_shipping_options=vendor_shipping_options
