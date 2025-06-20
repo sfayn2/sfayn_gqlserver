@@ -15,6 +15,7 @@ class Mutation(graphene.ObjectType):
     select_shipping_option = mutations.select_shipping_option_mutation.SelectShippingOptionMutation.Field()
     mark_as_shipped_order = mutations.mark_as_shipped_mutation.MarkAsShippedMutation.Field()
     add_shipping_tracking_reference = mutations.add_shipping_tracking_reference_mutation.AddShippingTrackingReferenceMutation.Field()
+    add_coupon = mutations.add_coupon_mutation.AddCouponMutation.Field()
 
 schema = graphene.Schema(query=Query, mutation=Mutation)
 

@@ -8,5 +8,5 @@ from abc import ABC, abstractmethod
 class CouponValidationServiceAbstract(ABC):
 
     @abstractmethod
-    def ensure_coupon_is_valid(self, coupon_code: str, vendor_id: uuid.UUID) -> Union[None, value_objects.Coupon]:
+    def ensure_coupon_is_valid(self, coupon_code: str, vendor_id: str) -> value_objects.Coupon:
         raise NotImplementedError("Subclasses must implement this method")

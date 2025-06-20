@@ -9,7 +9,7 @@ from ddd.order_management.presentation.graphql import object_types
 # ==========================
 # Mutations 
 # ===================
-class AddShippingTrackingReferenceMutation(relay.ClientIDMutation):
+class AddCouponMutation(relay.ClientIDMutation):
     class Input:
         order_id = graphene.String()
         coupon_code = graphene.String()

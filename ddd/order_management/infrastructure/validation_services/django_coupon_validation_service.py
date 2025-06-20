@@ -8,9 +8,19 @@ from order_management import models as django_snapshots
 
 class DjangoCouponValidationService(ports.CouponValidationServiceAbstract):
 
-    def ensure_coupon_is_valid(self, coupon_code: str, vendor_id: uuid.UUID) -> Union[None, value_objects.Coupon]:
-        vendor_coupon_snapshot = django_snapshots.VendorCouponSnapshot.objects.filter(coupon_code=item, vendoroffersnapshot__vendor__id=vendor_id)
+    def ensure_coupon_is_valid(
+        self, coupon_code: str, vendor_id: str
+    ) -> value_objects.Coupon:
+
+        vendor_coupon_snapshot = django_snapshots.VendorCouponSnapshot.objects.filter(
+            coupon_code=coupon_code, vendor_id=vendor_id
+        )
+
         if vendor_coupon_snapshot.exists():
             return django_mappers.CouponMapper.to_domain(vendor_coupon_snapshot)
+        
+        raise exceptions.CouponException(
+            f"Coupon {coupon_code} is not offered by vendor {vendor_id}"
+        )
 
 
