@@ -64,7 +64,7 @@ def register_command_handlers():
             customer_repo=repositories.DjangoCustomerRepositoryImpl(),
             vendor_repo=repositories.DjangoVendorRepositoryImpl(),
             order_service=domain_services.OrderService(),
-            product_vendor_validation_service=validation_services.DjangoProductsVendorValidationService()
+            stock_validation_service=validation_services.DjangoStockValidationService()
         ),
         commands.SelectShippingOptionCommand: lambda command: handlers.handle_select_shipping_option(
             command=command, 

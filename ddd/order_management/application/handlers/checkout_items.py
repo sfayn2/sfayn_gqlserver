@@ -13,7 +13,7 @@ def handle_checkout_items(
         uow: UnitOfWorkAbstract,
         customer_repo: CustomerAbstract,
         vendor_repo: VendorAbstract,
-        product_vendor_validation_service: ProductVendorValidationServiceAbstract,
+        stock_validation_service: StockValidationServiceAbstract,
         order_service: OrderServiceAbstract) -> dtos.ResponseDTO:
     try:
         with uow:
@@ -22,7 +22,8 @@ def handle_checkout_items(
             shipping_address = customer_repo.get_shipping_address(command.customer_id)
             line_items = vendor_repo.get_line_items(command.vendor_id, command.product_skus)
 
-            product_vendor_validation_service.ensure_line_items_vendor_is_valid(items=line_items)
+            stock_validation_service.ensure_items_in_stock(line_items)
+
 
             draft_order = order_service.create_draft_order(
                 customer_details=customer_details,

@@ -120,3 +120,7 @@ class ShippingOptionStrategyDTO(BaseModel):
     flat_rate: MoneyDTO
     currency: str
     is_active: bool
+
+class ProductSkusDTO(BaseModel):
+    product_sku: str
+    order_quantity: int

@@ -1,3 +1,2 @@
 from .django_coupon_validation_service import DjangoCouponValidationService
-from .django_products_vendor_validation_service import DjangoProductsVendorValidationService
 from .django_stock_validation_service import DjangoStockValidationService

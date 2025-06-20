@@ -13,6 +13,7 @@ from ddd.order_management.application.dtos.dtos import (
     OrderDTO,
     OfferStrategyDTO,
     ShippingOptionStrategyDTO,
+    ProductSkusDTO,
 )
 from ddd.order_management.application.dtos.snapshot_dtos import (
     VendorDetailsSnapshotDTO,

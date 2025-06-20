@@ -12,7 +12,7 @@ class Command(BaseModel, frozen=True):
 class CheckoutItemsCommand(Command):
     customer_id: constr(min_length=1, strip_whitespace=True)
     vendor_id: constr(min_length=1, strip_whitespace=True)
-    product_skus: List[str]
+    product_skus: List[dtos.ProductSkusDTO]
 
 class PlaceOrderCommand(Command):
     order_id: str

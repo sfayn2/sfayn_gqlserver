@@ -52,3 +52,7 @@ class PaymentDetailsInput(graphene.InputObjectType):
 
 class CouponInput(graphene.InputObjectType):
     coupon_code = graphene.String(required=True)
+
+class ProductSkusInput(graphene.InputObjectType):
+    product_sku = graphene.String(required=True)
+    order_quantity = graphene.Int(required=True)

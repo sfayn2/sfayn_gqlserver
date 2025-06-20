@@ -1,3 +1,4 @@
+from __future__ import annotations
 import pytz, uuid
 from datetime import datetime
 from typing import List
@@ -7,7 +8,7 @@ from ddd.order_management.infrastructure import django_mappers
 
 class DjangoVendorRepositoryImpl(repositories.VendorAbstract):
 
-    def get_line_items(self, vendor_id: str, skus: List[str]) -> models.LineItem:
+    def get_line_items(self, vendor_id: str, product_skus_input: List[ProductSkuDTO]) -> List[models.LineItem]:
         try:
             django_vendor_details = django_snapshots.VendorDetailsSnapshot.objects.get(
                 vendor_id=vendor_id, 
@@ -16,20 +17,25 @@ class DjangoVendorRepositoryImpl(repositories.VendorAbstract):
         except django_snapshots.VendorDetailsSnapshot.DoesNotExist:
             raise exceptions.VendorDetailsException(f"Vendor {vendor_id} Details not available")
 
+        product_skus = [item.product_sku for item in product_skus_input]
+
         django_products = django_snapshots.VendorProductSnapshot.objects.filter(
             vendor_id=vendor_id, 
-            product_sku__in=skus,
+            product_sku__in=product_skus,
             is_active=True
         )
 
         if not django_products.exists():
-            raise exceptions.VendorProductNotFoundException(f"Vendor {vendor_id} Products {','.join(skus)} not available")
+            raise exceptions.VendorProductNotFoundException(f"Vendor {vendor_id} Products {','.join(product_skus)} not available")
 
         line_items = []
         for product in django_products:
 
             #do this to fit w LineItemMapper expected fields
-            product.order_quantity = product.stock
+            for product_sku_input in product_skus_input:
+                if product_sku_input.product_sku == product.product_sku:
+                    product.order_quantity = product_sku_input.order_quantity
+
             product.vendor_name = django_vendor_details.name
             product.vendor_country = django_vendor_details.country
             product.is_free_gift = False

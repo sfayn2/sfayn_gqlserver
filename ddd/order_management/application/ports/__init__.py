@@ -2,7 +2,6 @@ from .coupon_validation_abstract import CouponValidationServiceAbstract
 from .email_abstract import EmailServiceAbstract
 from .logging_abstract import LoggingServiceAbstract
 from .payment_abstract import PaymentGatewayAbstract, PaymentServiceAbstract
-from .products_vendor_validation_service_abstract import ProductsVendorValidationServiceAbstract
 from .stock_validation_service_abstract import StockValidationServiceAbstract
 from .vendor_details_snapshot_abstract import VendorDetailsSnapshotAbstract
 from .vendor_offer_snapshot_abstract import VendorOfferSnapshotAbstract
