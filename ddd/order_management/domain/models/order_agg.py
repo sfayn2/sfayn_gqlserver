@@ -128,12 +128,26 @@ class Order:
 
         self.raise_event(event)
 
-    def confirm_order(self):
+    def verify_payments(self, payment_details: value_objects.PaymentDetails) -> bool:
+        if payment_details.order_id != order.order_id:
+            raise exceptions.InvalidOrderOperation("Payment details verification Order ID mismatch")
+
+        if payment_details.paid_amount < order.final_amount:
+            raise exceptions.InvalidOrderOperation(
+                f"Payment details paid amount not match with expected amount {order.final_amount.amount} {order.final_amount.currency}"
+            )
+
+        if payment_details.status != enums.PaymentMethod.PAID:
+            raise exceptions.InvalidOrderOperation(f"Payment details {payment_details.transaction_id} was not success")
+
+        return True
+
+
+    def confirm_order(self, payment_verified: bool):
         if self.order_status != enums.OrderStatus.PENDING:
             raise exceptions.InvalidOrderOperation("Only pending orders can be confirmed.")
-        #if not payment_verified:
-        #    raise exceptions.InvalidOrderOperation("Order cannot be confirmed without verified payment.")
-        if payment_details.payment_status != enums.PaymentStatus.PAID:
+
+        if not payment_verified:
             raise exceptions.InvalidOrderOperation("Order cannot be confirmed without verified payment.")
 
         self.order_status = enums.OrderStatus.CONFIRMED

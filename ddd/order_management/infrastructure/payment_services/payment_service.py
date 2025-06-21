@@ -43,16 +43,6 @@ class PaypalPaymentGateway(ports.PaymentGatewayAbstract):
             currency=purchase_units[0]["amount"]["currency"]
         )
 
-        if purchase_units[0].get("custom") != order.order_id:
-            raise exceptions.InvalidOrderOperation("Payment Verification Order ID mismatch")
-
-        if paypal_paid_amount != order.final_amount:
-            raise exceptions.InvalidOrderOperation(f"Transaction Amount mismatch: expected {order.final_amount.amount} {order.final_amount.currency}")
-
-        if paypal_response.get("status") != "COMPLETED":
-            raise exceptions.InvalidOrderOperation("Transaction not completed")
-
-
         return value_objects.PaymentDetails(
             method=enums.PaymentMethod.PAYPAL,
             paid_amount=paypal_paid_amount,
