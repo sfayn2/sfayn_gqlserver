@@ -38,7 +38,7 @@ def handle_confirm_order(
 
             return dtos.ResponseDTO(
                 success=True,
-                message="Order successfully confirmed."
+                message=f"Order {confirmed_order.order_id} successfully confirmed."
             )
     except exceptions.InvalidOrderOperation as e:
         return shared.handle_invalid_order_operation(e)

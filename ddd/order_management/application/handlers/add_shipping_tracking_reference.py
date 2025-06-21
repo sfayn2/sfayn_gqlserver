@@ -24,7 +24,7 @@ def handle_add_shipping_tracking_reference(
 
             return dtos.ResponseDTO(
                 success=True,
-                message="Order successfully add shipping tracking reference."
+                message=f"Order {order.order_id} successfully add shipping tracking reference."
             )
 
     except exceptions.InvalidOrderOperation as e:

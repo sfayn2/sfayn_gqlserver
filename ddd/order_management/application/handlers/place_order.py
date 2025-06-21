@@ -26,7 +26,7 @@ def handle_place_order(
 
             return dtos.ResponseDTO(
                 success=True,
-                message="Order successfully placed order."
+                message=f"Order {order.order_id} successfully placed order."
             )
 
 

@@ -36,7 +36,7 @@ def handle_select_shipping_option(
 
             return dtos.ResponseDTO(
                 success=True,
-                message="Order successfully selected shipping option."
+                message=f"Order {order_w_shipping_option.order_id} successfully selected shipping option."
             )
 
     except exceptions.InvalidOrderOperation as e:

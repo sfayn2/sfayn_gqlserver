@@ -24,7 +24,7 @@ def handle_mark_as_shipped(
 
             return dtos.ResponseDTO(
                 success=True,
-                message="Cart items successfully mark as shipped."
+                message=f"Order {order.order_id} successfully mark as shipped."
             )
 
 
