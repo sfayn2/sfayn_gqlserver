@@ -128,7 +128,7 @@ class Order:
 
         self.raise_event(event)
 
-    def verify_payments(self, payment_details: value_objects.PaymentDetails) -> bool:
+    def _verify_payment(self, payment_details: value_objects.PaymentDetails) -> bool:
         if payment_details.order_id != order.order_id:
             raise exceptions.InvalidOrderOperation("Payment details verification Order ID mismatch")
 
@@ -143,11 +143,11 @@ class Order:
         return True
 
 
-    def confirm_order(self, payment_verified: bool):
+    def confirm_order(self, is_verified: bool):
         if self.order_status != enums.OrderStatus.PENDING:
             raise exceptions.InvalidOrderOperation("Only pending orders can be confirmed.")
 
-        if not payment_verified:
+        if not is_verified:
             raise exceptions.InvalidOrderOperation("Order cannot be confirmed without verified payment.")
 
         self.order_status = enums.OrderStatus.CONFIRMED
@@ -228,7 +228,10 @@ class Order:
             raise exceptions.InvalidOrderOperation("Payment details cannot be none.")
         if self.order_status != enums.OrderStatus.PENDING:
             raise exceptions.InvalidOrderOperation("Only pending order can update payment details.")
-        self.payment_details = payment_details
+
+        is_verified = self._verify_payment(payment_details)
+        if is_verified:
+            self.payment_details = payment_details
 
     def mark_as_shipped(self):
         if self.order_status != enums.OrderStatus.CONFIRMED:

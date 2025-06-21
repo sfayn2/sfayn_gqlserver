@@ -30,13 +30,12 @@ def handle_confirm_order(
                 order=order
             )
 
-            verified_payments = order.verify_payments(payment_details)
-            if verified_payments:
-                order.update_payment_details(
-                    payment_details
-                )
+            # w verify payment before update
+            order.update_payment_details(
+                payment_details
+            )
 
-            order.confirm_order(verified_payments)
+            order.confirm_order(True)
 
             uow.order.save(order)
             uow.commit()
