@@ -128,10 +128,12 @@ class Order:
 
         self.raise_event(event)
 
-    def confirm_order(self, payment_verified: bool):
+    def confirm_order(self):
         if self.order_status != enums.OrderStatus.PENDING:
             raise exceptions.InvalidOrderOperation("Only pending orders can be confirmed.")
-        if not payment_verified:
+        #if not payment_verified:
+        #    raise exceptions.InvalidOrderOperation("Order cannot be confirmed without verified payment.")
+        if payment_details.payment_status != enums.PaymentStatus.PAID:
             raise exceptions.InvalidOrderOperation("Order cannot be confirmed without verified payment.")
 
         self.order_status = enums.OrderStatus.CONFIRMED

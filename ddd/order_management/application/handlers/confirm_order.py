@@ -13,7 +13,6 @@ def handle_confirm_order(
         command: commands.ConfirmOrderCommand, 
         uow: UnitOfWorkAbstract, 
         payment_service: PaymentServiceAbstract,
-        order_service: OrderServiceAbstract,
         stock_validation_service: StockValidationServiceAbstract
     ) -> dtos.ResponseDTO:
 
@@ -31,17 +30,20 @@ def handle_confirm_order(
                 order=order
             )
 
-            confirmed_order = order_service.confirm_order(
-                order=order,
-                payment_details=payment_details
-            )
+            order.update_payment_details(payment_details)
+            order.confirm_order()
 
-            uow.order.save(confirmed_order)
+            #confirmed_order = order_service.confirm_order(
+            #    order=order,
+            #    payment_details=payment_details
+            #)
+
+            uow.order.save(order)
             uow.commit()
 
             return dtos.ResponseDTO(
                 success=True,
-                message=f"Order {confirmed_order.order_id} successfully confirmed."
+                message=f"Order {order.order_id} successfully confirmed."
             )
     except exceptions.InvalidOrderOperation as e:
         return shared.handle_invalid_order_operation(e)

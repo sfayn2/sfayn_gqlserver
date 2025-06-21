@@ -86,7 +86,6 @@ def register_command_handlers():
             command=command, 
             uow=repositories.DjangoOrderUnitOfWork(),
             payment_service=payment_services.PaymentService(),
-            order_service=domain_services.OrderService(),
             stock_validation_service=validation_services.DjangoStockValidationService()
         ),
         commands.ShipOrderCommand: lambda command: handlers.handle_mark_as_shipped(

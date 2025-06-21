@@ -13,18 +13,18 @@ from ddd.order_management.domain import (
 class OrderService(ports.OrderServiceAbstract):
     #Order life cycle
 
-    def confirm_order(self, payment_details: value_objects.PaymentDetails,
-                    order: models.Order) -> models.Order:
-        
-        if payment_details.payment_status == enums.PaymentStatus.PAID:
-            order.confirm_order(True)
-            order.update_payment_details(payment_details)
-        else:
-            raise exceptions.PaymentDetailsException(
-                f"Unable to confirm Order {order.order_id}, Payment was not successful."
-            )
+    #def confirm_order(self, payment_details: value_objects.PaymentDetails,
+    #                order: models.Order) -> models.Order:
+    #    
+    #    if payment_details.payment_status == enums.PaymentStatus.PAID:
+    #        order.confirm_order(True)
+    #        order.update_payment_details(payment_details)
+    #    else:
+    #        raise exceptions.PaymentDetailsException(
+    #            f"Unable to confirm Order {order.order_id}, Payment was not successful."
+    #        )
 
-        return order
+    #    return order
 
     def create_draft_order(
             self,
