@@ -11,8 +11,8 @@ from ddd.order_management.presentation.graphql import object_types
 # ===================
 class AddShippingTrackingReferenceMutation(relay.ClientIDMutation):
     class Input:
-        order_id = graphene.String()
-        shipping_reference = graphene.String()
+        order_id = graphene.String(required=True)
+        shipping_reference = graphene.String(required=True)
 
     result = graphene.Field(object_types.ResponseType)
 

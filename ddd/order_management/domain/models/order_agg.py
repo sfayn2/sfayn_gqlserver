@@ -261,7 +261,9 @@ class Order:
 
     def cancel_order(self, cancellation_reason: str):
         if not self.order_status in (enums.OrderStatus.PENDING, enums.OrderStatus.CONFIRMED):
-            raise exceptions.InvalidOrderOperation("Cannot cancel a completed or already cancelled order or shipped order")
+            raise exceptions.InvalidOrderOperation("Cannot cancel a completed or already cancelled order or shipped order or draft order")
+        if not cancellation_reason:
+            raise exceptions.InvalidOrderOperation("Cannot cancel without a cancellation reason.")
         self.order_status = enums.OrderStatus.CANCELLED
         self.cancellation_reason = cancellation_reason
         self.update_modified_date()

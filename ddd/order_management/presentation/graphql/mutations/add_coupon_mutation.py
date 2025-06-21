@@ -11,8 +11,8 @@ from ddd.order_management.presentation.graphql import object_types
 # ===================
 class AddCouponMutation(relay.ClientIDMutation):
     class Input:
-        order_id = graphene.String()
-        coupon_code = graphene.String()
+        order_id = graphene.String(required=True)
+        coupon_code = graphene.String(required=True)
 
     result = graphene.Field(object_types.ResponseType)
 
