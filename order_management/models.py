@@ -308,9 +308,9 @@ class CustomerAddressSnapshot(models.Model):
         unique_together = ('customer_id', 'address_type', 'is_default') #ensure one default per addres type
 
 # =========
-# Authorization snapshot
+# Local Authorization / Scope Based
 # =========
-class UserAuthorizationSnapshot(models.Model):
+class UserAuthorization(models.Model):
     user_id = models.CharField(max_length=150)
     permission_codename = models.CharField(max_length=255)
     scope = models.CharField(max_length=150, help_text='ex. { "vendor_id": "v-1234" }')

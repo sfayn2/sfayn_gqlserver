@@ -82,8 +82,3 @@ class CustomerAddressSnapshotDTO(BaseModel):
     is_default: bool
     is_active: bool
 
-class UserAuthorizationSnapshotDTO(BaseModel):
-    user_id: str
-    permission_codename: str
-    scope: dict
-    is_active: bool

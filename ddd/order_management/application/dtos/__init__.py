@@ -23,5 +23,4 @@ from ddd.order_management.application.dtos.snapshot_dtos import (
     VendorProductSnapshotDTO,
     CustomerDetailsSnapshotDTO,
     CustomerAddressSnapshotDTO,
-    UserAuthorizationSnapshotDTO
 )

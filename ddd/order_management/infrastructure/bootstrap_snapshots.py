@@ -44,17 +44,9 @@ def run_customer_snapshot_sync():
 
     print("Customer snapshot synced.")
 
-def run_user_auth_snapshot_sync():
-    provider = snapshot_services.DjangoUserAuthorizationSnapshotProvider()
-    django_user_auth = snapshot_services.DjangoUserAuthorizationSnapshotSyncService(provider)
-    django_user_auth.sync()
-
-    print("User Auth snapshot synced.")
-
 def run_all_snapshot_sync():
     run_vendor_details_snapshot_sync()
     run_vendor_offer_snapshot_sync()
     run_vendor_product_snapshot_sync()
     run_vendor_shippingoptions_snapshot_sync()
     run_customer_snapshot_sync()
-    run_user_auth_snapshot_sync()
