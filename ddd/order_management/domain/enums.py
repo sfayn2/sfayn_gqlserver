@@ -49,3 +49,11 @@ class PaymentMethod(Enum):
     @classmethod
     def choices(cls):
         return generate_choices(cls)
+
+class PaymentStatus(Enum):
+    PAID = "Paid"
+    PENDING = "Pending"
+
+    @classmethod
+    def choices(cls):
+        return generate_choices(cls)

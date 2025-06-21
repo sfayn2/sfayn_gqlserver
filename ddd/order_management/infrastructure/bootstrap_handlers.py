@@ -19,7 +19,7 @@ from ddd.order_management.application import commands, message_bus, queries
 
 def register_event_handlers():
     event_bus.EVENT_HANDLERS.update({
-        "order_management.events.OrderCanceledEvent": [
+        "order_management.events.CanceledOrderEvent": [
                 lambda event, uow: handlers.handle_logged_order(
                     event=event,
                     uow=uow,
@@ -66,6 +66,11 @@ def register_command_handlers():
             order_service=domain_services.OrderService(),
             stock_validation_service=validation_services.DjangoStockValidationService()
         ),
+        commands.AddCouponCommand: lambda command: handlers.handle_add_coupon(
+            command=command,
+            uow=repositories.DjangoOrderUnitOfWork(),
+            coupon_validation=validation_services.DjangoCouponValidationService()
+        ),
         commands.SelectShippingOptionCommand: lambda command: handlers.handle_select_shipping_option(
             command=command, 
             uow=repositories.DjangoOrderUnitOfWork(),
@@ -84,7 +89,7 @@ def register_command_handlers():
             order_service=domain_services.OrderService(),
             stock_validation_service=validation_services.DjangoStockValidationService()
         ),
-        commands.MarkAsShippedOrderCommand: lambda command: handlers.handle_mark_as_shipped(
+        commands.ShipOrderCommand: lambda command: handlers.handle_mark_as_shipped(
             command=command,
             uow=repositories.DjangoOrderUnitOfWork()
         ),
@@ -92,10 +97,9 @@ def register_command_handlers():
             command=command,
             uow=repositories.DjangoOrderUnitOfWork()
         ),
-        commands.AddCouponCommand: lambda command: handlers.handle_add_coupon(
+        commands.CompleteOrderCommand: lambda command: handlers.handle_mark_as_completed(
             command=command,
-            uow=repositories.DjangoOrderUnitOfWork(),
-            coupon_validation=validation_services.DjangoCouponValidationService()
+            uow=repositories.DjangoOrderUnitOfWork()
         ),
     })
 

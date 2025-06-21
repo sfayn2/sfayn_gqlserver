@@ -48,7 +48,7 @@ class PaymentDetailsDTO(BaseModel):
     method: enums.PaymentMethod
     paid_amount: MoneyDTO
     transaction_id: str
-    status: str
+    status: enums.PaymentStatus
 
 class LineItemDTO(BaseModel):
     product_sku: str

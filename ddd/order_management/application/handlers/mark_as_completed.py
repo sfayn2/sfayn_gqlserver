@@ -10,21 +10,21 @@ from ddd.order_management.application import (
 from ddd.order_management.domain import exceptions
 
 
-def handle_mark_as_shipped(
-        command: commands.ShipOrderCommand, 
+def handle_mark_as_completed(
+        command: commands.CompleteOrderCommand, 
         uow: UnitOfWorkAbstract) -> dtos.ResponseDTO:
     try:
         with uow:
 
             order = uow.order.get(order_id=command.order_id)
-            order.mark_as_shipped()
+            order.mark_as_completed()
 
             uow.order.save(order)
             uow.commit()
 
             return dtos.ResponseDTO(
                 success=True,
-                message=f"Order {order.order_id} successfully mark as shipped."
+                message=f"Order {order.order_id} successfully mark as completed."
             )
 
 

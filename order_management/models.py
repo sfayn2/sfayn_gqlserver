@@ -107,6 +107,7 @@ class Order(models.Model):
             blank=True, 
             help_text="amount paid by customer", 
     )
+    payment_status = models.CharField(max_length=50, null=True, blank=True, choices=enums.PaymentStatus.choices)
 
     currency = models.CharField(max_length=50, help_text="Currency for calculation requirements & validation. e.g. SGD")
     date_created = models.DateTimeField(auto_now_add=True) 

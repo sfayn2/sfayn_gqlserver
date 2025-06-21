@@ -48,3 +48,9 @@ class Money:
     def default(cls) -> Money:
         return Money(amount=Decimal("0"), currency="SGD") #need to get from settigns?
 
+    def __lt__(self, other: Money) -> bool:
+        if self.currency != other.currency:
+            raise exceptions.MoneyException("Cannot compare money with different currencies")
+        return self.amount < other.amount
+
+

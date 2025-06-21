@@ -17,9 +17,6 @@ class CheckoutItemsCommand(Command):
 class PlaceOrderCommand(Command):
     order_id: str
     
-class MarkAsShippedOrderCommand(Command):
-    order_id: str
-
 class AddShippingTrackingReferenceCommand(Command):
     order_id: str
     shipping_reference: str

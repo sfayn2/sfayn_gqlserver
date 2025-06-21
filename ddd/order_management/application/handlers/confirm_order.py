@@ -26,7 +26,10 @@ def handle_confirm_order(
             stock_validation_service.ensure_items_in_stock(order.line_items)
 
             payment_gateway = payment_service.get_payment_gateway(command.payment_method)
-            payment_details = payment_gateway.get_payment_details(command.transaction_id)
+            payment_details = payment_gateway.get_payment_details(
+                command.transaction_id,
+                order=order
+            )
 
             confirmed_order = order_service.confirm_order(
                 order=order,

@@ -23,7 +23,7 @@ class OrderMapper:
                     'shipping_delivery_time': order.shipping_details.delivery_time if order.shipping_details else None,
                     'shipping_cost': order.shipping_details.cost.amount if order.shipping_details else None,
                     'shipping_tracking_reference': order.shipping_reference,
-                    'payment_method': order.payment_details.method.value if order.payment_details else None,
+                    'payment_method': order.payment_details.method if order.payment_details else None,
                     'payment_reference': order.payment_details.transaction_id if order.payment_details else None,
                     'payment_amount': order.payment_details.paid_amount.amount if order.payment_details else None, 
                     'cancellation_reason': order.cancellation_reason, 
@@ -72,12 +72,14 @@ class OrderMapper:
         payment_details = None
         if django_order_object.payment_method:
             payment_details=value_objects.PaymentDetails(
+                order_id=django_order_object.order_id,
                 method=django_order_object.payment_method,
                 transaction_id=django_order_object.payment_reference,
                 paid_amount=value_objects.Money(
                     amount=django_order_object.payment_amount,
                     currency=django_order_object.currency
-                )
+                ),
+                status=enums.PaymentStatus(django_order_object.payment_status)
             )
 
         return models.Order(

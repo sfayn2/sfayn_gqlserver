@@ -23,58 +23,58 @@ class DomainEvent(ABC):
 
 
 @dataclass
-class OrderPlacedEvent(DomainEvent):
+class PlacedOrderEvent(DomainEvent):
     order_id: str
     order_status: enums.OrderStatus
 
 @dataclass
-class OrderConfirmedEvent(DomainEvent):
+class ConfirmedOrderEvent(DomainEvent):
     order_id: str
     order_status: enums.OrderStatus
 
 @dataclass
-class OrderShippedEvent(DomainEvent):
+class ShippedOrderEvent(DomainEvent):
     order_id: str
     order_status: enums.OrderStatus
 
 @dataclass
-class OrderCanceledEvent(DomainEvent):
+class CanceledOrderEvent(DomainEvent):
     order_id: str
     order_status: enums.OrderStatus
 
 @dataclass
-class OrderCompletedEvent(DomainEvent):
+class CompletedOrderEvent(DomainEvent):
     order_id: str
     order_status: enums.OrderStatus
 
 @dataclass
-class OrderPaymentAppliedEvent(DomainEvent):
+class AppliedPaymentEvent(DomainEvent):
     order_id: str
     amount: value_objects.Money
 
 
 @dataclass
-class OrderDraftEvent(DomainEvent):
+class CheckedOutEvent(DomainEvent):
     order_id: str
     order_status: enums.OrderStatus
 
 @dataclass
-class OrderShippingOptionSelectedEvent(DomainEvent):
+class SelectedShippingOptionEvent(DomainEvent):
     order_id: str
     order_status: enums.OrderStatus
 
 @dataclass
-class OrderOffersAppliedEvent(DomainEvent):
+class AppliedOffersEvent(DomainEvent):
     order_id: str
     order_status: enums.OrderStatus
 
 @dataclass
-class OrderCouponAppliedEvent(DomainEvent):
+class AppliedCouponEvent(DomainEvent):
     order_id: str
     order_status: enums.OrderStatus
 
 
 @dataclass
-class OrderTaxesAppliedEvent(DomainEvent):
+class AppliedTaxesEvent(DomainEvent):
     order_id: str
     order_status: enums.OrderStatus

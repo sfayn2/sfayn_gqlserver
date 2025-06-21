@@ -15,17 +15,14 @@ class OrderService(ports.OrderServiceAbstract):
 
     def confirm_order(self, payment_details: value_objects.PaymentDetails,
                     order: models.Order) -> models.Order:
-        if payment_details.order_id != order.order_id:
-            raise exceptions.InvalidOrderOperation("Payment Verification Order ID mismatch")
-
-        if payment_details.paid_amount != order.final_amount:
-            raise exceptions.InvalidOrderOperation(f"Transaction Amount mismatch: expected {order.final_amount.amount} {order.final_amount.currency}")
-
-        if payment_details.status != "COMPLETED":
-            raise exceptions.InvalidOrderOperation("Transaction not completed")
         
-        order.confirm_order(True)
-        order.update_payment_details(payment_details)
+        if payment_details.payment_status == enums.PaymentStatus.PAID:
+            order.confirm_order(True)
+            order.update_payment_details(payment_details)
+        else:
+            raise exceptions.PaymentDetailsException(
+                f"Unable to confirm Order {order.order_id}, Payment was not successful."
+            )
 
         return order
 

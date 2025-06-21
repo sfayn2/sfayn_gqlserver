@@ -121,7 +121,7 @@ class Order:
         self.order_status = enums.OrderStatus.PENDING
         self.update_modified_date()
 
-        event = events.OrderPlacedEvent(
+        event = events.PlacedOrderEvent(
             order_id=self.order_id,
             order_status=self.order_status,
         )
@@ -137,7 +137,7 @@ class Order:
         self.order_status = enums.OrderStatus.CONFIRMED
         self.update_modified_date()
 
-        event = events.OrderConfirmedEvent(
+        event = events.ConfirmedOrderEvent(
             order_id=self.order_id,
             order_status=self.order_status,
         )
@@ -162,7 +162,7 @@ class Order:
         if offer_details:
             self.update_offer_details(offer_details)
 
-        event = events.OrderOffersAppliedEvent(
+        event = events.AppliedOffersEvent(
             order_id=self.order_id,
             order_status=self.order_status,
         )
@@ -200,7 +200,7 @@ class Order:
 
         self.calculate_final_amount()
 
-        event = events.OrderTaxesAppliedEvent(
+        event = events.AppliedTaxesEvent(
             order_id=self.order_id,
             order_status=self.order_status,
         )
@@ -220,7 +220,7 @@ class Order:
         self.order_status = enums.OrderStatus.SHIPPED
         self.update_modified_date()
 
-        event = events.OrderShippedEvent(
+        event = events.ShippedOrderEvent(
             order_id=self.order_id,
             order_status=self.order_status,
         )
@@ -233,7 +233,7 @@ class Order:
         self.order_status = enums.OrderStatus.DRAFT
         self.update_modified_date()
 
-        event = events.OrderDraftEvent(
+        event = events.CheckedOutEvent(
             order_id=self.order_id,
             order_status=self.order_status,
         )
@@ -247,7 +247,7 @@ class Order:
         self.cancellation_reason = cancellation_reason
         self.update_modified_date()
 
-        event = events.OrderCanceledEvent(
+        event = events.CanceledOrderEvent(
             order_id=self.order_id,
             order_status=self.order_status,
         )
@@ -258,13 +258,19 @@ class Order:
         if self.order_status != enums.OrderStatus.SHIPPED:
             raise exceptions.InvalidOrderOperation("Only shipped order can mark as completed.")
 
-        if self.payment_details.method == enums.PaymentMethod.COD and not self.payment_details:
-            raise exceptions.InvalidOrderOperation("Cannot mark as completed with outstanding payments.")
+        if not self.payment_details or (self.payment_details and self.payment_details.status != enums.PaymentStatus.PAID):
+            raise exceptions.InvalidOrderOperation(f"Cannot mark as completed with outstanding payments.")
+
+        if self.payment_details.paid_amount < self.final_amount:
+            raise exceptions.InvalidOrderOperation(f"Cannot mark as completed with outstanding payments. Paid amount {self.payment_details.paid_amount.currency} {self.payment_details.paid_amount.amount} is lesser than the expected amount {self.final_amount.currency} {self.final_amount.amount}")
+
+        #if self.payment_details.method == enums.PaymentMethod.COD and not self.payment_details:
+        #    raise exceptions.InvalidOrderOperation(f"Cannot mark as completed with outstanding payments for {enums.PaymentMethod.COD}.")
 
         self.order_status = enums.OrderStatus.COMPLETED
         self.update_modified_date()
 
-        event = events.OrderCompletedEvent(
+        event = events.CompletedOrderEvent(
             order_id=self.order_id,
             order_status=self.order_status,
         )
@@ -291,7 +297,7 @@ class Order:
             raise exceptions.InvalidOrderOperation("Only draft order can apply coupon.")
         self.coupons.append(coupon)
 
-        event = events.OrderCouponAppliedEvent(
+        event = events.AppliedCouponEvent(
             order_id=self.order_id,
             order_status=self.order_status,
         )
@@ -319,6 +325,14 @@ class Order:
         for option in shipping_options:
             if option == shipping_option:
                 self.update_shipping_details(option)
+
+                event = events.SelectedShippingOptionEvent(
+                    order_id=self.order_id,
+                    order_status=self.order_status,
+                )
+
+                self.raise_event(event)
+
                 return self
         raise exceptions.InvalidOrderOperation(f"Shipping option not supported: {shipping_option}")
 

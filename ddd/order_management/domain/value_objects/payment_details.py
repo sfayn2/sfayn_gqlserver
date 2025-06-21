@@ -7,14 +7,14 @@ from .money import Money
 @dataclass(frozen=True)
 class PaymentDetails:
     order_id: str
-    method: str
+    method: enum.PaymentMethod
     paid_amount: Money
     transaction_id: str
-    status: str
+    status: enum.PaymentStatus
 
     def __post_init__(self):
         if not self.order_id:
-            raise exceptions.PaymentDetailsException("Order Id in is required for 3rd Party payment verification.")
+            raise exceptions.PaymentDetailsException("Order Id is required for 3rd Party payment verification.")
 
         if not self.method:
             raise exceptions.PaymentDetailsException("Payment method is required.")
@@ -25,8 +25,8 @@ class PaymentDetails:
         if not self.status:
             raise exceptions.PaymentDetailsException("Payment status is required.")
 
-        if not self.method.value in [item.value for item in enums.PaymentMethod]:
-            raise exceptions.PaymentDetailsException(f"Payment method {self.method.value} not supported.")
+        #if not self.method.value in [item.value for item in enums.PaymentMethod]:
+        #    raise exceptions.PaymentDetailsException(f"Payment method {self.method.value} not supported.")
 
         if self.paid_amount and self.paid_amount.amount < Decimal("0"):
             raise exceptions.PaymentDetailsException("Paid amount cannot be negative.")
