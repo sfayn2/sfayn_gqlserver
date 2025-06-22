@@ -26,6 +26,7 @@ def handle_get_shipping_options(
             vendor_shipping_options=vendor_shipping_options
         )
 
-        shipping_options_dto = mappers.ShippingOptionsResponseMapper.to_dtos(available_shipping_options)
+        response_dto = [mappers.ShippingDetailsMapper.to_dto(opt) for opt in available_shipping_options]
+        #shipping_options_dto = mappers.ShippingOptionsResponseMapper.to_dtos(available_shipping_options)
 
-        return shipping_options_dto
+        return response_dto
