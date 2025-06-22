@@ -23,6 +23,7 @@ class ShippingDetailsDTO(BaseModel):
         use_enum_values = True
 
 class CustomerDetailsDTO(BaseModel):
+    customer_id: str
     first_name: str
     last_name: str
     email: str

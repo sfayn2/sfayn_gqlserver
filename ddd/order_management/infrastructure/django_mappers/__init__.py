@@ -3,3 +3,4 @@ from .django_line_item_mapper import LineItemMapper
 from .django_order_mapper import OrderMapper
 from .django_offer_strategy_mapper import OfferStrategyMapper
 from .django_shipping_option_strategy_mapper import ShippingOptionStrategyMapper
+from .django_address_mapper import AddressMapper

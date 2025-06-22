@@ -19,8 +19,9 @@ class Order(models.Model):
     ) 
     cancellation_reason = models.CharField(max_length=255, blank=True, null=True, help_text="both entity like vendor or customer can cancel the order?")
 
-    customer_first_name = models.CharField(max_length=255)
-    customer_last_name = models.CharField(max_length=255)
+    customer_id = models.CharField(max_length=150, blank=True, null=True)
+    customer_first_name = models.CharField(max_length=255, blank=True, null=True)
+    customer_last_name = models.CharField(max_length=255, blank=True, null=True)
     customer_email = models.EmailField(max_length=255, blank=True, null=True)
     coupons = models.CharField(
         max_length=150,

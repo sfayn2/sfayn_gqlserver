@@ -332,11 +332,11 @@ class Order:
             raise exceptions.InvalidOrderOperation("Only draft order can remove coupon.")
         self.coupons.remove(coupon)
 
-    def update_destination(self, destination: value_objects.Address):
+    def change_destination(self, destination: value_objects.Address):
         if not destination:
             raise exceptions.InvalidOrderOperation("Destination cannot be none.")
         if self.order_status != enums.OrderStatus.DRAFT:
-            raise exceptions.InvalidOrderOperation("Only draft order can update destination.")
+            raise exceptions.InvalidOrderOperation("Only draft order can change destination.")
         self.destination = destination
         self.update_modified_date()
     

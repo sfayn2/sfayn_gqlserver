@@ -1,4 +1,5 @@
 from .coupon_validation_abstract import CouponValidationServiceAbstract
+from .customer_address_validation_service_abstract import CustomerAddressValidationServiceAbstract
 from .email_abstract import EmailServiceAbstract
 from .logging_abstract import LoggingServiceAbstract
 from .payment_abstract import PaymentGatewayAbstract, PaymentServiceAbstract
@@ -8,4 +9,3 @@ from .vendor_offer_snapshot_abstract import VendorOfferSnapshotAbstract
 from .vendor_product_snapshot_abstract import VendorProductSnapshotAbstract
 from .vendor_shippingoption_snapshot_abstract import VendorShippingOptionSnapshotAbstract
 from .customer_snapshot_abstract import CustomerSnapshotAbstract
-from .user_authorization_snapshot_abstract import UserAuthorizationSnapshotAbstract

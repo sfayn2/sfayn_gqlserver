@@ -27,12 +27,12 @@ class PackageInput(graphene.InputObjectType):
 #    product_price = graphene.Field(MoneyInput, required=True)
 #    package = graphene.Field(PackageInput, required=True)
 #
-#class AddressInput(graphene.InputObjectType):
-#    street = graphene.String(required=True)
-#    city = graphene.String(required=True)
-#    state = graphene.String(required=True)
-#    postal = graphene.String(required=True)
-#    country = graphene.String(required=True)
+class AddressInput(graphene.InputObjectType):
+    street = graphene.String(required=True)
+    city = graphene.String(required=True)
+    state = graphene.String(required=True)
+    postal = graphene.String(required=True)
+    country = graphene.String(required=True)
 #
 #class CustomerDetailsInput(graphene.InputObjectType):
 #    first_name = graphene.String(required=True)

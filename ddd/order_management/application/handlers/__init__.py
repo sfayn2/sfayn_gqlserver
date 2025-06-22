@@ -9,6 +9,7 @@ from .get_order import handle_get_order
 from .mark_as_shipped import handle_mark_as_shipped
 from .mark_as_completed import handle_mark_as_completed
 from .cancel_order import handle_cancel_order
+from .change_destination import handle_change_destination
 
 from .event_handlers.apply_applicable_offers import handle_apply_applicable_offers
 from .event_handlers.apply_tax_results import handle_apply_tax_results

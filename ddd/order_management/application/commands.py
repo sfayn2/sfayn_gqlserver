@@ -47,3 +47,7 @@ class CompleteOrderCommand(Command):
 class ApplyPaymentCommand(Command):
     order_id: str
     payment: dtos.PaymentDetailsDTO
+
+class ChangeDestinationCommand(Command):
+    order_id: str
+    address: dtos.AddressDTO

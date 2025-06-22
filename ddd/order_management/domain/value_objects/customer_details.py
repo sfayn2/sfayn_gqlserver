@@ -5,6 +5,7 @@ from ddd.order_management.domain import exceptions
 #right now only for Gues customer
 @dataclass(frozen=True)    
 class CustomerDetails:
+    customer_id: str
     first_name: str
     last_name: str
     email: str

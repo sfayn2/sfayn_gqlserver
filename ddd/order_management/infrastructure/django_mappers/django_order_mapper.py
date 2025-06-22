@@ -86,17 +86,12 @@ class OrderMapper:
             order_id=django_order_object.order_id,
             date_created=django_order_object.date_created,
             date_modified=django_order_object.date_modified, 
-            destination=value_objects.Address(
-                street=django_order_object.delivery_street,
-                city=django_order_object.delivery_city,
-                postal=int(django_order_object.delivery_postal),
-                country=django_order_object.delivery_country,
-                state=django_order_object.delivery_state
-            ),
+            destination=django_mappers.AddressMapper.to_domain(django_order_object),
             line_items=[
                 django_mappers.LineItemMapper.to_domain(item) for item in django_order_object.line_items.all()
             ],
             customer_details=value_objects.CustomerDetails(
+                customer_id=django_order_object.customer_id,
                 first_name=django_order_object.customer_first_name,
                 last_name=django_order_object.customer_last_name,
                 email=django_order_object.customer_email
