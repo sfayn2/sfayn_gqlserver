@@ -1,3 +1,5 @@
+from __future__ import annotations
+from typing import List
 from ddd.order_management.domain import repositories, exceptions, value_objects
 from order_management import models as django_snapshots
 from ddd.order_management.infrastructure import django_mappers
@@ -13,21 +15,21 @@ class DjangoCustomerRepositoryImpl(repositories.CustomerAbstract):
                 raise exceptions.InvalidOrderOperation(f"Customer details for {customer_id} is not available.")
 
         return django_mappers.CustomerDetailsMapper.to_domain(customer_details)
-        #return value_objects.CustomerDetails(
-        #    customer_id=customer_details.customer_id,
-        #    first_name=customer_details.first_name,
-        #    last_name=customer_details.last_name,
-        #    email=customer_details.email
-        #)
 
-    def get_shipping_address(self, customer_id: str) -> value_objects.Address:
-        try:
-            customer_address = django_snapshots.CustomerAddressSnapshot.objects.get(
-                customer_id=customer_id,
-                address_type="shipping",
-                is_active=True)
-        except django_snapshots.CustomerAddressSnapshot.DoesNotExist:
-                raise exceptions.InvalidOrderOperation(f"Customer address for {customer_id} available.")
+    def get_shipping_addresses(self, customer_id: str) -> List[value_objects.Address]:
+        customer_addresses = django_snapshots.CustomerAddressSnapshot.objects.filter(
+            customer_id=customer_id,
+            address_type="shipping",
+            is_active=True)
 
-        return django_mappers.AddressMapper.to_domain(customer_address)
+        if not customer_addresses.exists():
+            raise exceptions.InvalidOrderOperation(f"No available shipping address for Customer {customer_id}.")
+
+        final_customer_address = []
+        for address in customer_addresses:
+            final_customer_address.append(
+                django_mappers.AddressMapper.to_domain(address)
+            )
+
+        return final_customer_address
 

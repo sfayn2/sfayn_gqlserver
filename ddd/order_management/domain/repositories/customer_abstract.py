@@ -9,5 +9,5 @@ class CustomerAbstract(ABC):
         raise NotImplementedError("Subclasses must implement this method")
 
     @abstractmethod
-    def get_shipping_address(self, customer_id: str) -> value_objects.CustomerDetails:
+    def get_shipping_addresses(self, customer_id: str) -> List[value_objects.CustomerDetails]:
         raise NotImplementedError("Subclasses must implement this method")

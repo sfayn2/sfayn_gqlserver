@@ -12,6 +12,13 @@ class ShippingDetailsType(graphene.ObjectType):
     delivery_time = graphene.String(required=True)
     cost = graphene.Field(MoneyType, required=True)
 
+class AddressType(graphene.ObjectType):
+    street = graphene.String(required=True)
+    city = graphene.String(required=True)
+    state = graphene.String(required=True)
+    postal = graphene.String(required=True)
+    country = graphene.String(required=True)
+
 class PaymentDetailsType(graphene.ObjectType):
     method = graphene.String(required=True)
     paid_amount = graphene.Field(MoneyType, required=True)

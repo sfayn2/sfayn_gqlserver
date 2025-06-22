@@ -34,7 +34,7 @@ class FakeCustomerSnapshotProvider(ports.CustomerSnapshotAbstract):
                 street="My street",
                 city="City1",
                 state="State1",
-                postal_code=12345,
+                postal=12345,
                 country="USA",
                 is_default=True,
                 is_active=True

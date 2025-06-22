@@ -13,3 +13,6 @@ class ShippingOptionsQuery(Query):
 
 class OrderQuery(Query):
     order_id: str
+
+class CustomerAddressesQuery(Query):
+    customer_id: str

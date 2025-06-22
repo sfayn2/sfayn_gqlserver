@@ -119,6 +119,11 @@ def register_query_handlers():
             vendor_repo=repositories.DjangoVendorRepositoryImpl(),
             shipping_option_service=domain_services.ShippingOptionStrategyService()
         ),
+        queries.CustomerAddressesQuery: lambda query: handlers.handle_get_customer_addresses(
+            query=query, 
+            uow=repositories.DjangoOrderUnitOfWork(),
+            customer_repo=repositories.DjangoCustomerRepositoryImpl()
+        ),
     })
 
 def register():

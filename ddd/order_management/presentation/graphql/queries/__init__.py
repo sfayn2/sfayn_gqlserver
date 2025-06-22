@@ -1,1 +1,2 @@
 from .shipping_options_query import ShippingOptionsQuery
+from .get_customer_addresses_query import CustomerAddressesQuery

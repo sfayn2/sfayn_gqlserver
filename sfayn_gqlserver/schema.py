@@ -4,7 +4,8 @@ from ddd.order_management.presentation.graphql import queries, mutations
 
 
 class Query(
-    queries.ShippingOptionsQuery
+    queries.ShippingOptionsQuery,
+    queries.CustomerAddressesQuery
 ):
     pass
 

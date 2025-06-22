@@ -77,7 +77,7 @@ class CustomerAddressSnapshotDTO(BaseModel):
     street: str
     city: str
     state: str
-    postal_code: int
+    postal: int
     country: str
     is_default: bool
     is_active: bool
