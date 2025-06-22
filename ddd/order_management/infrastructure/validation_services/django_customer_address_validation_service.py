@@ -17,7 +17,7 @@ class DjangoCustomerAddressValidationService(ports.CustomerAddressValidationServ
                 customer_id=customer_id,
                 street=address.street,
                 city=address.city,
-                postal_code=address.postal,
+                postal=address.postal,
                 country=address.country,
                 state=address.state
             )

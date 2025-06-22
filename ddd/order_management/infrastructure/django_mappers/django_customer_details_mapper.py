@@ -1,21 +1,13 @@
 import ast
 from ddd.order_management.domain import models, value_objects
 
-class AddressMapper:
+class CustomerDetailsMapper:
 
     @staticmethod
-    def to_domain(customer_address) -> value_objects.Address:
-        return value_objects.Address(
-            street=customer_address.street,
-            city=customer_address.city,
-            state=customer_address.state,
-            postal=int(customer_address.postal_code),
-            country=customer_address.country
+    def to_domain(customer_object) -> value_objects.CustomerDetails:
+        return value_objects.CustomerDetails(
+            customer_id=customer_object.customer_id,
+            first_name=customer_object.first_name,
+            last_name=customer_object.last_name,
+            email=customer_object.email
         )
-        #return value_objects.Address(
-        #    street=django_order_object.delivery_street,
-        #    city=django_order_object.delivery_city,
-        #    postal=int(django_order_object.delivery_postal),
-        #    country=django_order_object.delivery_country,
-        #    state=django_order_object.delivery_state
-        #)

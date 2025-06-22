@@ -13,13 +13,20 @@ def handle_checkout_items(
         uow: UnitOfWorkAbstract,
         customer_repo: CustomerAbstract,
         vendor_repo: VendorAbstract,
+        address_validation_service: CustomerAddressValidationAbstract,
         stock_validation_service: StockValidationServiceAbstract,
         order_service: OrderServiceAbstract) -> dtos.ResponseDTO:
     try:
         with uow:
 
             customer_details = customer_repo.get_customer_details(command.customer_id)
-            shipping_address = customer_repo.get_shipping_address(command.customer_id)
+
+            #shipping_address = customer_repo.get_shipping_address(command.customer_id)
+            address_validation_service.ensure_customer_address_is_valid(
+                customer_id=command.customer_id,
+                address=command.address
+            )
+
             line_items = vendor_repo.get_line_items(command.vendor_id, command.product_skus)
 
             stock_validation_service.ensure_items_in_stock(line_items)
@@ -27,7 +34,7 @@ def handle_checkout_items(
 
             draft_order = order_service.create_draft_order(
                 customer_details=customer_details,
-                shipping_address=shipping_address,
+                shipping_address=mappers.AddressMapper.to_domain(command.address),
                 line_items=line_items
             )
 

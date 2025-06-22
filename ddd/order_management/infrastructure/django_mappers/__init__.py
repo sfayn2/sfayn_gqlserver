@@ -4,3 +4,4 @@ from .django_order_mapper import OrderMapper
 from .django_offer_strategy_mapper import OfferStrategyMapper
 from .django_shipping_option_strategy_mapper import ShippingOptionStrategyMapper
 from .django_address_mapper import AddressMapper
+from .django_customer_details_mapper import CustomerDetailsMapper

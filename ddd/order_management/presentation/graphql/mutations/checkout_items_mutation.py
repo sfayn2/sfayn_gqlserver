@@ -9,6 +9,7 @@ class CheckoutItemsMutation(relay.ClientIDMutation):
     class Input:
         vendor_id = graphene.String(required=True)
         customer_id = graphene.String(required=True)
+        address = graphene.Field(input_types.AddressInput, required=True)
         product_skus = graphene.List(input_types.ProductSkusInput, required=True)
 
     result = graphene.Field(object_types.ResponseType)

@@ -64,6 +64,7 @@ def register_command_handlers():
             customer_repo=repositories.DjangoCustomerRepositoryImpl(),
             vendor_repo=repositories.DjangoVendorRepositoryImpl(),
             order_service=domain_services.OrderService(),
+            address_validation_service=validation_services.DjangoCustomerAddressValidationService(),
             stock_validation_service=validation_services.DjangoStockValidationService()
         ),
         commands.ChangeDestinationCommand: lambda command: handlers.handle_change_destination(
