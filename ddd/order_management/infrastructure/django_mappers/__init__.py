@@ -5,3 +5,5 @@ from .django_offer_strategy_mapper import OfferStrategyMapper
 from .django_shipping_option_strategy_mapper import ShippingOptionStrategyMapper
 from .django_address_mapper import AddressMapper
 from .django_customer_details_mapper import CustomerDetailsMapper
+from .django_payment_details_mapper import PaymentDetailsMapper
+from .django_shipping_details_mapper import ShippingDetailsMapper

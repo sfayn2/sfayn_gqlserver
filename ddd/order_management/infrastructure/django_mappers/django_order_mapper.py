@@ -1,4 +1,4 @@
-import ast
+import ast, json
 from ddd.order_management.domain import value_objects, models, enums
 from ddd.order_management.infrastructure import django_mappers
 from order_management import models as django_snapshots
@@ -28,13 +28,13 @@ class OrderMapper:
                     'payment_amount': order.payment_details.paid_amount.amount if order.payment_details else None, 
                     'cancellation_reason': order.cancellation_reason, 
                     'total_discounts_fee': order.total_discounts_fee.amount if order.total_discounts_fee else None, 
-                    'offer_details': order.offer_details if order.offer_details else [],
-                    'tax_details': order.tax_details if order.tax_details else [], 
+                    'offer_details': json.dumps([offd for offd in order.offer_details]),
+                    'tax_details': json.dumps([taxd for taxd in order.tax_details]),
                     'tax_amount': order.tax_amount.amount if order.tax_amount else None, 
                     'total_amount': order.total_amount.amount if order.total_amount else None, 
                     'final_amount': order.final_amount.amount if order.final_amount else None, 
                     'shipping_tracking_reference': order.shipping_reference, 
-                    'coupons': [coupon.coupon_code for coupon in order.coupons], 
+                    'coupons': json.dumps([coupon.coupon_code for coupon in order.coupons]), 
                     'order_status': order.order_status.value, 
                     'currency': order.currency,
                     'date_modified': order.date_modified
@@ -43,44 +43,25 @@ class OrderMapper:
 
     @staticmethod
     def to_domain(django_order_object) -> models.Order:
-        shipping_details = None
-        if django_order_object.shipping_method:
-            shipping_details=value_objects.ShippingDetails(
-                method=enums.ShippingMethod(django_order_object.shipping_method),
-                delivery_time=django_order_object.shipping_delivery_time,
-                cost=value_objects.Money(
-                    amount=django_order_object.shipping_cost,
-                    currency=django_order_object.currency
-                )
-            )
 
-        for item in django_order_object.line_items.all():
-            if item.vendor_id:
-                vendor_details = value_objects.VendorDetails(
-                    vendor_id=item.vendor_id,
-                    name=item.vendor_name,
-                    country=item.vendor_country
-                )
-                break
+        #for item in django_order_object.line_items.all():
+        #    if item.vendor_id:
+        #        vendor_details = value_objects.VendorDetails(
+        #            vendor_id=item.vendor_id,
+        #            name=item.vendor_name,
+        #            country=item.vendor_country
+        #        )
+        #        break
+
+        #assuming it will always have item
+        vendor_id = django_order_object.line_items.all().values_list("vendor_id", flat=True)[0]
 
         django_coupons = []
-        for item in ast.literal_eval(django_order_object.coupons):
-            vendor_coupon_snapshot = django_snapshots.VendorCouponSnapshot.objects.filter(coupon_code=item, vendor_id=vendor_details.vendor_id)
+        for item in json.loads(django_order_object.coupons):
+            vendor_coupon_snapshot = django_snapshots.VendorCouponSnapshot.objects.filter(coupon_code=item, vendor_id=vendor_id)
             if vendor_coupon_snapshot.exists():
                 django_coupons.append(django_mappers.CouponMapper.to_domain(vendor_coupon_snapshot))
 
-        payment_details = None
-        if django_order_object.payment_method:
-            payment_details=value_objects.PaymentDetails(
-                order_id=django_order_object.order_id,
-                method=django_order_object.payment_method,
-                transaction_id=django_order_object.payment_reference,
-                paid_amount=value_objects.Money(
-                    amount=django_order_object.payment_amount,
-                    currency=django_order_object.currency
-                ),
-                status=enums.PaymentStatus(django_order_object.payment_status)
-            )
 
         return models.Order(
             order_id=django_order_object.order_id,
@@ -90,21 +71,16 @@ class OrderMapper:
             line_items=[
                 django_mappers.LineItemMapper.to_domain(item) for item in django_order_object.line_items.all()
             ],
-            customer_details=value_objects.CustomerDetails(
-                customer_id=django_order_object.customer_id,
-                first_name=django_order_object.customer_first_name,
-                last_name=django_order_object.customer_last_name,
-                email=django_order_object.customer_email
-            ),
-            shipping_details=shipping_details if shipping_details else None,
-            payment_details=payment_details if payment_details else None,
+            customer_details=django_mappers.CustomerDetailsMapper.to_domain(django_order_object),
+            shipping_details=django_mappers.ShippingDetailsMapper.to_domain(django_order_object) if django_order_object.shipping_method else None,
+            payment_details=django_mappers.PaymentDetailsMapper.to_domain(django_order_object) if django_order_object.payment_method else None,
             cancellation_reason=django_order_object.cancellation_reason,
             total_discounts_fee=value_objects.Money(
                 amount=django_order_object.total_discounts_fee,
                 currency=django_order_object.currency
             ),
-            offer_details=ast.literal_eval(django_order_object.offer_details) if django_order_object.offer_details else None,
-            tax_details=ast.literal_eval(django_order_object.tax_details) if django_order_object.tax_details else None,
+            offer_details=json.loads(django_order_object.offer_details) if django_order_object.offer_details else None,
+            tax_details=json.loads(django_order_object.tax_details) if django_order_object.tax_details else None,
             tax_amount=value_objects.Money(
                 amount=django_order_object.tax_amount,
                 currency=django_order_object.currency

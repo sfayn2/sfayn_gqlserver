@@ -1,4 +1,4 @@
-import ast
+import ast, json
 from ddd.order_management.domain import value_objects, models, enums
 
 class OfferStrategyMapper:
@@ -18,7 +18,7 @@ class OfferStrategyMapper:
         conditions = django_filter_results.get("conditions")
 
         return value_objects.OfferStrategy(
-            conditions=ast.literal_eval(conditions),
+            conditions=json.loads(conditions),
             coupons=coupons,
             offer_type=enums.OfferType(django_filter_results.get("offer_type")),
             name=django_filter_results.get("name"),

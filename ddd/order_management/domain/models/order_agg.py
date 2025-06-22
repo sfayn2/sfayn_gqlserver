@@ -316,6 +316,8 @@ class Order:
             raise exceptions.InvalidOrderOperation("Coupon cannot be none.")
         if self.order_status != enums.OrderStatus.DRAFT:
             raise exceptions.InvalidOrderOperation("Only draft order can apply coupon.")
+        if coupon in self.coupons:
+            raise exceptions.InvalidOrderOperation(f"Coupon {coupon.coupon_code} already applied in the order.")
         self.coupons.append(coupon)
 
         event = events.AppliedCouponEvent(

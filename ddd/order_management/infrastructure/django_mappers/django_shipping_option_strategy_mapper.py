@@ -1,4 +1,4 @@
-import ast
+import ast, json
 from ddd.order_management.domain import value_objects, models, enums
 
 class ShippingOptionStrategyMapper:
@@ -8,7 +8,7 @@ class ShippingOptionStrategyMapper:
         return value_objects.ShippingOptionStrategy(
             name=enums.ShippingMethod(django_filter_results.get("name")),
             delivery_time=django_filter_results.get("delivery_time"),
-            conditions=ast.literal_eval(django_filter_results.get("conditions")),
+            conditions=json.loads(django_filter_results.get("conditions")),
             base_cost=value_objects.Money(
                 amount=django_filter_results.get("base_cost"),
                 currency=django_filter_results.get("currency")

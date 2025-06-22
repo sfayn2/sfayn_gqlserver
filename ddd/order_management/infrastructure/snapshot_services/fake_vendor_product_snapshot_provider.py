@@ -1,5 +1,5 @@
 from __future__ import annotations
-import uuid
+import uuid, json
 from typing import List
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
@@ -19,7 +19,7 @@ class FakeVendorProductSnapshotProvider(ports.VendorProductSnapshotAbstract):
                 product_sku="T-SHIRT-L",
                 product_name="T Shirt Large Size",
                 product_category="Men's T-Shirts",
-                options={"Size": "M", "Color": "RED"},
+                options=json.dumps({"Size": "M", "Color": "RED"}),
                 product_price=Decimal("1.5"),
                 stock=10,
                 product_currency="SGD",

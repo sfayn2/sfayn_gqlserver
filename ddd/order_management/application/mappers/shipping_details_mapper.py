@@ -9,13 +9,13 @@ class ShippingDetailsMapper:
         return dtos.ShippingDetailsDTO(**asdict(shipping_details))
 
     @staticmethod
-    def to_domain(shipping_details_dto: dtos.ShippingDetailsDTO) -> value_objects.ShippingDetails:
+    def to_domain(shipping_details_obj) -> value_objects.ShippingDetails:
         return value_objects.ShippingDetails(
-            method=enums.ShippingMethod(shipping_details_dto.method),
-            delivery_time=shipping_details_dto.delivery_time,
+            method=enums.ShippingMethod(shipping_details_obj.method),
+            delivery_time=shipping_details_obj.delivery_time,
             cost=value_objects.Money(
-                amount=shipping_details_dto.cost.amount,
-                currency=shipping_details_dto.cost.currency
+                amount=shipping_details_obj.cost.amount,
+                currency=shipping_details_obj.cost.currency
             )
         )
 

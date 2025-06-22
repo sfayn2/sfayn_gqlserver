@@ -75,7 +75,7 @@ def register_command_handlers():
         commands.AddCouponCommand: lambda command: handlers.handle_add_coupon(
             command=command,
             uow=repositories.DjangoOrderUnitOfWork(),
-            coupon_validation=validation_services.DjangoCouponValidationService()
+            coupon_validation_service=validation_services.DjangoCouponValidationService()
         ),
         commands.SelectShippingOptionCommand: lambda command: handlers.handle_select_shipping_option(
             command=command, 

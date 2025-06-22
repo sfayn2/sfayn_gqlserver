@@ -1,6 +1,7 @@
 from __future__ import annotations
 import pytz
 import uuid
+import json
 from typing import List
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
@@ -20,7 +21,7 @@ class FakeVendorOfferSnapshotProvider(ports.VendorOfferSnapshotAbstract):
                 offer_type=enums.OfferType.PERCENTAGE_DISCOUNT,
                 name="10% Off",
                 discount_value="10",
-                conditions={"eligible_products": ["SKU1"]},
+                conditions=json.dumps({"eligible_products": ["SKU1"]}),
                 required_coupon=False,
                 stackable=True,
                 priority=1,

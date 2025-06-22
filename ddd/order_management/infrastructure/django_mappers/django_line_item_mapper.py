@@ -1,4 +1,4 @@
-import ast
+import ast, json
 from decimal import Decimal
 from ddd.order_management.domain import value_objects, models
 
@@ -15,7 +15,7 @@ class LineItemMapper:
                     'vendor_name': line_item.vendor.name, 
                     'vendor_country': line_item.vendor.country, 
                     'product_category': line_item.product_category, 
-                    'options': line_item.options, 
+                    'options': json.dumps(line_item.options), 
                     'product_price': line_item.product_price.amount, 
                     'product_currency': line_item.product_price.currency,
                     'order_quantity': line_item.order_quantity, 
@@ -39,7 +39,7 @@ class LineItemMapper:
                 country=django_line_item.vendor_country
             ),
             product_category=django_line_item.product_category,
-            options=ast.literal_eval(django_line_item.options),
+            options=json.loads(django_line_item.options),
             product_price=value_objects.Money(
                 amount=django_line_item.product_price,
                 currency=django_line_item.product_currency
