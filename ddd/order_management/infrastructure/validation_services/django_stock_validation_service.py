@@ -14,7 +14,7 @@ class DjangoStockValidationService(ports.StockValidationServiceAbstract):
         for item in items:
             available_qty = product_map.get(item.product_sku)
             if available_qty is None or item.order_quantity > available_qty:
-                raise exceptions.OutOfStockException(f"Product {item.product_sku} is out of stock")
+                raise exceptions.OutOfStockException(f"Product {item.product_sku} has only {available_qty} remaining stock/s.")
 
     def _get_stocks(self, items: List[models.LineItem]):
         product_map = {

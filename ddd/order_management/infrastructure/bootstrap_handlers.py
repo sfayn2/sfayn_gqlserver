@@ -67,6 +67,11 @@ def register_command_handlers():
             address_validation_service=validation_services.DjangoCustomerAddressValidationService(),
             stock_validation_service=validation_services.DjangoStockValidationService()
         ),
+        commands.ChangeOrderQuantityCommand: lambda command: handlers.handle_change_order_quantity(
+            command=command,
+            uow=repositories.DjangoOrderUnitOfWork(),
+            stock_validation_service=validation_services.DjangoStockValidationService()
+        ),
         commands.ChangeDestinationCommand: lambda command: handlers.handle_change_destination(
             command=command,
             uow=repositories.DjangoOrderUnitOfWork(),

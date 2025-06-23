@@ -8,3 +8,4 @@ from .add_shipping_tracking_reference_mutation import AddShippingTrackingReferen
 from .add_coupon_mutation import AddCouponMutation
 from .cancel_order_mutation import CancelOrderMutation
 from .change_destination_mutation import ChangeDestinationMutation
+from .change_order_quantity_mutation import ChangeOrderQuantityMutation

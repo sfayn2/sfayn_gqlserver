@@ -52,3 +52,8 @@ class ApplyPaymentCommand(Command):
 class ChangeDestinationCommand(Command):
     order_id: str
     address: dtos.AddressDTO
+
+class ChangeOrderQuantityCommand(Command):
+    order_id: constr(min_length=1, strip_whitespace=True)
+    product_sku: constr(min_length=1, strip_whitespace=True)
+    new_quantity: int

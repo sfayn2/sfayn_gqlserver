@@ -88,7 +88,7 @@ class Order:
         self.shipping_details = shipping_details
         self.update_modified_date()
 
-    def update_order_quantity(self, product_sku: str, new_quantity: int):
+    def change_order_quantity(self, product_sku: str, new_quantity: int):
         if self.order_status != enums.OrderStatus.DRAFT:
             raise exceptions.InvalidOrderOperation("Only draft order can update order quantity.")
         for line_item in self.line_items:

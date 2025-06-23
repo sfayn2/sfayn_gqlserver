@@ -12,6 +12,7 @@ class Query(
 class Mutation(graphene.ObjectType):
     checkout_items = mutations.checkout_items_mutation.CheckoutItemsMutation.Field()
     change_destination = mutations.change_destination_mutation.ChangeDestinationMutation.Field()
+    change_order_quantity = mutations.change_order_quantity_mutation.ChangeOrderQuantityMutation.Field()
     add_coupon = mutations.add_coupon_mutation.AddCouponMutation.Field()
     select_shipping_option = mutations.select_shipping_option_mutation.SelectShippingOptionMutation.Field()
     place_order = mutations.place_order_mutation.PlaceOrderMutation.Field()
