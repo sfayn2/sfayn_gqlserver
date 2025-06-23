@@ -34,7 +34,7 @@ class Order:
         if self.currency != line_item.product_price.currency:
             raise exceptions.InvalidOrderOperation("Currency mismatch between order and line item.")
 
-        if self.vendor_id and self.vendor_id != line_item.vendor.id:
+        if self.vendor_id and self.vendor_id != line_item.vendor.vendor_id:
             raise exceptions.InvalidOrderOperation("Vendor mismatch between order and line item.")
 
     def generate_order_id(self):
@@ -46,7 +46,7 @@ class Order:
         self.date_modified = datetime.now()
 
     def add_line_item(self, line_item: LineItem) -> None:
-        if not self.line_items:
+        if not line_item:
             raise exceptions.InvalidOrderOperation("Please provide line item to add.")
         if line_item.is_free_gift and line_item.product_price.amount > 0:
             raise exceptions.InvalidOrderOperation("Free gifts must have a price of zero.")
@@ -56,7 +56,7 @@ class Order:
         self._validate_line_item(line_item)
 
         if line_item in self.line_items:
-            raise exceptions.InvalidOrderOperation(f"Line item with SKU {line_item.product_sku} already exists.")
+            raise exceptions.InvalidOrderOperation(f"Order {self.order_id} Line item with SKU {line_item.product_sku} already exists.")
 
         self.line_items.append(line_item)
         self._update_totals()
@@ -129,12 +129,12 @@ class Order:
         self.raise_event(event)
 
     def _verify_payment(self, payment_details: value_objects.PaymentDetails) -> bool:
-        if payment_details.order_id != order.order_id:
+        if payment_details.order_id != self.order_id:
             raise exceptions.InvalidOrderOperation("Payment details verification Order ID mismatch")
 
-        if payment_details.paid_amount < order.final_amount:
+        if payment_details.paid_amount < self.final_amount:
             raise exceptions.InvalidOrderOperation(
-                f"Payment details paid amount not match with expected amount {order.final_amount.amount} {order.final_amount.currency}"
+                f"Payment details paid amount not match with expected amount {self.final_amount.amount} {self.final_amount.currency}"
             )
 
         if payment_details.status != enums.PaymentMethod.PAID:
