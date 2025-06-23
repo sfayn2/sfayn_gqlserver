@@ -31,7 +31,8 @@ def handle_change_order_quantity(
 
             return dtos.ResponseDTO(
                 success=True,
-                message=f"Order {order.order_id} successfully changed order quantity of Produt SKU {command.product_sku}."
+                message=f"Order {order.order_id} successfully changed order quantity of Product SKU {command.product_sku}."
+
             )
 
 
