@@ -62,7 +62,7 @@ class Order:
         self._update_totals()
 
     def remove_line_item(self, line_item: LineItem) -> None:
-        if not self.line_items:
+        if not line_item:
             raise exceptions.InvalidOrderOperation("Please provide line item to remove.")
         if line_item not in self.line_items:
             raise exceptions.InvalidOrderOperation("No line items exist in the order to remove.")
