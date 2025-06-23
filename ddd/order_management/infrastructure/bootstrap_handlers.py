@@ -72,7 +72,7 @@ def register_command_handlers():
             uow=repositories.DjangoOrderUnitOfWork(),
             stock_validation_service=validation_services.DjangoStockValidationService()
         ),
-        commands.AddLineItemCommand: lambda command: handlers.handle_add_line_item(
+        commands.AddLineItemsCommand: lambda command: handlers.handle_add_line_items(
             command=command,
             uow=repositories.DjangoOrderUnitOfWork(),
             vendor_repo=repositories.DjangoVendorRepositoryImpl(),

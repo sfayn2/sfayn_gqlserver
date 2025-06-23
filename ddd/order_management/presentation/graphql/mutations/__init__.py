@@ -9,4 +9,4 @@ from .add_coupon_mutation import AddCouponMutation
 from .cancel_order_mutation import CancelOrderMutation
 from .change_destination_mutation import ChangeDestinationMutation
 from .change_order_quantity_mutation import ChangeOrderQuantityMutation
-from .add_line_item_mutation import AddLineItemMutation
+from .add_line_items_mutation import AddLineItemsMutation

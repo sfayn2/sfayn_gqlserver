@@ -53,7 +53,7 @@ class OrderMapper:
         #        )
         #        break
 
-        #assuming it will always have item
+        #TODO: what if all items has been remove for specific order?
         vendor_id = django_order_object.line_items.all().values_list("vendor_id", flat=True)[0]
 
         django_coupons = []

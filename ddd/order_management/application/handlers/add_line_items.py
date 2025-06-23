@@ -8,8 +8,8 @@ from ddd.order_management.application import (
     shared
 )
 
-def handle_add_line_item(
-        command: commands.AddLineItemCommand, 
+def handle_add_line_items(
+        command: commands.AddLineItemsCommand, 
         uow: UnitOfWorkAbstract,
         vendor_repo: VendorAbstract,
         stock_validation_service: StockValidationServiceAbstract
@@ -21,10 +21,9 @@ def handle_add_line_item(
 
             line_items = vendor_repo.get_line_items(
                 order.vendor_id, 
-                [command.product_sku]
+                command.product_skus
             )
 
-            # we expect single return here; then why do we loop?
             for line_item in line_items:
                 order.add_line_item(line_item)
 
