@@ -73,6 +73,17 @@ class AppliedCouponEvent(DomainEvent):
     order_id: str
     order_status: enums.OrderStatus
 
+@dataclass
+class RemovedCouponEvent(DomainEvent):
+    order_id: str
+    order_status: enums.OrderStatus
+
+@dataclass
+class ChangedDestinationEvent(DomainEvent):
+    order_id: str
+    order_status: enums.OrderStatus
+    #TODO destination payload?
+
 
 @dataclass
 class AppliedTaxesEvent(DomainEvent):

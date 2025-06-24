@@ -42,7 +42,7 @@ class Order:
             raise exceptions.InvalidOrderOperation("Order Id already generated.")
         self.order_id = f"ORD-{uuid.uuid4().hex[:12].upper()}"
 
-    def update_modified_date(self):
+    def _update_modified_date(self):
         self.date_modified = datetime.now()
 
     def add_line_item(self, line_item: LineItem) -> None:
@@ -77,21 +77,13 @@ class Order:
         self.line_items.remove(line_item)
         self._update_totals()
 
-    def update_line_items(self, line_items: List[LineItem]) -> None:
-        if not line_items:
-            raise exceptions.InvalidOrderOperation("Please provide line items to update.")
-        if self.order_status != enums.OrderStatus.DRAFT:
-            raise exceptions.InvalidOrderOperation("Only draft order can update line items.")
-        self.line_items = line_items
-        self._update_totals()
-
     def update_shipping_details(self, shipping_details: value_objects.ShippingDetails) -> None:
         if not shipping_details:
             raise exceptions.InvalidOrderOperation("Shipping details must be provided.")
         if self.order_status != enums.OrderStatus.DRAFT:
             raise exceptions.InvalidOrderOperation("Only draft order can update shipping details.")
         self.shipping_details = shipping_details
-        self.update_modified_date()
+        self._update_modified_date()
 
     def change_order_quantity(self, product_sku: str, new_quantity: int):
         if self.order_status != enums.OrderStatus.DRAFT:
@@ -124,7 +116,7 @@ class Order:
             raise exceptions.InvalidOrderOperation("Order must have a selected shipping option")
 
         self.order_status = enums.OrderStatus.PENDING
-        self.update_modified_date()
+        self._update_modified_date()
 
         event = events.PlacedOrderEvent(
             order_id=self.order_id,
@@ -158,7 +150,7 @@ class Order:
             raise exceptions.InvalidOrderOperation("Order cannot be confirmed without verified payment.")
 
         self.order_status = enums.OrderStatus.CONFIRMED
-        self.update_modified_date()
+        self._update_modified_date()
 
         event = events.ConfirmedOrderEvent(
             order_id=self.order_id,
@@ -183,7 +175,9 @@ class Order:
 
 
         if offer_details:
-            self.update_offer_details(offer_details)
+            self._update_offer_details(offer_details)
+
+        self._update_modified_date()
 
         event = events.AppliedOffersEvent(
             order_id=self.order_id,
@@ -222,6 +216,7 @@ class Order:
         self.tax_details = tax_details
 
         self.calculate_final_amount()
+        self._update_modified_date()
 
         event = events.AppliedTaxesEvent(
             order_id=self.order_id,
@@ -242,7 +237,7 @@ class Order:
         if self.order_status != enums.OrderStatus.CONFIRMED:
             raise exceptions.InvalidOrderOperation("Only confirm order can mark as shipped.")
         self.order_status = enums.OrderStatus.SHIPPED
-        self.update_modified_date()
+        self._update_modified_date()
 
         event = events.ShippedOrderEvent(
             order_id=self.order_id,
@@ -255,7 +250,7 @@ class Order:
         if self.order_status != None:
             raise exceptions.InvalidOrderOperation("Only checkout order can mark as draft.")
         self.order_status = enums.OrderStatus.DRAFT
-        self.update_modified_date()
+        self._update_modified_date()
 
         event = events.CheckedOutEvent(
             order_id=self.order_id,
@@ -271,7 +266,7 @@ class Order:
             raise exceptions.InvalidOrderOperation("Cannot cancel without a cancellation reason.")
         self.order_status = enums.OrderStatus.CANCELLED
         self.cancellation_reason = cancellation_reason
-        self.update_modified_date()
+        self._update_modified_date()
 
         event = events.CanceledOrderEvent(
             order_id=self.order_id,
@@ -294,7 +289,7 @@ class Order:
         #    raise exceptions.InvalidOrderOperation(f"Cannot mark as completed with outstanding payments for {enums.PaymentMethod.COD}.")
 
         self.order_status = enums.OrderStatus.COMPLETED
-        self.update_modified_date()
+        self._update_modified_date()
 
         event = events.CompletedOrderEvent(
             order_id=self.order_id,
@@ -310,8 +305,9 @@ class Order:
             raise exceptions.InvalidOrderOperation("The Shipping tracking reference url is invalid.")
 
         self.shipping_reference = shipping_reference
+        self._update_modified_date()
 
-    def update_offer_details(self, offer_details: List[str]):
+    def _update_offer_details(self, offer_details: List[str]):
         if self.order_status not in (enums.OrderStatus.DRAFT, enums.OrderStatus.PENDING):
             raise exceptions.InvalidOrderOperation("Only draft order can update offer details.")
         self.offer_details = offer_details
@@ -323,7 +319,9 @@ class Order:
             raise exceptions.InvalidOrderOperation("Only draft order can apply coupon.")
         if coupon in self.coupons:
             raise exceptions.InvalidOrderOperation(f"Coupon {coupon.coupon_code} already applied in the order.")
+
         self.coupons.append(coupon)
+        self._update_modified_date()
 
         event = events.AppliedCouponEvent(
             order_id=self.order_id,
@@ -337,7 +335,16 @@ class Order:
             raise exceptions.InvalidOrderOperation("Coupon cannot be none.")
         if self.order_status != enums.OrderStatus.DRAFT:
             raise exceptions.InvalidOrderOperation("Only draft order can remove coupon.")
+
         self.coupons.remove(coupon)
+        self._update_modified_date()
+
+        event = events.RemovedCouponEvent(
+            order_id=self.order_id,
+            order_status=self.order_status,
+        )
+
+        self.raise_event(event)
 
     def change_destination(self, destination: value_objects.Address):
         if not destination:
@@ -345,7 +352,14 @@ class Order:
         if self.order_status != enums.OrderStatus.DRAFT:
             raise exceptions.InvalidOrderOperation("Only draft order can change destination.")
         self.destination = destination
-        self.update_modified_date()
+        self._update_modified_date()
+
+        event = events.ChangedDestinationEvent(
+            order_id=self.order_id,
+            order_status=self.order_status,
+        )
+
+        self.raise_event(event)
     
     def select_shipping_option(self, shipping_option: value_objects.ShippingDetails, shipping_options: List[value_objects.ShippingDetails]):
         if self.order_status != enums.OrderStatus.DRAFT:
