@@ -69,6 +69,11 @@ class Order:
         if self.order_status != enums.OrderStatus.DRAFT:
             raise exceptions.InvalidOrderOperation("Only draft order can remove line items.")
 
+        if len(self.line_items) <= 1:
+            raise exceptions.InvalidOrderOperation(
+                "Cannot remove the last item. Please cancel the order instead."
+            )
+
         self.line_items.remove(line_item)
         self._update_totals()
 
@@ -400,16 +405,22 @@ class Order:
     @property
     def vendor_id(self) -> str:
         #assuming invariant
+        if not self.line_items:
+            raise exceptions.InvalidOrderOperation("Vendor is unknown because the order has no line items.")
         return self.line_items[0].vendor.vendor_id
 
     @property
     def vendor_name(self) -> str:
         #assuming invariant
+        if not self.line_items:
+            raise exceptions.InvalidOrderOperation("Vendor is unknown because the order has no line items.")
         return self.line_items[0].vendor.name
 
     @property
     def vendor_country(self) -> str:
         #assuming invariant
+        if not self.line_items:
+            raise exceptions.InvalidOrderOperation("Vendor is unknown because the order has no line items.")
         if not self.line_items[0].vendor.country:
             raise exceptions.InvalidOrderOperation("Vendor country is missing, its crucial in determining domestic shipment.")
         return self.line_items[0].vendor.country
