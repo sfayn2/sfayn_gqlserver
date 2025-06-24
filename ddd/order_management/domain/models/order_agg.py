@@ -414,6 +414,8 @@ class Order:
     @property
     def currency(self) -> str:
         #assuming invariants
+        if not self.line_items:
+            raise exceptions.InvalidOrderOperation("Currency is unknown because the order has no line items.")
         return self.line_items[0].product_price.currency
 
     @property
