@@ -1,23 +1,26 @@
+# Commands
 from .checkout_items import handle_checkout_items
 from .confirm_order import handle_confirm_order
-from .get_shipping_options import handle_get_shipping_options
 from .place_order import handle_place_order
 from .select_shipping_option import handle_select_shipping_option
 from .add_coupon import handle_add_coupon
 from .add_shipping_tracking_reference import handle_add_shipping_tracking_reference
-from .get_order import handle_get_order
 from .mark_as_shipped import handle_mark_as_shipped
 from .mark_as_completed import handle_mark_as_completed
 from .cancel_order import handle_cancel_order
 from .change_destination import handle_change_destination
 from .change_order_quantity import handle_change_order_quantity
-from .get_customer_addresses import handle_get_customer_addresses
 from .add_line_items import handle_add_line_items
 from .remove_line_items import handle_remove_line_items
 
+# Queries
+from .get_order import handle_get_order
+from .list_shipping_options import handle_list_shipping_options
+from .list_customer_addresses import handle_list_customer_addresses
+
+# Events
 from .event_handlers.apply_applicable_offers import handle_apply_applicable_offers
 from .event_handlers.apply_tax_results import handle_apply_tax_results
 from .event_handlers.email_canceled_order import handle_email_canceled_order
 from .event_handlers.log_order import handle_logged_order
-
 
