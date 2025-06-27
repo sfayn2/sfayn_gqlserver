@@ -10,17 +10,12 @@ from ddd.order_management.application import (
 )
 
 def handle_get_order(
-        query: queries.OrderQuery, 
+        query: queries.GetOrderQuery, 
         uow: UnitOfWorkAbstract) -> dtos.OrderResponseDTO:
-    with uow:
 
-        order = uow.order.get(order_id=query.order_id)
+    order = uow.order.get(order_id=query.order_id)
 
-        order_dto =  mappers.OrderResponseMapper.to_dto(
-                order=order,
-                success=True,
-                message="Order successfully query for {query.order_id}."
-            )
-
-        return order_dto
+    return mappers.OrderMapper.to_dto(
+            order=order
+        )
 

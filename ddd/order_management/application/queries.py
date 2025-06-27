@@ -8,11 +8,11 @@ from ddd.order_management.domain import enums
 class Query(BaseModel, frozen=True):
     pass
 
-class ShippingOptionsQuery(Query):
+class ListShippingOptionsQuery(Query):
     order_id: str
 
-class OrderQuery(Query):
+class GetOrderQuery(Query):
     order_id: str
 
-class CustomerAddressesQuery(Query):
+class ListCustomerAddressesQuery(Query):
     customer_id: str

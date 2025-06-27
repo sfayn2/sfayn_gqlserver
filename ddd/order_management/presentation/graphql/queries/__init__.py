@@ -1,2 +1,3 @@
-from .shipping_options_query import ShippingOptionsQuery
-from .get_customer_addresses_query import CustomerAddressesQuery
+from .list_shipping_options_query import ListShippingOptionsQuery
+from .list_customer_addresses_query import ListCustomerAddressesQuery
+from .get_order_query import GetOrderQuery

@@ -51,6 +51,9 @@ class PaymentDetailsDTO(BaseModel):
     transaction_id: str
     status: enums.PaymentStatus
 
+    class Config:
+        use_enum_values = True
+
 class LineItemDTO(BaseModel):
     product_sku: str
     product_name: str 
@@ -103,6 +106,9 @@ class OrderDTO(BaseModel):
     currency: str
     date_modified: Optional[datetime]
 
+    class Config:
+        use_enum_values = True
+
 class OfferStrategyDTO(BaseModel):
     offer_type: enums.OfferType
     name: str
@@ -116,6 +122,9 @@ class OfferStrategyDTO(BaseModel):
     end_date: datetime
     is_active: bool
 
+    class Config:
+        use_enum_values = True
+
 class ShippingOptionStrategyDTO(BaseModel):
     name: enums.ShippingMethod
     delivery_time: str
@@ -124,6 +133,9 @@ class ShippingOptionStrategyDTO(BaseModel):
     flat_rate: MoneyDTO
     currency: str
     is_active: bool
+
+    class Config:
+        use_enum_values = True
 
 class ProductSkusDTO(BaseModel):
     product_sku: str

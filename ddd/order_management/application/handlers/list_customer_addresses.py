@@ -9,8 +9,8 @@ from ddd.order_management.application import (
     queries
 )
 
-def handle_get_customer_addresses(
-        query: queries.CustomerAddressesQuery, 
+def handle_list_customer_addresses(
+        query: queries.ListCustomerAddressesQuery, 
         uow: UnitOfWorkAbstract,
         customer_repo: CustomerAbstract,
 ) -> List[dtos.AddressDTO]:

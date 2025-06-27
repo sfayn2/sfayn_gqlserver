@@ -9,8 +9,8 @@ from ddd.order_management.application import (
     queries
 )
 
-def handle_get_shipping_options(
-        query: queries.ShippingOptionsQuery, 
+def handle_list_shipping_options(
+        query: queries.ListShippingOptionsQuery, 
         uow: UnitOfWorkAbstract,
         vendor_repo: VendorAbstract,
         shipping_option_service: ShippingOptionStrategyServiceAbstract

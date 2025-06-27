@@ -125,16 +125,20 @@ def register_command_handlers():
 
 def register_query_handlers():
     message_bus.QUERY_HANDLERS.update({
-        queries.ShippingOptionsQuery: lambda query: handlers.handle_get_shipping_options(
+        queries.ListShippingOptionsQuery: lambda query: handlers.handle_list_shipping_options(
             query=query, 
             uow=repositories.DjangoOrderUnitOfWork(),
             vendor_repo=repositories.DjangoVendorRepositoryImpl(),
             shipping_option_service=domain_services.ShippingOptionStrategyService()
         ),
-        queries.CustomerAddressesQuery: lambda query: handlers.handle_get_customer_addresses(
+        queries.ListCustomerAddressesQuery: lambda query: handlers.handle_list_customer_addresses(
             query=query, 
             uow=repositories.DjangoOrderUnitOfWork(),
             customer_repo=repositories.DjangoCustomerRepositoryImpl()
+        ),
+        queries.GetOrderQuery: lambda query: handlers.handle_get_order(
+            query=query, 
+            uow=repositories.DjangoOrderUnitOfWork()
         ),
     })
 
