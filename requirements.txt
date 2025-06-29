@@ -4,7 +4,9 @@ async-timeout==5.0.1
 blessed==1.20.0
 bpython==0.24
 certifi==2024.8.30
+cffi==1.17.1
 charset-normalizer==3.4.0
+cryptography==45.0.4
 curtsies==0.4.2
 cwcwidth==0.1.9
 Django==5.1.4
@@ -21,10 +23,12 @@ packaging==24.2
 pillow==11.0.0
 pluggy==1.5.0
 promise==2.3
+pycparser==2.22
 pydantic==2.10.5
 pydantic-settings==2.7.1
 pydantic_core==2.27.2
 Pygments==2.18.0
+PyJWT==2.10.1
 pytest==8.3.4
 pytest-django==4.9.0
 python-dateutil==2.9.0.post0
