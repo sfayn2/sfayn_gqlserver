@@ -15,9 +15,9 @@ PASSWORD = os.getenv("PASSWORD")
 
 
 # ====== token request ===
-token_endpoint = f"http://localhost:8080/realms/CustomerRealm/protocol/openid-connect/token"
-jwks_uri = "http://localhost:8080/realms/CustomerRealm/protocol/openid-connect/certs"
-issuer = "http://localhost:8080/realms/CustomerRealm"
+token_endpoint = f"http://localhost:8080/realms/TestRealm/protocol/openid-connect/token"
+jwks_uri = "http://localhost:8080/realms/TestRealm/protocol/openid-connect/certs"
+issuer = "http://localhost:8080/realms/TestRealm"
 
 data = {
     "grant_type": "password",
@@ -37,6 +37,7 @@ tokens = response.json()
 access_token = tokens["access_token"]
 id_token = tokens.get("id_token", "<none>")
 print(f"access token received!")
+print(tokens)
 
 jwks_client = PyJWKClient(jwks_uri)
 signing_key = jwks_client.get_signing_key_from_jwt(access_token)
@@ -46,6 +47,7 @@ decoded = jwt.decode(
     signing_key.key,
     algorithms=["RS256"],
     issuer=issuer,
+    audience=CLIENT_ID
 )
 
 print("decoded access token payload:")
