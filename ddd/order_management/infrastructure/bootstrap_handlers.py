@@ -1,4 +1,4 @@
-
+from dotenv import load_dotenv
 from ddd.order_management.domain import events, services as domain_services
 from ddd.order_management.infrastructure import (
     event_bus, 
@@ -6,12 +6,15 @@ from ddd.order_management.infrastructure import (
     email_services,
     logging_services,
     repositories,
-    payment_services
+    payment_services,
+    idp_services
 )
 from ddd.order_management.application import handlers
 from ddd.order_management.application.handlers import event_handlers
 
 from ddd.order_management.application import commands, message_bus, queries
+
+load_dotenv()
 
 #Depending on the framework arch this might be inside manage.py , app.py, or main.py ?
 #if project grows, breakdown handlers by feature
@@ -120,6 +123,11 @@ def register_command_handlers():
         commands.CompleteOrderCommand: lambda command: handlers.handle_mark_as_completed(
             command=command,
             uow=repositories.DjangoOrderUnitOfWork()
+        ),
+        commands.LoginCallbackCommand: lambda command: handlers.handle_login_callback(
+            command=command,
+            uow=repositories.DjangoOrderUnitOfWork(),
+            login_callback_service=idp_services.KeycloakLoginCallbackService()
         ),
     })
 

@@ -12,6 +12,7 @@ from .change_destination import handle_change_destination
 from .change_order_quantity import handle_change_order_quantity
 from .add_line_items import handle_add_line_items
 from .remove_line_items import handle_remove_line_items
+from .login_callback import handle_login_callback
 
 # Queries
 from .get_order import handle_get_order

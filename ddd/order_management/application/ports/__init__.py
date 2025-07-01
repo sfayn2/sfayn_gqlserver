@@ -9,3 +9,4 @@ from .vendor_offer_snapshot_abstract import VendorOfferSnapshotAbstract
 from .vendor_product_snapshot_abstract import VendorProductSnapshotAbstract
 from .vendor_shippingoption_snapshot_abstract import VendorShippingOptionSnapshotAbstract
 from .customer_snapshot_abstract import CustomerSnapshotAbstract
+from .idp_abstract import IdPProviderAbstract, LoginCallbackAbstract

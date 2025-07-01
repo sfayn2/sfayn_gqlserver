@@ -1,4 +1,4 @@
-from ddd.order_management.application.dtos.dtos import (
+from .dtos import (
     ResponseDTO,
     MoneyDTO,
     ShippingDetailsDTO,
@@ -15,7 +15,7 @@ from ddd.order_management.application.dtos.dtos import (
     ShippingOptionStrategyDTO,
     ProductSkusDTO,
 )
-from ddd.order_management.application.dtos.snapshot_dtos import (
+from .snapshot_dtos import (
     VendorDetailsSnapshotDTO,
     VendorCouponSnapshotDTO,
     VendorOfferSnapshotDTO,
@@ -24,3 +24,5 @@ from ddd.order_management.application.dtos.snapshot_dtos import (
     CustomerDetailsSnapshotDTO,
     CustomerAddressSnapshotDTO,
 )
+
+from .idp_dtos import IdPTokenDTO
