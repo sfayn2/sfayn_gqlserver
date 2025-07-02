@@ -3,13 +3,13 @@ import requests
 from ddd.order_management.application import ports, dtos
 
 
-class KeycloakIdPProvider(ports.IdPProviderAbstract):
+class KeycloakIdPCallbackService(ports.IdPCallbackServiceAbstract):
     def __init__(self, base_url, realm, client_id, client_secret):
         self.token_url = f"{base_url}/realms/{realm}/protocol/openid-connect/token"
         self.client_id = client_id
         self.client_secret = client_secret
 
-    def get_token_by_code(self, code: str, redirect_uri: str) -> dtos.IdPTokenDTO:
+    def get_tokens(self, code: str, redirect_uri: str) -> dtos.IdPTokenDTO:
         headers = {
             "Content-Type": "application/x-www-form-urlencoded"
         }

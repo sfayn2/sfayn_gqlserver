@@ -19,6 +19,13 @@ load_dotenv()
 #Depending on the framework arch this might be inside manage.py , app.py, or main.py ?
 #if project grows, breakdown handlers by feature
 
+login_callback_service = idp_services.KeycloakIdPCallbackService(
+    base_url=os.getenv("KEYCLOAK_BASE_URL"),
+    realm=os.getenv("KEYCLOAK_REALM"),
+    client_id=os.getenv("KEYCLOAK_CLIENT_ID"),
+    client_secret=os.getenv("KEYCLOAK_CLIENT_SECRET")
+)
+
 
 def register_event_handlers():
     event_bus.EVENT_HANDLERS.update({
@@ -127,7 +134,7 @@ def register_command_handlers():
         commands.LoginCallbackCommand: lambda command: handlers.handle_login_callback(
             command=command,
             uow=repositories.DjangoOrderUnitOfWork(),
-            login_callback_service=idp_services.KeycloakLoginCallbackService()
+            login_callback_service=login_callback_service
         ),
     })
 

@@ -17,6 +17,6 @@ def handle_login_callback(
         login_callback_service: LoginCallbackServiceAbstract
     ) -> dtos.IdPTokenDTO:
 
-    token = login_callback_service.login_callback(command.code, command.redirect_uri)
+    tokens = login_callback_service.get_tokens(command.code, command.redirect_uri)
 
-    return token
+    return tokens
