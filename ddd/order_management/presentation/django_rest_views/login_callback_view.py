@@ -6,13 +6,16 @@ from ddd.order_management.application import (
 
 def login_callback_view(request):
     code = request.GET.get("code")
-    redirect_uri = request.build_absolute_uri(request.path)
+    redirect_uri = request.GET.get("redirect_uri")
 
-    if not code:
-        return HttpResponseBadRequest("Missing authorization code.")
+    if not code or not redirect_uri:
+        return HttpResponseBadRequest("Missing authorization code or redirect_uri.")
     
     try:
-        command = commands.LoginCallbackCommand.model_validate({"code":code, "redirect_uri": redirect_uri})
+        command = commands.LoginCallbackCommand.model_validate({
+            "code": code, 
+            "redirect_uri": redirect_uri
+        })
         result = message_bus.handle(command)
 
         response = JsonResponse(result.model_dump())
