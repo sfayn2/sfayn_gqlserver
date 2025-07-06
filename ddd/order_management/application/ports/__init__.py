@@ -10,3 +10,4 @@ from .vendor_product_snapshot_abstract import VendorProductSnapshotAbstract
 from .vendor_shippingoption_snapshot_abstract import VendorShippingOptionSnapshotAbstract
 from .customer_snapshot_abstract import CustomerSnapshotAbstract
 from .idp_callback_service_abstract import IdPCallbackServiceAbstract
+from .access_control_service_abstract import AccessControlServiceAbstract

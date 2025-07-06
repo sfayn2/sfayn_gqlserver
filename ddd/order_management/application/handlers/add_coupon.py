@@ -13,11 +13,17 @@ from ddd.order_management.domain import exceptions
 def handle_add_coupon(
         command: commands.AddCouponCommand, 
         coupon_validation_service: CouponValidationServiceAbstract,
-        uow: UnitOfWorkAbstract
+        uow: UnitOfWorkAbstract,
+        access_control: AccessControlServiceAbstract
 ) -> dtos.ResponseDTO:
 
     try:
         with uow:
+
+            user = access_control.ensure_user_has(
+                token=command.token,
+                permission="add_coupon"
+            )
 
             order = uow.order.get(order_id=command.order_id)
             valid_coupon  = coupon_validation_service.ensure_coupon_is_valid(

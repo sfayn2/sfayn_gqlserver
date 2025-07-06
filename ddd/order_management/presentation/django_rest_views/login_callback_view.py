@@ -19,7 +19,14 @@ def login_callback_view(request):
         result = message_bus.handle(command)
 
         response = JsonResponse(result.model_dump())
-        response.set_cookie("access_token", result.access_token, httponly=True, samesite="Lax")
+        response.set_cookie(
+            key="access_token", value=result.access_token, httponly=True, 
+            samesite="Lax", domain=".josnin.dev", path="/", secure=True
+        )
+        response.set_cookie(
+            key="refresh_token", value=result.refresh_token, httponly=True, 
+            samesite="Strict", domain=".josnin.dev", path="/idp/refresh_token", secure=True
+        )
         return response
 
     except Exception as e:

@@ -14,7 +14,7 @@ from ddd.order_management.domain import exceptions
 def handle_login_callback(
         command: commands.LoginCallbackCommand, 
         uow: UnitOfWorkAbstract, 
-        login_callback_service: LoginCallbackServiceAbstract
+        login_service: IdPCallbackServiceAbstract
     ) -> dtos.IdPTokenDTO:
 
     tokens = login_callback_service.get_tokens(command.code, command.redirect_uri)

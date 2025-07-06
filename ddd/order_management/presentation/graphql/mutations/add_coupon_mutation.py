@@ -18,6 +18,8 @@ class AddCouponMutation(relay.ClientIDMutation):
 
     @classmethod
     def mutate_and_get_payload(cls, root, info, **input):
+        input["token"] = info.context.COOKIES.get("access_token")
+
         command = commands.AddCouponCommand.model_validate(input)
         result = message_bus.handle(command)
 

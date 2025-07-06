@@ -7,7 +7,7 @@ from ddd.order_management.application import dtos
 from ddd.order_management.domain import enums
 
 class Command(BaseModel, frozen=True):
-    pass
+    token: str
 
 class CheckoutItemsCommand(Command):
     customer_id: constr(min_length=1, strip_whitespace=True)

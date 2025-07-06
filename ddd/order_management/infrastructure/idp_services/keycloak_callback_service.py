@@ -1,35 +1,73 @@
 from __future__ import annotations
 import requests
 from ddd.order_management.application import ports, dtos
+from order_management import models as django_snapshots
+
+class KeycloakLoginCallbackService:
+
+    def __init__(self, idp_provider, jwt_handler, role_map: dict[str, list[str]]):
+        self.idp_provider = idp_provider
+        self.jwt_handler = jwt_handler
+        self.role_map = role_map
+
+        def login_callback(self, code: str, redirect_uri: str) -> dtos.IdpTokenDTO:
+            token_set = self.idp_provider.get_token_by_code(code, redirect_uri)
+            access_token = token_set["access_token"]
+            decoded = self.jwt_handler.decode(access_token)
+
+            user_id = decoded["sub"]
+            tenant_id = decoded["tenant_id"]
+            roles = decoded.get("realm_access", {}).get("roles", [])
+
+            #how about scope? order:read?
+            #Roles to permission mapping?
+            permissions = {p for r in roles for p in self.role_map.get(r, [])}
+
+            # Sync user auth
+            django_snapshots.UserAuthorization.objects.filter(user_id=user_id).delete()
+            for perm in permissions:
+                django_snapshots.UserAuthorization.objects.create(
+                    user_id=user_id,
+                    permission_code_name=perm,
+                    scope={"tenant_id": tenant_id}
+                )
+
+            return dtos.IdPToken(
+                access_token=access_token,
+                refresh_token=token_set.get("refresh_token")
+            )
 
 
-class KeycloakIdPCallbackService(ports.IdPCallbackServiceAbstract):
-    def __init__(self, base_url, realm, client_id, client_secret):
-        self.token_url = f"{base_url}/realms/{realm}/protocol/openid-connect/token"
-        self.client_id = client_id
-        self.client_secret = client_secret
 
-    def get_tokens(self, code: str, redirect_uri: str) -> dtos.IdPTokenDTO:
-        headers = {
-            "Content-Type": "application/x-www-form-urlencoded"
-        }
-        payload = {
-            "grant_type": "authorization_code",
-            "code": code,
-            "redirect_uri": redirect_uri,
-            "client_id": self.client_id,
-            "client_secret": self.client_secret
-        }
 
-        response = requests.post(self.token_url, data=payload, headers=headers)
-        response.raise_for_status()
-        data = response.json()
-
-        return dtos.IdPTokenDTO(
-            access_token=data["access_token"],
-            refresh_token=data.get("refresh_token", ""),
-            id_token=data.get("id_token", ""),
-            expires_in=data.get("expires_in", 0),
-            scope=data.get("scope", ""),
-            token_type=data.get("token_type", "Bearer")
-        )
+#class KeycloakIdPCallbackService(ports.IdPCallbackServiceAbstract):
+#    def __init__(self, base_url, realm, client_id, client_secret):
+#        self.token_url = f"{base_url}/realms/{realm}/protocol/openid-connect/token"
+#        self.client_id = client_id
+#        self.client_secret = client_secret
+#
+#    def get_tokens(self, code: str, redirect_uri: str) -> dtos.IdPTokenDTO:
+#        headers = {
+#            "Content-Type": "application/x-www-form-urlencoded"
+#        }
+#        payload = {
+#            "grant_type": "authorization_code",
+#            "code": code,
+#            "redirect_uri": redirect_uri,
+#            "client_id": self.client_id,
+#            "client_secret": self.client_secret
+#        }
+#
+#        response = requests.post(self.token_url, data=payload, headers=headers)
+#        response.raise_for_status()
+#        data = response.json()
+#
+#        return dtos.IdPTokenDTO(
+#            access_token=data["access_token"],
+#            refresh_token=data.get("refresh_token", ""),
+#            id_token=data.get("id_token", ""),
+#            expires_in=data.get("expires_in", 0),
+#            scope=data.get("scope", ""),
+#            token_type=data.get("token_type", "Bearer")
+#        )
+#

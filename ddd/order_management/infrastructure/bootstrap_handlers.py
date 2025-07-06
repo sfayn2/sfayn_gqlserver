@@ -1,3 +1,4 @@
+import os
 from dotenv import load_dotenv
 from ddd.order_management.domain import events, services as domain_services
 from ddd.order_management.infrastructure import (
@@ -7,7 +8,8 @@ from ddd.order_management.infrastructure import (
     logging_services,
     repositories,
     payment_services,
-    idp_services
+    idp_services,
+    access_control_services
 )
 from ddd.order_management.application import handlers
 from ddd.order_management.application.handlers import event_handlers
@@ -19,11 +21,31 @@ load_dotenv()
 #Depending on the framework arch this might be inside manage.py , app.py, or main.py ?
 #if project grows, breakdown handlers by feature
 
-login_callback_service = idp_services.KeycloakIdPCallbackService(
-    base_url=os.getenv("KEYCLOAK_BASE_URL"),
-    realm=os.getenv("KEYCLOAK_REALM"),
+jwt_handler = access_control_services.JwtTokenHandler(
+    public_key=os.getenv("KEYCLOAK_PUBLIC_KEY"),
+    issuer=os.getenv("KEYCLOAK_ISSUER"),
+    audience=os.getenv("KEYCLOAK_CLIENT_ID")
+)
+
+role_map = {
+    "customer": ["place_order", "confirm_order", "cancel_order"],
+    "vendor": ["mark_as_shipped", "mark_as_completed"]
+}
+
+idp_provider = idp_services.KeycloakIdPProvider(
+    token_url=os.getenv("KEYCLOAK_TOKEN"),
     client_id=os.getenv("KEYCLOAK_CLIENT_ID"),
     client_secret=os.getenv("KEYCLOAK_CLIENT_SECRET")
+)
+
+login_callback_service = idp_services.KeycloakLoginCallbackService(
+    idp_provider=idp_provider,
+    jwt_handler=jwt_handler,
+    role_map=role_map
+)
+
+access_control = access_control_services.AccessControlService(
+    jwt_handler=jwt_handler
 )
 
 
