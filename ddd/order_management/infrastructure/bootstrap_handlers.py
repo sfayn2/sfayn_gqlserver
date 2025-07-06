@@ -28,8 +28,11 @@ jwt_handler = access_control_services.JwtTokenHandler(
 )
 
 role_map = {
-    "customer": ["place_order", "confirm_order", "cancel_order"],
-    "vendor": ["mark_as_shipped", "mark_as_completed"]
+    "customer": ["checkout_items", "add_line_items", "remove_line_items", 
+    "add_coupon", "remove_coupon", "change_destination", "change_order_quantity", 
+    "select_shipping_option", "list_shipping_options", "list_customer_addresses"
+    "place_order", "confirm_order", "cancel_order", "get_order"],
+    "vendor": ["mark_as_shipped", "add_shipping_tracking_reference", "mark_as_completed"]
 }
 
 idp_provider = idp_services.KeycloakIdPProvider(
