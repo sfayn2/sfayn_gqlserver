@@ -7,13 +7,13 @@ from ddd.order_management.application import (
 def login_callback_view(request):
     code = request.GET.get("code")
     redirect_uri = request.GET.get("redirect_uri")
-    next_path = request.GET.get("next_path")
+    next_path = request.GET.get("next")
 
     try:
         command = commands.LoginCallbackCommand.model_validate({
             "code": code, 
             "redirect_uri": redirect_uri,
-            "next_path": next
+            "next_path": next_path
         })
         result = message_bus.handle(command)
 
