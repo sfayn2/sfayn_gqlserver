@@ -69,3 +69,4 @@ class RemoveLineItemsCommand(Command):
 class LoginCallbackCommand(Command):
     code: constr(min_length=1, strip_whitespace=True)
     redirect_uri: constr(min_length=1, strip_whitespace=True)
+    next_path: constr(min_length=1, strip_whitespace=True)

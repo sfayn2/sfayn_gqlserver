@@ -15,9 +15,9 @@ PASSWORD = os.getenv("PASSWORD")
 
 
 # ====== token request ===
-token_endpoint = f"http://localhost:8080/realms/TestRealm/protocol/openid-connect/token"
-jwks_uri = "http://localhost:8080/realms/TestRealm/protocol/openid-connect/certs"
-issuer = "http://localhost:8080/realms/TestRealm"
+token_endpoint = f"http://localhost:8080/realms/ecommerce_realm/protocol/openid-connect/token"
+jwks_uri = "http://localhost:8080/realms/ecommerce_realm/protocol/openid-connect/certs"
+issuer = "http://localhost:8080/realms/ecommerce_realm"
 
 data = {
     "grant_type": "password",
