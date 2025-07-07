@@ -25,7 +25,7 @@ def handle_add_coupon(
             user = access_control.ensure_user_has(
                 token=command.token,
                 permission="add_coupon",
-                scope={"tenant_id": order.tenant_id, "customer_id": order.customer_details.customer_id}
+                scope={"tenant_id": order.vendor_id, "customer_id": order.customer_details.customer_id}
             )
 
             valid_coupon  = coupon_validation_service.ensure_coupon_is_valid(

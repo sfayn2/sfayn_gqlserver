@@ -10,43 +10,63 @@ class KeycloakLoginCallbackService:
         self.jwt_handler = jwt_handler
         self.role_map = role_map
 
-        def login_callback(self, code: str, redirect_uri: str) -> dtos.IdpTokenDTO:
-            token_set = self.idp_provider.get_token_by_code(code, redirect_uri)
-            access_token = token_set["access_token"]
-            decoded = self.jwt_handler.decode(access_token)
+    def login_callback(self, code: str, redirect_uri: str) -> dtos.IdpTokenDTO:
+        token_set = self.idp_provider.get_token_by_code(code, redirect_uri)
+        access_token = token_set["access_token"]
+        decoded = self.jwt_handler.decode(access_token)
 
-            user_id = decoded["sub"]
-            tenant_id = decoded["tenant_id"]
-            roles = decoded.get("realm_access", {}).get("roles", [])
-
-            #Roles to permission mapping?
-            #permissions = {p for r in roles for p in self.role_map.get(r, [])}
+        user_id = decoded["sub"]
+        tenant_id = decoded["tenant_id"]
+        roles = decoded.get("realm_access", {}).get("roles", [])
 
 
 
-            # Sync user auth
-            django_snapshots.UserAuthorization.objects.filter(user_id=user_id).delete()
-            for role in roles:
-                scope = {"tenant_id": tenant_id}
-                for permissions in self.role_map.get(role, []):
+        # Sync user auth
+        django_snapshots.UserAuthorization.objects.filter(user_id=user_id).delete()
+        for role in roles:
+            permissions = self.role_map.get(role, [])
+            scope = {"tenant_id": tenant_id}
+            for perm in permissions:
 
-                    # customer_id or vendor_id
-                    if role == "customer":
-                        scope["customer_id"] = user_id
-                    elif role == "vendor_id":
-                        scope["vendor_id"] = user_id
+                # customer_id or vendor_id
+                if role == "customer":
+                    scope["customer_id"] = user_id
+                elif role == "vendor":
+                    scope["vendor_id"] = user_id
 
-                    for perm in permissions:
-                        django_snapshots.UserAuthorization.objects.create(
-                            user_id=user_id,
-                            permission_code_name=perm,
-                            scope=scope
-                        )
+                django_snapshots.UserAuthorization.objects.create(
+                    user_id=user_id,
+                    permission_code_name=perm,
+                    scope=scope
+                )
 
-            return dtos.IdPToken(
-                access_token=access_token,
-                refresh_token=token_set.get("refresh_token")
+        #Sync customer
+        if "customer" in role:
+            django_snapshots.CustomerDetailsSnapshot.objects.filter(user_id=user_id).delete()
+            django_snapshots.CustomerDetailsSnapshot.objects.create(
+                customer_id=user_id,
+                user_id=user_id,
+                first_name=decoded["given_name"],
+                last_name=decoded["family_name"],
+                email=decoded["email"],
+                is_active=True
             )
+
+        #Sync vendor
+        #TODO?
+        if "vendor" in role:
+            django_snapshots.VendorDetailsSnapshot.objects.filter(vendor_id=tenant_id).delete()
+            django_snapshots.VendorDetailsSnapshot.objects.create(
+                vendor_id=tenant_id,
+                name=decoded["name"],
+                country=decoded["country"],
+                is_active=True
+            )
+
+        return dtos.IdPTokenDTO(
+            access_token=access_token,
+            refresh_token=token_set.get("refresh_token")
+        )
 
 
 
