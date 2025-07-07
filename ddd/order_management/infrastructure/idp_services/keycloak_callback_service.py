@@ -3,7 +3,7 @@ import requests
 from ddd.order_management.application import ports, dtos
 from order_management import models as django_snapshots
 
-class KeycloakLoginCallbackService:
+class KeycloakLoginCallbackService(ports.IdPLoginCallbackServiceAbtract):
 
     def __init__(self, idp_provider, jwt_handler, role_map: dict[str, list[str]]):
         self.idp_provider = idp_provider
