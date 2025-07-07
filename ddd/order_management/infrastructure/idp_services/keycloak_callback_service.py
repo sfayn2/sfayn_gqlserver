@@ -19,18 +19,29 @@ class KeycloakLoginCallbackService:
             tenant_id = decoded["tenant_id"]
             roles = decoded.get("realm_access", {}).get("roles", [])
 
-            #how about scope? order:read?
             #Roles to permission mapping?
-            permissions = {p for r in roles for p in self.role_map.get(r, [])}
+            #permissions = {p for r in roles for p in self.role_map.get(r, [])}
+
+
 
             # Sync user auth
             django_snapshots.UserAuthorization.objects.filter(user_id=user_id).delete()
-            for perm in permissions:
-                django_snapshots.UserAuthorization.objects.create(
-                    user_id=user_id,
-                    permission_code_name=perm,
-                    scope={"tenant_id": tenant_id}
-                )
+            for role in roles:
+                scope = {"tenant_id": tenant_id}
+                for permissions in self.role_map.get(role, []):
+
+                    # customer_id or vendor_id
+                    if role == "customer":
+                        scope["customer_id"] = user_id
+                    elif role == "vendor_id":
+                        scope["vendor_id"] = user_id
+
+                    for perm in permissions:
+                        django_snapshots.UserAuthorization.objects.create(
+                            user_id=user_id,
+                            permission_code_name=perm,
+                            scope=scope
+                        )
 
             return dtos.IdPToken(
                 access_token=access_token,
