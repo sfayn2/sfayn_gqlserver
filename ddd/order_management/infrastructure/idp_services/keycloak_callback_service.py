@@ -16,8 +16,11 @@ class KeycloakLoginCallbackService(ports.IdPLoginCallbackServiceAbtract):
         decoded = self.jwt_handler.decode(access_token)
 
         user_id = decoded["sub"]
-        tenant_id = decoded["tenant_id"]
+        tenant_id = decoded.get("tenant_id")
         roles = decoded.get("realm_access", {}).get("roles", [])
+
+        if not tenant_id:
+            raise Exception("Missing tenant_id in token.")
 
 
 
@@ -25,8 +28,8 @@ class KeycloakLoginCallbackService(ports.IdPLoginCallbackServiceAbtract):
         django_snapshots.UserAuthorization.objects.filter(user_id=user_id).delete()
         for role in roles:
             permissions = self.role_map.get(role, [])
-            scope = {"tenant_id": tenant_id}
             for perm in permissions:
+                scope = {"tenant_id": tenant_id}
 
                 # customer_id or vendor_id
                 if role == "customer":
@@ -41,25 +44,25 @@ class KeycloakLoginCallbackService(ports.IdPLoginCallbackServiceAbtract):
                 )
 
         #Sync customer
-        if "customer" in role:
+        if "customer" in roles:
             django_snapshots.CustomerDetailsSnapshot.objects.filter(user_id=user_id).delete()
             django_snapshots.CustomerDetailsSnapshot.objects.create(
                 customer_id=user_id,
                 user_id=user_id,
-                first_name=decoded["given_name"],
-                last_name=decoded["family_name"],
-                email=decoded["email"],
+                first_name=decoded.get("given_name"),
+                last_name=decoded.get("family_name"),
+                email=decoded.get("email"),
                 is_active=True
             )
 
         #Sync vendor
         #TODO?
-        if "vendor" in role:
+        if "vendor" in roles:
             django_snapshots.VendorDetailsSnapshot.objects.filter(vendor_id=tenant_id).delete()
             django_snapshots.VendorDetailsSnapshot.objects.create(
                 vendor_id=tenant_id,
-                name=decoded["name"],
-                country=decoded["country"],
+                name=decoded.get("vendor_name"),
+                country=decoded.get("vendor_country"),
                 is_active=True
             )
 
