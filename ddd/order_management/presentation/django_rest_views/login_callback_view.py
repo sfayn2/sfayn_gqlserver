@@ -4,6 +4,9 @@ from ddd.order_management.application import (
     message_bus, commands
   )
 
+# ===============================
+#TODO to have this in separate auth_service
+# =====================
 def login_callback_view(request):
     code = request.GET.get("code")
     redirect_uri = request.GET.get("redirect_uri")

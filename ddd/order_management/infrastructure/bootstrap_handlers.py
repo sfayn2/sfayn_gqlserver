@@ -9,7 +9,8 @@ from ddd.order_management.infrastructure import (
     repositories,
     payment_services,
     idp_services,
-    access_control_services
+    access_control_services,
+    authorization_services
 )
 from ddd.order_management.application import handlers
 from ddd.order_management.application.handlers import event_handlers
@@ -21,6 +22,9 @@ load_dotenv()
 #Depending on the framework arch this might be inside manage.py , app.py, or main.py ?
 #if project grows, breakdown handlers by feature
 
+# ===============================
+#TODO to have this in separate auth_service
+# =====================
 jwt_handler = access_control_services.JwtTokenHandler(
     public_key=os.getenv("KEYCLOAK_PUBLIC_KEY"),
     issuer=os.getenv("KEYCLOAK_ISSUER"),
@@ -46,9 +50,13 @@ login_callback_service = idp_services.KeycloakLoginCallbackService(
     jwt_handler=jwt_handler,
     role_map=role_map
 )
+# ===============================
+#TODO to have this in separate auth_service
+# =====================
 
 access_control = access_control_services.AccessControlService(
     jwt_handler=jwt_handler
+    userinfo_url=os.getenv("KEYCLOAK_USERINFO")
 )
 
 
@@ -121,7 +129,8 @@ def register_command_handlers():
         commands.AddCouponCommand: lambda command: handlers.handle_add_coupon(
             command=command,
             uow=repositories.DjangoOrderUnitOfWork(),
-            coupon_validation_service=validation_services.DjangoCouponValidationService()
+            coupon_validation_service=validation_services.DjangoCouponValidationService(),
+            access_control=access_control
         ),
         commands.SelectShippingOptionCommand: lambda command: handlers.handle_select_shipping_option(
             command=command, 

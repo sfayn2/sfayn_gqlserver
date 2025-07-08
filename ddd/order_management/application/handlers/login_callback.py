@@ -11,6 +11,9 @@ from ddd.order_management.application import (
 )
 from ddd.order_management.domain import exceptions
 
+# ===============================
+#TODO to have this in separate auth_service
+# =====================
 def handle_login_callback(
         command: commands.LoginCallbackCommand, 
         uow: UnitOfWorkAbstract, 

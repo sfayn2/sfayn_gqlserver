@@ -42,3 +42,6 @@ class VendorProductNotFoundException(InvalidOrderOperation):
 
 class Forbidden(Exception):
     pass
+
+class AccessControlException(Exception):
+    pass

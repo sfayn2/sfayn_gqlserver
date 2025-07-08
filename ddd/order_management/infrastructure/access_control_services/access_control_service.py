@@ -1,30 +1,47 @@
 from __future__ import annotations
+import requests
 from typing import Tuple
 from order_management import models as django_snapshots
-#from ddd.order_management.domain import exceptions
+from ddd.order_management.domain import exceptions
 from ddd.order_management.application import ports
 
+# ===============================
+#TODO to have this in separate auth_service
+# =====================
 class AccessControlService(ports.AccessControlServiceAbstract):
-    def __init__(self, jwt_handler):
+    def __init__(self, jwt_handler: str, userinfo_url: str):
         self.jwt_handler = jwt_handler
+        self.userinfo_url = userinfo_url
 
-    def ensure_user_has(self, token: str, permission: str, scope: dict = None) -> Tuple(bool, dict):
+    def ensure_user_is_authorized_for(
+        self, jwt_token: str, required_permission: str, required_scope: dict = None
+    ) -> Tuple(bool, dict):
 
-        decoded = self.jwt_handler.decode(token)
-        user_id = decoded["sub"]
+        identity_claims = self.jwt_handler.decode(jwt_token)
+        user_id = identity_claims["sub"]
+        token_type = identity_claims.get("token_type", "Bearer")
 
-        qs = django_snapshopts.UserAuthorization.objects.filter(
+        user_info = self._fetch_userinfo(jwt_token, token_type)
+
+        matching_authorizations = django_snapshopts.UserAuthorization.objects.filter(
             user_id=user_id,
-            permission_codename=permission
+            permission_codename=required_permission
         )
 
-        if scope:
-            for qry in qs:
-                if all(qry.scope.get(k) == v for k, v in scope.items()):
-                    return True, decoded
+        if required_scope:
+            for authorization in matching_authorizations:
+                if all(authorization.scope.get(k) == v for k, v in required_scope.items()):
+                    return True, user_info
 
-            raise Exception("Permission denied")
-        elif not qs.exists():
-            raise Exception("Permission denied")
+            raise exceptions.AccessControlException("Access denied: required scoped permission not found")
+        elif not matching_authorizations.exists():
+            raise exceptions.AccessControlException("Access denied: permission not granted")
 
-        return True, decoded
+        return True, user_info
+
+    def _fetch_userinfo(self, jwt_token: str, token_type: str) -> dict:
+        headers = {"Authorization": f"{token_type} {jwt_token}"}
+        response = requests.get(self.userinfo_url, headers=headers)
+        if response.status_code != 200:
+            raise exceptions.AccessControlException("Failed to fetch user info")
+        return response.json()

@@ -3,9 +3,9 @@ import uuid
 from ddd.order_management.application import ports
 from order_management import models as django_snapshots
 
-class SampleAuthorizationService(ports.AuthorizationServiceAbstract):
-    def can(self, user_id: uuid.UUID, permission: str, scope: dict = None) -> bool:
-        perms = django_snapshots.UserAuthorizationSnapshot.objects.filter(
+class AuthorizationService(ports.AuthorizationServiceAbstract):
+    def has_permission(self, user_id: str, permission: str, scope: dict = None) -> bool:
+        perms = django_snapshots.UserAuthorization.objects.filter(
             user_id=user_id,
             permission_codename=permission
         )
