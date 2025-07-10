@@ -55,9 +55,18 @@ login_callback_service = idp_services.KeycloakLoginCallbackService(
 # =====================
 
 access_control = access_control_services.AccessControlService(
-    jwt_handler=jwt_handler
+    jwt_handler=jwt_handler,
     userinfo_url=os.getenv("KEYCLOAK_USERINFO")
 )
+
+def register_async_event_handlers():
+    event_bus.ASYNC_EVENT_HANDLERS.update({
+        "auth_service.events.UserLoggedInEvent": [
+                lambda event: handlers.handle_user_logged_in(
+                    event=event
+                ),
+            ],
+    })
 
 
 def register_event_handlers():
@@ -193,5 +202,7 @@ def register_query_handlers():
 
 def register():
     register_event_handlers()
+    register_async_event_handlers()
+
     register_command_handlers()
     register_query_handlers()

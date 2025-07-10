@@ -9,3 +9,4 @@ class OrderManagementConfig(AppConfig):
         from ddd.order_management.infrastructure import bootstrap_handlers
         bootstrap_handlers.register()
 
+

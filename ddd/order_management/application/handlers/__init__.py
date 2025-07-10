@@ -24,4 +24,5 @@ from .event_handlers.apply_applicable_offers import handle_apply_applicable_offe
 from .event_handlers.apply_tax_results import handle_apply_tax_results
 from .event_handlers.email_canceled_order import handle_email_canceled_order
 from .event_handlers.log_order import handle_logged_order
+from .event_handlers.user_logged_in import handle_user_logged_in
 
