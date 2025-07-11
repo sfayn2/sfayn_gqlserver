@@ -20,14 +20,10 @@ def handle_checkout_items(
     try:
         with uow:
 
-            _, user_ctx = access_control.get_user_context(
-                token=command.token
-            )
-
             access_control.ensure_user_is_authorized_for(
                 token=command.token,
                 required_permission="checkout_items",
-                required_scope={"tenant_id": user_ctx.tenant_id, "customer_id": command.customer_id}
+                required_scope={"customer_id": command.customer_id}
             )
 
             customer_details = customer_repo.get_customer_details(command.customer_id)

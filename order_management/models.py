@@ -321,7 +321,8 @@ class CustomerAddressSnapshot(models.Model):
 class UserAuthorizationSnapshot(models.Model):
     user_id = models.CharField(max_length=150)
     permission_codename = models.CharField(max_length=255)
-    scope = models.CharField(max_length=150, help_text='ex. { "tenant_id": "t-1234" }')
+    tenant_id = models.CharField(max_length=150)
+    scope = models.CharField(max_length=150, help_text='ex. { "customer_id": "c-1234" }')
     is_active = models.BooleanField(default=True)
     last_update_dt = models.DateTimeField(auto_now=True) 
 

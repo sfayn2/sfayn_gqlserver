@@ -13,7 +13,6 @@ class DjangoUserAuthorizationSnapshotSyncService(ports.SnapshotSyncServiceAbstra
 
         for role in event.claims.realm_access.get("roles"):
             permissions = self.role_map.get(role, [])
-            scope = {"tenant_id": event.claims.get("tenant_id")}
 
             # customer_id or vendor_id
             if role == "customer":
@@ -24,6 +23,7 @@ class DjangoUserAuthorizationSnapshotSyncService(ports.SnapshotSyncServiceAbstra
 
                 django_snapshots.UserAuthorization.objects.create(
                     user_id=event.user_id,
+                    tenant_id=event.claims.get("tenant_id"),
                     permission_code_name=perm,
                     scope=scope
                 )
