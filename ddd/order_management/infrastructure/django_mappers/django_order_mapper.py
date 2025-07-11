@@ -37,6 +37,7 @@ class OrderMapper:
                     'coupons': json.dumps([coupon.coupon_code for coupon in order.coupons]), 
                     'order_status': order.order_status.value, 
                     'currency': order.currency,
+                    'tenant_id': order.tenant_id,
                     'date_modified': order.date_modified
                 }
         }
@@ -65,6 +66,7 @@ class OrderMapper:
 
         return models.Order(
             order_id=django_order_object.order_id,
+            tenant_id=django_order_object.tenant_id,
             date_created=django_order_object.date_created,
             date_modified=django_order_object.date_modified, 
             destination=django_mappers.AddressMapper.to_domain(django_order_object),

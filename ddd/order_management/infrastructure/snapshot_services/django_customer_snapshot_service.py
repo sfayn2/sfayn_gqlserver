@@ -14,6 +14,7 @@ class DjangoCustomerSnapshotSyncService(ports.SnapshotSyncServiceAbstract):
             first_name=event.claims.get("given_name"),
             last_name=event.claims.get("family_name"),
             email=event.claims.get("email"),
+            tenant_id=event.claims.get("tenant_id"),
             is_active=True
         )
 

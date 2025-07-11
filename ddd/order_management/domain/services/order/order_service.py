@@ -17,7 +17,8 @@ class OrderService(ports.OrderServiceAbstract):
             self,
             customer_details: value_objects.CustomerDetails,
             shipping_address: value_objects.Address,
-            line_items: List[models.LineItem]
+            line_items: List[models.LineItem],
+            tenant_id: str
     ) -> models.Order:
         order = models.Order(
             date_created=datetime.now(),
@@ -26,6 +27,7 @@ class OrderService(ports.OrderServiceAbstract):
         )
 
         order.generate_order_id()
+        order.tenant_id = tenant_id
         order.mark_as_draft()
         for line_item in line_items:
             order.add_line_item(line_item)

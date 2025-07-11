@@ -11,6 +11,7 @@ from ddd.order_management.domain import enums, exceptions, events, value_objects
 @dataclass
 class Order:
     date_created: datetime
+    tenant_id: str
     destination: value_objects.Address
     customer_details: value_objects.CustomerDetails
     order_status: Optional[enums.OrderStatus] = None

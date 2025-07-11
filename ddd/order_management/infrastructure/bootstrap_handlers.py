@@ -122,7 +122,8 @@ def register_command_handlers():
             vendor_repo=repositories.DjangoVendorRepositoryImpl(),
             order_service=domain_services.OrderService(),
             address_validation_service=validation_services.DjangoCustomerAddressValidationService(),
-            stock_validation_service=validation_services.DjangoStockValidationService()
+            stock_validation_service=validation_services.DjangoStockValidationService(),
+            access_control=access_control
         ),
         commands.ChangeOrderQuantityCommand: lambda command: handlers.handle_change_order_quantity(
             command=command,

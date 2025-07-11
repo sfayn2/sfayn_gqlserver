@@ -22,10 +22,10 @@ def handle_add_coupon(
 
             order = uow.order.get(order_id=command.order_id)
 
-            user_info = access_control.ensure_user_is_authorized_for(
+            access_control.ensure_user_is_authorized_for(
                 token=command.token,
                 required_permission="add_coupon",
-                required_scope={"tenant_id": order.vendor_id, "customer_id": order.customer_details.customer_id}
+                required_scope={"tenant_id": order.tenant_id, "customer_id": order.customer_details.customer_id}
             )
 
             valid_coupon  = coupon_validation_service.ensure_coupon_is_valid(

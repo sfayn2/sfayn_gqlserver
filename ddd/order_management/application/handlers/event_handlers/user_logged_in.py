@@ -16,7 +16,7 @@ def handle_user_logged_in(
     try:
         event_payloads = dtos.UserLoggedInIntegrationEvent(**event)
     except Exception as e:
-        rasise exceptions.IntegrationException(f"Invalid event payload {e}")
+        raise exceptions.IntegrationException(f"Invalid event payload {e}")
 
     auth_sync.sync(event)
     if "customer" in event.claims.realm_access.roles:

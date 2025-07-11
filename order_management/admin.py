@@ -2,7 +2,7 @@ from django.contrib import admin
 from order_management.models import (
     Order, 
     OrderLine,
-    UserAuthorization,
+    UserAuthorizationSnapshot,
     VendorDetailsSnapshot,
     VendorCouponSnapshot,
     VendorOfferSnapshot,
@@ -42,13 +42,13 @@ class CustomerDetailsSnapshotAdmin(admin.ModelAdmin):
 class CustomerAddressSnapshotAdmin(admin.ModelAdmin):
     pass
 
-class UserAuthorizationAdmin(admin.ModelAdmin):
+class UserAuthorizationSnapshotAdmin(admin.ModelAdmin):
     pass
 
 
 admin.site.register(Order, OrderAdmin)
 admin.site.register(OrderLine, OrderLineAdmin)
-admin.site.register(UserAuthorization, UserAuthorizationAdmin)
+admin.site.register(UserAuthorizationSnapshot, UserAuthorizationSnapshotAdmin)
 
 #just a snapshots
 admin.site.register(VendorDetailsSnapshot, VendorDetailsSnapshotAdmin)

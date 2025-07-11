@@ -1,5 +1,6 @@
 from __future__ import annotations
 from typing import Dict
+from ddd.order_management.application import ports
 from order_management import models as django_snapshots
 
 
@@ -13,5 +14,6 @@ class DjangoVendorDetailsSnapshotSyncService(ports.SnapshotSyncServiceAbstract):
             vendor_id=event.claims.get("vendor_id"),
             vendor_name=event.claims.get("vendor_name"),
             vendor_country=event.claims.get("vendor_country"),
+            tenant_id=event.claims.get("tenant_id"),
             is_active=True
         )

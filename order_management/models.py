@@ -111,6 +111,7 @@ class Order(models.Model):
     payment_status = models.CharField(max_length=50, null=True, blank=True, choices=enums.PaymentStatus.choices)
 
     currency = models.CharField(max_length=50, help_text="Currency for calculation requirements & validation. e.g. SGD")
+    tenant_id = models.CharField(max_length=150)
     date_created = models.DateTimeField(auto_now_add=True) 
     date_modified = models.DateTimeField(auto_now=True) 
 
@@ -164,6 +165,7 @@ class OrderLine(models.Model):
 #==============
 class VendorDetailsSnapshot(models.Model):
     vendor_id = models.CharField(max_length=150)
+    tenant_id = models.CharField(max_length=150)
     name = models.CharField(max_length=200)
     country = models.CharField(max_length=50, help_text="Can use to determine if the order is domestic compared w destination")
     is_active = models.BooleanField(default=True, help_text="To quickly control whether the is valid")
@@ -174,6 +176,7 @@ class VendorDetailsSnapshot(models.Model):
 
 class VendorCouponSnapshot(models.Model):
     vendor_id = models.CharField(max_length=150)
+    tenant_id = models.CharField(max_length=150)
     offer_id = models.CharField(max_length=150)
     coupon_code = models.CharField(max_length=50, help_text="e.g WELCOME25")
     start_date = models.DateTimeField(help_text="Only valid on start of this date")
@@ -186,6 +189,7 @@ class VendorCouponSnapshot(models.Model):
 
 class VendorOfferSnapshot(models.Model):
     vendor_id = models.CharField(max_length=150)
+    tenant_id = models.CharField(max_length=150)
     offer_id = models.CharField(max_length=150)
     name = models.CharField(max_length=255)
     offer_type = models.CharField(max_length=50, choices=enums.OfferType.choices)
@@ -212,6 +216,7 @@ class VendorOfferSnapshot(models.Model):
 
 class VendorShippingOptionSnapshot(models.Model):
     vendor_id = models.CharField(max_length=150)
+    tenant_id = models.CharField(max_length=150)
     name = models.CharField(max_length=255, help_text="ex. Standard")
 
     #for future fullfilmmemt requirement?
@@ -244,6 +249,7 @@ class VendorShippingOptionSnapshot(models.Model):
 class VendorProductSnapshot(models.Model):
     product_id = models.CharField(max_length=150)
     vendor_id = models.CharField(max_length=150)
+    tenant_id = models.CharField(max_length=150)
     product_sku = models.CharField(max_length=50)
     product_name = models.CharField(max_length=255)
     product_category = models.CharField(max_length=100, help_text="some countries uses category to calculate tax")
@@ -270,6 +276,7 @@ class VendorProductSnapshot(models.Model):
 #===================
 class CustomerDetailsSnapshot(models.Model):
     customer_id = models.CharField(max_length=150)
+    tenant_id = models.CharField(max_length=150)
     user_id = models.CharField(max_length=150, null=True, blank=True)
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
@@ -311,10 +318,10 @@ class CustomerAddressSnapshot(models.Model):
 # =========
 # Local Authorization / Scope Based
 # =========
-class UserAuthorization(models.Model):
+class UserAuthorizationSnapshot(models.Model):
     user_id = models.CharField(max_length=150)
     permission_codename = models.CharField(max_length=255)
-    scope = models.CharField(max_length=150, help_text='ex. { "vendor_id": "v-1234" }')
+    scope = models.CharField(max_length=150, help_text='ex. { "tenant_id": "t-1234" }')
     is_active = models.BooleanField(default=True)
     last_update_dt = models.DateTimeField(auto_now=True) 
 

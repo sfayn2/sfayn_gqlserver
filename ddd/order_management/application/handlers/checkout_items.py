@@ -15,9 +15,20 @@ def handle_checkout_items(
         vendor_repo: VendorAbstract,
         address_validation_service: CustomerAddressValidationAbstract,
         stock_validation_service: StockValidationServiceAbstract,
+        access_control: AccessControlServiceAbstract,
         order_service: OrderServiceAbstract) -> dtos.ResponseDTO:
     try:
         with uow:
+
+            _, user_ctx = access_control.get_user_context(
+                token=command.token
+            )
+
+            access_control.ensure_user_is_authorized_for(
+                token=command.token,
+                required_permission="checkout_items",
+                required_scope={"tenant_id": user_ctx.tenant_id, "customer_id": command.customer_id}
+            )
 
             customer_details = customer_repo.get_customer_details(command.customer_id)
 
@@ -35,8 +46,10 @@ def handle_checkout_items(
             draft_order = order_service.create_draft_order(
                 customer_details=customer_details,
                 shipping_address=mappers.AddressMapper.to_domain(command.address),
-                line_items=line_items
+                line_items=line_items,
+                tenant_id=user_ctx.tenant_id
             )
+
 
             uow.order.save(draft_order)
             uow.commit()

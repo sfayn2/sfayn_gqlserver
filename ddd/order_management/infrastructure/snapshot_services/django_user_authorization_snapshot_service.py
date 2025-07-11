@@ -5,7 +5,7 @@ from order_management import models as django_snapshots
 
 
 class DjangoUserAuthorizationSnapshotSyncService(ports.SnapshotSyncServiceAbstract):
-    def __init__(self, role_map: Dict[str, List[str]):
+    def __init__(self, role_map: Dict[str, List[str]]):
         self.role_map = role_map
 
     def sync(self, event: dtos.UserLoggedInIntegrationEvent):

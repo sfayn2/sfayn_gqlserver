@@ -13,15 +13,24 @@ class AccessControlService(ports.AccessControlServiceAbstract):
         self.jwt_handler = jwt_handler
         self.userinfo_url = userinfo_url
 
-    def ensure_user_is_authorized_for(
-        self, jwt_token: str, required_permission: str, required_scope: dict = None
-    ) -> Tuple(bool, dict):
-
+    def get_user_context(self, token: str):
         identity_claims = self.jwt_handler.decode(jwt_token)
         user_id = identity_claims["sub"]
         token_type = identity_claims.get("token_type", "Bearer")
 
         user_info = self._fetch_userinfo(jwt_token, token_type)
+        return user_id, user_info
+
+    def ensure_user_is_authorized_for(
+        self, token: str, required_permission: str, required_scope: dict = None
+    ) -> Tuple(bool, dict):
+
+        #identity_claims = self.jwt_handler.decode(jwt_token)
+        #user_id = identity_claims["sub"]
+        #token_type = identity_claims.get("token_type", "Bearer")
+
+        #user_info = self._fetch_userinfo(jwt_token, token_type)
+        user_id, user_info = self.get_user_context(token)
 
         matching_authorizations = django_snapshopts.UserAuthorization.objects.filter(
             user_id=user_id,
