@@ -11,3 +11,4 @@ class CustomerSnapshotAbstract(ABC):
     @abstractmethod
     def get_customer_address(self, customer_id: str) -> List[dtos.CustomerAddressSnapshotDTO]:
         raise NotImplementedError("Subclasses must implement this method")
+

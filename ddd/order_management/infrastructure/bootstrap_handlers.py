@@ -10,7 +10,8 @@ from ddd.order_management.infrastructure import (
     payment_services,
     idp_services,
     access_control_services,
-    authorization_services
+    authorization_services,
+    snapshot_services
 )
 from ddd.order_management.application import handlers
 from ddd.order_management.application.handlers import event_handlers
@@ -22,6 +23,14 @@ load_dotenv()
 #Depending on the framework arch this might be inside manage.py , app.py, or main.py ?
 #if project grows, breakdown handlers by feature
 
+role_map = {
+    "customer": ["checkout_items", "add_line_items", "remove_line_items", 
+    "add_coupon", "remove_coupon", "change_destination", "change_order_quantity", 
+    "select_shipping_option", "list_shipping_options", "list_customer_addresses"
+    "place_order", "confirm_order", "cancel_order", "get_order"],
+    "vendor": ["mark_as_shipped", "add_shipping_tracking_reference", "mark_as_completed"]
+}
+
 # ===============================
 #TODO to have this in separate auth_service
 # =====================
@@ -31,13 +40,6 @@ jwt_handler = access_control_services.JwtTokenHandler(
     audience=os.getenv("KEYCLOAK_CLIENT_ID")
 )
 
-role_map = {
-    "customer": ["checkout_items", "add_line_items", "remove_line_items", 
-    "add_coupon", "remove_coupon", "change_destination", "change_order_quantity", 
-    "select_shipping_option", "list_shipping_options", "list_customer_addresses"
-    "place_order", "confirm_order", "cancel_order", "get_order"],
-    "vendor": ["mark_as_shipped", "add_shipping_tracking_reference", "mark_as_completed"]
-}
 
 idp_provider = idp_services.KeycloakIdPProvider(
     token_url=os.getenv("KEYCLOAK_TOKEN"),
@@ -63,7 +65,10 @@ def register_async_event_handlers():
     event_bus.ASYNC_EVENT_HANDLERS.update({
         "auth_service.events.UserLoggedInEvent": [
                 lambda event: handlers.handle_user_logged_in(
-                    event=event
+                    event=event,
+                    auth_sync=snapshot_services.DjangoUserAuthorizationSnapshotSyncService(role_map),
+                    customer_sync=snapshot_services.DjangoCustomerSnapshotSyncService(),
+                    vendor_sync=snapshot_services.DjangoVendorDetailsSnapshotSyncService(),
                 ),
             ],
     })

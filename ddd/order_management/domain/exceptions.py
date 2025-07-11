@@ -45,3 +45,6 @@ class Forbidden(Exception):
 
 class AccessControlException(Exception):
     pass
+
+class IntegrationException(Exception):
+    pass

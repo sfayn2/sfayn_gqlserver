@@ -1,14 +1,17 @@
 from __future__ import annotations
+from typing import Dict
 from order_management import models as django_snapshots
 
 
-class DjangoVendorDetailsSnapshotSyncService:
-    def __init__(self, vendor_provider: VendorDetailsSnapshotAbstract):
-        self.vendor_provider = vendor_provider
+class DjangoVendorDetailsSnapshotSyncService(ports.SnapshotSyncServiceAbstract):
+    #def __init__(self, vendor_provider: VendorDetailsSnapshotAbstract):
+    #    self.vendor_provider = vendor_provider
 
-    def sync(self):
-        django_snapshots.VendorDetailsSnapshot.objects.all().delete()
-
-        vendors = self.vendor_provider.get_all_vendors()
-        for vendor in vendors:
-            django_snapshots.VendorDetailsSnapshot.objects.create(**vendor.model_dump())
+    def sync(self, event: dtos.UserLoggedInIntegrationEvent):
+        django_snapshots.VendorDetailsSnapshot.objects.filter(vendor_id=event.claims.get("vendor_id")).delete()
+        django_snapshots.VendorDetailsSnapshot.objects.create(
+            vendor_id=event.claims.get("vendor_id"),
+            vendor_name=event.claims.get("vendor_name"),
+            vendor_country=event.claims.get("vendor_country"),
+            is_active=True
+        )
