@@ -20,7 +20,7 @@ def handle_checkout_items(
     try:
         with uow:
 
-            _, user_info = access_control.ensure_user_is_authorized_for(
+            user_ctx = access_control.ensure_user_is_authorized_for(
                 token=command.token,
                 required_permission="checkout_items",
                 required_scope={"customer_id": command.customer_id}
@@ -43,7 +43,7 @@ def handle_checkout_items(
                 customer_details=customer_details,
                 shipping_address=mappers.AddressMapper.to_domain(command.address),
                 line_items=line_items,
-                tenant_id=user_info.get("tenant_id")
+                tenant_id=user_ctx.tenant_id
             )
 
 

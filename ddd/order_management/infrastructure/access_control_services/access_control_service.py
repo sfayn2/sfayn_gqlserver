@@ -3,7 +3,7 @@ import requests
 from typing import Tuple
 from order_management import models as django_snapshots
 from ddd.order_management.domain import exceptions
-from ddd.order_management.application import ports
+from ddd.order_management.application import ports, dtos
 
 # ===============================
 #TODO to have this in separate auth_service
@@ -19,26 +19,38 @@ class AccessControlService(ports.AccessControlServiceAbstract):
 
         identity_claims = self.jwt_handler.decode(jwt_token)
         user_id = identity_claims["sub"]
+        tenant_id = identity_claims["tenant_id"]
+        roles = identity_claims.get("realm_access", {}).get("roles", [])
         token_type = identity_claims.get("token_type", "Bearer")
 
         user_info = self._fetch_userinfo(jwt_token, token_type)
 
         matching_authorizations = django_snapshopts.UserAuthorization.objects.filter(
-            user_id=user_info.get("sub"),
-            tenant_id=user_info.get("tenant_id"),
+            user_id=user_id,
+            tenant_id=tenant_id,
             permission_codename=required_permission
         )
 
         if required_scope:
             for authorization in matching_authorizations:
                 if all(authorization.scope.get(k) == v for k, v in required_scope.items()):
-                    return True, user_info
+                    return dtos.UserContextDTO(
+                        user_id=user_id,
+                        tenant_id=tenant_id,
+                        roles=roles,
+                        user_info=user_info
+                    )
 
             raise exceptions.AccessControlException("Access denied: required scoped permission not found")
         elif not matching_authorizations.exists():
             raise exceptions.AccessControlException("Access denied: permission not granted")
 
-        return True, user_info
+        return dtos.UserContextDTO(
+            user_id=user_id,
+            tenant_id=tenant_id,
+            roles=roles,
+            user_info=user_info
+        )
 
     def _fetch_userinfo(self, jwt_token: str, token_type: str) -> dict:
         headers = {"Authorization": f"{token_type} {jwt_token}"}

@@ -14,6 +14,7 @@ from .dtos import (
     OfferStrategyDTO,
     ShippingOptionStrategyDTO,
     ProductSkusDTO,
+    UserContextDTO
 )
 from .snapshot_dtos import (
     VendorDetailsSnapshotDTO,
