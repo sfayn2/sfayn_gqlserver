@@ -20,10 +20,11 @@ def handle_change_destination(
 
             order = uow.order.get(order_id=command.order_id)
 
-            validation_service.ensure_customer_address_is_valid(
-                customer_id=order.customer_details.customer_id,
-                address=command.address
-            )
+            # Decision: allow to change w adhoc address
+            #validation_service.ensure_customer_address_is_valid(
+            #    customer_id=order.customer_details.customer_id,
+            #    address=command.address
+            #)
 
             order.change_destination(
                 command.address
