@@ -128,17 +128,20 @@ def register_command_handlers():
         commands.ChangeOrderQuantityCommand: lambda command: handlers.handle_change_order_quantity(
             command=command,
             uow=repositories.DjangoOrderUnitOfWork(),
+            access_control=access_control,
             stock_validation_service=validation_services.DjangoStockValidationService()
         ),
         commands.AddLineItemsCommand: lambda command: handlers.handle_add_line_items(
             command=command,
             uow=repositories.DjangoOrderUnitOfWork(),
             vendor_repo=repositories.DjangoVendorRepositoryImpl(),
+            access_control=access_control,
             stock_validation_service=validation_services.DjangoStockValidationService()
         ),
         commands.ChangeDestinationCommand: lambda command: handlers.handle_change_destination(
             command=command,
             uow=repositories.DjangoOrderUnitOfWork(),
+            access_control=access_control,
             validation_service=validation_services.DjangoCustomerAddressValidationService()
         ),
         commands.AddCouponCommand: lambda command: handlers.handle_add_coupon(
@@ -151,33 +154,40 @@ def register_command_handlers():
             command=command, 
             uow=repositories.DjangoOrderUnitOfWork(),
             vendor_repo=repositories.DjangoVendorRepositoryImpl(),
+            access_control=access_control,
             shipping_option_service=domain_services.ShippingOptionStrategyService()
         ),
         commands.PlaceOrderCommand: lambda command: handlers.handle_place_order(
             command=command,
             uow=repositories.DjangoOrderUnitOfWork(),
+            access_control=access_control,
             stock_validation_service=validation_services.DjangoStockValidationService()
         ),
         commands.ConfirmOrderCommand: lambda command: handlers.handle_confirm_order(
             command=command, 
             uow=repositories.DjangoOrderUnitOfWork(),
             payment_service=payment_services.PaymentService(),
+            access_control=access_control,
             stock_validation_service=validation_services.DjangoStockValidationService()
         ),
         commands.CancelOrderCommand: lambda command: handlers.handle_cancel_order(
             command=command,
+            access_control=access_control,
             uow=repositories.DjangoOrderUnitOfWork()
         ),
         commands.ShipOrderCommand: lambda command: handlers.handle_mark_as_shipped(
             command=command,
+            access_control=access_control,
             uow=repositories.DjangoOrderUnitOfWork()
         ),
         commands.AddShippingTrackingReferenceCommand: lambda command: handlers.handle_add_shipping_tracking_reference(
             command=command,
+            access_control=access_control,
             uow=repositories.DjangoOrderUnitOfWork()
         ),
         commands.CompleteOrderCommand: lambda command: handlers.handle_mark_as_completed(
             command=command,
+            access_control=access_control,
             uow=repositories.DjangoOrderUnitOfWork()
         ),
         commands.LoginCallbackCommand: lambda command: handlers.handle_login_callback(

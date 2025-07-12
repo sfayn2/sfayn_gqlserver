@@ -13,12 +13,19 @@ def handle_list_shipping_options(
         query: queries.ListShippingOptionsQuery, 
         uow: UnitOfWorkAbstract,
         vendor_repo: VendorAbstract,
+        access_control: AccessControlServiceAbstract,
         shipping_option_service: ShippingOptionStrategyServiceAbstract
 ) -> List[dtos.ShippingDetailsDTO]:
 
     with uow:
 
         order = uow.order.get(order_id=query.order_id)
+
+        access_control.ensure_user_is_authorized_for(
+            token=command.token,
+            required_permission="list_shipping_options",
+            required_scope={"customer_id": order.customer_details.customer_id }
+        )
 
         vendor_shipping_options = vendor_repo.get_shipping_options(vendor_id=order.vendor_id)
         available_shipping_options = shipping_option_service.get_applicable_shipping_options(

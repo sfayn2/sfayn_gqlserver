@@ -3,7 +3,7 @@ from graphene import relay
 from ddd.order_management.application import (
     message_bus, commands
   )
-from ddd.order_management.presentation.graphql import object_types
+from ddd.order_management.presentation.graphql import object_types, common
 
 # ======
 # expected to call in front end via Paypal onApprove ?
@@ -20,6 +20,7 @@ class ConfirmOrderMutation(relay.ClientIDMutation):
 
     @classmethod
     def mutate_and_get_payload(cls, root, info, **input):
+        input["token"] = common.get_token_from_context(info)
         command = commands.ConfirmOrderCommand.model_validate(input)
         result = message_bus.handle(command)
         return cls(result=object_types.ResponseType(**result.model_dump()))

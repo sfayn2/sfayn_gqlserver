@@ -11,12 +11,19 @@ from ddd.order_management.application import (
 def handle_remove_line_items(
         command: commands.RemoveLineItemsCommand, 
         uow: UnitOfWorkAbstract,
+        access_control: AccessControlServiceAbstract,
         vendor_repo: VendorAbstract
 ) -> dtos.ResponseDTO:
     try:
         with uow:
 
             order = uow.order.get(order_id=command.order_id)
+
+            access_control.ensure_user_is_authorized_for(
+                token=command.token,
+                required_permission="remove_line_items",
+                required_scope={"customer_id": order.customer_details.customer_id }
+            )
 
             line_items = vendor_repo.get_line_items(
                 order.vendor_id, 

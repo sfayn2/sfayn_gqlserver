@@ -12,11 +12,19 @@ from ddd.order_management.domain import exceptions
 
 def handle_cancel_order(
         command: commands.CancelOrderCommand, 
+        access_control: AccessControlServiceAbstract,
         uow: UnitOfWorkAbstract) -> dtos.ResponseDTO:
     try:
         with uow:
 
             order = uow.order.get(order_id=command.order_id)
+
+            access_control.ensure_user_is_authorized_for(
+                token=command.token,
+                required_permission="cancel_order",
+                required_scope={"customer_id": order.customer_details.customer_id }
+            )
+
             order.cancel_order(command.cancellation_reason)
 
             uow.order.save(order)

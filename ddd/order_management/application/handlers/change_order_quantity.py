@@ -13,12 +13,20 @@ from ddd.order_management.domain import exceptions
 def handle_change_order_quantity(
         command: commands.ChangeOrderQuantityCommand, 
         uow: UnitOfWorkAbstract,
+        access_control: AccessControlServiceAbstract,
         stock_validation_service: StockValidationServiceAbstract
     ) -> dtos.ResponseDTO:
     try:
         with uow:
 
             order = uow.order.get(order_id=command.order_id)
+
+            access_control.ensure_user_is_authorized_for(
+                token=command.token,
+                required_permission="change_order_quantity",
+                required_scope={"customer_id": order.customer_details.customer_id }
+            )
+
             order.change_order_quantity(
                 product_sku=command.product_sku,
                 new_quantity=command.new_quantity

@@ -12,12 +12,19 @@ def handle_add_line_items(
         command: commands.AddLineItemsCommand, 
         uow: UnitOfWorkAbstract,
         vendor_repo: VendorAbstract,
-        stock_validation_service: StockValidationServiceAbstract
+        stock_validation_service: StockValidationServiceAbstract,
+        access_control: AccessControlServiceAbstract
 ) -> dtos.ResponseDTO:
     try:
         with uow:
 
             order = uow.order.get(order_id=command.order_id)
+
+            access_control.ensure_user_is_authorized_for(
+                token=command.token,
+                required_permission="add_line_items",
+                required_scope={"customer_id": order.customer_details.customer_id}
+            )
 
             line_items = vendor_repo.get_line_items(
                 order.vendor_id, 
