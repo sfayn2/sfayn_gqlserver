@@ -58,7 +58,7 @@ login_callback_service = idp_services.KeycloakLoginCallbackService(
 
 access_control = access_control_services.AccessControlService(
     jwt_handler=jwt_handler,
-    userinfo_url=os.getenv("KEYCLOAK_USERINFO")
+    userinfo_url=os.getenv("AUTHSERVICE_USERINFO")
 )
 
 def register_async_event_handlers():

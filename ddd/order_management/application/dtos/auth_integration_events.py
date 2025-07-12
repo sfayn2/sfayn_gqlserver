@@ -2,23 +2,16 @@ import uuid
 from pydantic import BaseModel, root_validator
 from typing import Dict, Optional, List
 
-class RealmAccessModel(BaseModel):
-    roles: List[str] = Field(default_factory=list)
-
-class ShippingAddressModel(BaseModel):
-    street: str
-    city: str
-    postal: int
-    state: str
-    country: str
-
-
-class ClaimsModel(BaseModel):
+class UserLoggedInIntegrationEvent(BaseModel):
+    event_type: str
+    token_type: str
+    sub: str
     tenant_id: str
+
     email: str
     given_name: Optional[str]
     family_name: Optional[str]
-    realm_access: RealmAccessModel
+    roles: List[str] = Field(default_factory=list)
 
     # Optional: vendor specific fields
     vendor_name: Optional[str]
@@ -27,7 +20,3 @@ class ClaimsModel(BaseModel):
     # Optional: Shipping address fields?
     shipping_address: Optional[ShippingAddressModel]
 
-class UserLoggedInIntegrationEvent(BaseModel):
-    event_type: str
-    user_id: str
-    claims: ClaimsModel

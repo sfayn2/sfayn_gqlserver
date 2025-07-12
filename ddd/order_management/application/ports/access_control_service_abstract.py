@@ -6,5 +6,5 @@ class AccessControlServiceAbstract(ABC):
     @abstractmethod
     def ensure_user_is_authorized_for(
         self, token: str, required_permission: str, required_scope: dict = None
-    ) -> Tuple(bool, dict):
+    ) -> dtos.UserLoggedInIntegrationEvent:
         raise NotImplementedError("Subclasses must implement this method")
