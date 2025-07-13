@@ -2,7 +2,7 @@
 
 [![Django CI](https://github.com/sfayn2/sfayn_gqlserver/actions/workflows/django.yml/badge.svg)](https://github.com/sfayn2/sfayn_gqlserver/actions/workflows/django.yml)
 
-# Basic GraphQL Api for creating Ecommerce site
+# Order Management Context Based on DDD principles
 
 * Focus on designing your own frontend Store Template
 * Django Admin to create your own Shop data (ex. Shop, Products, Order, Customer, etc.)
