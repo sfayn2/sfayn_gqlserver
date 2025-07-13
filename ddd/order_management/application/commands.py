@@ -10,7 +10,8 @@ class Command(BaseModel, frozen=True):
     token: str
 
 class CheckoutItemsCommand(Command):
-    customer_id: constr(min_length=1, strip_whitespace=True)
+    #customer_id: constr(min_length=1, strip_whitespace=True)
+    customer_details: dtos.CustomerDetailsDTO
     vendor_id: constr(min_length=1, strip_whitespace=True)
     address: dtos.AddressDTO
     product_skus: List[dtos.ProductSkusDTO]

@@ -34,10 +34,11 @@ class AddressInput(graphene.InputObjectType):
     postal = graphene.String(required=True)
     country = graphene.String(required=True)
 #
-#class CustomerDetailsInput(graphene.InputObjectType):
-#    first_name = graphene.String(required=True)
-#    last_name = graphene.String(required=True)
-#    email = graphene.String(required=True)
+class CustomerDetailsInput(graphene.InputObjectType):
+    customer_id = graphene.String(required=True)
+    first_name = graphene.String(required=True)
+    last_name = graphene.String(required=True)
+    email = graphene.String(required=True)
 
 class ShippingDetailsInput(graphene.InputObjectType):
     method = graphene.String(required=True)

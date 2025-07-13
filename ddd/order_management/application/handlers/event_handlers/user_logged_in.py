@@ -18,9 +18,9 @@ def handle_user_logged_in(
         raise exceptions.IntegrationException(f"Invalid event payload {e}")
 
     auth_sync.sync(event_payloads)
-    #if "customer" in event_payloads.claims.roles:
-    #    customer_sync.sync(event_payloads)
-    #if "vendor" in event_payloads.claims.roles:
+    if "customer" in event_payloads.roles:
+        customer_sync.sync(event_payloads)
+    #if "vendor" in event_payloads.roles:
     #    vendor_sync.sync(event_payloads)
 
 

@@ -23,16 +23,17 @@ def handle_checkout_items(
             user_ctx = access_control.ensure_user_is_authorized_for(
                 token=command.token,
                 required_permission="checkout_items",
-                required_scope={"customer_id": command.customer_id}
+                required_scope={"customer_id": command.customer_details.customer_id}
             )
 
-            customer_details = customer_repo.get_customer_details(command.customer_id)
+            # Decision: allow user to fill in customer details + address in front end
+            #customer_details = customer_repo.get_customer_details(command.customer_id)
 
             #shipping_address = customer_repo.get_shipping_address(command.customer_id)
-            address_validation_service.ensure_customer_address_is_valid(
-                customer_id=command.customer_id,
-                address=command.address
-            )
+            #address_validation_service.ensure_customer_address_is_valid(
+            #    customer_id=command.customer_id,
+            #    address=command.address
+            #)
 
             line_items = vendor_repo.get_line_items(command.vendor_id, command.product_skus)
 
@@ -40,7 +41,7 @@ def handle_checkout_items(
 
 
             draft_order = order_service.create_draft_order(
-                customer_details=customer_details,
+                customer_details=mappers.CustomerDetailsMapper.to_domain(customer_details),
                 shipping_address=mappers.AddressMapper.to_domain(command.address),
                 line_items=line_items,
                 tenant_id=user_ctx.tenant_id
