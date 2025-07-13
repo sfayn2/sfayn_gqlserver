@@ -12,7 +12,7 @@ class Address:
     # make use of country to country code converter if require?
 
     def __post_init__(self):
-        if not self.street or not self.city or not self.postal or not self.state:
+        if not self.street or not self.city or not self.postal or not self.state or not self.country:
             raise exceptions.AddressException("Address fields (street, city, postal, country, state) cannot be empty.")
         if not isinstance(self.postal, int) or self.postal <= 0:
             raise exceptions.AddressException(f"Invalid postal code {self.postal}. It must be a positive integer.")

@@ -29,15 +29,14 @@ def handle_checkout_items(
             # Decision: allow user to fill in customer details + address in front end
             #customer_details = customer_repo.get_customer_details(command.customer_id)
 
-            #shipping_address = customer_repo.get_shipping_address(command.customer_id)
             #address_validation_service.ensure_customer_address_is_valid(
             #    customer_id=command.customer_id,
             #    address=command.address
             #)
 
-            line_items = vendor_repo.get_line_items(command.vendor_id, command.product_skus)
+            vendor_line_items = vendor_repo.get_line_items(command.vendor_id, command.product_skus)
 
-            stock_validation_service.ensure_items_in_stock(line_items)
+            stock_validation_service.ensure_items_in_stock(vendor_line_items)
 
 
             draft_order = order_service.create_draft_order(

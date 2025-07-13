@@ -2,7 +2,6 @@ from __future__ import annotations
 from dataclasses import dataclass
 from ddd.order_management.domain import exceptions
 
-#right now only for Gues customer
 @dataclass(frozen=True)    
 class CustomerDetails:
     customer_id: str
@@ -12,5 +11,7 @@ class CustomerDetails:
 
     def __post_init__(self):
         if not self.first_name or not self.last_name or not self.email:
-            raise exceptions.CustomerDetailsException("Customer details are incomplete.")
-        #TODO: validate email
+            raise exceptions.CustomerDetailsException("Customer details fields (street, city, postal, country, state) cannot be empty.")
+
+        if not re.match(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', self.email):
+            raise exceptions.CustomerDetailsException("Customer email is not valid.")
