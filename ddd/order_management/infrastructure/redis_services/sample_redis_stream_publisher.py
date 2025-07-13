@@ -5,12 +5,10 @@ import redis
 redis_client = redis.Redis.from_url('redis://localhost:6379')
 
 claims = {
-    "sub": "abc123",
+    "roles": ["customer"],
     "email": "abc@email.com",
-    "tenant_id": "tenant-abc",
-    "realm_access": {
-        "roles": ["customer"]
-    },
+    "given_name": "Given name1",
+    "family_name" : "family1",
     "vendor_id": "v-124",
     "vendor_name": "vendor 1",
     "vendor_country": "India",
@@ -25,7 +23,9 @@ claims = {
 
 event = {
     "event_type": "auth_service.events.UserLoggedInEvent",
-    "user_id": "abc123",
+    "sub": "abc123",
+    "token_type": "Bearer",
+    "tenant_id": "t-123",
     "claims": json.dumps(claims)
 }
 

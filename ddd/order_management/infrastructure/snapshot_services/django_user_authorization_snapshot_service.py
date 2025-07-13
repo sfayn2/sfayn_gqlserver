@@ -9,21 +9,22 @@ class DjangoUserAuthorizationSnapshotSyncService(ports.SnapshotSyncServiceAbstra
         self.role_map = role_map
 
     def sync(self, event: dtos.UserLoggedInIntegrationEvent):
-        django_snapshots.UserAuthorization.objects.filter(user_id=event.user_id).delete()
+        django_snapshots.UserAuthorizationSnapshot.objects.filter(user_id=event.sub).delete()
 
-        for role in event.claims.realm_access.get("roles"):
+        for role in event.claims.roles:
             permissions = self.role_map.get(role, [])
+            scope = {}
 
             # customer_id or vendor_id
             if role == "customer":
-                scope["customer_id"] = event.user_id
+                scope["customer_id"] = event.sub
             elif role == "vendor":
-                scope["vendor_id"] = event.user_id
+                scope["vendor_id"] = event.sub
             for perm in permissions:
 
-                django_snapshots.UserAuthorization.objects.create(
-                    user_id=event.user_id,
-                    tenant_id=event.claims.get("tenant_id"),
-                    permission_code_name=perm,
+                django_snapshots.UserAuthorizationSnapshot.objects.create(
+                    user_id=event.sub,
+                    tenant_id=event.tenant_id,
+                    permission_codename=perm,
                     scope=scope
                 )

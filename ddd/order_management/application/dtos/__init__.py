@@ -13,8 +13,7 @@ from .dtos import (
     OrderDTO,
     OfferStrategyDTO,
     ShippingOptionStrategyDTO,
-    ProductSkusDTO,
-    UserContextDTO
+    ProductSkusDTO
 )
 from .snapshot_dtos import (
     VendorDetailsSnapshotDTO,
@@ -27,3 +26,4 @@ from .snapshot_dtos import (
 )
 
 from .idp_dtos import IdPTokenDTO
+from .auth_integration_events import UserLoggedInIntegrationEvent

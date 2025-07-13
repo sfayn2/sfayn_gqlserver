@@ -10,7 +10,6 @@ from ddd.order_management.infrastructure import (
     payment_services,
     idp_services,
     access_control_services,
-    authorization_services,
     snapshot_services
 )
 from ddd.order_management.application import handlers
@@ -57,8 +56,7 @@ login_callback_service = idp_services.KeycloakLoginCallbackService(
 # =====================
 
 access_control = access_control_services.AccessControlService(
-    jwt_handler=jwt_handler,
-    userinfo_url=os.getenv("AUTHSERVICE_USERINFO")
+    jwt_handler=jwt_handler
 )
 
 def register_async_event_handlers():

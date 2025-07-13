@@ -9,11 +9,11 @@ class DjangoVendorDetailsSnapshotSyncService(ports.SnapshotSyncServiceAbstract):
     #    self.vendor_provider = vendor_provider
 
     def sync(self, event: dtos.UserLoggedInIntegrationEvent):
-        django_snapshots.VendorDetailsSnapshot.objects.filter(vendor_id=event.claims.get("vendor_id")).delete()
+        django_snapshots.VendorDetailsSnapshot.objects.filter(vendor_id=event.claims.vendor_id).delete()
         django_snapshots.VendorDetailsSnapshot.objects.create(
-            vendor_id=event.claims.get("vendor_id"),
-            vendor_name=event.claims.get("vendor_name"),
-            vendor_country=event.claims.get("vendor_country"),
-            tenant_id=event.claims.get("tenant_id"),
+            vendor_id=event.claims.vendor_id,
+            vendor_name=event.claims.vendor_name,
+            vendor_country=event.claims.vendor_country,
+            tenant_id=event.tenant_id,
             is_active=True
         )

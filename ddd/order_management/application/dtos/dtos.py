@@ -140,9 +140,3 @@ class ShippingOptionStrategyDTO(BaseModel):
 class ProductSkusDTO(BaseModel):
     product_sku: str
     order_quantity: int
-
-class UserContextDTO(BaseModel):
-    user_id: str
-    tenant_id: str
-    roles: List[str]
-    user_info: Dict[str, Any]

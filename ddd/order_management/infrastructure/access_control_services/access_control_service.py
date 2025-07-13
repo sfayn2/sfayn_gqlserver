@@ -8,7 +8,7 @@ from ddd.order_management.application import ports, dtos
 class AccessControlService(ports.AccessControlServiceAbstract):
     def __init__(self, jwt_handler: str):
         self.jwt_handler = jwt_handler
-        self.userinfo_url = userinfo_url
+        #self.userinfo_url = userinfo_url
 
     def ensure_user_is_authorized_for(
         self, token: str, required_permission: str, required_scope: dict = None
@@ -16,7 +16,7 @@ class AccessControlService(ports.AccessControlServiceAbstract):
 
         identity_claims = self.jwt_handler.decode(jwt_token)
         token_type = identity_claims.get("token_type", "Bearer")
-        claims = self._fetch_userinfo(jwt_token, token_type)
+        #claims = self._fetch_userinfo(jwt_token, token_type)
 
         valid_claims = dtos.UserLoggedInIntegrationEvent.model_validate(**claims)
         #user_id = identity_claims["sub"]
@@ -40,11 +40,10 @@ class AccessControlService(ports.AccessControlServiceAbstract):
             raise exceptions.AccessControlException("Access denied: permission not granted")
 
         return valid_claims
-        )
 
-    def _fetch_userinfo(self, jwt_token: str, token_type: str) -> dict:
-        headers = {"Authorization": f"{token_type} {jwt_token}"}
-        response = requests.get(self.userinfo_url, headers=headers)
-        if response.status_code != 200:
-            raise exceptions.AccessControlException("Failed to fetch user info")
-        return response.json()
+    #def _fetch_userinfo(self, jwt_token: str, token_type: str) -> dict:
+    #    headers = {"Authorization": f"{token_type} {jwt_token}"}
+    #    response = requests.get(self.userinfo_url, headers=headers)
+    #    if response.status_code != 200:
+    #        raise exceptions.AccessControlException("Failed to fetch user info")
+    #    return response.json()
