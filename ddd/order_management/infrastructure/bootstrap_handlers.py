@@ -64,9 +64,7 @@ def register_async_event_handlers():
         "auth_service.events.UserLoggedInEvent": [
                 lambda event: handlers.handle_user_logged_in(
                     event=event,
-                    auth_sync=snapshot_services.DjangoUserAuthorizationSnapshotSyncService(role_map),
-                    customer_sync=snapshot_services.DjangoCustomerSnapshotSyncService(),
-                    vendor_sync=snapshot_services.DjangoVendorDetailsSnapshotSyncService(),
+                    auth_sync=snapshot_services.DjangoUserAuthorizationSnapshotSyncService(role_map)
                 ),
             ],
     })

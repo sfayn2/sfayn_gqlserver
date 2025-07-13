@@ -11,7 +11,7 @@ class DjangoUserAuthorizationSnapshotSyncService(ports.SnapshotSyncServiceAbstra
     def sync(self, event: dtos.UserLoggedInIntegrationEvent):
         django_snapshots.UserAuthorizationSnapshot.objects.filter(user_id=event.sub).delete()
 
-        for role in event.claims.roles:
+        for role in event.roles:
             permissions = self.role_map.get(role, [])
             scope = {}
 

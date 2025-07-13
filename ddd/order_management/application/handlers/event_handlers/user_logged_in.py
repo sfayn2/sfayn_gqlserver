@@ -9,9 +9,7 @@ from ddd.order_management.domain import events, exceptions
 #Async handler
 def handle_user_logged_in(
     event: dtos.UserLoggedInIntegrationEvent,
-    auth_sync: ports.SnapshotSyncServiceAbstract,
-    customer_sync: ports.SnapshotSyncServiceAbstract,
-    vendor_sync: ports.SnapshotSyncServiceAbstract
+    auth_sync: ports.SnapshotSyncServiceAbstract
 ):
 
     try:
@@ -20,10 +18,10 @@ def handle_user_logged_in(
         raise exceptions.IntegrationException(f"Invalid event payload {e}")
 
     auth_sync.sync(event_payloads)
-    if "customer" in event_payloads.claims.roles:
-        customer_sync.sync(event_payloads)
-    if "vendor" in event_payloads.claims.roles:
-        vendor_sync.sync(event_payloads)
+    #if "customer" in event_payloads.claims.roles:
+    #    customer_sync.sync(event_payloads)
+    #if "vendor" in event_payloads.claims.roles:
+    #    vendor_sync.sync(event_payloads)
 
 
     print(f"User has been logged in {event_payloads}")
