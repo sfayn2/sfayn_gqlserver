@@ -6,7 +6,7 @@ class Command(BaseCommand):
 
         rsl = redis_stream_listener.RedisStreamListener(
             consumer_name="order_worker1",
-            stream_name="stream.auth_service"
+            stream_name="stream.identity_gateway_service"
             )
 
         rsl.listen()

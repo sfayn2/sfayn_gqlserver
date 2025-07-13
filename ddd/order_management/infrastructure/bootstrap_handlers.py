@@ -61,13 +61,17 @@ access_control = access_control_services.AccessControlService(
 
 def register_async_event_handlers():
     event_bus.ASYNC_EVENT_HANDLERS.update({
-        "auth_service.events.UserLoggedInEvent": [
+        "identity_gateway_service.events.UserLoggedInEvent": [
                 lambda event: handlers.handle_user_logged_in(
                     event=event,
                     auth_sync=snapshot_services.DjangoUserAuthorizationSnapshotSyncService(role_map),
                     customer_sync=snapshot_services.DjangoCustomerSnapshotSyncService()
                 ),
             ],
+        "product_catalog.events.ProductUpdatedEvent": [],
+        "vendor_registry.events.VendorUpdatedEvent":[],
+        "vendor_registry.events.VendorOfferUpdatedEvent":[],
+        "vendor_registry.events.VendorShippingOptionUpdatedEvent":[]
     })
 
 
