@@ -1,0 +1,18 @@
+mutation {
+  selectShippingOption(input: {
+    orderId: "ORD-AF29C5BA3036",
+    shippingDetails: {
+      method: "Standard",
+      deliveryTime: "2-3 Days",
+      cost: {
+        amount: "5.000"
+        currency: "SGD"
+      }
+    }
+  }) {
+    result {
+      message
+      success
+    }
+  }
+}

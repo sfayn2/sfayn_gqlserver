@@ -13,29 +13,29 @@ This Project is currently under active development. Major changes are ongoing.
 
 ## Auth
 
-All APIs require a **valid JWT** (eg. from Keycloak)
-No token -> No access.
+All APIs require a **valid JWT** (eg. from Keycloak).
+**No token -> No access.**
 
 ## API overview
 
 GraphQL mutations/queries available:
 
 ### Checkout flow
-- `checkoutItems`
+- [`checkoutItems](./mutations/checkout_items.graphql)
 - `addLineItem`
 - `removeLineItem`
 - `changeOrderQuantity`
-- `addCoupon`
+- [`addCoupon`](./mutations/add_coupon.graphql)
 - `listShippingOptions`
-- `selectShippingOption`
+- [`selectShippingOption`](./mutations/selection_shipping_option.graphql)
 - `listCustomerAddresses`
-- `changeDestination`
+- [`changeDestination`](./mutations/change_destination.graphql)
 
 ### Order Lifecycle
-- `placeOrder` *(if draft order)*
-- `confirmOrder` *(if pending payment)*
+- [`placeOrder` *(if draft order)*](./mutations/place_order.graphql)
+- [`confirmOrder` *(if pending payment)*](./mutations/confirm_order.graphql)
 - `cancelOrder` *(if pending/confirmed order)*
-- `markAsShipped` *(if confirmed order)*
+- [`markAsShipped` *(if confirmed order)*](./mutations/mark_as_shipped.graphql)
 - `addShippingTrackingReference` *(if shipped order)*
 - `markAsCompleted` *(if received)*
 
@@ -43,70 +43,6 @@ GraphQL mutations/queries available:
 1. **User logs in via Idp (e.g Keycloak)**
 2. **Frontend handles cart** (not API responsibility)
 3. **Use GraphQL to checkout and build order**
-
-```graphql
-   mutation {
-  checkoutItems(input: {
-    customerId: "c-234",
-    vendorId: "v-234",
-     address: {
-    	street: "My street",
-      city: "City1",
-      state: "State1",
-      postal: "12345",
-      country: "Singapore"
-    }
-    productSkus:[
-      {
-        productSku: "T-SHIRT-L",
-        orderQuantity: 10
-      }
-    ]
-    
-  }) {
-    result {
-      success
-      message
-    }
-  }
-}
-
-mutation {
-  placeOrder(input: {
-    orderId: "ORD-AF29C5BA3036"
-  }) {
-    result {
-      message
-      success
-    } 
-  }
-}
-
-mutation {
-  confirmOrder(input: {
-    orderId: "ORD-FC8D8D9F",
-    transactionId: "2L633961FY072164Y",
-    method: "Paypal"
-  }) {
-result {
-      message
-      success
-    } 
-
-  }
-
-
-  mutation {
-  markAsShippedOrder(input: {
-    orderId: "ORD-AF29C5BA3036",
-}) {
-    result {
-      message
-      success
-    } 
-  }
-}
-```
 
 ## Installation 
 ```

@@ -1,0 +1,18 @@
+mutation {
+  changeDestination(input: {
+    orderId: "ORD-AF29C5BA3036",
+    address: {
+    	street: "My street",
+      city: "City1",
+      state: "State1",
+      postal: "12345",
+      country: "Singapore"
+    }
+    
+}) {
+    result {
+      message
+      success
+    } 
+  }
+}

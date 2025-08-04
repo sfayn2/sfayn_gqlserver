@@ -1,0 +1,10 @@
+mutation {
+  placeOrder(input: {
+    orderId: "ORD-AF29C5BA3036"
+  }) {
+    result {
+      message
+      success
+    } 
+  }
+}
