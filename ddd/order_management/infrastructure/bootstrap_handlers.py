@@ -17,7 +17,7 @@ from ddd.order_management.application.handlers import event_handlers
 
 from ddd.order_management.application import commands, message_bus, queries
 
-load_dotenv()
+load_dotenv(".env.test")
 
 #Depending on the framework arch this might be inside manage.py , app.py, or main.py ?
 #if project grows, breakdown handlers by feature
@@ -30,30 +30,31 @@ role_map = {
     "vendor": ["mark_as_shipped", "add_shipping_tracking_reference", "mark_as_completed"]
 }
 
-# ===============================
-#TODO to have this in separate auth_service
-# =====================
 jwt_handler = access_control_services.JwtTokenHandler(
     public_key=os.getenv("KEYCLOAK_PUBLIC_KEY"),
     issuer=os.getenv("KEYCLOAK_ISSUER"),
-    audience=os.getenv("KEYCLOAK_CLIENT_ID")
+    audience=os.getenv("KEYCLOAK_CLIENT_ID"),
+    algorithm=os.getenv("KEYCLOAK_ALGORITHM")
 )
 
 
-idp_provider = idp_services.KeycloakIdPProvider(
-    token_url=os.getenv("KEYCLOAK_TOKEN"),
-    client_id=os.getenv("KEYCLOAK_CLIENT_ID"),
-    client_secret=os.getenv("KEYCLOAK_CLIENT_SECRET")
-)
-
-login_callback_service = idp_services.KeycloakLoginCallbackService(
-    idp_provider=idp_provider,
-    jwt_handler=jwt_handler,
-    role_map=role_map
-)
-# ===============================
-#TODO to have this in separate auth_service
-# =====================
+## ===============================
+##TODO to have this in separate auth_service
+## =====================
+#idp_provider = idp_services.KeycloakIdPProvider(
+#    token_url=os.getenv("KEYCLOAK_TOKEN"),
+#    client_id=os.getenv("KEYCLOAK_CLIENT_ID"),
+#    client_secret=os.getenv("KEYCLOAK_CLIENT_SECRET")
+#)
+#
+#login_callback_service = idp_services.KeycloakLoginCallbackService(
+#    idp_provider=idp_provider,
+#    jwt_handler=jwt_handler,
+#    role_map=role_map
+#)
+## ===============================
+##TODO to have this in separate auth_service
+## =====================
 
 access_control = access_control_services.AccessControlService(
     jwt_handler=jwt_handler
@@ -190,12 +191,7 @@ def register_command_handlers():
             command=command,
             access_control=access_control,
             uow=repositories.DjangoOrderUnitOfWork()
-        ),
-        commands.LoginCallbackCommand: lambda command: handlers.handle_login_callback(
-            command=command,
-            uow=repositories.DjangoOrderUnitOfWork(),
-            login_callback_service=login_callback_service
-        ),
+        )
     })
 
 def register_query_handlers():

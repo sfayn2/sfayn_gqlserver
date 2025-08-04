@@ -1,10 +1,11 @@
 import jwt
 
 class JwtTokenHandler:
-    def __init__(self, public_key: str, issuer: str, audience: str):
+    def __init__(self, public_key: str, issuer: str, audience: str, algorithm: str):
         self.public_key = public_key
         self.issuer = issuer
         self.audience = audience
+        self.algorithm = algorithm
 
     def decode(self, token: str) -> dict:
 
@@ -15,7 +16,7 @@ class JwtTokenHandler:
             return jwt.decode(
                 token,
                 signing_key.key,
-                algorithms=["RS256"],
+                algorithms=[self.algorithm],
                 issuer=self.issuer,
                 audience=self.audience
             )
