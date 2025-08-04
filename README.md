@@ -14,24 +14,33 @@ This Project is currently under active development. Major changes are ongoing.
 ## Auth
 
 All APIs require a **valid JWT** (eg. from Keycloak).
+Use header: `Authorization: Bearer <your token>`
 **No token -> No access.**
+
+## Example flow
+1. **User logs in via Idp (e.g Keycloak)**
+2. **Frontend handles cart** (not API responsibility)
+3. **Use GraphQL to checkout and build order**
 
 ## API overview
 
 GraphQL mutations/queries available:
 
 ### Checkout flow
+
+> Run these APIs after the frontend cart is prepared:
+
 - [`checkoutItems](./mutations/checkout_items.graphql)
-- `addLineItem`
-- `removeLineItem`
-- `changeOrderQuantity`
+- `addLineItem`, `removeLineItem`, `changeOrderQuantity`
 - [`addCoupon`](./mutations/add_coupon.graphql)
-- `listShippingOptions`
-- [`selectShippingOption`](./mutations/selection_shipping_option.graphql)
 - `listCustomerAddresses`
 - [`changeDestination`](./mutations/change_destination.graphql)
+- `listShippingOptions`
+- [`selectShippingOption`](./mutations/selection_shipping_option.graphql)
 
 ### Order Lifecycle
+> Once ready, move the order through its lifecycle 
+
 - [`placeOrder` *(if draft order)*](./mutations/place_order.graphql)
 - [`confirmOrder` *(if pending payment)*](./mutations/confirm_order.graphql)
 - `cancelOrder` *(if pending/confirmed order)*
@@ -39,10 +48,6 @@ GraphQL mutations/queries available:
 - `addShippingTrackingReference` *(if shipped order)*
 - `markAsCompleted` *(if received)*
 
-## Example flow
-1. **User logs in via Idp (e.g Keycloak)**
-2. **Frontend handles cart** (not API responsibility)
-3. **Use GraphQL to checkout and build order**
 
 ## Installation 
 ```
