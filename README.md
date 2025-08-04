@@ -2,20 +2,111 @@
 
 [![Django CI](https://github.com/sfayn2/sfayn_gqlserver/actions/workflows/django.yml/badge.svg)](https://github.com/sfayn2/sfayn_gqlserver/actions/workflows/django.yml)
 
-# Order Management Context Based on DDD principles
+# Order Management API (DDD + GraphQL)
 
-* Focus on designing your own frontend Store Template
-* Django Admin to create your own Shop data (ex. Shop, Products, Order, Customer, etc.)
+This service provides secure, JWT-authentication GraphQL APIs to manage customer orders using Domain-Drive Design (DDD) principles
+
 
 ## Work in Progress
 This Project is currently under active development. Major changes are ongoing.
 
-![image](https://github.com/user-attachments/assets/a3aec50a-18bf-429a-b44e-8db93fd797d4)
+
+## Auth
+
+All APIs require a **valid JWT** (eg. from Keycloak)
+No token -> No access.
+
+## API overview
+
+GraphQL mutations/queries available:
+
+### Checkout flow
+- `checkoutItems`
+- `addLineItem`
+- `removeLineItem`
+- `changeOrderQuantity`
+- `addCoupon`
+- `listShippingOptions`
+- `selectShippingOption`
+- `listCustomerAddresses`
+- `changeDestination`
+
+### Order Lifecycle
+- `placeOrder` *(if draft order)*
+- `confirmOrder` *(if pending payment)*
+- `cancelOrder` *(if pending/confirmed order)*
+- `markAsShipped` *(if confirmed order)*
+- `addShippingTrackingReference` *(if shipped order)*
+- `markAsCompleted` *(if received)*
+
+## Example flow
+1. **User logs in via Idp (e.g Keycloak)**
+2. **Frontend handles cart** (not API responsibility)
+3. **Use GraphQL to checkout and build order**
+
+```graphql
+   mutation {
+  checkoutItems(input: {
+    customerId: "c-234",
+    vendorId: "v-234",
+     address: {
+    	street: "My street",
+      city: "City1",
+      state: "State1",
+      postal: "12345",
+      country: "Singapore"
+    }
+    productSkus:[
+      {
+        productSku: "T-SHIRT-L",
+        orderQuantity: 10
+      }
+    ]
+    
+  }) {
+    result {
+      success
+      message
+    }
+  }
+}
+
+mutation {
+  placeOrder(input: {
+    orderId: "ORD-AF29C5BA3036"
+  }) {
+    result {
+      message
+      success
+    } 
+  }
+}
+
+mutation {
+  confirmOrder(input: {
+    orderId: "ORD-FC8D8D9F",
+    transactionId: "2L633961FY072164Y",
+    method: "Paypal"
+  }) {
+result {
+      message
+      success
+    } 
+
+  }
 
 
-## Demo
-
-https://demo.josnin.dev/sfayn-gql/graphql/
+  mutation {
+  markAsShippedOrder(input: {
+    orderId: "ORD-AF29C5BA3036",
+}) {
+    result {
+      message
+      success
+    } 
+  }
+}
+```
 
 ## Installation 
 ```
