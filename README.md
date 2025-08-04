@@ -17,6 +17,21 @@ All APIs require a **valid JWT** (eg. from Keycloak).
 Use header: `Authorization: Bearer <your token>`
 **No token -> No access.**
 
+## User Sync Requirement
+
+if you're not using a shared [identity gateway](https://github.com/sfayn2/identity_gateway) to emit UserEventLoggedIn, you must sync the user manually to the Order system before calling GraphQL APIs.
+
+## Tenant Scoping
+
+Supports single-tenant or multi-tenant setups.
+All JWTs must inlude a tenant_id claims.
+
+* All orders, addresses, & line items are scoped by tenant_id
+* Prevents cross-tenant data access or leakage
+* Ensures isolation in multi-tenant Saas deployments
+
+> Even in single-tenant mode, tenant_id is required to ensure consistency and future proofing.
+
 ## Example flow
 1. **User logs in via Idp (e.g Keycloak)**
 2. **Frontend handles cart** (not API responsibility)
