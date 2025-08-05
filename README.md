@@ -37,7 +37,7 @@ This Project is currently under active development. Major changes are ongoing.
 
 ## User Sync Requirement
 
-- if using our [IDP Gateway](https://github.com/sfayn2/identity_gateway) to emit UserEventLoggedIn, users are **auto-synced**
+- if using our [IDP Gateway](https://github.com/sfayn2/identity_gateway) can emit UserEventLoggedInEvent, users are **auto-synced**
 - else, frontend must call [syncUser]() manually to the OMS before calling GraphQL Checkout/Order lifecycle flow APIs.
 
 
@@ -84,7 +84,7 @@ GraphQL mutations/queries available:
 * Select shipping via [listShippingOption]() & [selectShippingOption]()
 4. **Place Order**
 * Call placeOrder to persist the order
-5. **Payment + Fulfillment
+5. **Payment + Fulfillment**
 * After successfull payment, call [confirmOrder]()
 * Vendor then updates order via:
     * markAsShipped
@@ -98,13 +98,13 @@ GraphQL mutations/queries available:
 The OMS relies on local snapshot models for product, vendor, offer, shipping, and user-related data. These  snapshots are used for read consistency and calculated decisions at the time of checkout or order placement.
 
 ### Support snapshots
-- ProductSnapshot
+- VendorProductSnapshot
 - VendorDetailsSnapshot
-- VendorsCoupon
+- VendorCoupon
 - VendorOffersSnapshot
 - VendorShippingOptionsSnapshot
 - CustomerDetailsSnapshot
-- CustomerAddressSnap
+- CustomerAddressSnapshot
 
 > `CustomerDetailsSnapshot` and `CustomerAddressesSnapshot` can also be populated at the time of checkout, so external sync is optional.
 
@@ -112,8 +112,9 @@ The OMS relies on local snapshot models for product, vendor, offer, shipping, an
 
 1. **Seamless with our Ecosystem**
 This OMS API works out of the box with our:
-- Product Catalog
-- Vendor Registry (Offers & Shipping Options)
+- [catalog](https://github.com/sfayn2/catalog_service)
+- [vendor registry](https://github.com/sfayn2/vendor_registry)
+- [identify gateway](https://github.com/sfayn2/identity_gateway)
 
 Snapshots are automatically updated via internal event sync. No extra integration is required.
 
@@ -122,18 +123,11 @@ if you're using an external product or vendor catalog:
 - You must provide your own snapshot sync logic per tenant.
 - Supported strategies:
     - Custom backend sync service (by request)
-    - Event-driven updates?
-    - Frontend-initiated snapshot sync (e.g after login)
     - Manual CSV import (see below)
+    - Event-driven updates (via Webhook - TODO)
 
 3. **Manual Snapshot Import (by request)**
 For simpler onboarding or non-technical users, we support manual snapshot import via `.csv` upload on request.
-- Supports:
-    - ProductSnapshot
-    - VendorDetailsSnapshot
-    - VendorOffersSnapshot
-    - VendorsShippingOption
-    - VendorsCoupon
 
 > Ask us for CSV template formats to start importing your data manually.
 
@@ -142,14 +136,14 @@ To keep local snapshots consistent;
 
 - Emit change events from your systems:
     - ProductUpdatedEvent
-    - TBD
-- Register a webhook target with our API per tenant (Coming soon)
+    - VendorUpdatedEvent
+    - VendorOfferUpdatedEvent
+    - VendorShippingOptionUpdatedEvent
+- Register a webhook target with our API per tenant (TODO)
 
 ### User Snapshot Sync (Optional)
 - CustomerDetailsSnapshot and CustomerAddresses can be synced from:
-    - IDP gateway login callback (e.g. Keycloak)
-    - Manual frontend sync after login (TBD)
-    - Or directly populated during checkout  (recommended for minimal setup)
+    - Manual frontend sync during customerSelection or changeDestination (TODO)
 
 ## Installation 
 ```
