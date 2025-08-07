@@ -48,10 +48,11 @@ This Project is currently under active development. Major changes are ongoing.
 * Optionally call syncUser if not using out of the box [IDP gateway](https://github.com/sfayn2/identity_gateway)
 2. **Cart Management**
 * Frontend handles cart UX
-* When ready to checkout, call [checkoutItems](./mutations/checkout_items.graphql), [addLineItems](./mutations/add_line_items.graphql), [removeLineItems](./mutations/remove_line_items.graphql), or [changeOrderQuantity](./mutations/change_order_quantity.graphql).
+* Allow user to fill in customer details + address, When ready to checkout, call [checkoutItems](./mutations/checkout_items.graphql)
 3. **Checkout**
-* Fetch addresses ([listCustomerAddresses](./mutations/list_customer_addresses.graphql)) or provide new address.
-* Select destination via [changeDestination](./mutations/change_destination.graphql)
+* Add more items[addLineItems](./mutations/add_line_items.graphql), [removeLineItems](./mutations/remove_line_items.graphql), or Change product order quantity [changeOrderQuantity](./mutations/change_order_quantity.graphql).
+* Fetch addresses ([listCustomerAddresses](./mutations/list_customer_addresses.graphql))
+* Select destination from addresses (or provide new address) via [changeDestination](./mutations/change_destination.graphql).
 * Apply coupons via  [addCoupon](./mutations/add_coupon.graphql))
 * Select shipping via [listShippingOption](./mutations/list_shipping_option.graphql) & [selectShippingOption](./mutations/selection_shipping_option.graphql)
 4. **Place Order**
