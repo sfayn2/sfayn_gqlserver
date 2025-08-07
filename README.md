@@ -41,57 +41,29 @@ This Project is currently under active development. Major changes are ongoing.
 - else, frontend must call [syncUser]() manually to the OMS before calling GraphQL Checkout/Order lifecycle flow APIs.
 
 
-
-
-## GraphQL API overview
-
-GraphQL mutations/queries available:
-
-### Checkout flow
-
-> Run these APIs after the frontend cart is prepared:
-
-- [`checkoutItems](./mutations/checkout_items.graphql)
-- `addLineItem`, `removeLineItem`, `changeOrderQuantity`
-- [`addCoupon`](./mutations/add_coupon.graphql)
-- `listCustomerAddresses`
-- [`changeDestination`](./mutations/change_destination.graphql)
-- `listShippingOptions`
-- [`selectShippingOption`](./mutations/selection_shipping_option.graphql)
-
-### Order Lifecycle
-> Once ready, move the order through its lifecycle 
-
-- [`placeOrder`](./mutations/place_order.graphql)
-- [`confirmOrder`](./mutations/confirm_order.graphql)
-- `cancelOrder`
-- [`markAsShipped`](./mutations/mark_as_shipped.graphql)
-- `addShippingTrackingReference`
-- `markAsCompleted`
-
 ## Example flow
 1. **User Login**
 * Frontend logs in via IDP (e.g Keycloak)
 * Retrieve JWT
-* Optionally call syncUser if not using out of the box IDP gateway
+* Optionally call syncUser if not using out of the box [IDP gateway](https://github.com/sfayn2/identity_gateway)
 2. **Cart Management**
 * Frontend handles cart UX
-* When ready to checkout, call [checkoutItems]() and [addLineItems]().
+* When ready to checkout, call [checkoutItems](./mutations/checkout_items.graphql), [addLineItems](./mutations/add_line_items.graphql), [removeLineItems](./mutations/remove_line_items.graphql), or [changeOrderQuantity](./mutations/change_order_quantity.graphql).
 3. **Checkout**
-* Fetch addresses ([listCustomerAddresses]()) or provide new address.
-* Select destination via [changeDestination]()
-* Apply coupons via  [addCoupon]()
-* Select shipping via [listShippingOption]() & [selectShippingOption]()
+* Fetch addresses ([listCustomerAddresses](./mutations/list_customer_addresses.graphql)) or provide new address.
+* Select destination via [changeDestination](./mutations/change_destination.graphql)
+* Apply coupons via  [addCoupon](./mutations/add_coupon.graphql))
+* Select shipping via [listShippingOption](./mutations/list_shipping_option.graphql) & [selectShippingOption](./mutations/selection_shipping_option.graphql)
 4. **Place Order**
-* Call placeOrder to persist the order
+* Call [placeOrder](./mutations/place_order.graphql) to persist the order
 5. **Payment + Fulfillment**
-* After successfull payment, call [confirmOrder]()
+* After successfull payment, call [confirmOrder](./mutations/confirm_order.graphql)
 * Vendor then updates order via:
-    * markAsShipped
-    * addShippingTrackingReference
-    * markAsCompleted
+    * [markAsShipped](./mutations/mark_as_shipped.graphql)
+    * [addShippingTrackingReference](./mutations/add_shipping_tracking_reference.graphql)
+    * [markAsCompleted](./mutations/mark_as_completed.graphql)
 6. **Cancel Order**
-* Orders in PENDING or CONFIRMED can be cancelled via [cancelOrder]()
+* Orders in PENDING or CONFIRMED can be cancelled via [cancelOrder](./mutations/cancel_order.graphql)
 
 ## Snapshot Strategy
 
@@ -124,7 +96,7 @@ if you're using an external product or vendor catalog:
 - Supported strategies:
     - Custom backend sync service (by request)
     - Manual CSV import (see below)
-    - Event-driven updates (via Webhook - TODO)
+    - Event-driven updates (via Webhook)
 
 3. **Manual Snapshot Import (by request)**
 For simpler onboarding or non-technical users, we support manual snapshot import via `.csv` upload on request.
