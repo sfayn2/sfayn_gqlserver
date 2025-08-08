@@ -121,7 +121,7 @@ To keep local snapshots consistent
     > CustomerDetailsSnapshot and CustomerAddressesSnapshot can be synced from (Optional):
         - Manual frontend sync during checkoutItems or changeDestination
 
-    > OMS Webhook receiver setup is available by request, as different systems use diferent signature formats and authorization schems. A shared secret will be issued for secure integration
+    > Ask us to setup webhook support for your signature format. A shared secret will be issued for secure integration
 
 ## Installation 
 ```
