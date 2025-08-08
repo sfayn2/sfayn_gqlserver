@@ -84,24 +84,25 @@ The OMS relies on local snapshot models for product, vendor, offer, shipping, an
 
 > `CustomerDetailsSnapshot` and `CustomerAddressesSnapshot` can also be populated at the time of checkout, so external sync is optional.
 
+
 ### Integration Strategies
 
 1. **Seamless with our Ecosystem**
-This OMS API works out of the box with our:
-- [catalog](https://github.com/sfayn2/catalog_service)
-- [vendor registry](https://github.com/sfayn2/vendor_registry)
-- [webhook sender service](https://github.com/sfayn2/webhook_sender_service)
-- [identify gateway](https://github.com/sfayn2/identity_gateway)
+    This OMS API works out of the box with our:
+    - [catalog](https://github.com/sfayn2/catalog_service)
+    - [vendor registry](https://github.com/sfayn2/vendor_registry)
+    - [webhook sender service](https://github.com/sfayn2/webhook_sender_service)
+    - [identify gateway](https://github.com/sfayn2/identity_gateway)
 
 Snapshots are automatically updated via internal event sync. No extra integration is required.
 
 2. **External System Integration**
 if you're using an external product or vendor catalog:
-- You must provide your own snapshot sync logic per tenant.
-- Supported strategies:
-    - Custom backend sync service (by request)
-    - Manual CSV import (see below)
-    - Event-driven updates (using existing OMS webhook APIs handler)
+    - You must provide your own snapshot sync logic per tenant.
+    - Supported strategies:
+        - Custom backend sync service (by request)
+        - Manual CSV import (see below)
+        - Event-driven updates (using existing OMS webhook APIs handler)
 
 ### Manual Snapshot Import (by request)
 For simpler onboarding, we support manual snapshot import via `.csv` upload on request.
@@ -111,14 +112,16 @@ For simpler onboarding, we support manual snapshot import via `.csv` upload on r
 ### Webhooks & Eventing Guidance
 To keep local snapshots consistent
 
-- Emit Webhook change events from your systems and trigger the following our own OMS webhook APIs snapshot sync handler:
-    - [VendorProductSnapshot]()
-    - [VendorDetailsSnapshot]()
-    - [VendorCoupon]()
-    - [VendorOffersSnapshot]()
-    - [VendorShippingOptionsSnapshot]()
-    - CustomerDetailsSnapshot and CustomerAddressesSnapshot can be synced from (Optional):
-        - Manual frontend sync during [checkoutItems](./mutations/checkout_items.graphql) or [changeDestination](./mutations/change_destination.graphql)
+- Emit Webhook events from your upstream systems whenever relevant data changes and trigger OMS snapshot sync APIs by calling our webhook endpoints, which handle the updates internally.
+    - for ProductUpdatedEvent, send event to 
+    - for VendorUpdatedEvent, send event to
+    - for VendorOfferUpdatedEvent, send event to
+    - for VendorShippingOptionUpdatedEvent, send event to
+
+    > CustomerDetailsSnapshot and CustomerAddressesSnapshot can be synced from (Optional):
+        - Manual frontend sync during checkoutItems or changeDestination
+
+    > To request a webhook secret key, contact us or refer to integration documentation
 
 ## Installation 
 ```
