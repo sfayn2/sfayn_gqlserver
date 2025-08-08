@@ -13,11 +13,11 @@ A modular, single multi-tenant **Order Management System** built with **Domain D
 - Supports strong decoupling between bounded contexts (Snapshot Architecture)
 - Prevents cross-tenant data access or leakage
 - Ensures isolation in multi-tenant Saas deployments
-- Works out of the box with our [catalog](https://github.com/sfayn2/catalog_service), [vendor registry](https://github.com/sfayn2/vendor_registry), & [identify gateway](https://github.com/sfayn2/identity_gateway)
+- Works out of the box with our [catalog](https://github.com/sfayn2/catalog_service), [vendor registry](https://github.com/sfayn2/vendor_registry), [identify gateway](https://github.com/sfayn2/identity_gateway), & [webhook sender service](https://github.com/sfayn2/webhook_sender_service)
 - Supports snapshot sync from external systems or manual CSV import (by request)
 
 
-> OMS-agnostic: Can integrate with any system via snapshot sync.
+> OMS-agnostic: Can integrate with any system via snapshot sync and available webhooks APIs.
 
 
 ## Work in Progress
@@ -65,6 +65,8 @@ This Project is currently under active development. Major changes are ongoing.
     * [markAsCompleted](./mutations/mark_as_completed.graphql)
 6. **Cancel Order**
 * Orders in PENDING or CONFIRMED can be cancelled via [cancelOrder](./mutations/cancel_order.graphql)
+7. **View Order Details**
+* View Customer Order [getOrder](./mutations/get_order.graphql)
 
 ## Snapshot Strategy
 
@@ -78,6 +80,7 @@ The OMS relies on local snapshot models for product, vendor, offer, shipping, an
 - VendorShippingOptionsSnapshot
 - CustomerDetailsSnapshot
 - CustomerAddressSnapshot
+- UserAuthorizationSnapshot
 
 > `CustomerDetailsSnapshot` and `CustomerAddressesSnapshot` can also be populated at the time of checkout, so external sync is optional.
 
@@ -87,6 +90,7 @@ The OMS relies on local snapshot models for product, vendor, offer, shipping, an
 This OMS API works out of the box with our:
 - [catalog](https://github.com/sfayn2/catalog_service)
 - [vendor registry](https://github.com/sfayn2/vendor_registry)
+- [webhook sender service](https://github.com/sfayn2/webhook_sender_service)
 - [identify gateway](https://github.com/sfayn2/identity_gateway)
 
 Snapshots are automatically updated via internal event sync. No extra integration is required.
@@ -97,26 +101,24 @@ if you're using an external product or vendor catalog:
 - Supported strategies:
     - Custom backend sync service (by request)
     - Manual CSV import (see below)
-    - Event-driven updates (via Webhook)
+    - Event-driven updates (using existing OMS webhook APIs handler)
 
-3. **Manual Snapshot Import (by request)**
-For simpler onboarding or non-technical users, we support manual snapshot import via `.csv` upload on request.
+### Manual Snapshot Import (by request)
+For simpler onboarding, we support manual snapshot import via `.csv` upload on request.
 
 > Ask us for CSV template formats to start importing your data manually.
 
 ### Webhooks & Eventing Guidance
-To keep local snapshots consistent;
+To keep local snapshots consistent
 
-- Emit change events from your systems:
-    - ProductUpdatedEvent
-    - VendorUpdatedEvent
-    - VendorOfferUpdatedEvent
-    - VendorShippingOptionUpdatedEvent
-- Register a webhook target with our API per tenant (TODO)
-
-### User Snapshot Sync (Optional)
-- CustomerDetailsSnapshot and CustomerAddresses can be synced from:
-    - Manual frontend sync during customerSelection or changeDestination (TODO)
+- Emit Webhook change events from your systems and trigger the following our own OMS webhook APIs snapshot sync handler:
+    - [VendorProductSnapshot]()
+    - [VendorDetailsSnapshot]()
+    - [VendorCoupon]()
+    - [VendorOffersSnapshot]()
+    - [VendorShippingOptionsSnapshot]()
+    - CustomerDetailsSnapshot and CustomerAddressesSnapshot can be synced from (Optional):
+        - Manual frontend sync during [checkoutItems](./mutations/checkout_items.graphql) or [changeDestination](./mutations/change_destination.graphql)
 
 ## Installation 
 ```
