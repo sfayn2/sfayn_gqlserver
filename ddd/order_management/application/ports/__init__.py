@@ -12,3 +12,4 @@ from .customer_snapshot_abstract import CustomerSnapshotAbstract
 from .snapshot_sync_service_abstract import SnapshotSyncServiceAbstract
 from .idp_callback_service_abstract import IdPLoginCallbackServiceAbstract
 from .access_control_service_abstract import AccessControlServiceAbstract
+from .webhook_signature_verifier_abstract import WebhookSignatureVerifier
