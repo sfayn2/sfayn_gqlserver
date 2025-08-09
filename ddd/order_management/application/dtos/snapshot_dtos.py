@@ -57,10 +57,10 @@ class VendorProductSnapshotDTO(BaseModel):
     product_price: Decimal
     stock: int
     product_currency: str
-    package_weight: Decimal
-    package_length: int
-    package_width: int
-    package_height: int
+    package_weight: Decimal = Field(alias="package_weight_kg")
+    package_length_cm: int = Field(alias="package_length_cm")
+    package_width_cm: int = Field(alias="package_width_cm")
+    package_height_cm: int = Field(alias="package_height_cm")
     is_active: bool
 
 class CustomerDetailsSnapshotDTO(BaseModel):

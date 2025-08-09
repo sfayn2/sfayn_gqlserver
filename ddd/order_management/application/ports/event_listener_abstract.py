@@ -1,7 +1,9 @@
 from __future__ import annotations
+import uuid
 from abc import ABC, abstractmethod
 
-#Snapshot from external event payloads
-class SnapshotSyncServiceAbstract(ABC):
-    def sync(self, event):
+class EventListenerAbstract(ABC):
+
+    @abstractmethod
+    def listen(event):
         raise NotImplementedError("Subclasses must implement this method")

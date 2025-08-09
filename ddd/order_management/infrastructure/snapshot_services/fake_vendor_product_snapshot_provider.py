@@ -23,10 +23,10 @@ class FakeVendorProductSnapshotProvider(ports.VendorProductSnapshotAbstract):
                 product_price=Decimal("1.5"),
                 stock=10,
                 product_currency="SGD",
-                package_weight=Decimal("2.1"),
-                package_length=10,
-                package_width=10,
-                package_height=10,
+                package_weight_kg=Decimal("2.1"),
+                package_length_cm=10,
+                package_width_cm=10,
+                package_height_cm=10,
                 is_active=True
             )
         ]

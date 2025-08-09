@@ -1,5 +1,6 @@
 import redis
 import json
+from ddd.order_management.application import ports
 from ddd.order_management.infrastructure.event_bus import ASYNC_EVENT_HANDLERS
 
 # =================
@@ -13,7 +14,8 @@ from ddd.order_management.infrastructure.event_bus import ASYNC_EVENT_HANDLERS
 
 # ===========
 # To consumer any stream service 
-class RedisStreamListener:
+
+class RedisStreamListener(ports.EventListenerAbstract):
     def __init__(self, stream_name: str, consumer_name: str, group_name: str = "order_management_service"):
         self.redis_client = redis.Redis.from_url('redis://localhost:6379', decode_responses=True)
         self.group_name = group_name

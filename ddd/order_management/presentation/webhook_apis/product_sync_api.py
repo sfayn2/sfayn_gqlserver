@@ -14,7 +14,7 @@ def product_sync_api(request, provider: str, tenant_id: str):
     try:
         payload = webhook_validate(provider, tenant_id, request)
         
-        command = commands.ProductSyncCommand.model_validate(payload)
+        command = commands.PublishProductUpdateCommand.model_validate(payload)
         result = message_bus.handle(command)
         return JsonResponse(result, status=200)
     except Exception:

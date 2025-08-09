@@ -7,7 +7,7 @@ class DjangoCustomerSnapshotSyncService(ports.SnapshotSyncServiceAbstract):
     #    self.customer_provider = customer_provider
 
     def sync(self, event: dtos.UserLoggedInIntegrationEvent):
-        django_snapshots.CustomerDetailsSnapshot.objects.filter(user_id=event.sub).delete()
+        django_snapshots.CustomerDetailsSnapshot.objects.filter(tenant_id=event.tenant_id, user_id=event.sub).delete()
         django_snapshots.CustomerDetailsSnapshot.objects.create(
             customer_id=event.sub,
             user_id=event.sub,

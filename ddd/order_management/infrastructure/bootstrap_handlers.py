@@ -10,7 +10,8 @@ from ddd.order_management.infrastructure import (
     payment_services,
     idp_services,
     access_control_services,
-    snapshot_services
+    snapshot_services,
+    redis_services
 )
 from ddd.order_management.application import handlers
 from ddd.order_management.application.handlers import event_handlers
@@ -30,6 +31,8 @@ role_map = {
     "vendor": ["mark_as_shipped", "add_shipping_tracking_reference", "mark_as_completed"]
 }
 
+
+
 jwt_handler = access_control_services.JwtTokenHandler(
     public_key=os.getenv("KEYCLOAK_PUBLIC_KEY"),
     issuer=os.getenv("KEYCLOAK_ISSUER"),
@@ -38,32 +41,16 @@ jwt_handler = access_control_services.JwtTokenHandler(
 )
 
 
-## ===============================
-##TODO to have this in separate auth_service
-## =====================
-#idp_provider = idp_services.KeycloakIdPProvider(
-#    token_url=os.getenv("KEYCLOAK_TOKEN"),
-#    client_id=os.getenv("KEYCLOAK_CLIENT_ID"),
-#    client_secret=os.getenv("KEYCLOAK_CLIENT_SECRET")
-#)
-#
-#login_callback_service = idp_services.KeycloakLoginCallbackService(
-#    idp_provider=idp_provider,
-#    jwt_handler=jwt_handler,
-#    role_map=role_map
-#)
-## ===============================
-##TODO to have this in separate auth_service
-## =====================
-
 access_control = access_control_services.AccessControlService(
     jwt_handler=jwt_handler
 )
 
+PRODUCT_EVENT_STREAM = "stream.events.ProductUpdate"
+
 def register_async_event_handlers():
     event_bus.ASYNC_EVENT_HANDLERS.update({
         "identity_gateway_service.events.UserLoggedInEvent": [
-                lambda event: handlers.handle_user_logged_in(
+                lambda event: handlers.handle_user_logged_in_async_event(
                     event=event,
                     auth_sync=snapshot_services.DjangoUserAuthorizationSnapshotSyncService(role_map),
                     customer_sync=snapshot_services.DjangoCustomerSnapshotSyncService()
@@ -191,6 +178,10 @@ def register_command_handlers():
             command=command,
             access_control=access_control,
             uow=repositories.DjangoOrderUnitOfWork()
+        )
+        commands.PublishProductUpdateCommand: lambda command: handlers.handle_product_update(
+            command=command,
+            product_update_publisher=redis_services.RedisStreamPublisher(stream_name=PRODUCT_UPDATE_STREAM_NAME)
         )
     })
 

@@ -25,5 +25,5 @@ from .snapshot_dtos import (
     CustomerAddressSnapshotDTO,
 )
 
-from .idp_dtos import IdPTokenDTO
-from .auth_integration_events import UserLoggedInIntegrationEvent
+from .integration_events.auth_integration_events import UserLoggedInIntegrationEvent
+from .integration_events.product_integration_events import ProductUpdateIntegrationEvent

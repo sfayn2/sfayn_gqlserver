@@ -7,9 +7,10 @@ from ddd.order_management.application import (
 from ddd.order_management.domain import events, exceptions
 
 #Async handler
-def handle_user_logged_in(
+def handle_user_logged_in_async_event(
     event: dtos.UserLoggedInIntegrationEvent,
-    auth_sync: ports.SnapshotSyncServiceAbstract
+    auth_sync: ports.SnapshotSyncServiceAbstract,
+    customer_sync: ports.SnapshotSyncServiceAbstract
 ):
 
     try:
@@ -20,8 +21,6 @@ def handle_user_logged_in(
     auth_sync.sync(event_payloads)
     if "customer" in event_payloads.roles:
         customer_sync.sync(event_payloads)
-    #if "vendor" in event_payloads.roles:
-    #    vendor_sync.sync(event_payloads)
 
 
     print(f"User has been logged in {event_payloads}")

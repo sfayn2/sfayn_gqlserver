@@ -8,12 +8,12 @@ def run_vendor_offer_snapshot_sync():
     
     print("Vendor offer snapshot synced.")
 
-def run_vendor_product_snapshot_sync():
-    provider = snapshot_services.FakeVendorProductSnapshotProvider()
-    django_vendor_offer_snapshot = snapshot_services.DjangoVendorProductSnapshotSyncService(provider)
-    django_vendor_offer_snapshot.sync()
-
-    print("Vendor product snapshot synced.")
+#def run_vendor_product_snapshot_sync():
+#    provider = snapshot_services.FakeVendorProductSnapshotProvider()
+#    django_vendor_offer_snapshot = snapshot_services.DjangoVendorProductSnapshotSyncService(provider)
+#    django_vendor_offer_snapshot.sync()
+#
+#    print("Vendor product snapshot synced.")
 
 def run_vendor_shippingoptions_snapshot_sync():
     provider = snapshot_services.FakeVendorShippingOptionSnapshotProvider()
@@ -25,5 +25,5 @@ def run_vendor_shippingoptions_snapshot_sync():
 
 def run_all_snapshot_sync():
     run_vendor_offer_snapshot_sync()
-    run_vendor_product_snapshot_sync()
+    #run_vendor_product_snapshot_sync()
     run_vendor_shippingoptions_snapshot_sync()
