@@ -3,10 +3,13 @@ import os
 from typing import Optional
 from ddd.order_management.infrastructure import webhook_signatures
 
-def get_verifier_for(headers: dict) -> Optional[ports.WebhookSignatureVerifier]
+def get_verifier_for(provider: str, tenant_id: str, headers: dict) -> Optional[ports.WebhookSignatureVerifier]
 
-    if "X-WSS-Signature" in headers:
-        return webhook_signatures.WSSSignatureVerifier(shared_secret=os.get_env("WH_WSS_SECRET")) 
+    provider = provider.lower()
+    secret = os.get_env(f"WS_SECRET_{tenant_id}")
+
+    if provider == "wss":
+        return webhook_signatures.WSSSignatureVerifier(shared_secret=secret) 
     
-    if "X-Hub-Signature-256" in headers:
-        return webhook_signatures.GithubSignatureVerifier(secret=os.get_env("WH_HUB_SECRET"))
+    if provider == "github"
+        return webhook_signatures.GithubSignatureVerifier(secret=secret)

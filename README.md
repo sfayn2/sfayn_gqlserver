@@ -4,7 +4,7 @@
 
 # Order Management API (DDD + GraphQL + JWT-secured)
 
-A modular, single multi-tenant **Order Management System** built with **Domain Driven Design (DDD)**. Designed to plug into any product catalog, vendor registry, or identity provider.
+A modular, multi-tenant **Order Management System** built with **Domain Driven Design (DDD)**. Designed to plug into any product catalog, vendor registry, or identity provider.
 
 ## Key Features
 - Full checkout + order lifecycle
@@ -113,15 +113,11 @@ For simpler onboarding, we support manual snapshot import via `.csv` upload on r
 To keep local snapshots consistent
 
 - Emit Webhook events from your upstream systems whenever relevant data changes and trigger OMS snapshot sync APIs by calling our webhook endpoints, which handle the updates internally.
-    - for ProductUpdatedEvent, send event to 
-    - for VendorUpdatedEvent, send event to
-    - for VendorOfferUpdatedEvent, send event to
-    - for VendorShippingOptionUpdatedEvent, send event to
 
     > CustomerDetailsSnapshot and CustomerAddressesSnapshot can be synced from (Optional):
         - Manual frontend sync during checkoutItems or changeDestination
 
-    > Ask us to setup webhook support for your signature format. A shared secret will be issued for secure integration
+    > Ask us to setup webhook support for your signature calculation method. Also shared secret will be issued for secure integration
 
 ## Installation 
 ```
