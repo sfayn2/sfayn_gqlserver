@@ -16,9 +16,9 @@ def product_sync_api(request, provider: str, tenant_id: str):
         
         command = commands.ProductSyncCommand.model_validate(payload)
         result = message_bus.handle(command)
+        return JsonResponse(result, status=200)
     except Exception:
-        return JsonResponse({"status": Failed, "message": "Invalid webhook request"}, status=400)
+        return JsonResponse({"message": "Invalid webhook request"}, status=500)
 
 
-    return JsonResponse(**result)
 

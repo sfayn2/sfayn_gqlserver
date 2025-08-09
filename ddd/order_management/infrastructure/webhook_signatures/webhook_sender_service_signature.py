@@ -10,7 +10,6 @@ class WSSSignatureVerifier(ports.WebhookSignatureVerifier):
     def verify(self, headers, body) -> bool:
         signature = headers.get("X-WSS-Signature", "")
         timestamp = headers.get("X-WSS-Timestamp", "") #to protect from replay
-
         if not signature or not timestamp:
             return False
 
@@ -24,7 +23,11 @@ class WSSSignatureVerifier(ports.WebhookSignatureVerifier):
 
         # recompute signature
         message = f"{timestamp}.{body.decode()}".encode()
-        expected = hmac.new(self.secret, message, hashlib.sha256).hexdigest()
+        expected = hmac.new(
+            self.secret, 
+            f"{timestamp}.{body.decode()}".encode(),
+            hashlib.sha256
+        ).hexdigest()
 
         return hmac.compare_digest(f"sha256={expected}", signature)
 
