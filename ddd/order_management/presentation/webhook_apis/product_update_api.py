@@ -6,7 +6,7 @@ from ddd.order_management.application import (
 from ddd.order_management.presentation.webhook_apis import webhook_validate
 
 @csrf_exempt
-def product_sync_api(request, provider: str, tenant_id: str):
+def product_update_api(request, provider: str, tenant_id: str):
 
     if request.method != "POST":
         return HttpResponseBadRequest("Only POST is allowed")
