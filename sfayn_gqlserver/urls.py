@@ -21,7 +21,6 @@ from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 from django.urls import re_path
 from django.views.static import serve
-from ddd.order_management.presentation import django_rest_views
 
 
 urlpatterns = [

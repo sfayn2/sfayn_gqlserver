@@ -12,7 +12,7 @@ from .change_destination import handle_change_destination
 from .change_order_quantity import handle_change_order_quantity
 from .add_line_items import handle_add_line_items
 from .remove_line_items import handle_remove_line_items
-from .login_callback import handle_login_callback
+from .publish_product_update import handle_publish_product_update
 
 # Queries
 from .get_order import handle_get_order
@@ -26,8 +26,8 @@ from .event_handlers.email_canceled_order import handle_email_canceled_order
 from .event_handlers.log_order import handle_logged_order
 
 # Async Events via Redis stream
-from .external_event_handlers.user_logged_in_async_event import handle_user_logged_in_async_event
-from .external_event_handlers.product_update_async_event import handle_product_update_async_event
+from .event_handlers.user_logged_in_async_event import handle_user_logged_in_async_event
+from .event_handlers.product_update_async_event import handle_product_update_async_event
 
 
 

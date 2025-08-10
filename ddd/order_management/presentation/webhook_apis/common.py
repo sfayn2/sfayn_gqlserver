@@ -2,7 +2,7 @@ from ddd.order_management.infrastructure import webhook_signatures
 
 def validate_webhook(provider, tenant_id, request):
     verifier = webhook_signatures.get_verifier_for(provider, tenant_id, request.headers)
-    if not verifier
+    if not verifier:
         raise Exception(f"No verifier found for provider {provider}")
 
     if not verifier.verify(request.headers, request.body):

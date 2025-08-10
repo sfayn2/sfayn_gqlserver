@@ -1,5 +1,5 @@
-import os
-from dotenv import load_dotenv
+import os, redis
+from dotenv import load_dotenv, find_dotenv
 from ddd.order_management.domain import events, services as domain_services
 from ddd.order_management.infrastructure import (
     event_bus, 
@@ -8,7 +8,6 @@ from ddd.order_management.infrastructure import (
     logging_services,
     repositories,
     payment_services,
-    idp_services,
     access_control_services,
     snapshot_services,
     redis_services
@@ -18,12 +17,13 @@ from ddd.order_management.application.handlers import event_handlers
 
 from ddd.order_management.application import commands, message_bus, queries
 
-load_dotenv(".env.test")
+load_dotenv(find_dotenv(filename=".env.test"))
+#load_dotenv()
 
 #Depending on the framework arch this might be inside manage.py , app.py, or main.py ?
 #if project grows, breakdown handlers by feature
 
-role_map = {
+ROLE_MAP = {
     "customer": ["checkout_items", "add_line_items", "remove_line_items", 
     "add_coupon", "remove_coupon", "change_destination", "change_order_quantity", 
     "select_shipping_option", "list_shipping_options", "list_customer_addresses"
@@ -45,24 +45,45 @@ access_control = access_control_services.AccessControlService(
     jwt_handler=jwt_handler
 )
 
-PRODUCT_EVENT_STREAM = "stream.events.ProductUpdate"
 
-def register_async_event_handlers():
-    event_bus.ASYNC_EVENT_HANDLERS.update({
-        "identity_gateway_service.events.UserLoggedInEvent": [
+#Redis internal system
+REDIS_CLIENT = redis.Redis.from_url(os.getenv("REDIS_URL"), decode_responses=True)
+REDIS_INTERNAL_STREAM = "stream.internal.order_management"
+
+#publish to external redis? 
+REDIS_EXTERNAL_CLIENT = redis.Redis.from_url(os.getenv("REDIS_EXTERNAL_URL"), decode_responses=True)
+REDIS_EXTERNAL_STREAM = "stream.external.order_management"
+
+
+# Async Event from External system
+def register_async_external_event_handlers():
+    event_bus.ASYNC_EXTERNAL_EVENT_HANDLERS.update({
+        "identity_gateway_service.external_events.UserLoggedInEvent": [
                 lambda event: handlers.handle_user_logged_in_async_event(
                     event=event,
-                    auth_sync=snapshot_services.DjangoUserAuthorizationSnapshotSyncService(role_map),
+                    auth_sync=snapshot_services.DjangoUserAuthorizationSnapshotSyncService(ROLE_MAP),
                     customer_sync=snapshot_services.DjangoCustomerSnapshotSyncService()
                 ),
             ],
-        "product_catalog.events.ProductUpdatedEvent": [],
-        "vendor_registry.events.VendorUpdatedEvent":[],
-        "vendor_registry.events.VendorOfferUpdatedEvent":[],
-        "vendor_registry.events.VendorShippingOptionUpdatedEvent":[]
+        "product_catalog.external_events.ProductUpdatedEvent": [],
+        "vendor_registry.external_events.VendorUpdatedEvent":[],
+        "vendor_registry.external_events.VendorOfferUpdatedEvent":[],
+        "vendor_registry.external_events.VendorShippingOptionUpdatedEvent":[]
     })
 
 
+# Async Event from Internal system
+def register_async_internal_event_handlers():
+    event_bus.ASYNC_INTERNAL_EVENT_HANDLERS.update({
+        "product_catalog.internal_events.ProductUpdatedEvent": [
+            lambda event: handlers.handle_product_update_async_event(
+                event=event,
+                product_sync=snapshot_services.DjangoVendorProductSnapshotSyncService()
+            ),
+        ],
+    })
+
+# Sync Event from Internal
 def register_event_handlers():
     event_bus.EVENT_HANDLERS.update({
         "order_management.events.CanceledOrderEvent": [
@@ -178,10 +199,10 @@ def register_command_handlers():
             command=command,
             access_control=access_control,
             uow=repositories.DjangoOrderUnitOfWork()
-        )
-        commands.PublishProductUpdateCommand: lambda command: handlers.handle_product_update(
+        ),
+        commands.PublishProductUpdateCommand: lambda command: handlers.handle_publish_product_update(
             command=command,
-            product_update_publisher=redis_services.RedisStreamPublisher(stream_name=PRODUCT_UPDATE_STREAM_NAME)
+            event_publisher=redis_services.RedisStreamPublisher(redis_client=REDIS_CLIENT, stream_name=REDIS_INTERNAL_STREAM)
         )
     })
 
@@ -206,7 +227,8 @@ def register_query_handlers():
 
 def register():
     register_event_handlers()
-    register_async_event_handlers()
+    register_async_internal_event_handlers()
+    register_async_external_event_handlers()
 
     register_command_handlers()
     register_query_handlers()

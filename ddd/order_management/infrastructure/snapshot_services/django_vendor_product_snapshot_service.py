@@ -1,5 +1,6 @@
 from __future__ import annotations
 from order_management import models as django_snapshots
+from ddd.order_management.application import ports
 
 
 #class DjangoVendorProductSnapshotSyncService:

@@ -85,4 +85,4 @@ class WebhookReceiverCommand(BaseModel, frozen=True):
 #    "data": { ... }
 # }
 class PublishProductUpdateCommand(WebhookReceiverCommand):
-    data: dtos.ProductSnapshotDTO
+    data: dtos.VendorProductSnapshotDTO

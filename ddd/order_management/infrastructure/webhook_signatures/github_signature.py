@@ -8,7 +8,7 @@ class GithubSignatureVerifier(ports.WebhookSignatureVerifier):
     def verify(self, headers, body) -> bool:
         signature = headers.get("X-Hub-Signature-256", "")
 
-        if not signature.startswith("sha256=")
+        if not signature.startswith("sha256="):
             return False
 
         expected = hmac.new(self.secret, body, hashlib.sha256).hexdigest()

@@ -1,7 +1,8 @@
 import redis
 import json
+from typing import List, Dict
 from ddd.order_management.application import ports
-from ddd.order_management.infrastructure.event_bus import ASYNC_EVENT_HANDLERS
+#from ddd.order_management.infrastructure.event_bus import ASYNC_EVENT_HANDLERS
 
 # =================
 # To Consume Auth Service Logged In user
@@ -16,11 +17,13 @@ from ddd.order_management.infrastructure.event_bus import ASYNC_EVENT_HANDLERS
 # To consumer any stream service 
 
 class RedisStreamListener(ports.EventListenerAbstract):
-    def __init__(self, stream_name: str, consumer_name: str, group_name: str = "order_management_service"):
-        self.redis_client = redis.Redis.from_url('redis://localhost:6379', decode_responses=True)
+    def __init__(self, redis_client: redis.Redis, stream_name: str, consumer_name: str, group_name: str = "order_management_service", event_handlers: Dict[str, List] = {}):
+        #self.redis_client = redis.Redis.from_url('redis://localhost:6379', decode_responses=True)
+        self.redis_client = redis_client
         self.group_name = group_name
         self.consumer_name = consumer_name
         self.stream_name = stream_name
+        self.event_handlers = event_handlers
         self._ensure_group()
 
     def _ensure_group(self):
@@ -45,7 +48,8 @@ class RedisStreamListener(ports.EventListenerAbstract):
                 for msg_id, event in events:
                     event_type = event.get("event_type")
 
-                    handlers = ASYNC_EVENT_HANDLERS.get(event_type, [])
+                    #handlers = ASYNC_EVENT_HANDLERS.get(event_type, [])
+                    handlers = event_handlers.get(event_type, [])
                     if handlers:
                         for handler in handlers:
                             event["roles"] = json.loads(event["roles"])
