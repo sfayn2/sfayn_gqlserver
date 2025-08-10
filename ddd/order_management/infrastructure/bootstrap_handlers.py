@@ -47,7 +47,7 @@ access_control = access_control_services.AccessControlService(
 
 
 #Redis internal system
-REDIS_CLIENT = redis.Redis.from_url(os.getenv("REDIS_INTERNAL_URL"), decode_responses=True)
+REDIS_INTERNAL_CLIENT = redis.Redis.from_url(os.getenv("REDIS_INTERNAL_URL"), decode_responses=True)
 REDIS_INTERNAL_STREAM = os.getenv("REDIS_INTERNAL_STREAM")
 
 
