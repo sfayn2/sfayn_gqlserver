@@ -47,15 +47,9 @@ access_control = access_control_services.AccessControlService(
 
 
 #Redis internal system
-REDIS_CLIENT = redis.Redis.from_url(os.getenv("REDIS_URL"), decode_responses=True)
-REDIS_INTERNAL_STREAM = "stream.internal.order_management"
+REDIS_CLIENT = redis.Redis.from_url(os.getenv("REDIS_INTERNAL_URL"), decode_responses=True)
+REDIS_INTERNAL_STREAM = os.getenv("REDIS_INTERNAL_STREAM")
 
-#publish to external redis? 
-REDIS_EXTERNAL_CLIENT = redis.Redis.from_url(os.getenv("REDIS_EXTERNAL_URL"), decode_responses=True)
-REDIS_EXTERNAL_STREAM = os.getenv("REDIS_EXTERNAL_STREAM")
-
-#TODO optionally select which event typ to expose?
-EXTERNAL_EVENT_TYPE_WHITELIST = []
 
 
 # Async Event from External system
@@ -205,7 +199,7 @@ def register_command_handlers():
         ),
         commands.PublishProductUpdateCommand: lambda command: handlers.handle_publish_product_update(
             command=command,
-            event_publisher=redis_services.RedisStreamPublisher(redis_client=REDIS_CLIENT, stream_name=REDIS_INTERNAL_STREAM)
+            event_publisher=redis_services.RedisStreamPublisher(redis_client=REDIS_INTERNAL_CLIENT, stream_name=REDIS_INTERNAL_STREAM)
         )
     })
 
