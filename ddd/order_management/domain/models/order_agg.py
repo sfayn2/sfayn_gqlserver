@@ -120,6 +120,7 @@ class Order:
         self._update_modified_date()
 
         event = events.PlacedOrderEvent(
+            tenant_id=self.tenant_id,
             order_id=self.order_id,
             order_status=self.order_status,
         )
@@ -154,6 +155,7 @@ class Order:
         self._update_modified_date()
 
         event = events.ConfirmedOrderEvent(
+            tenant_id=self.tenant_id,
             order_id=self.order_id,
             order_status=self.order_status,
         )
@@ -181,6 +183,7 @@ class Order:
         self._update_modified_date()
 
         event = events.AppliedOffersEvent(
+            tenant_id=self.tenant_id,
             order_id=self.order_id,
             order_status=self.order_status,
         )
@@ -220,6 +223,7 @@ class Order:
         self._update_modified_date()
 
         event = events.AppliedTaxesEvent(
+            tenant_id=self.tenant_id,
             order_id=self.order_id,
             order_status=self.order_status,
         )
@@ -241,6 +245,7 @@ class Order:
         self._update_modified_date()
 
         event = events.ShippedOrderEvent(
+            tenant_id=self.tenant_id,
             order_id=self.order_id,
             order_status=self.order_status,
         )
@@ -254,6 +259,7 @@ class Order:
         self._update_modified_date()
 
         event = events.CheckedOutEvent(
+            tenant_id=self.tenant_id,
             order_id=self.order_id,
             order_status=self.order_status,
         )
@@ -270,6 +276,7 @@ class Order:
         self._update_modified_date()
 
         event = events.CanceledOrderEvent(
+            tenant_id=self.tenant_id,
             order_id=self.order_id,
             order_status=self.order_status,
         )
@@ -293,6 +300,7 @@ class Order:
         self._update_modified_date()
 
         event = events.CompletedOrderEvent(
+            tenant_id=self.tenant_id,
             order_id=self.order_id,
             order_status=self.order_status,
         )
@@ -325,6 +333,7 @@ class Order:
         self._update_modified_date()
 
         event = events.AppliedCouponEvent(
+            tenant_id=self.tenant_id,
             order_id=self.order_id,
             order_status=self.order_status,
         )
@@ -341,6 +350,7 @@ class Order:
         self._update_modified_date()
 
         event = events.RemovedCouponEvent(
+            tenant_id=self.tenant_id,
             order_id=self.order_id,
             order_status=self.order_status,
         )
@@ -356,6 +366,7 @@ class Order:
         self._update_modified_date()
 
         event = events.ChangedDestinationEvent(
+            tenant_id=self.tenant_id,
             order_id=self.order_id,
             order_status=self.order_status,
         )
@@ -370,6 +381,7 @@ class Order:
                 self.update_shipping_details(option)
 
                 event = events.SelectedShippingOptionEvent(
+                    tenant_id=self.tenant_id,
                     order_id=self.order_id,
                     order_status=self.order_status,
                 )

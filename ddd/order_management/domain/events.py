@@ -9,6 +9,7 @@ if TYPE_CHECKING:
     from ddd.order_management.domain import models
 
 class DomainEvent(ABC):
+    tenant_id: str
 
     def event_type(self) -> str:
         return f"order_management.events.{self.__class__.__name__}"

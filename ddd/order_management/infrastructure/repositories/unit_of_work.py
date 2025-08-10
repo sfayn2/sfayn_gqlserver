@@ -12,6 +12,8 @@ class DjangoOrderUnitOfWork(repositories.UnitOfWorkAbstract):
         self.vendor = impl_repositories.DjangoVendorRepositoryImpl()
 
         self.event_publisher = event_bus
+
+
         self._events = []
 
     def __enter__(self):
@@ -48,5 +50,6 @@ class DjangoOrderUnitOfWork(repositories.UnitOfWorkAbstract):
         for event in self._events:
             print(f"Publish event : {event}")
             self.event_publisher.publish(event, self)
+
     
 

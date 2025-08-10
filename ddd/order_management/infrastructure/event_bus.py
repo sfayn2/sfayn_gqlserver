@@ -1,12 +1,12 @@
 from __future__ import annotations
+import redis
 from typing import Dict, List
 from ddd.order_management.domain import events, repositories
 from ddd.order_management.infrastructure import redis_services
 
-#TODO: make sure bootstrap.py is called upfront to register event handlers(ex. apps.py? )
+#Note: make sure bootstrap.py is called upfront to register event handlers(ex. apps.py? )
 EVENT_HANDLERS: Dict[str, List] = {}
-ASYNC_INTERNAL_EVENT_HANDLERS: Dict[str, List] = {}
-ASYNC_EXTERNAL_EVENT_HANDLERS: Dict[str, List] = {}
+
 
 def publish(event: events.DomainEvent, uow: UnitOfWorkAbstract, **dependencies):
     # handle the synchronous event locally by triggering event handlers
@@ -14,6 +14,15 @@ def publish(event: events.DomainEvent, uow: UnitOfWorkAbstract, **dependencies):
     for handler in handlers:
         handler(event, uow, **dependencies)
 
-    # TODO publish async event for external handler?
-    #redis_event_publish(event=event, uow=uow)
-    #redis_services.redis_stream_publisher.publish_event(event=event)
+    # TODO is this the correct place?
+    # external async event publisher
+    external_event_publisher = redis_services.RedisStreamPublisher(
+        redis_client=redis.Redis.from_url(os.getenv("REDIS_EXTERNAL_URL"), decode_responses=True),
+        stream_name=os.getenv("REDIS_EXTERNAL_STREAM")
+    )
+
+    external_event_publisher.publish({
+        "event_type": event.event_type(),
+        **event.to_dict()
+    })
+

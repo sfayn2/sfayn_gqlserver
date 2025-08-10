@@ -52,7 +52,7 @@ REDIS_INTERNAL_STREAM = "stream.internal.order_management"
 
 #publish to external redis? 
 REDIS_EXTERNAL_CLIENT = redis.Redis.from_url(os.getenv("REDIS_EXTERNAL_URL"), decode_responses=True)
-REDIS_EXTERNAL_STREAM = "stream.external.order_management"
+REDIS_EXTERNAL_STREAM = os.getenv("REDIS_EXTERNAL_STREAM")
 
 
 # Async Event from External system
