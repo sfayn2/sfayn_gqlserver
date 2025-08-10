@@ -34,15 +34,21 @@ def publish(event: events.DomainEvent, uow: UnitOfWorkAbstract, **dependencies):
 
     # internal event publisher raised by domain event
     if event.event_type() in INTERNAL_EVENT_WHITELIST:
-        internal_event_publisher.publish({
-            "event_type": event.event_type(),
-            **event.to_dict()
-        })
+        try:
+            internal_event_publisher.publish({
+                "event_type": event.event_type(),
+                **event.to_dict()
+            })
+        except Exception as e:
+            print(f"Failed to publish internal event {event.event_type()}")
 
     # external event publisher raised by domain event
     if event.event_type() in EXTERNAL_EVENT_WHITELIST:
-        external_event_publisher.publish({
-            "event_type": event.event_type(),
-            **event.to_dict()
-        })
+        try:
+            external_event_publisher.publish({
+                "event_type": event.event_type(),
+                **event.to_dict()
+            })
+        except Exception as e:
+            print(f"Failed to publish external event {event.event_type()}")
 
