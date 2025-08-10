@@ -54,6 +54,9 @@ REDIS_INTERNAL_STREAM = "stream.internal.order_management"
 REDIS_EXTERNAL_CLIENT = redis.Redis.from_url(os.getenv("REDIS_EXTERNAL_URL"), decode_responses=True)
 REDIS_EXTERNAL_STREAM = os.getenv("REDIS_EXTERNAL_STREAM")
 
+#TODO optionally select which event typ to expose?
+EXTERNAL_EVENT_TYPE_WHITELIST = []
+
 
 # Async Event from External system
 def register_async_external_event_handlers():
