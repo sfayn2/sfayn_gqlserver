@@ -4,7 +4,7 @@ from typing import Dict, List
 from ddd.order_management.domain import events, repositories
 from ddd.order_management.infrastructure import redis_services
 
-#Note: make sure bootstrap.py is called upfront to register event handlers(ex. apps.py? )
+#NOTE: make sure bootstrap.py is called upfront to register event handlers(ex. apps.py? )
 EVENT_HANDLERS: Dict[str, List] = {}
 
 external_event_publisher = redis_services.RedisStreamPublisher(
@@ -18,11 +18,11 @@ internal_event_publisher = redis_services.RedisStreamPublisher(
 )
 
 EXTERNAL_EVENT_WHITELIST = set(
-    e.strip() for e in os.getenv("EXTERNAL_EVENT_WHITELIST", "").split(",") if strip()
+    e.strip() for e in os.getenv("EXTERNAL_EVENT_WHITELIST", "").split(",") if e.strip()
 )
 
 INTERNAL_EVENT_WHITELIST = set(
-    e.strip() for e in os.getenv("INTERNAL_EVENT_WHITELIST", "").split(",") if strip()
+    e.strip() for e in os.getenv("INTERNAL_EVENT_WHITELIST", "").split(",") if e.strip()
 )
 
 
