@@ -59,9 +59,10 @@ def custom_headers():
         "HTTP_X_Wss_Timestamp": str(int(time.time()))
     }
 
+@patch("ddd.order_management.presentation.webhook_apis.common.validate_webhook")
 @patch("ddd.order_management.application.message_bus.handle")
-def test_valid_post_returns_200(mock_handle, mock_request_factory, provider, tenant_id, valid_payload, custom_headers):
-
+def test_valid_post_returns_200(mock_handle, mock_validate, mock_request_factory, provider, tenant_id, valid_payload, custom_headers):
+    mock_validate.return_value = valid_payload
     mock_handle.return_value = dtos.ResponseDTO(
         success=True,
         message="Product update has been published."
@@ -80,6 +81,7 @@ def test_valid_post_returns_200(mock_handle, mock_request_factory, provider, ten
     assert response.content == b'{"success": true, "message": "Product update has been published."}'
 
     mock_handle.assert_called_once()
+    mock_validate.assert_called_once()
 
 def test_non_post_method_return_400(mock_request_factory, provider, tenant_id):
     request = mock_request_factory.get(f"/webhook/{provider}/{tenant_id}/product_update")
