@@ -59,12 +59,9 @@ def custom_headers():
         "HTTP_X_Wss_Timestamp": str(int(time.time()))
     }
 
-#@patch("ddd.order_management.presentation.webhook_apis.common.validate_webhook")
 @patch("ddd.order_management.application.message_bus.handle")
-#def test_valid_post_returns_200(mock_handle, mock_validate, mock_request_factory, provider, tenant_id, valid_payload, custom_headers):
 def test_valid_post_returns_200(mock_handle, mock_request_factory, provider, tenant_id, valid_payload, custom_headers):
 
-    #mock_validate.return_value = valid_payload
     mock_handle.return_value = dtos.ResponseDTO(
         success=True,
         message="Product update has been published."
@@ -82,5 +79,56 @@ def test_valid_post_returns_200(mock_handle, mock_request_factory, provider, ten
     assert response.status_code == 200
     assert response.content == b'{"success": true, "message": "Product update has been published."}'
 
-    #mock_validate.assert_called_once()
     mock_handle.assert_called_once()
+
+def test_non_post_method_return_400(mock_request_factory, provider, tenant_id):
+    request = mock_request_factory.get(f"/webhook/{provider}/{tenant_id}/product_update")
+    response = webhook_apis.product_update_api(request, provider, tenant_id)
+
+    assert response.status_code == 400
+    assert "Only POST is allowed" in response.content.decode()
+
+@patch("ddd.order_management.presentation.webhook_apis.common.validate_webhook")
+def test_invalid_signature(mock_validate, mock_request_factory, provider, tenant_id, custom_headers):
+    mock_validate.side_effect = Exception("Invalid signature")
+
+    request = mock_request_factory.post(
+        f"/webhook/{provider}/{tenant_id}/product_update",
+        data='{"dummy": "to return invalid sign"}',
+        content_type="application/json",
+        **custom_headers
+    )
+
+    response = webhook_apis.product_update_api(request, provider, tenant_id)
+
+    assert "Invalid signature" in response.content.decode()
+
+@patch("ddd.order_management.presentation.webhook_apis.common.validate_webhook")
+def test_invalid_json_payload(mock_validate, mock_request_factory, provider, tenant_id, valid_payload, custom_headers):
+    mock_validate.side_effect = Exception("Invalid JSON payload")
+
+    request = mock_request_factory.post(
+        f"/webhook/{provider}/{tenant_id}/product_update",
+        data=valid_payload.model_dump_json(by_alias=True),
+        content_type="application/json",
+        **custom_headers
+    )
+
+    response = webhook_apis.product_update_api(request, provider, tenant_id)
+
+    assert "Invalid JSON payload" in response.content.decode()
+
+@patch("ddd.order_management.presentation.webhook_apis.common.validate_webhook")
+def test_no_webhook_signature_verifier(mock_validate, mock_request_factory, provider, tenant_id, valid_payload, custom_headers):
+    mock_validate.side_effect = Exception(f"No verifier found for provider {provider}")
+
+    request = mock_request_factory.post(
+        f"/webhook/{provider}/{tenant_id}/product_update",
+        data=valid_payload.model_dump_json(by_alias=True),
+        content_type="application/json",
+        **custom_headers
+    )
+
+    response = webhook_apis.product_update_api(request, provider, tenant_id)
+
+    assert f"No verifier found for provider {provider}" in response.content.decode()

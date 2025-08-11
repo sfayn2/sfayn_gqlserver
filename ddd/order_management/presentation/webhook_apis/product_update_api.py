@@ -19,7 +19,7 @@ def product_update_api(request, provider: str, tenant_id: str):
         return JsonResponse(result.model_dump())
     except Exception as e:
         # TODO log exception
-        return JsonResponse({"success": False, "message": "Invalid webhook request"}, status=500)
+        return JsonResponse({"success": False, "message": str(e) }, status=500)
 
 
 
