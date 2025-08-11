@@ -16,9 +16,10 @@ def product_update_api(request, provider: str, tenant_id: str):
         
         command = commands.PublishProductUpdateCommand.model_validate(payload)
         result = message_bus.handle(command)
-        return JsonResponse(result, status=200)
-    except Exception:
-        return JsonResponse({"message": "Invalid webhook request"}, status=500)
+        return JsonResponse(result.model_dump_json())
+    except Exception as e:
+        # TODO log exception
+        return JsonResponse({"success": False, "message": "Invalid webhook request"}, status=500)
 
 
 
