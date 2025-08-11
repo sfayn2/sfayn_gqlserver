@@ -14,6 +14,12 @@ class DomainEvent(ABC):
     def event_type(self) -> str:
         return f"order_management.events.{self.__class__.__name__}"
 
+    def internal_event_type(self) -> str:
+        return f"order_management.internal_events.{self.__class__.__name__}"
+
+    def external_event_type(self) -> str:
+        return f"order_management.external_events.{self.__class__.__name__}"
+
     def to_dict(self) -> dict:
         return asdict(self)
 

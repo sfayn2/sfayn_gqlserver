@@ -46,13 +46,7 @@ access_control = access_control_services.AccessControlService(
 )
 
 
-#Redis internal system
-REDIS_INTERNAL_CLIENT = redis.Redis.from_url(os.getenv("REDIS_INTERNAL_URL"), decode_responses=True)
-REDIS_INTERNAL_STREAM = os.getenv("REDIS_INTERNAL_STREAM")
-
-
-
-# Async Event from External system
+# Async Event handlers from External system / Redis;kafka stream
 def register_async_external_event_handlers():
     event_bus.ASYNC_EXTERNAL_EVENT_HANDLERS.update({
         "identity_gateway_service.external_events.UserLoggedInEvent": [
@@ -69,7 +63,7 @@ def register_async_external_event_handlers():
     })
 
 
-# Async Event from Internal system
+# Async Event handlers from Internal system / Redis;kafka stream
 def register_async_internal_event_handlers():
     event_bus.ASYNC_INTERNAL_EVENT_HANDLERS.update({
         "product_catalog.internal_events.ProductUpdatedEvent": [
@@ -80,10 +74,10 @@ def register_async_internal_event_handlers():
         ],
     })
 
-# Sync Event from Internal
+# Sync Event handlers from Internal domain event
 def register_event_handlers():
     event_bus.EVENT_HANDLERS.update({
-        "order_management.events.CanceledOrderEvent": [
+        events.CanceledOrderEvent: [
                 lambda event, uow: handlers.handle_logged_order(
                     event=event,
                     uow=uow,
@@ -95,7 +89,7 @@ def register_event_handlers():
                     email=email_services.EmailService()
                 )
             ],
-        "order_management.events.OrderShippingOptionSelectedEvent": [
+        events.SelectedShippingOptionEvent: [
                 lambda event, uow: handlers.handle_apply_applicable_offers(
                     event=event, 
                     uow=uow,
@@ -103,14 +97,14 @@ def register_event_handlers():
                     offer_service=domain_services.OfferStrategyService()
                 )
             ],
-        "order_management.events.OrderOffersAppliedEvent": [
+        events.AppliedOffersEvent: [
                 lambda event, uow: handlers.handle_apply_tax_results(
                     event=event, 
                     uow=uow,
                     tax_service=domain_services.TaxStrategyService()
                 )
             ],
-        "order_management.events.OrderTaxesAppliedEvent": [
+        events.AppliedTaxesEvent: [
                 lambda event, uow: handlers.handle_logged_order(
                     event=event, 
                     uow=uow,
@@ -199,7 +193,7 @@ def register_command_handlers():
         ),
         commands.PublishProductUpdateCommand: lambda command: handlers.handle_publish_product_update(
             command=command,
-            event_publisher=redis_services.RedisStreamPublisher(redis_client=REDIS_INTERNAL_CLIENT, stream_name=REDIS_INTERNAL_STREAM)
+            event_publisher=event_bus.get_internal_publisher()
         )
     })
 

@@ -30,7 +30,7 @@ redis_client = redis.Redis.from_url('redis://localhost:6379')
 #}
 
 event = {
-    "event_type": "identity_gateway_service.events.UserLoggedInEvent",
+    "event_type": "identity_gateway_service.external_events.UserLoggedInEvent",
     "sub": "abc123",
     "token_type": "Bearer",
     "tenant_id": "t-123",
