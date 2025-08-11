@@ -37,7 +37,7 @@ This Project is currently under active development. Major changes are ongoing.
 
 ## User Sync Requirement
 
-- if using our [IDP Gateway](https://github.com/sfayn2/identity_gateway) can emit UserEventLoggedInEvent, users are **auto-synced**
+- if using our [identity gateway](https://github.com/sfayn2/identity_gateway) can emit UserEventLoggedInEvent, users are **auto-synced**
 - else, frontend must call [syncUser]() manually to the OMS before calling GraphQL Checkout/Order lifecycle flow APIs.
 
 
@@ -45,7 +45,7 @@ This Project is currently under active development. Major changes are ongoing.
 1. **User Login**
 * Frontend logs in via IDP (e.g Keycloak)
 * Retrieve JWT
-* Optionally call syncUser if not using out of the box [IDP gateway](https://github.com/sfayn2/identity_gateway)
+* Optionally call syncUser if not using out of the box [identity gateway](https://github.com/sfayn2/identity_gateway)
 2. **Cart Management**
 * Frontend handles cart UX
 * Allow user to fill in customer details + address, When ready to checkout, call [checkoutItems](./mutations/checkout_items.graphql)
@@ -130,14 +130,8 @@ pip install -r requirements
 python manage.py runserver 0.0.0.0:4000
 ```
 
-
-### Help
-
-Need help? Open an issue in: [ISSUES](https://github.com/sfayn2/sfayn_gqlserver/issues)
-
-
-### Contributing
-Want to improve and add feature? Fork the repo, add your changes and send a pull request.
+## Contributing
+Contributions welcome! Please open issues or submit pull requests
 
 
 
