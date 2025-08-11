@@ -1,15 +1,15 @@
 # Our own Webhook Sender Service 
-import hmac, hashlib
+import hmac, hashlib, time
 from ddd.order_management.application import ports
 
 class WSSSignatureVerifier(ports.WebhookSignatureVerifier):
-    def __init__(self, shared_secret: str, max_age: int = 300):
-        self.secret = shared_secret.encode()
+    def __init__(self, shared_secret: str, max_age: int = 3000):
+        self.secret = shared_secret
         self.max_age = max_age
 
     def verify(self, headers, body) -> bool:
-        signature = headers.get("X-WSS-Signature", "")
-        timestamp = headers.get("X-WSS-Timestamp", "") #to protect from replay
+        signature = headers.get("X-Wss-Signature", "")
+        timestamp = headers.get("X-Wss-Timestamp", "") #to protect from replay
         if not signature or not timestamp:
             return False
 
@@ -22,14 +22,10 @@ class WSSSignatureVerifier(ports.WebhookSignatureVerifier):
             return False
 
         # recompute signature
-        message = f"{timestamp}.{body.decode()}".encode()
-        expected = hmac.new(
-            self.secret, 
-            f"{timestamp}.{body.decode()}".encode(),
-            hashlib.sha256
-        ).hexdigest()
+        expected = self.generate_signature(self.secret, body)
 
-        return hmac.compare_digest(f"sha256={expected}", signature)
+        return hmac.compare_digest(expected, signature)
 
-    def get_sender(self) -> str:
-        return "webhook_sender_service"
+    def generate_signature(self, secret: str, body: bytes) -> str:
+        signature = hmac.new(secret.encode(), body, hashlib.sha256).hexdigest()
+        return signature

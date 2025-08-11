@@ -1,3 +1,4 @@
+import json
 from ddd.order_management.infrastructure import webhook_signatures
 
 def validate_webhook(provider, tenant_id, request):
@@ -9,7 +10,7 @@ def validate_webhook(provider, tenant_id, request):
         raise Exception("Invalid signature")
 
     try:
-        payload = json.loads(body.decode())
+        payload = json.loads(request.body.decode())
     except Exception:
         raise Exception("Invalid JSON payload")
 

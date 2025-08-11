@@ -20,7 +20,7 @@ def handle_publish_product_update(
 
         return dtos.ResponseDTO(
             success=True,
-            message=f"Product update has been published {event}"
+            message="Product update has been published."
         )
 
     except exceptions.InvalidOrderOperation as e:

@@ -12,11 +12,11 @@ def product_update_api(request, provider: str, tenant_id: str):
         return HttpResponseBadRequest("Only POST is allowed")
 
     try:
-        payload = common.webhook_validate(provider, tenant_id, request)
+        payload = common.validate_webhook(provider, tenant_id, request)
         
         command = commands.PublishProductUpdateCommand.model_validate(payload)
         result = message_bus.handle(command)
-        return JsonResponse(result.model_dump_json())
+        return JsonResponse(result.model_dump())
     except Exception as e:
         # TODO log exception
         return JsonResponse({"success": False, "message": "Invalid webhook request"}, status=500)

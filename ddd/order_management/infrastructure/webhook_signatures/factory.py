@@ -6,7 +6,7 @@ from ddd.order_management.infrastructure import webhook_signatures
 def get_verifier_for(provider: str, tenant_id: str, headers: dict) -> Optional[ports.WebhookSignatureVerifier]:
 
     provider = provider.lower()
-    secret = os.get_env(f"WS_SECRET_{tenant_id}")
+    secret = os.getenv(f"WH_SECRET_{tenant_id}")
     if not secret:
         return None
 

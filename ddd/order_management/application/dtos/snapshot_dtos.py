@@ -49,6 +49,7 @@ class VendorShippingOptionSnapshotDTO(BaseModel):
 
 class VendorProductSnapshotDTO(BaseModel):
     product_id: str
+    tenant_id: str
     vendor_id: str
     product_sku: str
     product_name: str

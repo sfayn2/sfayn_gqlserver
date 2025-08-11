@@ -14,6 +14,3 @@ class GithubSignatureVerifier(ports.WebhookSignatureVerifier):
         expected = hmac.new(self.secret, body, hashlib.sha256).hexdigest()
 
         return hmac.compare_digest(f"sha256={expected}", signature)
-
-    def get_sender(self) -> str:
-        return "github"
