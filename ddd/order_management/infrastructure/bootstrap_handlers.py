@@ -66,7 +66,7 @@ def register_async_external_event_handlers():
 # Async Event handlers from Internal system / Redis;kafka stream
 def register_async_internal_event_handlers():
     event_bus.ASYNC_INTERNAL_EVENT_HANDLERS.update({
-        "product_catalog.internal_events.ProductUpdatedEvent": [
+        "order_management.internal_events.ProductUpdatedEvent": [
             lambda event: handlers.handle_product_update_async_event(
                 event=event,
                 product_sync=snapshot_services.DjangoVendorProductSnapshotSyncService()

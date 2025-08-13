@@ -6,7 +6,6 @@ from ddd.order_management.application import dtos
 
 class ProductUpdateIntegrationEvent(BaseModel):
     event_type: str
-    tenant_id: str
     data: dtos.VendorProductSnapshotDTO
 
 

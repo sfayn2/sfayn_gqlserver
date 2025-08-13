@@ -27,10 +27,12 @@ def valid_headers():
 def valid_body():
     return b'{"product_id": "p-1234"}'
 
-def test_validate_webhook_success(monkeypatch, provider, tenant_id, valid_headers, valid_body):
-    verifier_mock = MagicMock()
-    verifier_mock.verify.return_value = True
-    monkeypatch.setattr(webhook_signatures, "get_verifier_for", lambda p, t, h: verifier_mock)
+@patch.object(webhook_signatures, 'get_verifier_for')
+def test_validate_webhook_success(mock_get_verifier_for, provider, tenant_id, valid_headers, valid_body):
+    #verifier_mock = MagicMock()
+    #verifier_mock.verify.return_value = True
+    #monkeypatch.setattr(webhook_signatures, "get_verifier_for", lambda p, t, h: verifier_mock)
+    mock_get_verifier_for.return_value.verify.return_value = True
 
     class DummyRequest:
         headers = valid_headers
@@ -43,7 +45,8 @@ def test_validate_webhook_success(monkeypatch, provider, tenant_id, valid_header
     assert payload["product_id"] == "p-1234"
     assert payload["tenant_id"] == tenant_id
 
-    verifier_mock.verify.assert_called_once_with(valid_headers, valid_body)
+    #verifier_mock.verify.assert_called_once_with(valid_headers, valid_body)
+    mock_get_verifier_for.return_value.verify.assert_called_once_with(request.headers, request.body)
 
 #def test_validate_webhook_invalid_signature(monkeypatch, provider, tenant_id, valid_headers, valid_body):
 #    verifier_mock = MagicMock()

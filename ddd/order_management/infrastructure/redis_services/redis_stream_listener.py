@@ -49,10 +49,11 @@ class RedisStreamListener(ports.EventListenerAbstract):
                     event_type = event.get("event_type")
 
                     #handlers = ASYNC_EVENT_HANDLERS.get(event_type, [])
-                    handlers = event_handlers.get(event_type, [])
+                    handlers = self.event_handlers.get(event_type, [])
                     if handlers:
                         for handler in handlers:
-                            event["roles"] = json.loads(event["roles"])
+                            if event.get("roles"):
+                                event["roles"] = json.loads(event["roles"])
                             handler(event)
                         self.redis_client.xack(self.stream_name, self.group_name, msg_id)
                     else:

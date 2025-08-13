@@ -4,6 +4,10 @@ from typing import Dict, List
 from ddd.order_management.domain import events, repositories
 from ddd.order_management.infrastructure import redis_services
 
+#TODO should be here or bootstrap?
+from dotenv import load_dotenv, find_dotenv
+load_dotenv(find_dotenv(filename=".env.test"))
+
 #NOTE: make sure bootstrap.py is called upfront to register event handlers(ex. apps.py? )
 EVENT_HANDLERS: Dict[str, List] = {}
 ASYNC_INTERNAL_EVENT_HANDLERS: Dict[str, List] = {}
@@ -24,12 +28,15 @@ INTERNAL_EVENT_WHITELIST = set(
     e.strip() for e in os.getenv("INTERNAL_EVENT_WHITELIST", "").split(",") if e.strip()
 )
 
+_internal_publisher = None
+_external_publisher = None
+
 def get_internal_publisher() -> redis_services.RedisStreamPublisher:
     # keep connection alive and reuse
     global _internal_publisher
 
     if _internal_publisher is None:
-        if not REDIS_INTERNAL_URL or REDIS_INTERNAL_STREAM:
+        if not REDIS_INTERNAL_URL and REDIS_INTERNAL_STREAM:
             raise RuntimeError("Internal Redis config is missing")
         _internal_publisher = redis_services.RedisStreamPublisher(
             redis_client=redis.Redis.from_url(REDIS_INTERNAL_URL, decode_responses=True),
@@ -42,7 +49,7 @@ def get_external_publisher() -> redis_services.RedisStreamPublisher:
     global _external_publisher
 
     if _external_publisher is None:
-        if not REDIS_EXTERNAL_URL or REDIS_EXTERNAL_STREAM:
+        if not REDIS_EXTERNAL_URL and REDIS_EXTERNAL_STREAM:
             raise RuntimeError("External Redis config is missing")
         _external_publisher = redis_services.RedisStreamPublisher(
             redis_client=redis.Redis.from_url(REDIS_EXTERNAL_URL, decode_responses=True),

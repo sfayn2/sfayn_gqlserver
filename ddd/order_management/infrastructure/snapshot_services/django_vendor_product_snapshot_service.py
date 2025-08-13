@@ -9,7 +9,7 @@ class DjangoVendorProductSnapshotSyncService(ports.SnapshotSyncServiceAbstract):
     #    self.vendor_product_provider = vendor_product_provider
 
     def sync(self, event: dtos.ProductUpdateIntegrationEvent):
-        django_snapshots.VendorProductSnapshot.objects.filter(tenant_id=event.tenant_id, product_id=event.data.product_id).delete()
+        django_snapshots.VendorProductSnapshot.objects.filter(tenant_id=event.data.tenant_id, product_id=event.data.product_id).delete()
         django_snapshots.VendorProductSnapshot.objects.create(
             **event.model_dump().get("data")
         )

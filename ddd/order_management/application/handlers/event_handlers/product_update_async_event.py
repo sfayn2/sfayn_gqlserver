@@ -12,7 +12,11 @@ def handle_product_update_async_event(
 ):
 
     try:
-        event_payloads = dtos.ProductUpdateIntegrationEvent(**event)
+        event1 = {
+            "event_type": event.get("event_type"),
+            "data": json.loads(event.get("data"))
+        }
+        event_payloads = dtos.ProductUpdateIntegrationEvent(**event1)
     except Exception as e:
         raise exceptions.IntegrationException(f"Invalid event payload {e}")
 
