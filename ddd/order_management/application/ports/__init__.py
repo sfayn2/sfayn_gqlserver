@@ -14,3 +14,4 @@ from .access_control_service_abstract import AccessControlServiceAbstract
 from .webhook_signature_verifier_abstract import WebhookSignatureVerifier
 from .event_publisher_abstract import EventPublisherAbstract
 from .event_listener_abstract import EventListenerAbstract
+from .event_payload_decoder_abstract import EventPayloadDecoderAbstract

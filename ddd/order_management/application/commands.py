@@ -78,7 +78,7 @@ class LoginCallbackCommand(Command1):
 # ----------------
 # Applicable to Webhook APIs
 # -----------
-class Command2(BaseModel, frozen=True):
+class Command2(Command):
     event_type: str
 
 # {

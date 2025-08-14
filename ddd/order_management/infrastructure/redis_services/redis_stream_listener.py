@@ -1,7 +1,8 @@
 import redis
 import json
-from typing import List, Dict
+from typing import List, Dict, Optional
 from ddd.order_management.application import ports
+from ddd.order_management.domain import exceptions
 #from ddd.order_management.infrastructure.event_bus import ASYNC_EVENT_HANDLERS
 
 # =================
@@ -17,13 +18,14 @@ from ddd.order_management.application import ports
 # To consumer any stream service 
 
 class RedisStreamListener(ports.EventListenerAbstract):
-    def __init__(self, redis_client: redis.Redis, stream_name: str, consumer_name: str, group_name: str = "order_management_service", event_handlers: Dict[str, List] = {}):
+    def __init__(self, event_payload_decoder: Optional[ports.EventPayloadDecoderAbstract], redis_client: redis.Redis, stream_name: str, consumer_name: str, group_name: str = "order_management_service", event_handlers: Dict[str, List] = {}):
         #self.redis_client = redis.Redis.from_url('redis://localhost:6379', decode_responses=True)
         self.redis_client = redis_client
         self.group_name = group_name
         self.consumer_name = consumer_name
         self.stream_name = stream_name
         self.event_handlers = event_handlers
+        self.event_payload_decoder = event_payload_decoder
         self._ensure_group()
 
     def _ensure_group(self):
@@ -54,7 +56,10 @@ class RedisStreamListener(ports.EventListenerAbstract):
                         for handler in handlers:
                             if event.get("roles"):
                                 event["roles"] = json.loads(event["roles"])
-                            handler(event)
+                            if self.event_payload_decoder:
+                                handler(self.event_payload_decoder.decode(event))
+                            else:
+                                handler(event)
                         self.redis_client.xack(self.stream_name, self.group_name, msg_id)
                     else:
                         print(f"Unknown event type {event_type}")

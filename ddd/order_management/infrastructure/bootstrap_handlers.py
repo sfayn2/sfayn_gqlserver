@@ -12,13 +12,15 @@ from ddd.order_management.infrastructure import (
     snapshot_services,
     redis_services
 )
-from ddd.order_management.application import handlers
-from ddd.order_management.application.handlers import event_handlers
-
-from ddd.order_management.application import commands, message_bus, queries
+from ddd.order_management.application import (
+    handlers,
+    commands, 
+    message_bus, 
+    queries,
+    dtos
+)
 
 load_dotenv(find_dotenv(filename=".env.test"))
-#load_dotenv()
 
 #Depending on the framework arch this might be inside manage.py , app.py, or main.py ?
 #if project grows, breakdown handlers by feature
@@ -32,7 +34,6 @@ ROLE_MAP = {
 }
 
 
-
 jwt_handler = access_control_services.JwtTokenHandler(
     public_key=os.getenv("KEYCLOAK_PUBLIC_KEY"),
     issuer=os.getenv("KEYCLOAK_ISSUER"),
@@ -44,6 +45,12 @@ jwt_handler = access_control_services.JwtTokenHandler(
 access_control = access_control_services.AccessControlService(
     jwt_handler=jwt_handler
 )
+
+
+# Central mapping of models used to validate event payloads based on even type
+event_bus.EVENT_MODELS = {
+    "order_management.internal_events.ProductUpdatedEvent": dtos.ProductUpdateIntegrationEvent
+}
 
 
 # Async Event handlers from External system / Redis;kafka stream

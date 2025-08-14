@@ -1,7 +1,8 @@
 from __future__ import annotations
 import redis, os
-from typing import Dict, List
+from typing import Dict, List, Type
 from ddd.order_management.domain import events, repositories
+from ddd.order_management.application import dtos
 from ddd.order_management.infrastructure import redis_services
 
 #TODO should be here or bootstrap?
@@ -12,6 +13,9 @@ load_dotenv(find_dotenv(filename=".env.test"))
 EVENT_HANDLERS: Dict[str, List] = {}
 ASYNC_INTERNAL_EVENT_HANDLERS: Dict[str, List] = {}
 ASYNC_EXTERNAL_EVENT_HANDLERS: Dict[str, List] = {}
+
+# central mapping of event stream payloads to dtos.IntegrationEvent
+EVENT_MODELS = Dict[str, Type[dtos.IntegrationEvent]]
 
 
 # Config
