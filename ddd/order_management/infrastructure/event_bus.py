@@ -18,12 +18,7 @@ internal_publisher = None
 external_publisher = None
 
 
-def publish(event: events.DomainEvent, uow: UnitOfWorkAbstract, **dependencies):
-    # handle the synchronous event locally by triggering event handlers
-    handlers = EVENT_HANDLERS.get(event, [])
-    for handler in handlers:
-        handler(event, uow, **dependencies)
-
+def publish_async_internal(event: events.DomainEvent):
     # internal event publisher raised by domain event
     if event.internal_event_type() in INTERNAL_EVENT_WHITELIST:
 
@@ -38,6 +33,7 @@ def publish(event: events.DomainEvent, uow: UnitOfWorkAbstract, **dependencies):
         except Exception as e:
             print(f"Failed to publish internal event {event.internal_event_type()}")
 
+def publish_async_external(event: events.DomainEvent):
     # external event publisher raised by domain event
     if event.external_event_type() in EXTERNAL_EVENT_WHITELIST:
 
@@ -51,4 +47,16 @@ def publish(event: events.DomainEvent, uow: UnitOfWorkAbstract, **dependencies):
             })
         except Exception as e:
             print(f"Failed to publish external event {event.external_event_type()}")
+
+
+def publish(event: events.DomainEvent, uow: UnitOfWorkAbstract, **dependencies):
+    # handle the synchronous event locally by triggering event handlers
+    handlers = EVENT_HANDLERS.get(event, [])
+    for handler in handlers:
+        handler(event, uow, **dependencies)
+    
+    publish_async_internal(event)
+    publish_async_external(event)
+
+
 
