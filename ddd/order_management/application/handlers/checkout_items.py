@@ -42,7 +42,7 @@ def handle_checkout_items(
             draft_order = order_service.create_draft_order(
                 customer_details=mappers.CustomerDetailsMapper.to_domain(customer_details),
                 shipping_address=mappers.AddressMapper.to_domain(command.address),
-                line_items=line_items,
+                line_items=vendor_line_items,
                 tenant_id=user_ctx.tenant_id
             )
 
