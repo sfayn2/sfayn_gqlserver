@@ -28,5 +28,8 @@ from .snapshot_dtos import (
 # Integration events
 from .integration_events.auth_integration_events import UserLoggedInIntegrationEvent
 from .integration_events.product_integration_events import ProductUpdateIntegrationEvent
-from .integration_events.vendor_integration_events import VendorDetailsUpdateIntegrationEvent
+from .integration_events.vendor_integration_events import (
+    VendorDetailsUpdateIntegrationEvent,
+    VendorCouponUpdateIntegrationEvent
+)
 from .integration_events.base import IntegrationEvent

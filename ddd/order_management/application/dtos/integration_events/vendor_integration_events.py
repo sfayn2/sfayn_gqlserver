@@ -3,3 +3,6 @@ from .base import IntegrationEvent
 
 class VendorDetailsUpdateIntegrationEvent(IntegrationEvent):
     data: dtos.VendorDetailsSnapshotDTO
+
+class VendorCouponUpdateIntegrationEvent(IntegrationEvent):
+    data: dtos.VendorCouponSnapshotDTO

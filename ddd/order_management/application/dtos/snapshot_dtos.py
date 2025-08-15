@@ -15,6 +15,7 @@ class VendorDetailsSnapshotDTO(BaseModel):
 
 class VendorCouponSnapshotDTO(BaseModel):
     vendor_id: str
+    tenant_id: str
     offer_id: str
     coupon_code: str
     start_date: Optional[datetime] = None

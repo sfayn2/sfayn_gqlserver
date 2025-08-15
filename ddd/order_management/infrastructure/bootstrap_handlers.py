@@ -51,7 +51,8 @@ access_control = access_control_services.AccessControlService(
 event_bus.EXTERNAL_EVENT_WHITELIST = []
 event_bus.INTERNAL_EVENT_WHITELIST = [
     "order_management.internal_events.ProductUpdatedEvent",
-    "order_management.internal_events.VendorDetailsUpdatedEvent"
+    "order_management.internal_events.VendorDetailsUpdatedEvent",
+    "order_management.internal_events.VendorCouponUpdatedEvent"
 ]
 
 # Setup Redis event publishers
@@ -70,7 +71,8 @@ event_bus.external_publisher = event_publishers.RedisStreamPublisher(
 # Map event types to validation models; define to support event payloads decoder w validation
 event_bus.EVENT_MODELS = {
     "order_management.internal_events.ProductUpdatedEvent": dtos.ProductUpdateIntegrationEvent,
-    "order_management.internal_events.VendorDetailsUpdatedEvent": dtos.VendorDetailsUpdateIntegrationEvent
+    "order_management.internal_events.VendorDetailsUpdatedEvent": dtos.VendorDetailsUpdateIntegrationEvent,
+    "order_management.internal_events.VendorCouponUpdatedEvent": dtos.VendorCouponUpdateIntegrationEvent
 }
 
 
@@ -102,6 +104,12 @@ event_bus.ASYNC_INTERNAL_EVENT_HANDLERS.update({
         lambda event: handlers.handle_vendor_details_update_async_event(
             event=event,
             vendor_details_sync=snapshot_services.DjangoVendorDetailsSnapshotSyncService()
+        ),
+    ],
+    "order_management.internal_events.VendorCouponUpdatedEvent": [
+        lambda event: handlers.handle_vendor_coupon_update_async_event(
+            event=event,
+            vendor_coupon_sync=snapshot_services.DjangoVendorCouponSnapshotSyncService()
         ),
     ],
 })
@@ -226,6 +234,10 @@ message_bus.COMMAND_HANDLERS.update({
         event_publisher=event_bus.internal_publisher
     ),
     commands.PublishVendorDetailsUpdateCommand: lambda command: handlers.handle_publish_vendor_details_update(
+        command=command,
+        event_publisher=event_bus.internal_publisher
+    ),
+    commands.PublishVendorCouponUpdateCommand: lambda command: handlers.handle_publish_vendor_coupon_update(
         command=command,
         event_publisher=event_bus.internal_publisher
     )

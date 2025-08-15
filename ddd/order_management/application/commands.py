@@ -91,3 +91,6 @@ class PublishProductUpdateCommand(Command2):
 
 class PublishVendorDetailsUpdateCommand(Command2):
     data: dtos.VendorDetailsSnapshotDTO
+
+class PublishVendorCouponUpdateCommand(Command2):
+    data: dtos.VendorCouponSnapshotDTO
