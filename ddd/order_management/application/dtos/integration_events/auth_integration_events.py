@@ -10,10 +10,5 @@ class Identity(BaseModel):
     roles: List[str] = Field(default_factory=list)
 
 class UserLoggedInIntegrationEvent(IntegrationEvent):
-    #event_type: str
     data: Identity
-    #sub: str
-    #token_type: str
-    #tenant_id: str
-    #roles: List[str] = Field(default_factory=list)
 

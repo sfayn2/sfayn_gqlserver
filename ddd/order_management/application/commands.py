@@ -76,7 +76,7 @@ class LoginCallbackCommand(Command1):
     next_path: constr(min_length=1, strip_whitespace=True)
 
 # ----------------
-# Applicable to Webhook APIs
+# Applicable to Webhook APIs / Integration events
 # -----------
 class Command2(Command):
     event_type: str
@@ -88,3 +88,6 @@ class Command2(Command):
 # }
 class PublishProductUpdateCommand(Command2):
     data: dtos.VendorProductSnapshotDTO
+
+class PublishVendorDetailsUpdateCommand(Command2):
+    data: dtos.VendorDetailsSnapshotDTO

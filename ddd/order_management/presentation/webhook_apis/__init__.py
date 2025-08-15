@@ -1,1 +1,2 @@
 from .product_update_api import product_update_api
+from .vendor_details_update_api import vendor_details_update_api

@@ -8,6 +8,7 @@ from ddd.order_management.application.dtos.dtos import MoneyDTO
 
 class VendorDetailsSnapshotDTO(BaseModel):
     vendor_id: str
+    tenant_id: str
     name: str
     country: str
     is_active: bool

@@ -23,6 +23,7 @@ class WSSSignatureVerifier(ports.WebhookSignatureVerifier):
 
         # recompute signature
         expected = self.generate_signature(self.secret, body)
+        #import pdb;pdb.set_trace()
 
         return hmac.compare_digest(expected, signature)
 
