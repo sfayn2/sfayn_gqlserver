@@ -25,7 +25,7 @@ load_dotenv(find_dotenv(filename=".env.test"))
 #Depending on the framework arch this might be inside manage.py , app.py, or main.py ?
 #if project grows, breakdown handlers by feature
 
-# Gives more control by assigning default permission based on role
+# Define role permissions
 ROLE_MAP = {
     "customer": ["checkout_items", "add_line_items", "remove_line_items", 
     "add_coupon", "remove_coupon", "change_destination", "change_order_quantity", 
@@ -42,27 +42,23 @@ JWT_HANDLER = access_control_services.JwtTokenHandler(
     algorithm=os.getenv("KEYCLOAK_ALGORITHM")
 )
 
-# Set access control
+# Configure JWT Authentication
 access_control = access_control_services.AccessControlService(
     jwt_handler=JWT_HANDLER
 )
 
-# Gives more control which event/s to publish externally
+# Configure which events get published
 event_bus.EXTERNAL_EVENT_WHITELIST = []
-
-# Gives more control which event/s to publish internallternally
 event_bus.INTERNAL_EVENT_WHITELIST = [
     "order_management.internal_events.ProductUpdatedEvent",
 ]
 
-# Set internal publisher eg. Redis/Kafka/etc
+# Setup Redis event publishers
 event_bus.internal_publisher = event_publishers.RedisStreamPublisher(
             redis_client=redis.Redis.from_url(os.getenv("REDIS_INTERNAL_URL"), decode_responses=True),
             stream_name=os.getenv("REDIS_INTERNAL_STREAM"),
             event_whitelist=event_bus.INTERNAL_EVENT_WHITELIST
         )
-
-# Set external publisher eg. Redis/Kafka/etc
 event_bus.external_publisher = event_publishers.RedisStreamPublisher(
             redis_client=redis.Redis.from_url(os.getenv("REDIS_EXTERNAL_URL"), decode_responses=True),
             stream_name=os.getenv("REDIS_EXTERNAL_STREAM"),
@@ -70,13 +66,13 @@ event_bus.external_publisher = event_publishers.RedisStreamPublisher(
         )
 
 
-# Set central mapping of models used to validate event payloads based on even type
+# Map event types to validation models; define to support event payloads validation
 event_bus.EVENT_MODELS = {
     "order_management.internal_events.ProductUpdatedEvent": dtos.ProductUpdateIntegrationEvent
 }
 
 
-# Async Event handlers from External system / Redis;kafka stream
+# External async (redis/kafka/etc) event handlers (from other services)
 event_bus.ASYNC_EXTERNAL_EVENT_HANDLERS.update({
     "identity_gateway_service.external_events.UserLoggedInEvent": [
             lambda event: handlers.handle_user_logged_in_async_event(
@@ -92,7 +88,7 @@ event_bus.ASYNC_EXTERNAL_EVENT_HANDLERS.update({
 })
 
 
-# Async Event handlers from Internal system / Redis;kafka stream
+# Internal async (redis/kafka/etc?) event handlers (within this service)
 event_bus.ASYNC_INTERNAL_EVENT_HANDLERS.update({
     "order_management.internal_events.ProductUpdatedEvent": [
         lambda event: handlers.handle_product_update_async_event(
@@ -102,7 +98,7 @@ event_bus.ASYNC_INTERNAL_EVENT_HANDLERS.update({
     ],
 })
 
-# Sync Event handlers from Internal domain event
+# Domain event handlers (immediate processing)
 event_bus.EVENT_HANDLERS.update({
     events.CanceledOrderEvent: [
             lambda event, uow: handlers.handle_logged_order(
@@ -140,7 +136,7 @@ event_bus.EVENT_HANDLERS.update({
         ],
 })
 
-# Command Handlers
+# Command Handlers (write operations)
 message_bus.COMMAND_HANDLERS.update({
     commands.CheckoutItemsCommand: lambda command: handlers.handle_checkout_items(
         command=command,
@@ -223,7 +219,7 @@ message_bus.COMMAND_HANDLERS.update({
     )
 })
 
-#Query Handlers
+#Query Handlers (read operations)
 message_bus.QUERY_HANDLERS.update({
     queries.ListShippingOptionsQuery: lambda query: handlers.handle_list_shipping_options(
         query=query, 
