@@ -9,7 +9,7 @@ class RedisEventPayloadDecoder(ports.EventPayloadDecoderAbstract):
     def __init__(self, event_models: Dict[str, Type[dtos.IntegrationEvent]]):
         self.event_models = event_models
 
-    def decode(self, raw_event: Dict[str, Any]):
+    def decode(self, raw_event: Dict[str, Any]) -> dtos.IntegrationEvent:
         event_type = raw_event.get("event_type")
         event_model = self.event_models.get(event_type)
         if not event_model:

@@ -5,5 +5,5 @@ from abc import ABC, abstractmethod
 class EventPayloadDecoderAbstract(ABC):
 
     @abstractmethod
-    def decode(self, raw_event: Dict[str, Any]):
+    def decode(self, raw_event: Dict[str, Any]) -> dtos.IntegrationEvent:
         raise NotImplementedError("Subclasses must implement this method")

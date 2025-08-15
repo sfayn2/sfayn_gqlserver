@@ -62,7 +62,7 @@ def custom_headers():
         "HTTP_X_Wss_Timestamp": str(int(time.time()))
     }
 
-#@pytest.mark.django_db
+@pytest.mark.django_db
 def test_valid_post_returns_200(client, provider, tenant_id, valid_payload, custom_headers):
     response = client.post(
         reverse("tenant_webhook_product_sync", args=[provider, tenant_id]),
