@@ -6,9 +6,10 @@ from ddd.order_management.infrastructure import django_mappers
 
 class DjangoCustomerRepositoryImpl(repositories.CustomerAbstract):
 
-    def get_customer_details(self, customer_id: str) -> value_objects.CustomerDetails:
+    def get_customer_details(self, tenant_id: str, customer_id: str) -> value_objects.CustomerDetails:
         try:
             customer_details = django_snapshots.CustomerDetailsSnapshot.objects.get(
+                tenant_id=tenant_id,
                 customer_id=customer_id,
                 is_active=True)
         except django_snapshots.CustomerDetailsSnapshot.DoesNotExist:
@@ -16,8 +17,9 @@ class DjangoCustomerRepositoryImpl(repositories.CustomerAbstract):
 
         return django_mappers.CustomerDetailsMapper.to_domain(customer_details)
 
-    def get_shipping_addresses(self, customer_id: str) -> List[value_objects.Address]:
+    def get_shipping_addresses(self, tenant_id: str, customer_id: str) -> List[value_objects.Address]:
         customer_addresses = django_snapshots.CustomerAddressSnapshot.objects.filter(
+            tenant_id=tenant_id,
             customer_id=customer_id,
             address_type="shipping",
             is_active=True)

@@ -14,7 +14,10 @@ def handle_apply_applicable_offers(
 
         order = uow.order.get(order_id=event.order_id)
 
-        vendor_offers = vendor.get_offers(order.vendor_id)
+        vendor_offers = vendor.get_offers(
+            order.tenant_id,
+            order.vendor_id
+        )
         applicable_offers = offer_service.evaluate_applicable_offers(order, vendor_offers)
 
         order.apply_applicable_offers(applicable_offers)

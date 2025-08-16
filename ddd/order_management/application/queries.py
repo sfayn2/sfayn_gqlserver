@@ -6,7 +6,7 @@ from datetime import datetime
 from ddd.order_management.domain import enums
 
 class Query(BaseModel, frozen=True):
-    pass
+    token: str
 
 class ListShippingOptionsQuery(Query):
     order_id: str

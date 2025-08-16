@@ -157,7 +157,6 @@ message_bus.COMMAND_HANDLERS.update({
     commands.CheckoutItemsCommand: lambda command: handlers.handle_checkout_items(
         command=command,
         uow=repositories.DjangoOrderUnitOfWork(),
-        customer_repo=repositories.DjangoCustomerRepositoryImpl(),
         vendor_repo=repositories.DjangoVendorRepositoryImpl(),
         order_service=domain_services.OrderService(),
         address_validation_service=validation_services.DjangoCustomerAddressValidationService(),

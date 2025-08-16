@@ -16,6 +16,7 @@ class FakeVendorProductSnapshotProvider(ports.VendorProductSnapshotAbstract):
             dtos.VendorProductSnapshotDTO(
                 product_id="p-234",
                 vendor_id="v-234",
+                tenant_id="tenant123",
                 product_sku="T-SHIRT-L",
                 product_name="T Shirt Large Size",
                 product_category="Men's T-Shirts",

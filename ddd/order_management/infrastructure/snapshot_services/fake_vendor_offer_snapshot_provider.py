@@ -18,6 +18,7 @@ class FakeVendorOfferSnapshotProvider(ports.VendorOfferSnapshotAbstract):
             dtos.VendorOfferSnapshotDTO(
                 vendor_id="v-234",
                 offer_id="o-234",
+                tenant_id="tenant123",
                 offer_type=enums.OfferType.PERCENTAGE_DISCOUNT,
                 name="10% Off",
                 discount_value="10",
@@ -32,12 +33,13 @@ class FakeVendorOfferSnapshotProvider(ports.VendorOfferSnapshotAbstract):
         ]
 
 
-    def get_coupons_for_offers(self, offer_id: uuid.UUID) -> List[dtos.VendorCouponSnapshotDTO]:
+    def get_coupons_for_offers(self, offer_id: str) -> List[dtos.VendorCouponSnapshotDTO]:
         #TODO rest api here
         return [
             dtos.VendorCouponSnapshotDTO(
                 vendor_id="v-234",
                 offer_id="o-234",
+                tenant_id="tenant123",
                 coupon_code="WELCOME25",
                 start_date=datetime.now(pytz.utc),
                 end_date=datetime.now(pytz.utc) + relativedelta(years=1),

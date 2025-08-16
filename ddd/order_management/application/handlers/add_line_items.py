@@ -27,6 +27,7 @@ def handle_add_line_items(
             )
 
             line_items = vendor_repo.get_line_items(
+                order.tenant_id,
                 order.vendor_id, 
                 command.product_skus
             )

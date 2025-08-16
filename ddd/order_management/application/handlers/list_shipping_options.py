@@ -27,7 +27,10 @@ def handle_list_shipping_options(
             required_scope={"customer_id": order.customer_details.customer_id }
         )
 
-        vendor_shipping_options = vendor_repo.get_shipping_options(vendor_id=order.vendor_id)
+        vendor_shipping_options = vendor_repo.get_shipping_options(
+                tenant_id=order.tenant_id, 
+                vendor_id=order.vendor_id
+            )
         available_shipping_options = shipping_option_service.get_applicable_shipping_options(
             order=order,
             vendor_shipping_options=vendor_shipping_options

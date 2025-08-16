@@ -9,13 +9,17 @@ from ddd.order_management.infrastructure import django_mappers
 class DjangoVendorRepositoryImpl(repositories.VendorAbstract):
 
     def get_line_items(
-        self, vendor_id: str, product_skus_input: List[ProductSkuDTO]
+        self, 
+        tenant_id: str,
+        vendor_id: str, 
+        product_skus_input: List[ProductSkuDTO]
     ) -> List[models.LineItem]:
         vendor_details = self._get_active_vendor_details(vendor_id)
 
         product_sku_map = {sku.product_sku: sku.order_quantity for sku in product_skus_input}
 
         available_products = list(django_snapshots.VendorProductSnapshot.objects.filter(
+                tenant_id=tenant_id,
                 vendor_id=vendor_id, 
                 product_sku__in=product_sku_map.keys(),
                 is_active=True
@@ -44,9 +48,11 @@ class DjangoVendorRepositoryImpl(repositories.VendorAbstract):
 
 
     def get_offers(
-        self, vendor_id: str
+        self, 
+        tenant_id: str,
+        vendor_id: str
     ) -> List[value_objects.OfferStrategy]:
-        offers = django_snapshots.VendorOfferSnapshot.objects.filter(vendor_id=vendor_id, is_active=True).values()
+        offers = django_snapshots.VendorOfferSnapshot.objects.filter(tenant_id=tenant_id, vendor_id=vendor_id, is_active=True).values()
         offer_list = [
             { **offer, "coupons": list(django_snapshots.VendorCouponSnapshot.objects.filter(offer_id=offer.get("offer_id")).values()) }
             for offer in offers
@@ -64,9 +70,11 @@ class DjangoVendorRepositoryImpl(repositories.VendorAbstract):
 
 
     def get_shipping_options(
-        self, vendor_id: uuid.UUID
+        self,
+        tenant_id: str,
+        vendor_id: str
     ) -> List[value_objects.ShippingOptionStrategy]:
-        shipping_options = django_snapshots.VendorShippingOptionSnapshot.objects.filter(vendor_id=vendor_id, is_active=True)
+        shipping_options = django_snapshots.VendorShippingOptionSnapshot.objects.filter(tenant_id=tenant_id, vendor_id=vendor_id, is_active=True)
         final_opts = []
         for option in shipping_options.values():
             option.pop("id")
@@ -77,14 +85,15 @@ class DjangoVendorRepositoryImpl(repositories.VendorAbstract):
                 continue
         return final_opts
 
-    def _get_active_vendor_details(self, vendor_id: str):
+    def _get_active_vendor_details(self, tenant_id: str, vendor_id: str):
         try:
             return django_snapshots.VendorDetailsSnapshot.objects.get(
+                tenant_id=tenant_id,
                 vendor_id=vendor_id, 
                 is_active=True
             )
         except django_snapshots.VendorDetailsSnapshot.DoesNotExist:
             raise exceptions.VendorDetailsException(
-                f"Vendor details not found for vendor_id={vendor_id}"
+                f"Vendor details not found for tenant {tenant_id} vendor {vendor_id}"
             )
 

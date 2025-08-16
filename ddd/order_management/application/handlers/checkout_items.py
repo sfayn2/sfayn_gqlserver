@@ -11,7 +11,6 @@ from ddd.order_management.application import (
 def handle_checkout_items(
         command: commands.CheckoutItemsCommand, 
         uow: UnitOfWorkAbstract,
-        customer_repo: CustomerAbstract,
         vendor_repo: VendorAbstract,
         address_validation_service: CustomerAddressValidationAbstract,
         stock_validation_service: StockValidationServiceAbstract,
@@ -34,7 +33,11 @@ def handle_checkout_items(
             #    address=command.address
             #)
 
-            vendor_line_items = vendor_repo.get_line_items(command.vendor_id, command.product_skus)
+            vendor_line_items = vendor_repo.get_line_items(
+                user_ctx.tenant_id,
+                command.vendor_id, 
+                command.product_skus
+            )
 
             stock_validation_service.ensure_items_in_stock(vendor_line_items)
 

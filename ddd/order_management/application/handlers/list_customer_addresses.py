@@ -16,13 +16,14 @@ def handle_list_customer_addresses(
         customer_repo: CustomerAbstract,
 ) -> List[dtos.AddressDTO]:
 
-    access_control.ensure_user_is_authorized_for(
-        token=command.token,
+    user_ctx = access_control.ensure_user_is_authorized_for(
+        token=query.token,
         required_permission="list_customer_addresses",
         required_scope={"customer_id": query.customer_id }
     )
 
     customer_addresses = customer_repo.get_shipping_addresses(
+        tenant_id=user_ctx.tenant_id,
         customer_id=query.customer_id
     )
 
