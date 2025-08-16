@@ -5,6 +5,7 @@ from ddd.order_management.application import (
     commands, 
     ports, 
     dtos, 
+    services as application_services,
     shared
 )
 from ddd.order_management.domain import exceptions
@@ -12,7 +13,7 @@ from ddd.order_management.domain import exceptions
 def handle_confirm_order(
         command: commands.ConfirmOrderCommand, 
         uow: UnitOfWorkAbstract, 
-        payment_service: PaymentServiceAbstract,
+        payment_service: application_services.PaymentService,
         access_control: AccessControlServiceAbstract,
         stock_validation_service: StockValidationServiceAbstract
     ) -> dtos.ResponseDTO:

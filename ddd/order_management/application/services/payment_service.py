@@ -1,0 +1,17 @@
+from __future__ import annotations
+import requests
+from decimal import Decimal
+from ddd.order_management.domain import value_objects, enums
+from ddd.order_management.application import ports
+
+    
+class PaymentService:
+
+    def __init__(self, payment_gateways: Dict[enums.PaymentMethod, ports.PaymentGatewayAbstract]):
+        self.payment_gateways = payment_gateways
+
+    def get_payment_gateway(self, payment_method: enums.PaymentMethod) -> ports.PaymentGatewayAbstract:
+        if payment_method not in self.payment_gateways:
+            raise ValueError(f"Unsupport payment gateway {payment_method}")
+
+        return self.payment_gateways[payment_method]

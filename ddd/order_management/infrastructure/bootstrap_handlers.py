@@ -1,23 +1,24 @@
 import os, redis
 from dotenv import load_dotenv, find_dotenv
-from ddd.order_management.domain import events, services as domain_services
+from ddd.order_management.domain import events, enums, services as domain_services
 from ddd.order_management.infrastructure import (
     event_bus, 
     validation_services, 
-    email_services,
-    logging_services,
+    email_senders,
+    logging,
     repositories,
-    payment_services,
     access_control_services,
     snapshot_services,
-    event_publishers
+    event_publishers,
+    payment_gateways
 )
 from ddd.order_management.application import (
     handlers,
     commands, 
     message_bus, 
     queries,
-    dtos
+    dtos,
+    services as application_services
 )
 
 load_dotenv(find_dotenv(filename=".env.test"))
@@ -46,6 +47,12 @@ JWT_HANDLER = access_control_services.JwtTokenHandler(
 access_control = access_control_services.AccessControlService(
     jwt_handler=JWT_HANDLER
 )
+
+# Configure supported payment gateways
+PAYMENT_GATEWAYS = {
+    enums.PaymentMethod.PAYPAL: payment_gateways.PaypalPaymentGateway(),
+    enums.PaymentMethod.STRIPE: payment_gateways.StripePaymentGateway()
+}
 
 # Configure which events get published
 event_bus.EXTERNAL_EVENT_WHITELIST = []
@@ -120,12 +127,12 @@ event_bus.EVENT_HANDLERS.update({
             lambda event, uow: handlers.handle_logged_order(
                 event=event,
                 uow=uow,
-                logging=logging_services.LoggingService()
+                logging=loggings.SampleLogging()
             ),
             lambda event, uow: handlers.handle_email_canceled_order(
                 event=event, 
                 uow=uow,
-                email=email_services.EmailService()
+                email=email_sender.MyEmailSender()
             )
         ],
     events.SelectedShippingOptionEvent: [
@@ -147,7 +154,7 @@ event_bus.EVENT_HANDLERS.update({
             lambda event, uow: handlers.handle_logged_order(
                 event=event, 
                 uow=uow,
-                logging=logging_services.LoggingService()
+                logging=loggings.SampleLogging()
             ),
         ],
 })
@@ -204,7 +211,7 @@ message_bus.COMMAND_HANDLERS.update({
     commands.ConfirmOrderCommand: lambda command: handlers.handle_confirm_order(
         command=command, 
         uow=repositories.DjangoOrderUnitOfWork(),
-        payment_service=payment_services.PaymentService(),
+        payment_service=application_services.PaymentService(PAYMENT_GATEWAYS),
         access_control=access_control,
         stock_validation_service=validation_services.DjangoStockValidationService()
     ),

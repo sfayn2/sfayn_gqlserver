@@ -1,8 +1,8 @@
 from .coupon_validation_abstract import CouponValidationServiceAbstract
 from .customer_address_validation_service_abstract import CustomerAddressValidationServiceAbstract
-from .email_abstract import EmailServiceAbstract
-from .logging_abstract import LoggingServiceAbstract
-from .payment_abstract import PaymentGatewayAbstract, PaymentServiceAbstract
+from .email_sender_abstract import EmailSenderAbstract
+from .logging_abstract import LoggingAbstract
+from .payment_abstract import PaymentGatewayAbstract
 from .stock_validation_service_abstract import StockValidationServiceAbstract
 #from .vendor_details_snapshot_abstract import VendorDetailsSnapshotAbstract
 from .vendor_offer_snapshot_abstract import VendorOfferSnapshotAbstract
