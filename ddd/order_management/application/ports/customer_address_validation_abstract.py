@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 # ========
 # Validate customer address
 # ==========
-class CustomerAddressValidationServiceAbstract(ABC):
+class CustomerAddressValidationAbstract(ABC):
 
     #TODO what if gues?
     @abstractmethod

@@ -15,7 +15,7 @@ def handle_confirm_order(
         uow: UnitOfWorkAbstract, 
         payment_service: application_services.PaymentService,
         access_control: AccessControlServiceAbstract,
-        stock_validation_service: StockValidationServiceAbstract
+        stock_validation: StockValidationAbstract
     ) -> dtos.ResponseDTO:
 
     try:
@@ -30,7 +30,10 @@ def handle_confirm_order(
                 required_scope={"customer_id": order.customer_details.customer_id }
             )
 
-            stock_validation_service.ensure_items_in_stock(order.line_items)
+            stock_validation.ensure_items_in_stock(
+                order.tenant_id,
+                order.line_items
+            )
 
             payment_gateway = payment_service.get_payment_gateway(command.payment_method)
             payment_details = payment_gateway.get_payment_details(

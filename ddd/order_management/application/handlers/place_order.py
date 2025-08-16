@@ -12,7 +12,7 @@ from ddd.order_management.domain import exceptions
 
 def handle_place_order(
         command: commands.PlaceOrderCommand, 
-        stock_validation_service: StockValidationServiceAbstract,
+        stock_validation: StockValidationAbstract,
         access_control: AccessControlServiceAbstract,
         uow: UnitOfWorkAbstract) -> dtos.ResponseDTO:
     try:
@@ -26,7 +26,10 @@ def handle_place_order(
                 required_scope={"customer_id": order.customer_details.customer_id }
             )
 
-            stock_validation_service.ensure_items_in_stock(order.line_items)
+            stock_validation.ensure_items_in_stock(
+                order.tenant_id,
+                order.line_items
+            )
             order.place_order()
 
             uow.order.save(order)

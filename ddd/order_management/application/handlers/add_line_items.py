@@ -12,7 +12,7 @@ def handle_add_line_items(
         command: commands.AddLineItemsCommand, 
         uow: UnitOfWorkAbstract,
         vendor_repo: VendorAbstract,
-        stock_validation_service: StockValidationServiceAbstract,
+        stock_validation: StockValidationAbstract,
         access_control: AccessControlServiceAbstract
 ) -> dtos.ResponseDTO:
     try:
@@ -35,7 +35,10 @@ def handle_add_line_items(
             for line_item in line_items:
                 order.add_line_item(line_item)
 
-            stock_validation_service.ensure_items_in_stock(order.line_items)
+            stock_validation.ensure_items_in_stock(
+                order.tenant_id,
+                order.line_items
+            )
 
             uow.order.save(order)
             uow.commit()

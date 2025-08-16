@@ -13,7 +13,7 @@ def handle_checkout_items(
         uow: UnitOfWorkAbstract,
         vendor_repo: VendorAbstract,
         address_validation_service: CustomerAddressValidationAbstract,
-        stock_validation_service: StockValidationServiceAbstract,
+        stock_validation: StockValidationAbstract,
         access_control: AccessControlServiceAbstract,
         order_service: OrderServiceAbstract) -> dtos.ResponseDTO:
     try:
@@ -39,7 +39,10 @@ def handle_checkout_items(
                 command.product_skus
             )
 
-            stock_validation_service.ensure_items_in_stock(vendor_line_items)
+            stock_validation.ensure_items_in_stock(
+                user_ctx.tenant_id,
+                vendor_line_items
+            )
 
 
             draft_order = order_service.create_draft_order(

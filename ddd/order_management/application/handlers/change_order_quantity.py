@@ -14,7 +14,7 @@ def handle_change_order_quantity(
         command: commands.ChangeOrderQuantityCommand, 
         uow: UnitOfWorkAbstract,
         access_control: AccessControlServiceAbstract,
-        stock_validation_service: StockValidationServiceAbstract
+        stock_validation: StockValidationAbstract
     ) -> dtos.ResponseDTO:
     try:
         with uow:
@@ -32,7 +32,10 @@ def handle_change_order_quantity(
                 new_quantity=command.new_quantity
             )
 
-            stock_validation_service.ensure_items_in_stock(order.line_items)
+            stock_validation.ensure_items_in_stock(
+                order.tenant_id,
+                order.line_items
+            )
 
             uow.order.save(order)
             uow.commit()

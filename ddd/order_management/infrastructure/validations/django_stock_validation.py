@@ -4,9 +4,9 @@ from ddd.order_management.application import ports
 from order_management import models as django_snapshots
 from ddd.order_management.domain import exceptions
 
-class DjangoStockValidationService(ports.StockValidationServiceAbstract):
+class DjangoStockValidation(ports.StockValidationAbstract):
 
-    def ensure_items_in_stock(self, items: List[models.LineItem]) -> None:
+    def ensure_items_in_stock(self, tenant_id: str, items: List[models.LineItem]) -> None:
 
         if items:
             product_map = self._get_stocks(items)
@@ -19,7 +19,7 @@ class DjangoStockValidationService(ports.StockValidationServiceAbstract):
     def _get_stocks(self, items: List[models.LineItem]):
         product_map = {
             p.product_sku: p.stock
-            for p in django_snapshots.VendorProductSnapshot.objects.filter(product_sku__in=[item.product_sku for item in items], vendor_id=items[0].vendor.vendor_id)
+            for p in django_snapshots.VendorProductSnapshot.objects.filter(tenant_id=tenant_id, product_sku__in=[item.product_sku for item in items], vendor_id=items[0].vendor.vendor_id)
         }
 
         return product_map

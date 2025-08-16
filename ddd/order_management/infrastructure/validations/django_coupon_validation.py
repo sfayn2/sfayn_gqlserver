@@ -6,14 +6,19 @@ from ddd.order_management.infrastructure import django_mappers
 from ddd.order_management.domain import exceptions
 from order_management import models as django_snapshots
 
-class DjangoCouponValidationService(ports.CouponValidationServiceAbstract):
+class DjangoCouponValidation(ports.CouponValidationAbstract):
 
     def ensure_coupon_is_valid(
-        self, coupon_code: str, vendor_id: str
+        self, 
+        tenant_id: str,
+        coupon_code: str, 
+        vendor_id: str
     ) -> value_objects.Coupon:
 
         vendor_coupon_snapshot = django_snapshots.VendorCouponSnapshot.objects.filter(
-            coupon_code=coupon_code, vendor_id=vendor_id
+            tenant_id=tenant_id,
+            coupon_code=coupon_code, 
+            vendor_id=vendor_id
         )
 
         if vendor_coupon_snapshot.exists():

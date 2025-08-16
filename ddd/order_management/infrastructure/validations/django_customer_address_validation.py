@@ -6,7 +6,7 @@ from ddd.order_management.infrastructure import django_mappers
 from ddd.order_management.domain import exceptions
 from order_management import models as django_snapshots
 
-class DjangoCustomerAddressValidationService(ports.CustomerAddressValidationServiceAbstract):
+class DjangoCustomerAddressValidation(ports.CustomerAddressValidationAbstract):
 
     def ensure_customer_address_is_valid(
         self, customer_id: str, address: dtos.AddressDTO

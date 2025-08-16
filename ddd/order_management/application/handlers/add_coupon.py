@@ -12,7 +12,7 @@ from ddd.order_management.domain import exceptions
 
 def handle_add_coupon(
         command: commands.AddCouponCommand, 
-        coupon_validation_service: CouponValidationServiceAbstract,
+        coupon_validation: CouponValidationAbstract,
         uow: UnitOfWorkAbstract,
         access_control: AccessControlServiceAbstract
 ) -> dtos.ResponseDTO:
@@ -28,7 +28,8 @@ def handle_add_coupon(
                 required_scope={"customer_id": order.customer_details.customer_id}
             )
 
-            valid_coupon  = coupon_validation_service.ensure_coupon_is_valid(
+            valid_coupon  = coupon_validation.ensure_coupon_is_valid(
+                    tenant_id=order.tenant_id,
                     coupon_code=command.coupon_code, 
                     vendor_id=order.vendor_id
                 )
