@@ -30,6 +30,8 @@ from .integration_events.auth_integration_events import UserLoggedInIntegrationE
 from .integration_events.product_integration_events import ProductUpdateIntegrationEvent
 from .integration_events.vendor_integration_events import (
     VendorDetailsUpdateIntegrationEvent,
-    VendorCouponUpdateIntegrationEvent
+    VendorCouponUpdateIntegrationEvent,
+    VendorOfferUpdateIntegrationEvent,
+    VendorShippingOptionUpdateIntegrationEvent
 )
 from .integration_events.base import IntegrationEvent

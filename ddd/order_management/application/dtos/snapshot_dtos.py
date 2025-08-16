@@ -23,6 +23,7 @@ class VendorCouponSnapshotDTO(BaseModel):
     is_active: Optional[bool] = None
 
 class VendorOfferSnapshotDTO(BaseModel):
+    tenant_id: str
     vendor_id: str
     offer_id: str
     offer_type: enums.OfferType
@@ -40,6 +41,7 @@ class VendorOfferSnapshotDTO(BaseModel):
         use_enum_values = True
 
 class VendorShippingOptionSnapshotDTO(BaseModel):
+    tenant_id: str
     vendor_id: str
     name: str
     delivery_time: str

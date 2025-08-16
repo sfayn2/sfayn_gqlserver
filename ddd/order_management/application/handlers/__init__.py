@@ -15,6 +15,8 @@ from .remove_line_items import handle_remove_line_items
 from .publish_product_update import handle_publish_product_update
 from .publish_vendor_details_update import handle_publish_vendor_details_update
 from .publish_vendor_coupon_update import handle_publish_vendor_coupon_update
+from .publish_vendor_offer_update import handle_publish_vendor_offer_update
+from .publish_vendor_shippingoption_update import handle_publish_vendor_shippingoption_update
 
 # Queries
 from .get_order import handle_get_order
@@ -32,6 +34,8 @@ from .event_handlers.user_logged_in_async_event import handle_user_logged_in_asy
 from .event_handlers.product_update_async_event import handle_product_update_async_event
 from .event_handlers.vendor_details_update_async_event import handle_vendor_details_update_async_event
 from .event_handlers.vendor_coupon_update_async_event import handle_vendor_coupon_update_async_event
+from .event_handlers.vendor_offer_update_async_event import handle_vendor_offer_update_async_event
+from .event_handlers.vendor_shippingoption_update_async_event import handle_vendor_shippingoption_update_async_event
 
 
 

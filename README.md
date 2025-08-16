@@ -17,7 +17,7 @@ A modular, multi-tenant **Order Management System** built with **Domain Driven D
 - Supports snapshot sync from external systems or manual CSV import (by request)
 
 
-> OMS-agnostic: Can integrate with any system via snapshot sync and available webhooks APIs.
+> OMS-agnostic: Can integrate with any system via snapshot sync or available webhooks APIs.
 
 
 ## Work in Progress
@@ -48,25 +48,25 @@ This Project is currently under active development. Major changes are ongoing.
 * Optionally call syncUser if not using out of the box [identity gateway](https://github.com/sfayn2/identity_gateway)
 2. **Cart Management**
 * Frontend handles cart UX
-* Allow user to fill in customer details + address, When ready to checkout, call [checkoutItems](./mutations/checkout_items.graphql)
+* Allow user to fill in customer details + address, When ready to checkout, call [checkoutItems](./sample_mutations/checkout_items.graphql)
 3. **Checkout**
-* Add more items[addLineItems](./mutations/add_line_items.graphql), [removeLineItems](./mutations/remove_line_items.graphql), or Change product order quantity [changeOrderQuantity](./mutations/change_order_quantity.graphql).
-* Fetch addresses ([listCustomerAddresses](./mutations/list_customer_addresses.graphql))
-* Select destination from addresses (or provide new address) via [changeDestination](./mutations/change_destination.graphql).
-* Apply coupons via  [addCoupon](./mutations/add_coupon.graphql))
-* Select shipping via [listShippingOption](./mutations/list_shipping_option.graphql) & [selectShippingOption](./mutations/selection_shipping_option.graphql)
+* Add more items[addLineItems](./sample_mutations/add_line_items.graphql), [removeLineItems](./sample_mutations/remove_line_items.graphql), or Change product order quantity [changeOrderQuantity](./sample_mutations/change_order_quantity.graphql).
+* Fetch addresses ([listCustomerAddresses](./sample_mutations/list_customer_addresses.graphql))
+* Select destination from addresses (or provide new address) via [changeDestination](./sample_mutations/change_destination.graphql).
+* Apply coupons via  [addCoupon](./sample_mutations/add_coupon.graphql))
+* Select shipping via [listShippingOption](./sample_mutations/list_shipping_option.graphql) & [selectShippingOption](./sample_mutations/selection_shipping_option.graphql)
 4. **Place Order**
-* Call [placeOrder](./mutations/place_order.graphql) to persist the order
+* Call [placeOrder](./sample_mutations/place_order.graphql) to persist the order
 5. **Payment + Fulfillment**
-* After successfull payment, call [confirmOrder](./mutations/confirm_order.graphql)
+* After successfull payment, call [confirmOrder](./sample_mutations/confirm_order.graphql)
 * Vendor then updates order via:
-    * [markAsShipped](./mutations/mark_as_shipped.graphql)
-    * [addShippingTrackingReference](./mutations/add_shipping_tracking_reference.graphql)
-    * [markAsCompleted](./mutations/mark_as_completed.graphql)
+    * [markAsShipped](./sample_mutations/mark_as_shipped.graphql)
+    * [addShippingTrackingReference](./sample_mutations/add_shipping_tracking_reference.graphql)
+    * [markAsCompleted](./sample_mutations/mark_as_completed.graphql)
 6. **Cancel Order**
-* Orders in PENDING or CONFIRMED can be cancelled via [cancelOrder](./mutations/cancel_order.graphql)
+* Orders in PENDING or CONFIRMED can be cancelled via [cancelOrder](./sample_mutations/cancel_order.graphql)
 7. **View Order Details**
-* View Customer Order [getOrder](./mutations/get_order.graphql)
+* View Customer Order [getOrder](./sample_mutations/get_order.graphql)
 
 ## Snapshot Strategy
 
@@ -75,7 +75,7 @@ The OMS relies on local snapshot models for product, vendor, offer, shipping, an
 ### Support snapshots
 - VendorProductSnapshot
 - VendorDetailsSnapshot
-- VendorCoupon
+- VendorCouponSnapshot
 - VendorOffersSnapshot
 - VendorShippingOptionsSnapshot
 - CustomerDetailsSnapshot

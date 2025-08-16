@@ -1,3 +1,5 @@
 from .product_update_api import product_update_api
 from .vendor_details_update_api import vendor_details_update_api
 from .vendor_coupon_update_api import vendor_coupon_update_api
+from .vendor_offer_update_api import vendor_offer_update_api
+from .vendor_shippingoption_update_api import vendor_shippingoption_update_api

@@ -69,7 +69,9 @@ event_bus.EXTERNAL_EVENT_WHITELIST = []
 event_bus.INTERNAL_EVENT_WHITELIST = [
     "order_management.internal_events.ProductUpdatedEvent",
     "order_management.internal_events.VendorDetailsUpdatedEvent",
-    "order_management.internal_events.VendorCouponUpdatedEvent"
+    "order_management.internal_events.VendorCouponUpdatedEvent",
+    "order_management.internal_events.VendorOfferUpdatedEvent",
+    "order_management.internal_events.VendorShippingOptionUpdatedEvent"
 ]
 
 # Setup Redis event publishers
@@ -89,7 +91,9 @@ event_bus.external_publisher = event_publishers.RedisStreamPublisher(
 event_bus.EVENT_MODELS = {
     "order_management.internal_events.ProductUpdatedEvent": dtos.ProductUpdateIntegrationEvent,
     "order_management.internal_events.VendorDetailsUpdatedEvent": dtos.VendorDetailsUpdateIntegrationEvent,
-    "order_management.internal_events.VendorCouponUpdatedEvent": dtos.VendorCouponUpdateIntegrationEvent
+    "order_management.internal_events.VendorCouponUpdatedEvent": dtos.VendorCouponUpdateIntegrationEvent,
+    "order_management.internal_events.VendorOfferUpdatedEvent": dtos.VendorOfferUpdateIntegrationEvent,
+    "order_management.internal_events.VendorShippingOptionUpdatedEvent": dtos.VendorShippingOptionUpdateIntegrationEvent
 }
 
 
@@ -127,6 +131,18 @@ event_bus.ASYNC_INTERNAL_EVENT_HANDLERS.update({
         lambda event: handlers.handle_vendor_coupon_update_async_event(
             event=event,
             vendor_coupon_snapshot_repo=snapshots.DjangoVendorCouponSnapshotRepo()
+        ),
+    ],
+    "order_management.internal_events.VendorOfferUpdatedEvent": [
+        lambda event: handlers.handle_vendor_offer_update_async_event(
+            event=event,
+            vendor_offer_snapshot_repo=snapshots.DjangoVendorOfferSnapshotRepo()
+        ),
+    ],
+    "order_management.internal_events.VendorShippingOptionUpdatedEvent": [
+        lambda event: handlers.handle_vendor_shippingoption_update_async_event(
+            event=event,
+            vendor_shippingoption_snapshot_repo=snapshots.DjangoVendorShippingOptionSnapshotRepo()
         ),
     ],
 })
@@ -253,6 +269,14 @@ message_bus.COMMAND_HANDLERS.update({
         event_publisher=event_bus.internal_publisher
     ),
     commands.PublishVendorCouponUpdateCommand: lambda command: handlers.handle_publish_vendor_coupon_update(
+        command=command,
+        event_publisher=event_bus.internal_publisher
+    ),
+    commands.PublishVendorOfferUpdateCommand: lambda command: handlers.handle_publish_vendor_offer_update(
+        command=command,
+        event_publisher=event_bus.internal_publisher
+    ),
+    commands.PublishVendorShippingOptionUpdateCommand: lambda command: handlers.handle_publish_vendor_shippingoption_update(
         command=command,
         event_publisher=event_bus.internal_publisher
     )

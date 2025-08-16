@@ -6,3 +6,9 @@ class VendorDetailsUpdateIntegrationEvent(IntegrationEvent):
 
 class VendorCouponUpdateIntegrationEvent(IntegrationEvent):
     data: dtos.VendorCouponSnapshotDTO
+
+class VendorOfferUpdateIntegrationEvent(IntegrationEvent):
+    data: dtos.VendorOfferSnapshotDTO
+
+class VendorShippingOptionUpdateIntegrationEvent(IntegrationEvent):
+    data: dtos.VendorShippingOptionSnapshotDTO
