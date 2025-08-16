@@ -1,8 +1,20 @@
+from __future__ import annotations
 import json
-from ddd.order_management.infrastructure import webhook_signatures
+from typing import Dict
+
+SIGNATURE_VERIFIER: Dict[str, callable] = {}
+
+def get_verifier_for(provider: str, tenant_id: str) -> Optional[ports.WebhookSignatureVerifier]:
+
+    provider = provider.lower()
+    verifier = SIGNATURE_VERIFIER.get(provider)
+    if verifier:
+        return verifier(tenant_id)
+
+    return None
 
 def validate_webhook(provider, tenant_id, request):
-    verifier = webhook_signatures.get_verifier_for(provider, tenant_id, request.headers)
+    verifier = get_verifier_for(provider, tenant_id)
     if not verifier:
         raise Exception(f"No verifier found for provider {provider}")
 

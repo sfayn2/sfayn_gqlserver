@@ -2,7 +2,7 @@
 import hmac, hashlib, time
 from ddd.order_management.application import ports
 
-class WSSSignatureVerifier(ports.WebhookSignatureVerifier):
+class WssSignatureVerifier(ports.WebhookSignatureVerifier):
     def __init__(self, shared_secret: str, max_age: int = 3000):
         self.secret = shared_secret
         self.max_age = max_age

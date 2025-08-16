@@ -10,7 +10,8 @@ from ddd.order_management.infrastructure import (
     access_control1,
     snapshots,
     event_publishers,
-    payment_gateways
+    payment_gateways,
+    webhook_signatures
 )
 from ddd.order_management.application import (
     handlers,
@@ -20,6 +21,7 @@ from ddd.order_management.application import (
     dtos,
     services as application_services
 )
+from ddd.order_management.application.services import webhook_validation_service
 
 load_dotenv(find_dotenv(filename=".env.test"))
 
@@ -52,6 +54,11 @@ access_control = access_control1.AccessControl1(
 PAYMENT_GATEWAYS = {
     enums.PaymentMethod.PAYPAL: payment_gateways.PaypalPaymentGateway(),
     enums.PaymentMethod.STRIPE: payment_gateways.StripePaymentGateway()
+}
+
+# Configure Webhook Signature Verifier
+webhook_validation_service.SIGNATURE_VERIFIER = {
+    "wss": lambda tenant_id: webhook_signatures.WssSignatureVerifier(shared_secret=os.getenv(f"WH_SECRET_{tenant_id}"))
 }
 
 # Configure which events get published

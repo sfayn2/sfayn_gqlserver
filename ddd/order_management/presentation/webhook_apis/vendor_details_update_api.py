@@ -3,7 +3,7 @@ from django.http import HttpResponseBadRequest, JsonResponse
 from ddd.order_management.application import (
     message_bus, commands
   )
-from ddd.order_management.presentation.webhook_apis import common
+from ddd.order_management.application.services import validate_webhook
 
 @csrf_exempt
 def vendor_details_update_api(request, provider: str, tenant_id: str):
@@ -12,7 +12,11 @@ def vendor_details_update_api(request, provider: str, tenant_id: str):
         return HttpResponseBadRequest("Only POST is allowed")
 
     try:
-        payload = common.validate_webhook(provider, tenant_id, request)
+        payload = validate_webhook(
+                provider, 
+                tenant_id, 
+                request
+            )
         
         command = commands.PublishVendorDetailsUpdateCommand.model_validate(payload)
         result = message_bus.handle(command)
