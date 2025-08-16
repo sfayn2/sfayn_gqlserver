@@ -116,7 +116,7 @@ event_bus.ASYNC_INTERNAL_EVENT_HANDLERS.update({
     "order_management.internal_events.VendorCouponUpdatedEvent": [
         lambda event: handlers.handle_vendor_coupon_update_async_event(
             event=event,
-            vendor_coupon_repo=snapshots.DjangoVendorCouponSnapshotRepo()
+            vendor_coupon_snapshot_repo=snapshots.DjangoVendorCouponSnapshotRepo()
         ),
     ],
 })
