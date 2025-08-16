@@ -21,7 +21,10 @@ from ddd.order_management.application import (
     dtos,
     services as application_services
 )
-from ddd.order_management.application.services import webhook_validation_service
+from ddd.order_management.application.services import (
+    webhook_validation_service,
+    payment_service
+)
 
 load_dotenv(find_dotenv(filename=".env.test"))
 
@@ -51,7 +54,7 @@ access_control = access_control1.AccessControl1(
 )
 
 # Configure supported payment gateways
-PAYMENT_GATEWAYS = {
+payment_service.PAYMENT_GATEWAYS = {
     enums.PaymentMethod.PAYPAL: payment_gateways.PaypalPaymentGateway(),
     enums.PaymentMethod.STRIPE: payment_gateways.StripePaymentGateway()
 }
@@ -217,7 +220,7 @@ message_bus.COMMAND_HANDLERS.update({
     commands.ConfirmOrderCommand: lambda command: handlers.handle_confirm_order(
         command=command, 
         uow=repositories.DjangoOrderUnitOfWork(),
-        payment_service=application_services.PaymentService(PAYMENT_GATEWAYS),
+        payment_service=application_services.PaymentService(),
         access_control=access_control,
         stock_validation=validation_services.DjangoStockValidationService()
     ),
