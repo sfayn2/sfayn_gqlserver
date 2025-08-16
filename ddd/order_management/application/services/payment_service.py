@@ -16,4 +16,4 @@ class PaymentService:
         if payment_method not in PAYMENT_GATEWAYS:
             raise ValueError(f"Unsupport payment gateway {payment_method}")
 
-        return self.payment_gateways[payment_method]
+        return PAYMENT_GATEWAY.get(payment_method)
