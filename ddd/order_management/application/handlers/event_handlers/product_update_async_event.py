@@ -8,10 +8,10 @@ from ddd.order_management.domain import events, exceptions
 
 def handle_product_update_async_event(
     event: dtos.ProductUpdateIntegrationEvent,
-    product_sync: ports.SnapshotSyncServiceAbstract
+    product_snapshot_repo: ports.SnapshotRepoAbstract
 ):
 
     # sync external produc snapshot sync
-    product_sync.sync(event)
+    product_snapshot_repo.sync(event)
 
     print(f"Product has been updated {event}")

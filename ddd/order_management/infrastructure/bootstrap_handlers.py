@@ -5,10 +5,10 @@ from ddd.order_management.infrastructure import (
     event_bus, 
     validation_services, 
     email_senders,
-    logging,
+    loggings,
     repositories,
     access_control_services,
-    snapshot_services,
+    snapshots,
     event_publishers,
     payment_gateways
 )
@@ -88,8 +88,8 @@ event_bus.ASYNC_EXTERNAL_EVENT_HANDLERS.update({
     "identity_gateway_service.external_events.UserLoggedInEvent": [
             lambda event: handlers.handle_user_logged_in_async_event(
                 event=event,
-                auth_sync=snapshot_services.DjangoUserAuthorizationSnapshotSyncService(ROLE_MAP),
-                customer_sync=snapshot_services.DjangoCustomerSnapshotSyncService()
+                auth_snapshot_repo=snapshots.DjangoUserAuthorizationSnapshotRepo(ROLE_MAP),
+                customer_snapshot_repo=snapshots.DjangoCustomerSnapshotRepo()
             ),
         ],
     "product_catalog.external_events.ProductUpdatedEvent": [],
@@ -104,19 +104,19 @@ event_bus.ASYNC_INTERNAL_EVENT_HANDLERS.update({
     "order_management.internal_events.ProductUpdatedEvent": [
         lambda event: handlers.handle_product_update_async_event(
             event=event,
-            product_sync=snapshot_services.DjangoVendorProductSnapshotSyncService()
+            product_snapshot_repo=snapshots.DjangoVendorProductSnapshotRepo()
         ),
     ],
     "order_management.internal_events.VendorDetailsUpdatedEvent": [
         lambda event: handlers.handle_vendor_details_update_async_event(
             event=event,
-            vendor_details_sync=snapshot_services.DjangoVendorDetailsSnapshotSyncService()
+            vendor_details_snapshot_repo=snapshots.DjangoVendorDetailsSnapshotRepo()
         ),
     ],
     "order_management.internal_events.VendorCouponUpdatedEvent": [
         lambda event: handlers.handle_vendor_coupon_update_async_event(
             event=event,
-            vendor_coupon_sync=snapshot_services.DjangoVendorCouponSnapshotSyncService()
+            vendor_coupon_repo=snapshots.DjangoVendorCouponSnapshotRepo()
         ),
     ],
 })

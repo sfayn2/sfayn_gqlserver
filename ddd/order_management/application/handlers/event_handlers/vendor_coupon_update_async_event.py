@@ -8,10 +8,10 @@ from ddd.order_management.domain import events, exceptions
 
 def handle_vendor_coupon_update_async_event(
     event: dtos.VendorCouponUpdateIntegrationEvent,
-    vendor_coupon_sync: ports.SnapshotSyncServiceAbstract
+    vendor_coupon_snapshot_repo: ports.SnapshotRepoAbstract
 ):
 
     # sync external vendor coupon snapshot sync
-    vendor_coupon_sync.sync(event)
+    vendor_coupon_snapshot_repo.sync(event)
 
     print(f"Vendor Coupon has been updated {event}")

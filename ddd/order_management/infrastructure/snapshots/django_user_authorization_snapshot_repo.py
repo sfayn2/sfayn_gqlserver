@@ -4,7 +4,7 @@ from ddd.order_management.application import ports, dtos
 from order_management import models as django_snapshots
 
 
-class DjangoUserAuthorizationSnapshotSyncService(ports.SnapshotSyncServiceAbstract):
+class DjangoUserAuthorizationSnapshotRepo(ports.SnapshotRepoAbstract):
     def __init__(self, role_map: Dict[str, List[str]]):
         self.role_map = role_map
 

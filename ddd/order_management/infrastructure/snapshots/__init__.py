@@ -1,0 +1,4 @@
+from .django_user_authorization_snapshot_repo import DjangoUserAuthorizationSnapshotRepo
+from .django_vendor_details_snapshot_repo import DjangoVendorDetailsSnapshotRepo
+from .django_vendor_product_snapshot_repo import DjangoVendorProductSnapshotRepo
+from .django_customer_snapshot_repo import DjangoCustomerSnapshotRepo

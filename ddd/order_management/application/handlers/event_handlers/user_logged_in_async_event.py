@@ -9,8 +9,8 @@ from ddd.order_management.domain import events, exceptions
 #Async handler
 def handle_user_logged_in_async_event(
     event: dtos.UserLoggedInIntegrationEvent,
-    auth_sync: ports.SnapshotSyncServiceAbstract,
-    customer_sync: ports.SnapshotSyncServiceAbstract
+    auth_snapshot_repo: ports.SnapshotRepoAbstract,
+    customer_snapshot_repo: ports.SnapshotRepoAbstract
 ):
 
     try:
@@ -18,9 +18,9 @@ def handle_user_logged_in_async_event(
     except Exception as e:
         raise exceptions.IntegrationException(f"Invalid event payload {e}")
 
-    auth_sync.sync(event_payloads)
+    auth_snapshot_repo.sync(event_payloads)
     if "customer" in event_payloads.roles:
-        customer_sync.sync(event_payloads)
+        customer_snapshot_repo.sync(event_payloads)
 
 
     print(f"User has been logged in {event_payloads}")
