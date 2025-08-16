@@ -7,7 +7,7 @@ from ddd.order_management.infrastructure import (
     email_senders,
     loggings,
     repositories,
-    access_control_services,
+    access_control1,
     snapshots,
     event_publishers,
     payment_gateways
@@ -36,7 +36,7 @@ ROLE_MAP = {
 }
 
 # JWT handler for access acontrol
-JWT_HANDLER = access_control_services.JwtTokenHandler(
+JWT_HANDLER = access_control1.JwtTokenHandler(
     public_key=os.getenv("KEYCLOAK_PUBLIC_KEY"),
     issuer=os.getenv("KEYCLOAK_ISSUER"),
     audience=os.getenv("KEYCLOAK_CLIENT_ID"),
@@ -44,7 +44,7 @@ JWT_HANDLER = access_control_services.JwtTokenHandler(
 )
 
 # Configure JWT Authentication
-access_control = access_control_services.AccessControlService(
+access_control = access_control1.AccessControl1(
     jwt_handler=JWT_HANDLER
 )
 

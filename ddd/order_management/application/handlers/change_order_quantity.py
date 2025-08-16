@@ -13,7 +13,7 @@ from ddd.order_management.domain import exceptions
 def handle_change_order_quantity(
         command: commands.ChangeOrderQuantityCommand, 
         uow: UnitOfWorkAbstract,
-        access_control: AccessControlServiceAbstract,
+        access_control: AccessControl1Abstract,
         stock_validation: StockValidationAbstract
     ) -> dtos.ResponseDTO:
     try:

@@ -13,7 +13,7 @@ def handle_list_shipping_options(
         query: queries.ListShippingOptionsQuery, 
         uow: UnitOfWorkAbstract,
         vendor_repo: VendorAbstract,
-        access_control: AccessControlServiceAbstract,
+        access_control: AccessControl1Abstract,
         shipping_option_service: ShippingOptionStrategyServiceAbstract
 ) -> List[dtos.ShippingDetailsDTO]:
 

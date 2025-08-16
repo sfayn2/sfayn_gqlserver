@@ -14,7 +14,7 @@ def handle_checkout_items(
         vendor_repo: VendorAbstract,
         address_validation_service: CustomerAddressValidationAbstract,
         stock_validation: StockValidationAbstract,
-        access_control: AccessControlServiceAbstract,
+        access_control: AccessControl1Abstract,
         order_service: OrderServiceAbstract) -> dtos.ResponseDTO:
     try:
         with uow:

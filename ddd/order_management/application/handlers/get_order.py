@@ -11,7 +11,7 @@ from ddd.order_management.application import (
 
 def handle_get_order(
         query: queries.GetOrderQuery, 
-        access_control: AccessControlServiceAbstract,
+        access_control: AccessControl1Abstract,
         uow: UnitOfWorkAbstract) -> dtos.OrderResponseDTO:
 
     order = uow.order.get(order_id=query.order_id)

@@ -15,7 +15,7 @@ from .vendor_shippingoption_snapshot_abstract import VendorShippingOptionSnapsho
 from .customer_snapshot_abstract import CustomerSnapshotAbstract
 from .snapshot_repo_abstract import SnapshotRepoAbstract
 
-from .access_control_service_abstract import AccessControlServiceAbstract
+from .access_control1_abstract import AccessControl1Abstract
 from .webhook_signature_verifier_abstract import WebhookSignatureVerifier
 
 # Events

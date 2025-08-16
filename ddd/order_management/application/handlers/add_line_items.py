@@ -13,7 +13,7 @@ def handle_add_line_items(
         uow: UnitOfWorkAbstract,
         vendor_repo: VendorAbstract,
         stock_validation: StockValidationAbstract,
-        access_control: AccessControlServiceAbstract
+        access_control: AccessControl1Abstract
 ) -> dtos.ResponseDTO:
     try:
         with uow:

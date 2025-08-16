@@ -13,7 +13,7 @@ from ddd.order_management.domain import exceptions
 def handle_change_destination(
         command: commands.ChangeDestinationCommand, 
         uow: UnitOfWorkAbstract,
-        access_control: AccessControlServiceAbstract
+        access_control: AccessControl1Abstract
     ) -> dtos.ResponseDTO:
     try:
         with uow:

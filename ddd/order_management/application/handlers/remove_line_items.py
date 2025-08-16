@@ -11,7 +11,7 @@ from ddd.order_management.application import (
 def handle_remove_line_items(
         command: commands.RemoveLineItemsCommand, 
         uow: UnitOfWorkAbstract,
-        access_control: AccessControlServiceAbstract,
+        access_control: AccessControl1Abstract,
         vendor_repo: VendorAbstract
 ) -> dtos.ResponseDTO:
     try:

@@ -12,7 +12,7 @@ from ddd.order_management.application import (
 def handle_list_customer_addresses(
         query: queries.ListCustomerAddressesQuery, 
         uow: UnitOfWorkAbstract,
-        access_control: AccessControlServiceAbstract,
+        access_control: AccessControl1Abstract,
         customer_repo: CustomerAbstract,
 ) -> List[dtos.AddressDTO]:
 

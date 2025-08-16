@@ -14,7 +14,7 @@ def handle_add_coupon(
         command: commands.AddCouponCommand, 
         coupon_validation: CouponValidationAbstract,
         uow: UnitOfWorkAbstract,
-        access_control: AccessControlServiceAbstract
+        access_control: AccessControl1Abstract
 ) -> dtos.ResponseDTO:
 
     try:

@@ -14,7 +14,7 @@ def handle_confirm_order(
         command: commands.ConfirmOrderCommand, 
         uow: UnitOfWorkAbstract, 
         payment_service: application_services.PaymentService,
-        access_control: AccessControlServiceAbstract,
+        access_control: AccessControl1Abstract,
         stock_validation: StockValidationAbstract
     ) -> dtos.ResponseDTO:
 

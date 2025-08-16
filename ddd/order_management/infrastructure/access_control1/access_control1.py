@@ -5,7 +5,7 @@ from order_management import models as django_snapshots
 from ddd.order_management.domain import exceptions
 from ddd.order_management.application import ports, dtos
 
-class AccessControlService(ports.AccessControlServiceAbstract):
+class AccessControl1(ports.AccessControl1Abstract):
     def __init__(self, jwt_handler: str):
         self.jwt_handler = jwt_handler
         #self.userinfo_url = userinfo_url

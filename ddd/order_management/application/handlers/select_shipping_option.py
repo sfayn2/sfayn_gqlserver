@@ -13,7 +13,7 @@ def handle_select_shipping_option(
         command: commands.SelectShippingOptionCommand, 
         uow: UnitOfWorkAbstract,
         vendor_repo: VendorAbstract,
-        access_control: AccessControlServiceAbstract,
+        access_control: AccessControl1Abstract,
         shipping_option_service: ShippingOptionStrategyServiceAbstract,
         ) -> dtos.ResponseDTO:
     try:

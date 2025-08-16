@@ -13,7 +13,7 @@ from ddd.order_management.domain import exceptions
 def handle_place_order(
         command: commands.PlaceOrderCommand, 
         stock_validation: StockValidationAbstract,
-        access_control: AccessControlServiceAbstract,
+        access_control: AccessControl1Abstract,
         uow: UnitOfWorkAbstract) -> dtos.ResponseDTO:
     try:
         with uow:
