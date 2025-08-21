@@ -29,7 +29,8 @@ from ddd.order_management.application import (
 from ddd.order_management.application.services import (
     webhook_validation_service,
     payment_service,
-    shipping_option_service
+    shipping_option_service,
+    offer_service
 )
 
 load_dotenv(find_dotenv(filename=".env.test"))
@@ -66,6 +67,15 @@ shipping_option_service.SHIPPING_OPTIONS = [
     domain_services.shipping_option_strategies.ExpressShippingStrategy,
     domain_services.shipping_option_strategies.LocalPickupShippingStrategy,
     domain_services.shipping_option_strategies.FreeShippingStrategy,
+]
+
+
+# Configure Vendor offerings
+offer_service.OFFERS = [
+    domain_services.offer_strategies.percentage_discount.PercentageDiscountStrategy,
+    domain_services.offer_strategies.free_gifts.FreeGiftOfferStrategy,
+    domain_services.offer_strategies.percentage_discount_by_coupon.PercentageDiscountCouponOfferStrategy,
+    domain_services.offer_strategies.free_shipping.FreeShippingOfferStrategy
 ]
 
 # Configure supported payment gateways
