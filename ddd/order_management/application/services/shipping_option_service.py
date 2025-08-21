@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import List, Dict, Tuple
+from typing import List, Dict, Tuple, Type
 
 from ddd.order_management.domain import (
     enums,
@@ -8,7 +8,7 @@ from ddd.order_management.domain import (
     services
 )
 
-SHIPPING_OPTIONS = Tuple[Tuple[enums.ShippingMethod, services.shipping_option_strategies.ShippingOptionStrategyAbstract]]
+SHIPPING_OPTIONS = List[Tuple[enums.ShippingMethod, Type[services.shipping_option_strategies.ShippingOptionStrategyAbstract]]]
 
 
 class ShippingOptionStrategyService:
@@ -21,13 +21,15 @@ class ShippingOptionStrategyService:
 
         valid_shipping_options = []
 
+        # check if theres a handler
         for option in vendor_shipping_options:
-            for so in SHIPPING_OPTIONS:
-                if option.option_name == so[0]:
+            for method, strategy_cls in SHIPPING_OPTIONS:
+                if option.option_name == method:
                     valid_shipping_options.append(
-                        ship_opt_strategy_class(option)
+                        strategy_cls(option)
                     )
 
+        # calculate cost if available
         options = []
         for option in valid_shipping_options:
             if option.is_eligible(order):
