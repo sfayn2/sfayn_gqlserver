@@ -8,7 +8,7 @@ from ddd.order_management.domain import (
     services
 )
 
-SHIPPING_OPTIONS = List[Tuple[enums.ShippingMethod, Type[services.shipping_option_strategies.ShippingOptionStrategyAbstract]]]
+SHIPPING_OPTIONS = List[Type[services.shipping_option_strategies.ShippingOptionStrategyAbstract]]
 
 
 class ShippingOptionStrategyService:
@@ -23,8 +23,10 @@ class ShippingOptionStrategyService:
 
         # check if theres a handler
         for option in vendor_shipping_options:
-            for method, strategy_cls in SHIPPING_OPTIONS:
-                if option.option_name == method:
+            for strategy_cls in SHIPPING_OPTIONS:
+                if (strategy_cls(option).method == option.method and
+                    strategy_cls(option).option_name == option.option_name
+                    ):
                     valid_shipping_options.append(
                         strategy_cls(option)
                     )

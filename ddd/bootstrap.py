@@ -60,15 +60,12 @@ access_control = access_control1.AccessControl1(
 )
 
 
-# Configure supported shipping options (if eligible)
+# Configure supported shipping options (still subject to  eligibility)
 shipping_option_service.SHIPPING_OPTIONS = [
-    (enums.ShippingMethod.STANDARD, domain_services.shipping_option_strategies.StandardShippingStrategy),
-    (enums.ShippingMethod.EXPRESS, domain_services.shipping_option_strategies.ExpressShippingStrategy),
-    (enums.ShippingMethod.LOCAL_PICKUP, domain_services.shipping_option_strategies.LocalPickupShippingStrategy),
-    (enums.ShippingMethod.FREE_SHIPPING, domain_services.shipping_option_strategies.FreeShippingStrategy),
-
-    #(enums.ShippingMethod.STANDARD, "Custom also can?")
-    #(enums.ShippingMethod.OTHER, "Custom here?")
+    domain_services.shipping_option_strategies.StandardShippingStrategy,
+    domain_services.shipping_option_strategies.ExpressShippingStrategy,
+    domain_services.shipping_option_strategies.LocalPickupShippingStrategy,
+    domain_services.shipping_option_strategies.FreeShippingStrategy,
 ]
 
 # Configure supported payment gateways
