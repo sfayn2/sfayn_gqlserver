@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import List, Dict
+from typing import List, Dict, Tuple
 
 from ddd.order_management.domain import (
     enums,
@@ -8,7 +8,7 @@ from ddd.order_management.domain import (
     services
 )
 
-SHIPPING_OPTIONS = Dict[enums.ShippingMethod, services.shipping_option_strategies.ShippingOptionStrategyAbstract]
+SHIPPING_OPTIONS = Tuple[Tuple[enums.ShippingMethod, services.shipping_option_strategies.ShippingOptionStrategyAbstract]]
 
 
 class ShippingOptionStrategyService:
