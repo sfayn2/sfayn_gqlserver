@@ -24,22 +24,20 @@ class ShippingOptionStrategyService:
         # check if theres a handler
         for option in vendor_shipping_options:
             for strategy_cls in SHIPPING_OPTIONS:
-                if (strategy_cls(option).method == option.method and
-                    strategy_cls(option).option_name == option.option_name
+                strategy_ins = strategy_cls(option)
+                if (strategy_ins.method == option.method and
+                    strategy_ins.option_name == option.option_name
                     ):
-                    valid_shipping_options.append(
-                        strategy_cls(option)
-                    )
+                    valid_shipping_options.append(strategy_ins)
 
         # calculate cost if available
         options = []
         for option in valid_shipping_options:
             if option.is_eligible(order):
-                cost = option.calculate_cost(order)
                 options.append(value_objects.ShippingDetails(
                         method=option.option_name,
                         delivery_time=option.delivery_time,
-                        cost=cost)
+                        cost=option.calculate_cost(order))
                 )
 
         if not options:
