@@ -37,6 +37,7 @@ class OfferType(Enum):
     BUNDLE = "bundle"
     FREE_GIFT = "free_gift"
     FREE_SHIPPING = "free_shipping"
+    OTHER = "Other" # for custom 
 
     @classmethod
     def choices(cls):
@@ -46,6 +47,7 @@ class PaymentMethod(Enum):
     PAYPAL = "Paypal"
     STRIPE = "Stripe"
     COD = "Cash On Delivery"
+    OTHER = "Other" # for custom 
 
     @classmethod
     def choices(cls):
