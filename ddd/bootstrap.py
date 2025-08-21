@@ -1,6 +1,11 @@
 import os, redis
 from dotenv import load_dotenv, find_dotenv
-from ddd.order_management.domain import events, enums, services as domain_services
+from ddd.order_management.domain import (
+    events, 
+    enums, 
+    value_objects,
+    services as domain_services
+)
 from ddd.order_management.infrastructure import (
     event_bus, 
     validations, 
@@ -23,7 +28,8 @@ from ddd.order_management.application import (
 )
 from ddd.order_management.application.services import (
     webhook_validation_service,
-    payment_service
+    payment_service,
+    shipping_option_service
 )
 
 load_dotenv(find_dotenv(filename=".env.test"))
@@ -51,6 +57,15 @@ JWT_HANDLER = access_control1.JwtTokenHandler(
 # Configure JWT Authentication
 access_control = access_control1.AccessControl1(
     jwt_handler=JWT_HANDLER
+)
+
+
+# Configure supported shipping options (if eligible)
+shipping_option_service.SHIPPING_OPTIONS = (
+    (enums.ShippingMethod.STANDARD, domain_services.shipping_option_strategies.StandardShippingStrategy),
+    (enums.ShippingMethod.EXPRESS, domain_services.shipping_option_strategies.ExpressShippingStrategy),
+    (enums.ShippingMethod.LOCAL_PICKUP, domain_services.shipping_option_strategies.LocalPickupShippingStrategy),
+    (enums.ShippingMethod.FREE_SHIPPING, domain_services.shipping_option_strategies.FreeShippingStrategy)
 )
 
 # Configure supported payment gateways
@@ -225,7 +240,7 @@ message_bus.COMMAND_HANDLERS.update({
         uow=repositories.DjangoOrderUnitOfWork(),
         vendor_repo=repositories.DjangoVendorRepositoryImpl(),
         access_control=access_control,
-        shipping_option_service=domain_services.ShippingOptionStrategyService()
+        shipping_option_service=shipping_option_service.ShippingOptionStrategyService()
     ),
     commands.PlaceOrderCommand: lambda command: handlers.handle_place_order(
         command=command,
@@ -288,7 +303,7 @@ message_bus.QUERY_HANDLERS.update({
         query=query, 
         uow=repositories.DjangoOrderUnitOfWork(),
         vendor_repo=repositories.DjangoVendorRepositoryImpl(),
-        shipping_option_service=domain_services.ShippingOptionStrategyService()
+        shipping_option_service=shipping_option_service.ShippingOptionStrategyService()
     ),
     queries.ListCustomerAddressesQuery: lambda query: handlers.handle_list_customer_addresses(
         query=query, 

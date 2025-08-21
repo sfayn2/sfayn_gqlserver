@@ -24,6 +24,7 @@ class ShippingMethod(Enum):
     FREE_SHIPPING = "Free Shipping"
     SAME_DAY = "Same Day Delivery"
     FLAT_RATE = "Flat Rate"
+    OTHER = "Other" # for custom or external shipping method?
 
     @classmethod
     def choices(cls):

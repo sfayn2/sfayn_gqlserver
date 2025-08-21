@@ -6,7 +6,8 @@ class ShippingOptionStrategyMapper:
     @staticmethod
     def to_domain(django_filter_results) -> value_objects.ShippingOptionStrategy:
         return value_objects.ShippingOptionStrategy(
-            name=enums.ShippingMethod(django_filter_results.get("name")),
+            option_name=django_filter.get("option_name"),
+            method=enums.ShippingMethod(django_filter_results.get("method")),
             delivery_time=django_filter_results.get("delivery_time"),
             conditions=json.loads(django_filter_results.get("conditions")),
             base_cost=value_objects.Money(

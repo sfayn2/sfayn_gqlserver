@@ -217,11 +217,9 @@ class VendorOfferSnapshot(models.Model):
 class VendorShippingOptionSnapshot(models.Model):
     vendor_id = models.CharField(max_length=150)
     tenant_id = models.CharField(max_length=150)
-    name = models.CharField(max_length=255, help_text="ex. Standard")
 
-    #for future fullfilmmemt requirement?
-    #method = models.CharField(max_length=255, help_text="DHL Standard")
-    #carrier = models.CharField(max_length=255, help_text="DHL")
+    option_name = models.CharField(max_length=255, help_text="Just a name of this shipping Option. e.g. MyStandard")
+    method = models.CharField(max_length=50, null=True, blank=True, choices=enums.ShippingMethod.choices)
 
     base_cost = models.DecimalField(
             decimal_places=settings.DEFAULT_DECIMAL_PLACES, 

@@ -43,7 +43,7 @@ class VendorOfferSnapshotDTO(BaseModel):
 class VendorShippingOptionSnapshotDTO(BaseModel):
     tenant_id: str
     vendor_id: str
-    name: str
+    option_name: str
     delivery_time: str
     conditions: dict
     base_cost: Decimal

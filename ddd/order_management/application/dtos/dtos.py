@@ -126,8 +126,9 @@ class OfferStrategyDTO(BaseModel):
         use_enum_values = True
 
 class ShippingOptionStrategyDTO(BaseModel):
-    name: enums.ShippingMethod
+    option_name: str
     delivery_time: str
+    method: enums.ShippingMethod
     conditions: dict
     base_cost: MoneyDTO
     flat_rate: MoneyDTO
