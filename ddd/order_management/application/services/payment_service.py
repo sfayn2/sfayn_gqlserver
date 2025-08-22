@@ -5,14 +5,15 @@ from decimal import Decimal
 from ddd.order_management.domain import value_objects, enums
 from ddd.order_management.application import ports
 
-PAYMENT_OPTIONS: List[Type[ports.PaymentGatewayAbstract]]
 
-    
 class PaymentService:
+
+    def __init__(self, payment_options: List[ports.PaymentGatewayAbstract]):
+        self.payment_options = payment_options
 
     def select_payment_option(self, payment_method: enums.PaymentMethod, provider: str) -> ports.PaymentGatewayAbstract:
 
-        for option in PAYMENT_OPTIONS:
+        for option in payment_options:
             if (payment_method == option.payment_option.method and 
             provider == option.payment_option.provider):
                 return option

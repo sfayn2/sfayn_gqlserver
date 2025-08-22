@@ -2,7 +2,7 @@ from __future__ import annotations
 from ddd.order_management.domain import models, value_objects
 from ddd.order_management.domain.services.offer_strategies import ports
 
-class FreeGiftOfferStrategy(ports.OfferStrategyAbstract):
+class FreeGiftsOfferStrategy(ports.OfferStrategyAbstract):
 
     def apply(self):
         free_gifts = []

@@ -5,13 +5,16 @@ from ddd.order_management.domain import (
     enums,
     value_objects,
     exceptions,
-    services
 )
+from ddd.order_management.domain.services import shipping_option_strategies
 
-SHIPPING_OPTIONS = List[Type[services.shipping_option_strategies.ShippingOptionStrategyAbstract]]
+#SHIPPING_OPTIONS = List[shipping_option_strategies.port.ShippingOptionStrategyAbstract]
 
 
-class ShippingOptionStrategyService:
+class ShippingOptionService:
+
+    def __init__(self, shipping_options: List[shipping_option_strategies.port.ShippingOptionStrategyAbstract]):
+        self.shipping_options = shipping_options
 
     def get_applicable_shipping_options(
                 self, 
@@ -23,7 +26,7 @@ class ShippingOptionStrategyService:
 
         # check if theres a handler
         for option in vendor_shipping_options:
-            for strategy_cls in SHIPPING_OPTIONS:
+            for strategy_cls in self.shipping_options:
                 strategy_ins = strategy_cls(option)
                 if (strategy_ins.method == option.method and
                     strategy_ins.option_name == option.option_name

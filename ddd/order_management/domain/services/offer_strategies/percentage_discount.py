@@ -2,7 +2,7 @@ from __future__ import annotations
 from ddd.order_management.domain import models, value_objects
 from ddd.order_management.domain.services.offer_strategies import ports
 
-class PercentageDiscountStrategy(ports.OfferStrategyAbstract):
+class PercentageDiscountOfferStrategy(ports.OfferStrategyAbstract):
 
     #apply on order
     def apply(self):

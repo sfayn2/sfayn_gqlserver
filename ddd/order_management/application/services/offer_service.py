@@ -5,7 +5,6 @@ from ddd.order_management.domain.services.offer_strategies import (
     ports
 )
 
-OFFERS = List[Type[ports.OfferStrategyAbstract]]
 
 # ================
 # Offer Strategy Service
@@ -13,9 +12,8 @@ OFFERS = List[Type[ports.OfferStrategyAbstract]]
 
 class OfferService:
 
-    #def __init__(self, offers: OFFER_STRATEGIES = DEFAULT_OFFER_STRATEGIES):
-    #    #self.vendor_repository = vendor_repository
-    #    self.offer_strategies = offers
+    def __init__(self, offers: List[ports.OfferStrategyAbstract]):
+        self.offers = offers
 
     def evaluate_applicable_offers(
                 self, 
@@ -31,7 +29,7 @@ class OfferService:
         sorted_vendor_offers = sorted(vendor_offers, key=lambda vo: vo.priority, reverse=True)
 
         for offer in sorted_vendor_offers:
-            for strategy_cls in OFFERS:
+            for strategy_cls in self.offers:
                 valid_offers.append(
                     strategy_cls(offer, order)
                 )

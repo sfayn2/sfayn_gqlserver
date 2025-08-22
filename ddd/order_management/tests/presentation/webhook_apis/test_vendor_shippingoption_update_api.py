@@ -29,7 +29,8 @@ def valid_payload(tenant_id):
     vendor_shipping = dtos.VendorShippingOptionSnapshotDTO(
             vendor_id="v-234",
             tenant_id="tenant123",
-            name="Standard",
+            option_name="MyStandard",
+            method="Standard",
             delivery_time="2-3 Days",
             conditions={"max_weight": 30},
             base_cost=Decimal("5"),
@@ -47,7 +48,7 @@ def valid_payload(tenant_id):
 @pytest.fixture
 def custom_headers():
     return {
-        "HTTP_X_Wss_Signature": "72cb720919911b84ba10b56a0fb8da7580274903785769b5be99ef6e2332ff6b",
+        "HTTP_X_Wss_Signature": "0a4ce7aab104cc49a939c7a9cce3f6dc30933e382244941528884986270eb279",
         "HTTP_X_Wss_Timestamp": str(int(time.time()))
     }
 

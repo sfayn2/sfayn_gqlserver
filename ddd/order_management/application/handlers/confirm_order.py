@@ -35,8 +35,12 @@ def handle_confirm_order(
                 order.line_items
             )
 
-            payment_option = payment_service.select_payment_option(command.payment_method, command.provider)
-            payment_details = payment_option.get_payment_details(
+            payment_gateway = payment_service.select_payment_option(
+                command.payment_method, 
+                command.provider
+            )
+
+            payment_details = payment_gateway.get_payment_details(
                 command.transaction_id,
                 order=order
             )
