@@ -44,8 +44,7 @@ class OfferType(Enum):
         return generate_choices(cls)
 
 class PaymentMethod(Enum):
-    PAYPAL = "Paypal"
-    STRIPE = "Stripe"
+    DIGITAL_WALLET = "Digital Wallet"
     COD = "Cash On Delivery"
     OTHER = "Other" # for custom 
 

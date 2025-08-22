@@ -2,7 +2,8 @@ mutation {
   confirmOrder(input: {
     orderId: "ORD-FC8D8D9F",
     transactionId: "2L633961FY072164Y",
-    method: "Paypal"
+    method: "Digital Wallet",
+    provider: "paypal"
   }) {
     result {
       message

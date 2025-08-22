@@ -136,7 +136,7 @@ class Order:
                 f"Payment details paid amount not match with expected amount {self.final_amount.amount} {self.final_amount.currency}"
             )
 
-        if payment_details.status != enums.PaymentMethod.PAID:
+        if payment_details.status != enums.PaymentStatus.PAID:
             raise exceptions.InvalidOrderOperation(f"Payment details {payment_details.transaction_id} was not success")
 
         self._update_payment_details(payment_details)

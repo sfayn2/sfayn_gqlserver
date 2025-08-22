@@ -141,3 +141,8 @@ class ShippingOptionStrategyDTO(BaseModel):
 class ProductSkusDTO(BaseModel):
     product_sku: str
     order_quantity: int
+
+# use for defining payment options
+class PaymentOptionDTO(BaseModel):
+    method: enums.PaymentMethod
+    provider: str

@@ -10,3 +10,8 @@ class PaymentGatewayAbstract(ABC):
     @abstractmethod
     def get_payment_details(self) -> value_objects.PaymentDetails:
         raise NotImplementedError("Subclasses must implement this method")
+
+    @property
+    @abstractmethod
+    def payment_option(self) -> dtos.PaymentOptionDTO:
+        raise NotImplementedError("Subclasses must implement this abstract property")

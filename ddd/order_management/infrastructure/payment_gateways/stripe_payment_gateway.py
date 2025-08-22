@@ -3,7 +3,7 @@ import requests, os
 from decimal import Decimal
 from django.conf import settings
 from ddd.order_management.domain import value_objects, enums
-from ddd.order_management.application import ports
+from ddd.order_management.application import ports, dtos
 
 
 class StripePaymentGateway(ports.PaymentGatewayAbstract):
@@ -47,5 +47,12 @@ class StripePaymentGateway(ports.PaymentGatewayAbstract):
             order_id=stripe_order_id,
             status=stripe_payment_status
         )
+
+    @property
+    def payment_option(self):
+        return {
+            "method": enums.PaymentMethod.DIGITAL_WALLET,
+            "provider": "paypal"
+        }
 
     

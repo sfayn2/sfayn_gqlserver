@@ -62,7 +62,7 @@ access_control = access_control1.AccessControl1(
 
 
 # Configure supported shipping options (still subject to  eligibility)
-shipping_option_service.SHIPPING_OPTIONS = [
+application_services.shipping_option_service.SHIPPING_OPTIONS = [
     domain_services.shipping_option_strategies.StandardShippingStrategy,
     domain_services.shipping_option_strategies.ExpressShippingStrategy,
     domain_services.shipping_option_strategies.LocalPickupShippingStrategy,
@@ -71,21 +71,21 @@ shipping_option_service.SHIPPING_OPTIONS = [
 
 
 # Configure Vendor offerings
-offer_service.OFFERS = [
+application_services.offer_service.OFFERS = [
     domain_services.offer_strategies.percentage_discount.PercentageDiscountStrategy,
     domain_services.offer_strategies.free_gifts.FreeGiftOfferStrategy,
     domain_services.offer_strategies.percentage_discount_by_coupon.PercentageDiscountCouponOfferStrategy,
     domain_services.offer_strategies.free_shipping.FreeShippingOfferStrategy
 ]
 
-# Configure supported payment gateways
-payment_service.PAYMENT_GATEWAYS = {
-    enums.PaymentMethod.PAYPAL: payment_gateways.PaypalPaymentGateway(),
-    enums.PaymentMethod.STRIPE: payment_gateways.StripePaymentGateway()
-}
+# Configure supported payment options
+application_services.payment_service.PAYMENT_OPTIONS = [
+    payment_gateways.PaypalPaymentGateway(),
+    payment_gateways.StripePaymentGateway(),
+]
 
 # Configure Webhook Signature Verifier
-webhook_validation_service.SIGNATURE_VERIFIER = {
+application_services.webhook_validation_service.SIGNATURE_VERIFIER = {
     "wss": lambda tenant_id: webhook_signatures.WssSignatureVerifier(shared_secret=os.getenv(f"WH_SECRET_{tenant_id}"))
 }
 
@@ -191,7 +191,7 @@ event_bus.EVENT_HANDLERS.update({
                 event=event, 
                 uow=uow,
                 vendor=repositories.DjangoVendorRepositoryImpl(),
-                offer_service=domain_services.OfferStrategyService()
+                offer_service=application_services.offer_service.OfferService()
             )
         ],
     events.AppliedOffersEvent: [
@@ -250,7 +250,7 @@ message_bus.COMMAND_HANDLERS.update({
         uow=repositories.DjangoOrderUnitOfWork(),
         vendor_repo=repositories.DjangoVendorRepositoryImpl(),
         access_control=access_control,
-        shipping_option_service=shipping_option_service.ShippingOptionStrategyService()
+        shipping_option_service=application_services.shipping_option_service.ShippingOptionStrategyService()
     ),
     commands.PlaceOrderCommand: lambda command: handlers.handle_place_order(
         command=command,
@@ -261,7 +261,7 @@ message_bus.COMMAND_HANDLERS.update({
     commands.ConfirmOrderCommand: lambda command: handlers.handle_confirm_order(
         command=command, 
         uow=repositories.DjangoOrderUnitOfWork(),
-        payment_service=application_services.PaymentService(),
+        payment_service=application_services.payment_service.PaymentService(),
         access_control=access_control,
         stock_validation=validation_services.DjangoStockValidationService()
     ),
@@ -313,7 +313,7 @@ message_bus.QUERY_HANDLERS.update({
         query=query, 
         uow=repositories.DjangoOrderUnitOfWork(),
         vendor_repo=repositories.DjangoVendorRepositoryImpl(),
-        shipping_option_service=shipping_option_service.ShippingOptionStrategyService()
+        shipping_option_service=application_services.shipping_option_service.ShippingOptionStrategyService()
     ),
     queries.ListCustomerAddressesQuery: lambda query: handlers.handle_list_customer_addresses(
         query=query, 

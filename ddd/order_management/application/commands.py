@@ -34,6 +34,7 @@ class ConfirmOrderCommand(Command1):
     order_id: str
     transaction_id: str
     payment_method: enums.PaymentMethod
+    provider: str
 
 class SelectShippingOptionCommand(Command1):
     order_id: str

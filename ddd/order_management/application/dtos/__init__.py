@@ -13,7 +13,8 @@ from .dtos import (
     OrderDTO,
     OfferStrategyDTO,
     ShippingOptionStrategyDTO,
-    ProductSkusDTO
+    ProductSkusDTO,
+    PaymentOptionDTO
 )
 from .snapshot_dtos import (
     VendorDetailsSnapshotDTO,

@@ -3,7 +3,7 @@ import requests, os
 from decimal import Decimal
 from django.conf import settings
 from ddd.order_management.domain import value_objects, enums
-from ddd.order_management.application import ports
+from ddd.order_management.application import ports, dtos
 
 class PaypalPaymentGateway(ports.PaymentGatewayAbstract):
 
@@ -49,4 +49,11 @@ class PaypalPaymentGateway(ports.PaymentGatewayAbstract):
             transaction_id=paypal_response.get("id"),
             order_id=purchase_units[0].get("custom"),
             status=enums.PaymentStatus.PAID
+        )
+
+    @property
+    def payment_option(self) -> dtos.PaymentOptionDTO:
+        return dtos.PaymentOptionDTO(
+            method=enums.PaymentMethod.DIGITAL_WALLET,
+            provider="paypal"
         )
