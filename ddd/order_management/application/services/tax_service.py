@@ -39,7 +39,8 @@ class TaxService:
         options = []
 
         for option in valid_taxes:
-            if option.is_eligible(order):
+            # inclusive no need to calculate
+            if option.is_eligible(order) and option.inclusive == False:
                 res = option.calculate_tax(order)
                 if res:
                     tax_results.append(res)

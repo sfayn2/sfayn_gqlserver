@@ -33,7 +33,7 @@ class OfferStrategy:
             if self.discount_value <= 0 or self.discount_value > 100:
                 raise exceptions.OfferStrategyException("Discount value (%) must be between 0 and 100")
 
-        if self.offer_type == enums.OfferType.FREE_GIFT:
+        if self.offer_type == enums.OfferType.FREE_GIFTS:
             if  not self._is_valid_gift_products(self.conditions.get("gift_products")):
                 raise exceptions.OfferStrategyException("Free gift offers must include a valid list of gift products w SKU and quantity.")
         
