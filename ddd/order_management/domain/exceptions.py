@@ -40,6 +40,9 @@ class NoApplicableShippingOptionException(InvalidOrderOperation):
 class NoApplicablePaymentOptionException(InvalidOrderOperation):
     pass
 
+class PaymentNotSettledException(InvalidOrderOperation):
+    pass
+
 class OutOfStockException(InvalidOrderOperation):
     pass
 

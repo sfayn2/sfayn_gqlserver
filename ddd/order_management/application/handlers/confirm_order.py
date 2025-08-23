@@ -40,20 +40,12 @@ def handle_confirm_order(
                 vendor_id=order.vendor_id
             )
 
-            available_payment_options = payment_service.get_applicable_payment_options(
+            payment_details = payment_service.resolve_payment_option(
+                vendor_payment_options=vendor_payment_options,
                 order=order,
-                vendor_payment_options=vendor_payment_options
-            )
-
-            payment_option = payment_service.select_payment_option(
-                command.payment_method, 
-                command.provider,
-                available_payment_options
-            )
-
-            payment_details = payment_option.get_payment_details(
-                command.transaction_id,
-                order=order
+                payment_method=command.payment_method,
+                provider=command.provider,
+                transaction_id=command.transaction_id
             )
 
             is_payment_verified = order.verify_payment(

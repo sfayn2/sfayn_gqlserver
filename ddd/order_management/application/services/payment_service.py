@@ -52,3 +52,28 @@ class PaymentService:
             raise exceptions.NoApplicablePaymentOptionException(f"No available payment options.")
 
         return options
+
+    def resolve_payment_option(
+        self,
+        payment_method: enums.PaymentMethod,
+        provider: str,
+        vendor_payment_options: List[dtos.PaymentOptionDTO],
+        order: models.Order,
+        transaction_id: str
+    ) -> value_objects.PaymentDetails:
+
+        available_payment_options = self.get_applicable_payment_options(
+            order=order,
+            vendor_payment_options=vendor_payment_options
+        )
+
+        payment_option = self.select_payment_option(
+            payment_method, 
+            provider,
+            available_payment_options
+        )
+
+        return payment_option.get_payment_details(
+            command.transaction_id,
+            order=order
+        )

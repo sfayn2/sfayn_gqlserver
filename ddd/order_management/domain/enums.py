@@ -55,6 +55,8 @@ class PaymentMethod(Enum):
 class PaymentStatus(Enum):
     PAID = "Paid"
     PENDING = "Pending"
+    CANCELLED = "Pending"
+    UNKNOWN = "Unknown"
 
     @classmethod
     def choices(cls):
