@@ -70,10 +70,10 @@ access_control = access_control1.AccessControl1(
 shipping_option_service = application_services.ShippingOptionService(
     shipping_options = {
         # enum.ShippingMethod, provider --> list of strategies?
-        (enums.ShippingMethod.STANDARD, "default"): [lambda tenant_id, strategy: shipping_option_strategies.StandardShippingStrategy(strategy=strategy)],
-        (enums.ShippingMethod.EXPRESS, "default"): [lambda tenant_id, strategy: shipping_option_strategies.ExpressShippingStrategy(strategy=strategy)],
-        (enums.ShippingMethod.LOCAL_PICKUP, "default"): [lambda tenant_id, strategy: shipping_option_strategies.LocalPickupShippingStrategy(strategy=strategy)],
-        (enums.ShippingMethod.FREE_SHIPPING, "default"): [lambda tenant_id, strategy: shipping_option_strategies.FreeShippingStrategy(strategy=strategy)],
+        (enums.ShippingMethod.STANDARD, "oms-default"): [lambda tenant_id, strategy: shipping_option_strategies.StandardShippingStrategy(strategy=strategy)],
+        (enums.ShippingMethod.EXPRESS, "oms-default"): [lambda tenant_id, strategy: shipping_option_strategies.ExpressShippingStrategy(strategy=strategy)],
+        (enums.ShippingMethod.LOCAL_PICKUP, "oms-default"): [lambda tenant_id, strategy: shipping_option_strategies.LocalPickupShippingStrategy(strategy=strategy)],
+        (enums.ShippingMethod.FREE_SHIPPING, "oms-default"): [lambda tenant_id, strategy: shipping_option_strategies.FreeShippingStrategy(strategy=strategy)],
         (enums.ShippingMethod.OTHER, "fedex"): [
             lambda tenant_id, strategy: shipping_option_gateway.SampleFedexShippingGateway(
                 strategy=strategy,
@@ -88,10 +88,10 @@ shipping_option_service = application_services.ShippingOptionService(
 # Configure Vendor offerings
 offer_service = application_services.OfferService(
     offers = {
-        (enums.OfferType.PERCENTAGE_DISCOUNT, "default"): [lambda tenant_id, strategy: offer_strategies.PercentageDiscountOfferStrategy(strategy=strategy)],
-        (enums.OfferType.FREE_GIFTS, "default"): [lambda tenant_id, strategy: offer_strategies.FreeGiftsOfferStrategy(strategy=strategy)],
-        (enums.OfferType.COUPON_PERCENTAGE_DISCOUNT, "default"): [lambda tenant_id, strategy: offer_strategies.PercentageDiscountCouponOfferStrategy(strategy=strategy)],
-        (enums.OfferType.PERCENTAGE_DISCOUNT, "default"): [lambda tenant_id, strategy: offer_strategies.PercentageDiscountOfferStrategy(strategy=strategy)],
+        (enums.OfferType.PERCENTAGE_DISCOUNT, "oms-default"): [lambda tenant_id, strategy: offer_strategies.PercentageDiscountOfferStrategy(strategy=strategy)],
+        (enums.OfferType.FREE_GIFTS, "oms-default"): [lambda tenant_id, strategy: offer_strategies.FreeGiftsOfferStrategy(strategy=strategy)],
+        (enums.OfferType.COUPON_PERCENTAGE_DISCOUNT, "oms-default"): [lambda tenant_id, strategy: offer_strategies.PercentageDiscountCouponOfferStrategy(strategy=strategy)],
+        (enums.OfferType.PERCENTAGE_DISCOUNT, "oms-default"): [lambda tenant_id, strategy: offer_strategies.PercentageDiscountOfferStrategy(strategy=strategy)],
     }
 )
 
@@ -99,7 +99,7 @@ offer_service = application_services.OfferService(
 # Configure supported payment options
 payment_service = application_services.PaymentService(
     payment_options = {
-        (enums.PaymentMethod.DIGITAL_WALLET, "default"): [
+        (enums.PaymentMethod.DIGITAL_WALLET, "oms-default"): [
             lambda tenant_id: payment_gateways.PayPalPaymentGateway(
                 client_id=os.getenv(f"PAYPAL_CLIENT_ID_{tenant_id}"),
                 client_secret=os.getenv(f"PAYPAL_CLIENT_SECRET_{tenant_id}"),

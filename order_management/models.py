@@ -192,6 +192,7 @@ class VendorOfferSnapshot(models.Model):
     tenant_id = models.CharField(max_length=150)
     offer_id = models.CharField(max_length=150)
     name = models.CharField(max_length=255)
+    provider = models.CharField(max_length=150, help_text="this is also being used to associate implementation handler and offer Type")
     offer_type = models.CharField(max_length=50, choices=enums.OfferType.choices)
     discount_value = models.DecimalField(
             decimal_places=settings.DEFAULT_DECIMAL_PLACES, 
@@ -218,7 +219,7 @@ class VendorPaymentOptionSnapshot(models.Model):
 
     option_name = models.CharField(max_length=255, help_text="Just a name of this payment Option. e.g. Credit Card (Stripe) ")
     method = models.CharField(max_length=50, null=True, blank=True, choices=enums.PaymentMethod.choices)
-    provider = models.CharField(max_length=150)
+    provider = models.CharField(max_length=150, help_text="this is also being used to associate implementation handler and payment method")
     conditions = models.CharField(max_length=150, help_text='ex. { "country": "US" }')
     is_active = models.BooleanField(default=False, help_text="To quickly control whether this option is still valid")
     last_update_dt = models.DateTimeField(auto_now=True) 
@@ -234,7 +235,7 @@ class VendorShippingOptionSnapshot(models.Model):
 
     option_name = models.CharField(max_length=255, help_text="Just a name of this shipping Option. e.g. MyStandard")
     method = models.CharField(max_length=50, null=True, blank=True, choices=enums.ShippingMethod.choices)
-    provider = models.CharField(max_length=150)
+    provider = models.CharField(max_length=150, help_text="this is also being used to associate implementation handler and shipping method")
 
     base_cost = models.DecimalField(
             decimal_places=settings.DEFAULT_DECIMAL_PLACES, 
