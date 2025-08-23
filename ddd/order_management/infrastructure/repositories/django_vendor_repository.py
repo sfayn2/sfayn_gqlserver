@@ -52,7 +52,7 @@ class DjangoVendorRepositoryImpl(repositories.VendorAbstract):
         self, 
         tenant_id: str,
         vendor_id: str
-    ) -> List[value_objects.OfferStrategy]:
+    ) -> List[dtos.VendorOfferSnapshotDTO]:
         offers = django_snapshots.VendorOfferSnapshot.objects.filter(tenant_id=tenant_id, vendor_id=vendor_id, is_active=True).values()
         offer_list = [
             { **offer, "coupons": list(django_snapshots.VendorCouponSnapshot.objects.filter(offer_id=offer.get("offer_id")).values()) }
@@ -62,7 +62,8 @@ class DjangoVendorRepositoryImpl(repositories.VendorAbstract):
         final_offers = []
         for offer in offer_list:
             try:
-                final_offers.append(django_mappers.OfferStrategyMapper.to_domain(offer))
+                #final_offers.append(django_mappers.OfferStrategyMapper.to_domain(offer))
+                final_offers.append(dtos.VendorOfferSnapshotDTO.model_validate(**offer))
             except exceptions.OfferStrategyException as e:
                 #TODO send notification for invalid offer?
                 print(f"DjangoVendorRepository.get_offer exception > {str(e)}")

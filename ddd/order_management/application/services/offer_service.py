@@ -18,7 +18,7 @@ class OfferService:
     def evaluate_applicable_offers(
                 self, 
                 order: models.Order, 
-                vendor_offers: List[value_objects.OfferStrategy]
+                vendor_offers: List[dtos.VendorOfferSnapshotDTO]
             ) -> List[ports.OfferStrategyAbstract]:
 
         #The assumption is all Offers are auto applied (except those w Coupons)
@@ -29,10 +29,16 @@ class OfferService:
         sorted_vendor_offers = sorted(vendor_offers, key=lambda vo: vo.priority, reverse=True)
 
         for offer in sorted_vendor_offers:
-            for strategy_cls in self.offers:
-                valid_offers.append(
-                    strategy_cls(offer, order)
+
+            key = (offer.method, offer.provider.lower())
+            strategy_factories = self.offers.get(key, [])
+            for factory in strategy_factories:
+                strategy_ins = factory(
+                    offer.tenant_id, 
+                    offer
                 )
+                valid_offers.append(strategy_ins)
+
 
             if offer.stackable == False:
                 #make sure offers already ordered based on highest priority, so checking stackable is enough
@@ -40,8 +46,9 @@ class OfferService:
                 #return valid_offers
 
         final_offers = []
-        for strategy in valid_offers:
-            final_offers.append(strategy)
+        for offer in valid_offers:
+            if offer.is_eligible(order):
+                final_offers.append(offer)
 
 
         return final_offers

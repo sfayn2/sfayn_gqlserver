@@ -35,7 +35,7 @@ class OfferType(Enum):
     FIXED_DISCOUNT = "fixed_discount"
     COUPON_PERCENTAGE_DISCOUNT = "coupon_discount"
     BUNDLE = "bundle"
-    FREE_GIFT = "free_gift"
+    FREE_GIFTS = "free_gifts"
     FREE_SHIPPING = "free_shipping"
     OTHER = "Other" # for custom 
 

@@ -171,8 +171,8 @@ class Order:
             raise exceptions.InvalidOrderOperation("Only when shipping option is selected.")
 
         offer_details = []
-        for strategy in offers:
-            res = strategy.apply()
+        for offer in offers:
+            res = offer.apply(self)
             if res:
                 offer_details.append(res)
 

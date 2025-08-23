@@ -5,21 +5,20 @@ from ddd.order_management.domain.services.offer_strategies import ports
 
 class FreeShippingOfferStrategy(ports.OfferStrategyAbstract):
 
-    def apply(self):
-        currency = order.currency
-        #if self.validate_minimum_order_total(order) and self.validate_coupon(order):
-        if self.validate_minimum_order_total():
-            zero_shipping_cost = value_objects.Money(
-                amount=Decimal("0"),
-                currency=currency
-            )
-            self.order.update_shipping_details(
-                    order.shipping_details.update_cost(zero_shipping_cost)
-                )
+    def __init__(self, strategy: value_objects.OfferStrategy):
+        self.strategy = strategy
 
-            return f"{self.strategy.name} | 0 {currency}"
-            #return value_objects.OfferResult(
-            #    name=self.strategy.name,
-            #    desc=f"{self.strategy.name} | 0 {currency}",
-            #    free_shipping=True
-            #)
+    def is_eligible(self, order: models.Order) -> bool:
+        return self.strategy.conditions and self.strategy.conditions.get("minimum_order_total") and (order.total_amount.amount >= self.strategy.conditions.get("minimum_order_total"))
+
+    def apply(self, order: models.Order):
+        currency = order.currency
+        zero_shipping_cost = value_objects.Money(
+            amount=Decimal("0"),
+            currency=currency
+        )
+        self.order.update_shipping_details(
+                order.shipping_details.update_cost(zero_shipping_cost)
+            )
+
+        return f"{self.strategy.name} | 0 {currency}"

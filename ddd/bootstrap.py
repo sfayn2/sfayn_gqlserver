@@ -85,15 +85,14 @@ shipping_option_service = application_services.ShippingOptionService(
 )
 
 
-
 # Configure Vendor offerings
 offer_service = application_services.OfferService(
-    offers=[
-        offer_strategies.PercentageDiscountOfferStrategy,
-        offer_strategies.FreeGiftsOfferStrategy,
-        offer_strategies.PercentageDiscountCouponOfferStrategy,
-        offer_strategies.FreeShippingOfferStrategy
-    ]
+    offers = {
+        (enums.OfferType.PERCENTAGE_DISCOUNT, "default"): [lambda tenant_id, strategy: offer_strategies.PercentageDiscountOfferStrategy(strategy=strategy)],
+        (enums.OfferType.FREE_GIFTS, "default"): [lambda tenant_id, strategy: offer_strategies.FreeGiftsOfferStrategy(strategy=strategy)],
+        (enums.OfferType.COUPON_PERCENTAGE_DISCOUNT, "default"): [lambda tenant_id, strategy: offer_strategies.PercentageDiscountCouponOfferStrategy(strategy=strategy)],
+        (enums.OfferType.PERCENTAGE_DISCOUNT, "default"): [lambda tenant_id, strategy: offer_strategies.PercentageDiscountOfferStrategy(strategy=strategy)],
+    }
 )
 
 

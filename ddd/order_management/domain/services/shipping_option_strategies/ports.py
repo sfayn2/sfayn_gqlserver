@@ -21,16 +21,3 @@ class ShippingOptionStrategyAbstract(ABC):
             Calculate the cost of shipping based on weight and dimensions
         """
         raise NotImplementedError("Subclasses must implement this method")
-
-class ShippingOptionStrategyServiceAbstract(ABC):
-
-    def __init__(self, vendor_repository: repositories.VendorAbstract):
-        self.vendor_repository = vendor_repository
-
-    @abstractmethod
-    def get_applicable_shipping_options(
-                self, 
-                order: models.Order, 
-                vendor_shipping_options: List[value_objects.ShippingOptionStrategy]
-            ) -> List[value_objects.ShippingDetails]:
-        raise NotImplementedError("Subclasses must implement this method")

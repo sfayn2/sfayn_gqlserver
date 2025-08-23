@@ -4,24 +4,30 @@ from ddd.order_management.domain.services.offer_strategies import ports
 
 class PercentageDiscountOfferStrategy(ports.OfferStrategyAbstract):
 
-    #apply on order
-    def apply(self):
-        total_discount = 0
-        currency = self.order.currency
-        discounted_items = []
-        eligible_products = self.strategy.conditions.get("eligible_products")
+    def __init__(self, strategy: value_objects.OfferStrategy):
+        self.strategy = strategy
+
+    def is_eligible(self, order: models.Order) -> bool:
         required_coupon = self.strategy.required_coupon
         if required_coupon == False:
-            for item in self.order.line_items:
-                if eligible_products and item.product_sku in eligible_products:
-                    if total_discount == 0:
-                        total_discount = item.total_price.multiply(self.strategy.discount_value / 100)
-                    else:
-                        total_discount = total_discount.add(
-                            item.total_price.multiply(self.strategy.discount_value / 100)
-                        )
-                    discounted_items.append(item.product_sku)
+            return True
+        return False
 
-            if discounted_items:
-                self.order.update_total_discounts_fee(total_discount.format())
-                return f"{self.strategy.name} | {','.join(discounted_items)} | {total_discount.format().amount}"
+    def apply(self, order: models.Order):
+        total_discount = 0
+        currency = order.currency
+        discounted_items = []
+        eligible_products = self.strategy.conditions.get("eligible_products")
+        for item in self.order.line_items:
+            if eligible_products and item.product_sku in eligible_products:
+                if total_discount == 0:
+                    total_discount = item.total_price.multiply(self.strategy.discount_value / 100)
+                else:
+                    total_discount = total_discount.add(
+                        item.total_price.multiply(self.strategy.discount_value / 100)
+                    )
+                discounted_items.append(item.product_sku)
+
+        if discounted_items:
+            order.update_total_discounts_fee(total_discount.format())
+            return f"{self.strategy.name} | {','.join(discounted_items)} | {total_discount.format().amount}"
