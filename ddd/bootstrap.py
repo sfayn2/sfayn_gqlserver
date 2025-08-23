@@ -69,16 +69,18 @@ access_control = access_control1.AccessControl1(
 # Configure supported shipping options (still subject to  eligibility)
 shipping_option_service = application_services.ShippingOptionService(
     shipping_options = {
-        # enum.ShippingMethod, provider
-        (enums.ShippingMethod.STANDARD, "default"): lambda tenant_id, strategy: shipping_option_strategies.StandardShippingStrategy(strategy=strategy),
-        (enums.ShippingMethod.EXPRESS, "default"): lambda tenant_id, strategy: shipping_option_strategies.ExpressShippingStrategy(strategy=strategy),
-        (enums.ShippingMethod.LOCAL_PICKUP, "default"): lambda tenant_id, strategy: shipping_option_strategies.LocalPickupShippingStrategy(strategy=strategy),
-        (enums.ShippingMethod.FREE_SHIPPING, "default"): lambda tenant_id, strategy: shipping_option_strategies.FreeShippingStrategy(strategy=strategy),
-        (enums.ShippingMethod.OTHER, "fedex"): lambda tenant_id, strategy: shipping_option_gateway.SampleFedexShippingGateway(
-            strategy=strategy,
-            api_base_url=os.getenv(f"CARRIER1_BASE_URL_{tenant_id}"),
-            api_key=os.getenv(f"CARRIER1_API_KEY_{tenant_id}")
-        )
+        # enum.ShippingMethod, provider --> list of strategies?
+        (enums.ShippingMethod.STANDARD, "default"): [lambda tenant_id, strategy: shipping_option_strategies.StandardShippingStrategy(strategy=strategy)],
+        (enums.ShippingMethod.EXPRESS, "default"): [lambda tenant_id, strategy: shipping_option_strategies.ExpressShippingStrategy(strategy=strategy)],
+        (enums.ShippingMethod.LOCAL_PICKUP, "default"): [lambda tenant_id, strategy: shipping_option_strategies.LocalPickupShippingStrategy(strategy=strategy)],
+        (enums.ShippingMethod.FREE_SHIPPING, "default"): [lambda tenant_id, strategy: shipping_option_strategies.FreeShippingStrategy(strategy=strategy)],
+        (enums.ShippingMethod.OTHER, "fedex"): [
+            lambda tenant_id, strategy: shipping_option_gateway.SampleFedexShippingGateway(
+                strategy=strategy,
+                api_base_url=os.getenv(f"CARRIER1_BASE_URL_{tenant_id}"),
+                api_key=os.getenv(f"CARRIER1_API_KEY_{tenant_id}")
+            ),
+        ]
     }
 )
 
