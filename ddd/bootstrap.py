@@ -99,13 +99,15 @@ offer_service = application_services.OfferService(
 
 # Configure supported payment options
 payment_service = application_services.PaymentService(
-    payment_options=[
-        lambda tenant_id: payment_gateways.PayPalPaymentGateway(
-            client_id=os.getenv(f"PAYPAL_CLIENT_ID_{tenant_id}"),
-            client_secret=os.getenv(f"PAYPAL_CLIENT_SECRET_{tenant_id}"),
-            client_url=os.getenv(f"PAYPAL_CLIENT_URL_{tenant_id}")
-        ),
-    ]
+    payment_options = {
+        (enums.PaymentMethod.DIGITAL_WALLET, "default"): [
+            lambda tenant_id: payment_gateways.PayPalPaymentGateway(
+                client_id=os.getenv(f"PAYPAL_CLIENT_ID_{tenant_id}"),
+                client_secret=os.getenv(f"PAYPAL_CLIENT_SECRET_{tenant_id}"),
+                client_url=os.getenv(f"PAYPAL_CLIENT_URL_{tenant_id}")
+            ),
+        ],
+    }
 )
 
 # Configure Webhook Signature Verifier

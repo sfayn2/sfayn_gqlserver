@@ -14,7 +14,6 @@ from .dtos import (
     OfferStrategyDTO,
     ShippingOptionStrategyDTO,
     ProductSkusDTO,
-    PaymentOptionDTO
 )
 from .snapshot_dtos import (
     VendorDetailsSnapshotDTO,
@@ -24,6 +23,7 @@ from .snapshot_dtos import (
     VendorProductSnapshotDTO,
     CustomerDetailsSnapshotDTO,
     CustomerAddressSnapshotDTO,
+    VendorPaymentOptionSnapshotDTO
 )
 
 # Integration events

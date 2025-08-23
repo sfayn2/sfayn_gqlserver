@@ -7,7 +7,7 @@ from ddd.order_management.application import ports, dtos
 
 class PaypalPaymentGateway(ports.PaymentGatewayAbstract):
 
-    def __init__(self):
+    def __init__(self, client_id: str, client_secret: str, client_url: str):
         self.PAYPAL_CLIENT_ID = os.getenv("PAYPAL_CLIENT_ID")
         self.PAYPAL_CLIENT_SECRET = os.getenv("PAYPAL_CLIENT_SECRET")
         self.PAYPAL_BASE_URL = "https://api.sandbox.paypal.com"
@@ -44,16 +44,9 @@ class PaypalPaymentGateway(ports.PaymentGatewayAbstract):
         )
 
         return value_objects.PaymentDetails(
-            method=enums.PaymentMethod.PAYPAL,
+            method=enums.PaymentMethod.DIGITAL_WALLET,
             paid_amount=paypal_paid_amount,
             transaction_id=paypal_response.get("id"),
             order_id=purchase_units[0].get("custom"),
             status=enums.PaymentStatus.PAID
-        )
-
-    @property
-    def payment_option(self) -> dtos.PaymentOptionDTO:
-        return dtos.PaymentOptionDTO(
-            method=enums.PaymentMethod.DIGITAL_WALLET,
-            provider="paypal"
         )

@@ -185,7 +185,7 @@ class VendorCouponSnapshot(models.Model):
     last_update_dt = models.DateTimeField(auto_now=True) 
 
     def __str__(self):
-        return f"{self.coupon_code} | Validity: {self.start_date} - {self.end_date} | Active: {self.is_active} | LastUpdate: {self.last_update_dt}"
+        return f"{self.tenant_id} | {self.vendor_id} | {self.coupon_code} | Validity: {self.start_date} - {self.end_date} | Active: {self.is_active} | LastUpdate: {self.last_update_dt}"
 
 class VendorOfferSnapshot(models.Model):
     vendor_id = models.CharField(max_length=150)
@@ -210,7 +210,19 @@ class VendorOfferSnapshot(models.Model):
 
 
     def __str__(self):
-        return f"{self.name} ( {self.offer_type} ) | Required Coupon : {self.required_coupon} | {self.start_date} - {self.end_date} | Is Active: {self.is_active} | LastUpdate: {self.last_update_dt}"
+        return f"{self.tenant_id} | {self.vendor_id} | {self.name} ( {self.offer_type} ) | Required Coupon : {self.required_coupon} | {self.start_date} - {self.end_date} | Is Active: {self.is_active} | LastUpdate: {self.last_update_dt}"
+
+class VendorPaymentOptionSnapshot(models.Model):
+    vendor_id = models.CharField(max_length=150)
+    tenant_id = models.CharField(max_length=150)
+
+    method = models.CharField(max_length=50, null=True, blank=True, choices=enums.PaymentMethod.choices)
+    provider = models.CharField(max_length=150)
+    is_active = models.BooleanField(default=False, help_text="To quickly control whether this option is still valid")
+    last_update_dt = models.DateTimeField(auto_now=True) 
+
+    def __str__(self):
+        return f"{self.tenant_id} | {self.vendor_id} | {self.option_name}  | LastUpdate: {self.last_update_dt}"
 
 
 
@@ -243,7 +255,7 @@ class VendorShippingOptionSnapshot(models.Model):
     last_update_dt = models.DateTimeField(auto_now=True) 
 
     def __str__(self):
-        return f"{self.name} | {self.delivery_time} | {self.conditions} | LastUpdate: {self.last_update_dt}"
+        return f"{self.tenant_id} | {self.vendor_id} | {self.option_name} | {self.delivery_time} | {self.conditions} | LastUpdate: {self.last_update_dt}"
 
 class VendorProductSnapshot(models.Model):
     product_id = models.CharField(max_length=150)
@@ -264,10 +276,10 @@ class VendorProductSnapshot(models.Model):
     last_update_dt = models.DateTimeField(auto_now=True) 
 
     class Meta:
-        unique_together = ('product_sku', 'vendor_id') #ensure one default per addres type
+        unique_together = ('product_sku', 'tenant_id', 'vendor_id') #ensure one default per addres type
 
     def __str__(self):
-        return f"({self.vendor_id}) {self.product_sku} | {self.product_name} | {self.stock} | {self.is_active}"
+        return f"({self.tenant_id} | {self.vendor_id}) | {self.product_sku} | {self.product_name} | {self.stock} | {self.is_active}"
 
 
 #===========================
@@ -284,7 +296,7 @@ class CustomerDetailsSnapshot(models.Model):
     last_update_dt = models.DateTimeField(auto_now=True) 
 
     def __str__(self):
-        return f"{self.customer_id} | {self.first_name} {self.last_name} | {self.email}"
+        return f"{self.tenant_id} | {self.customer_id} | {self.first_name} {self.last_name} | {self.email}"
 
 class CustomerAddressSnapshot(models.Model):
     ADDRESS_TYPE_CHOICES = (
@@ -329,4 +341,4 @@ class UserAuthorizationSnapshot(models.Model):
         unique_together = ('user_id', 'permission_codename', 'scope') 
 
     def __str__(self):
-        return f"{self.user_id} | {self.permission_codename} | {self.scope}"
+        return f"{self.tenant_id} | {self.user_id} | {self.permission_codename} | {self.scope}"

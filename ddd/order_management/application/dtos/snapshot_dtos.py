@@ -56,6 +56,18 @@ class VendorShippingOptionSnapshotDTO(BaseModel):
     class Config:
         use_enum_values = True
 
+class VendorPaymentOptionSnapshotDTO(BaseModel):
+    tenant_id: str
+    vendor_id: str
+    method: enums.PaymentMethod
+    provider: str
+    is_active: bool
+
+    class Config:
+        use_enum_values = True
+
+
+
 class VendorProductSnapshotDTO(BaseModel):
     product_id: str
     tenant_id: str

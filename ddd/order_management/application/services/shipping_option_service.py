@@ -26,7 +26,7 @@ class ShippingOptionService:
     def get_applicable_shipping_options(
                 self, 
                 order: models.Order, 
-                vendor_shipping_options: List[value_objects.ShippingOptionStrategy]
+                vendor_shipping_options: List[dtos.VendorShippingOptionSnapshotDTO]
             ) -> List[value_objects.ShippingDetails]:
 
         valid_shipping_options = []

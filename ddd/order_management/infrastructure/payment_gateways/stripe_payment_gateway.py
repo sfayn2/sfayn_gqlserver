@@ -47,12 +47,3 @@ class StripePaymentGateway(ports.PaymentGatewayAbstract):
             order_id=stripe_order_id,
             status=stripe_payment_status
         )
-
-    @property
-    def payment_option(self):
-        return {
-            "method": enums.PaymentMethod.DIGITAL_WALLET,
-            "provider": "paypal"
-        }
-
-    
