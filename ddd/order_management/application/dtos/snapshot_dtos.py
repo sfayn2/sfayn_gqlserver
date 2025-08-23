@@ -59,6 +59,8 @@ class VendorShippingOptionSnapshotDTO(BaseModel):
 class VendorPaymentOptionSnapshotDTO(BaseModel):
     tenant_id: str
     vendor_id: str
+    option_name: str
+    conditions: dict
     method: enums.PaymentMethod
     provider: str
     is_active: bool

@@ -216,8 +216,10 @@ class VendorPaymentOptionSnapshot(models.Model):
     vendor_id = models.CharField(max_length=150)
     tenant_id = models.CharField(max_length=150)
 
+    option_name = models.CharField(max_length=255, help_text="Just a name of this payment Option. e.g. Credit Card (Stripe) ")
     method = models.CharField(max_length=50, null=True, blank=True, choices=enums.PaymentMethod.choices)
     provider = models.CharField(max_length=150)
+    conditions = models.CharField(max_length=150, help_text='ex. { "country": "US" }')
     is_active = models.BooleanField(default=False, help_text="To quickly control whether this option is still valid")
     last_update_dt = models.DateTimeField(auto_now=True) 
 

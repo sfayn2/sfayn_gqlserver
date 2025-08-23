@@ -8,12 +8,15 @@ from ddd.order_management.application import ports, dtos
 class PaypalPaymentGateway(ports.PaymentGatewayAbstract):
 
     def __init__(self, client_id: str, client_secret: str, client_url: str):
-        self.PAYPAL_CLIENT_ID = os.getenv("PAYPAL_CLIENT_ID")
-        self.PAYPAL_CLIENT_SECRET = os.getenv("PAYPAL_CLIENT_SECRET")
-        self.PAYPAL_BASE_URL = "https://api.sandbox.paypal.com"
+        self.paypal_client_id = client_id
+        self.paypal_client_secret = client_secret
+        self.paypal_base_url = client_url
+
+    def is_eligible(self, order: models.Order) -> bool:
+        return True
 
     def get_payment_details(self, transaction_id: str, order: models.Order) -> value_objects.PaymentDetails:
-        url = f"{self.PAYPAL_BASE_URL}/v1/checkout/orders/{transaction_id}"
+        url = f"{self.paypal_base_url}/v1/checkout/orders/{transaction_id}"
         headers = {"Authorization": f"Bearer {self._get_access_token()}"}
 
         response = requests.get(url, headers=headers)
@@ -21,13 +24,10 @@ class PaypalPaymentGateway(ports.PaymentGatewayAbstract):
         return self._map_to_domain(response.json(), order)
     
     def _get_access_token(self):
-        self.client_id = self.PAYPAL_CLIENT_ID
-        self.client_secret = self.PAYPAL_CLIENT_SECRET
-        self.base_url = self.PAYPAL_BASE_URL
-        url = f"{self.base_url}/v1/oauth2/token"
+        url = f"{self.paypal_base_url}/v1/oauth2/token"
         headers = {"Accept": "application/json", "Accept-Language": "en-US"}
         data = {"grant_type": "client_credentials"}
-        response = requests.post(url, headers=headers, data=data, auth=(self.client_id, self.client_secret))
+        response = requests.post(url, headers=headers, data=data, auth=(self.paypal_client_id, self.paypal_client_secret))
 
         #response.raise_for_status()
         return response.json()["access_token"]

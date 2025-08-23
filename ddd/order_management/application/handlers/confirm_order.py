@@ -35,11 +35,20 @@ def handle_confirm_order(
                 order.line_items
             )
 
-            vendor_payment_options = vendor_repo.get_payment_options(vendor_id=order.vendor_id)
+            vendor_payment_options = vendor_repo.get_payment_options(
+                tenant_id=order.tenant_id,
+                vendor_id=order.vendor_id
+            )
+
+            available_payment_options = payment_service.get_applicable_payment_options(
+                order=order,
+                vendor_payment_options=vendor_payment_options
+            )
+
             payment_option = payment_service.select_payment_option(
                 command.payment_method, 
                 command.provider,
-                vendor_payment_options
+                available_payment_options
             )
 
             payment_details = payment_option.get_payment_details(

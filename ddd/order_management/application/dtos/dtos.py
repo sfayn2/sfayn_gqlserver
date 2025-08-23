@@ -54,6 +54,11 @@ class PaymentDetailsDTO(BaseModel):
     class Config:
         use_enum_values = True
 
+class PaymentOptionDTO(BaseModel):
+    option_name: str
+    method: enums.PaymentMethod
+    provider: str
+
 class LineItemDTO(BaseModel):
     product_sku: str
     product_name: str 
@@ -141,3 +146,4 @@ class ShippingOptionStrategyDTO(BaseModel):
 class ProductSkusDTO(BaseModel):
     product_sku: str
     order_quantity: int
+
