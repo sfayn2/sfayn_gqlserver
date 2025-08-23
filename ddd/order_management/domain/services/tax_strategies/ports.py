@@ -8,12 +8,14 @@ from ddd.order_management.domain import models, value_objects
 # =======
 
 class TaxStrategyAbstract(ABC):
+
     @abstractmethod
-    def calculate_tax(self, order: models.Order) -> value_objects.TaxResult:
+    def is_eligible(self, order: models.Order) -> bool:
+        """
+            Determine if taxes is eligible for the given package.
+        """
         raise NotImplementedError("Subclasses must implement this method")
 
-class TaxStrategyServiceAbstract(ABC):
-
     @abstractmethod
-    def calculate_all_taxes(self, order: models.Order, tax_strategies: List[TaxStrategyAbstract]) -> Tuple[value_objects.Money, List[str]]:
+    def calculate_tax(self, order: models.Order) -> value_objects.TaxResult:
         raise NotImplementedError("Subclasses must implement this method")

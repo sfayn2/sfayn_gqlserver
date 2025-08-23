@@ -32,6 +32,7 @@ def valid_payload(tenant_id):
         tenant_id="tenant123",
         offer_type=enums.OfferType.PERCENTAGE_DISCOUNT,
         name="10% Off",
+        provider="oms-default",
         discount_value="10",
         conditions={"eligible_products": ["SKU1"]},
         required_coupon=False,
@@ -51,7 +52,7 @@ def valid_payload(tenant_id):
 @pytest.fixture
 def custom_headers():
     return {
-        "HTTP_X_Wss_Signature": "b75a8f2498dfb3dc77931ea565aad6cb4a375d07c399d3ed716c703266341d64",
+        "HTTP_X_Wss_Signature": "35a4c8a44911aef2bcd82f2fea67fa5f7fcb08c825e18ec9ff9bd0e1fcd92285",
         "HTTP_X_Wss_Timestamp": str(int(time.time()))
     }
 

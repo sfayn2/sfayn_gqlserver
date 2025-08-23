@@ -40,6 +40,20 @@ class VendorOfferSnapshotDTO(BaseModel):
     class Config:
         use_enum_values = True
 
+class VendorTaxOptionSnapshotDTO(BaseModel):
+    tenant_id: str
+    vendor_id: str
+    tax_type: enums.TaxType
+    inclusive: bool
+    provider: str
+    conditions: dict
+    rate: Decimal
+    is_active: bool
+
+    class Config:
+        use_enum_values = True
+
+
 class VendorShippingOptionSnapshotDTO(BaseModel):
     tenant_id: str
     vendor_id: str

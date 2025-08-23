@@ -228,6 +228,27 @@ class VendorPaymentOptionSnapshot(models.Model):
         return f"{self.tenant_id} | {self.vendor_id} | {self.option_name}  | LastUpdate: {self.last_update_dt}"
 
 
+class VendorTaxOptionSnapshot(models.Model):
+    vendor_id = models.CharField(max_length=150)
+    tenant_id = models.CharField(max_length=150)
+
+    tax_type = models.CharField(max_length=50, null=True, blank=True, choices=enums.TaxType.choices)
+    provider = models.CharField(max_length=150, help_text="this is also being used to associate implementation handler and tax type")
+    inclusive = models.BooleanField(default=False)
+
+    rate = models.DecimalField(
+            decimal_places=settings.DEFAULT_DECIMAL_PLACES, 
+            max_digits=settings.DEFAULT_MAX_DIGITS,
+            help_text="", 
+            default=Decimal("0.0")
+        )
+    conditions = models.CharField(max_length=150, help_text='ex. { "state_tax_rate": { "CA": 0.075, "NY": 0.04, "TX": 0.0625 } }')
+
+    is_active = models.BooleanField(default=False, help_text="To quickly control whether this option is still valid")
+    last_update_dt = models.DateTimeField(auto_now=True) 
+
+    def __str__(self):
+        return f"{self.tenant_id} | {self.vendor_id} | {self.tax_type} | {self.conditions} | LastUpdate: {self.last_update_dt}"
 
 class VendorShippingOptionSnapshot(models.Model):
     vendor_id = models.CharField(max_length=150)

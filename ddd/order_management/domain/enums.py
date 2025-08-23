@@ -1,16 +1,17 @@
 from enum import Enum
 
 def generate_choices(cls):
+    #TODO not applicable anymore since key value matches
     return tuple((i.value, i.name.replace("_"," ").title()) for i in cls)
 
 
 class OrderStatus(Enum):
-    DRAFT = "Draft"
-    PENDING = "Pending"
-    CONFIRMED = "Confirmed"
-    SHIPPED = "Shipped"
-    CANCELLED = "Cancelled"
-    COMPLETED = "Completed"
+    DRAFT = "DRAFT"
+    PENDING = "PENDING"
+    CONFIRMED = "CONFIRMED"
+    SHIPPED = "SHIPPED"
+    CANCELLED = "CANCELLED"
+    COMPLETED = "COMPLETED"
 
     @classmethod
     def choices(cls):
@@ -18,45 +19,57 @@ class OrderStatus(Enum):
 
 
 class ShippingMethod(Enum):
-    STANDARD = "Standard"
-    EXPRESS = "Express"
-    LOCAL_PICKUP = "Local Pickup"
-    FREE_SHIPPING = "Free Shipping"
-    SAME_DAY = "Same Day Delivery"
-    FLAT_RATE = "Flat Rate"
-    OTHER = "Other" # for custom or external shipping method?
+    STANDARD = "STANDARD"
+    EXPRESS = "EXPRESS"
+    LOCAL_PICKUP = "LOCAL_PICKUP"
+    FREE_SHIPPING = "FREE_SHIPPING"
+    SAME_DAY = "SAME_DAY_DELIVERY"
+    FLAT_RATE = "FLAT_RATE"
+    OTHER = "OTHER" # for custom or external shipping method?
 
     @classmethod
     def choices(cls):
         return generate_choices(cls)
 
 class OfferType(Enum):
-    PERCENTAGE_DISCOUNT = "percentage_discount"
-    FIXED_DISCOUNT = "fixed_discount"
-    COUPON_PERCENTAGE_DISCOUNT = "coupon_discount"
-    BUNDLE = "bundle"
-    FREE_GIFTS = "free_gifts"
-    FREE_SHIPPING = "free_shipping"
-    OTHER = "Other" # for custom 
+    PERCENTAGE_DISCOUNT = "PERCENTAGE_DISCOUNT"
+    FIXED_DISCOUNT = "FIXED_DISCOUNT"
+    COUPON_PERCENTAGE_DISCOUNT = "COUPON_PERCENTAGE_DISCOUNT"
+    BUNDLE = "BUNDLE"
+    FREE_GIFTS = "FREE_GIFTS"
+    FREE_SHIPPING = "FREE_SHIPPING"
+    OTHER = "OTHER" # for custom 
 
     @classmethod
     def choices(cls):
         return generate_choices(cls)
 
 class PaymentMethod(Enum):
-    DIGITAL_WALLET = "Digital Wallet"
-    COD = "Cash On Delivery"
-    OTHER = "Other" # for custom 
+    DIGITAL_WALLET = "DIGITAL_WALLET"
+    CASH_ON_DELIVERY = "CASH_ON_DELIVERY"
+    OTHER = "OTHER" # for custom 
 
     @classmethod
     def choices(cls):
         return generate_choices(cls)
 
 class PaymentStatus(Enum):
-    PAID = "Paid"
-    PENDING = "Pending"
-    CANCELLED = "Pending"
-    UNKNOWN = "Unknown"
+    PAID = "PAID"
+    PENDING = "PENDING"
+    CANCELLED = "CANCELLED"
+    UNKNOWN = "UNKNOWN"
+
+    @classmethod
+    def choices(cls):
+        return generate_choices(cls)
+
+class TaxType(Enum):
+    SALES_TAX = "SALES_TAX"
+    STATE_TAX = "STATE_TAX"
+    VAT = "VAT"
+    GST = "GST"
+    NONE = "NONE" # explicitly no tax
+    OTHER = "OTHER"
 
     @classmethod
     def choices(cls):

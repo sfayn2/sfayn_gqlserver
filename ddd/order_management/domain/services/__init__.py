@@ -1,4 +1,4 @@
 from .order.order_service import OrderService
-from .tax_strategies.tax_strategy_service import TaxStrategyService
+#from .tax_strategies.tax_strategy_service import TaxStrategyService
 #from .offer_strategies.offer_strategy_service import OfferStrategyService
 #from .shipping_option_strategies import shipping_option_strategy_service

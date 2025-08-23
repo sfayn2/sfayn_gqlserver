@@ -8,8 +8,8 @@ from ddd.order_management.domain import (
 )
 from ddd.order_management.domain.services import (
     shipping_option_strategies,
-    offer_strategies
-
+    offer_strategies,
+    tax_strategies
 )
 from ddd.order_management.infrastructure import (
     event_bus, 
@@ -94,6 +94,15 @@ offer_service = application_services.OfferService(
         (enums.OfferType.PERCENTAGE_DISCOUNT, "oms-default"): [lambda tenant_id, strategy: offer_strategies.PercentageDiscountOfferStrategy(strategy=strategy)],
     }
 )
+
+# Configure Tax Service
+tax_service = application_services.TaxService(
+    tax_options = {
+        (enums.TaxType.GST, "oms-default"): [lambda tenant_id, strategy: tax_strategies.CountryBasedTaxStrategy(strategy=strategy)],
+        (enums.TaxType.STATE_TAX, "oms-default"): [lambda tenant_id, strategy: tax_strategies.StateBasedTaxStrategy(strategy=strategy)],
+    }
+)
+
 
 
 # Configure supported payment options
@@ -223,7 +232,7 @@ event_bus.EVENT_HANDLERS.update({
             lambda event, uow: handlers.handle_apply_tax_results(
                 event=event, 
                 uow=uow,
-                tax_service=domain_services.TaxStrategyService()
+                tax_service=tax_service
             )
         ],
     events.AppliedTaxesEvent: [

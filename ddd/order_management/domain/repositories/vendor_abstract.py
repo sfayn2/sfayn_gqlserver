@@ -19,13 +19,22 @@ class VendorAbstract(ABC):
         self, 
         tenant_id: str,
         vendor_id: str
-    ) -> List[value_objects.OfferStrategy]:
+    ) -> List[dtos.VendorOfferSnapshotDTO]:
         raise NotImplementedError("Subclasses must implement this method")
 
+
+    #TODO something wrong application dtos in domain?? though only annotation
     @abstractmethod
     def get_shipping_options(
         self,
         tenant_id: str,
         vendor_id: str
     ) -> List[dtos.VendorShippingOptionSnapshotDTO]:
+        raise NotImplementedError("Subclasses must implement this method")
+
+    def get_tax_options(
+        self,
+        tenant_id: str,
+        vendor_id: str
+    ) -> List[dtos.VendorTaxOptionSnapshotDTO]:
         raise NotImplementedError("Subclasses must implement this method")

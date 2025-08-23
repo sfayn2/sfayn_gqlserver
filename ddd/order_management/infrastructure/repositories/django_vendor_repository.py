@@ -88,6 +88,22 @@ class DjangoVendorRepositoryImpl(repositories.VendorAbstract):
                 continue
         return final_opts
 
+    def get_tax_options(
+        self,
+        tenant_id: str,
+        vendor_id: str
+    ) -> List[dtos.VendorTaxOptionSnapshotDTO]:
+        tax_options = django_snapshots.VendorTaxOptionSnapshot.objects.filter(tenant_id=tenant_id, vendor_id=vendor_id, is_active=True)
+        final_opts = []
+        for option in tax_options.values():
+            try:
+                final_opts.append(dtos.VendorTaxOptionSnapshotDTO.model_validate(**option))
+            except (ValueError) as e:
+                print(f"DjangoVendorRepository.get_tax_options exception > {str(e)}")
+                continue
+        return final_opts
+
+
     def get_payment_options(
         self,
         tenant_id: str,

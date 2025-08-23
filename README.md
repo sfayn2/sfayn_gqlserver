@@ -70,13 +70,15 @@ This Project is currently under active development. Major changes are ongoing.
 
 ## Snapshot Strategy
 
-The OMS relies on local snapshot models for product, vendor, offer, shipping, and user-related data. These  snapshots are used for read consistency and calculated decisions at the time of checkout or order placement.
+The OMS relies on local snapshot models for product, vendor, customer, and user-related data. These  snapshots are used for read consistency and calculated decisions at the time of checkout or order placement.
 
 ### Support snapshots
 - VendorProductSnapshot
 - VendorDetailsSnapshot
 - VendorCouponSnapshot
 - VendorOffersSnapshot
+- VendorTaxOptionsSnapshot
+- VendorPaymentOptionsSnapshot
 - VendorShippingOptionsSnapshot
 - CustomerDetailsSnapshot
 - CustomerAddressSnapshot
@@ -119,16 +121,6 @@ To keep local snapshots consistent
 
     > Ask us to setup webhook support for your signature calculation method. Also shared secret will be issued for secure integration
 
-## Installation 
-```
-cd /home/{username}/sfayn_gqlserver
-pip install -r requirements
-```
-
-## How to run development server? 
-```
-python manage.py runserver 0.0.0.0:4000
-```
 
 ## Contributing
 Contributions welcome! Please open issues or submit pull requests
