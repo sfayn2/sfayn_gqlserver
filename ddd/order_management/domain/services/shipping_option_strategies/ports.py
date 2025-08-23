@@ -7,8 +7,6 @@ from ddd.order_management.domain import models, value_objects, repositories
 # ========
 class ShippingOptionStrategyAbstract(ABC):
 
-    def __init__(self, strategy: value_objects.ShippingOptionStrategy):
-        self.strategy = strategy
 
     @abstractmethod
     def is_eligible(self, order: models.Order) -> bool:

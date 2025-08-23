@@ -13,7 +13,7 @@ from ddd.order_management.domain.services import shipping_option_strategies
 
 class ShippingOptionService:
 
-    def __init__(self, shipping_options: List[shipping_option_strategies.port.ShippingOptionStrategyAbstract]):
+    def __init__(self, shipping_options: Dict[Tuple[enums.ShippingMethod, str], shipping_option_strategies.port.ShippingOptionStrategyAbstract]):
         self.shipping_options = shipping_options
 
     def get_applicable_shipping_options(
@@ -24,13 +24,12 @@ class ShippingOptionService:
 
         valid_shipping_options = []
 
-        # check if theres a handler
-        for option in vendor_shipping_options:
-            for strategy_cls in self.shipping_options:
-                strategy_ins = strategy_cls(option)
-                if (strategy_ins.method == option.method and
-                    strategy_ins.option_name == option.option_name
-                    ):
+        # shipping options to handler 
+        for vendor_option in vendor_shipping_options: #source alwys assumed its active
+            for strategy_key, strategy_cls in self.shipping_options.items():
+                key_method, key_provider = strategy_key
+                if vendor_option.method == key_method and vendor_option.provider == key_provider:
+                    strategy_ins = strategy_cls(order.tenant_id, vendor_option)
                     valid_shipping_options.append(strategy_ins)
 
         # calculate cost if available
@@ -44,7 +43,7 @@ class ShippingOptionService:
                 )
 
         if not options:
-            raise exceptions.InvalidOrderOperation(f"No available shipping options.")
+            raise exceptions.NoApplicableShippingOptionException(f"No available shipping options.")
 
         return options
 

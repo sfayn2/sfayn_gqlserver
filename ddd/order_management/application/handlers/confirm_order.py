@@ -36,6 +36,7 @@ def handle_confirm_order(
             )
 
             payment_gateway = payment_service.select_payment_option(
+                order.tenant_id,
                 command.payment_method, 
                 command.provider
             )

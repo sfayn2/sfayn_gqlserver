@@ -44,12 +44,17 @@ class VendorShippingOptionSnapshotDTO(BaseModel):
     tenant_id: str
     vendor_id: str
     option_name: str
+    method: enums.ShippingMethod
+    provider: str
     delivery_time: str
     conditions: dict
     base_cost: Decimal
     flat_rate: Decimal
     currency: str
     is_active: bool
+
+    class Config:
+        use_enum_values = True
 
 class VendorProductSnapshotDTO(BaseModel):
     product_id: str

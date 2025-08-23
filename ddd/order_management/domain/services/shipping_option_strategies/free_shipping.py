@@ -3,6 +3,9 @@ from ddd.order_management.domain.services.shipping_option_strategies import port
 
 class FreeShippingStrategy(ports.ShippingOptionStrategyAbstract):
 
+    def __init__(self, strategy: value_objects.ShippingOptionStrategy):
+        self.strategy = strategy
+
     def is_eligible(self, order: models.Order) -> bool:
         #orders above $50?
         return order.sub_total > self.strategy.conditions.get("min_order_amount")

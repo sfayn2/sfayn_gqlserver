@@ -31,6 +31,12 @@ class VendorDetailsException(InvalidOrderOperation):
 class ShippingOptionStrategyException(InvalidOrderOperation):
     pass
 
+class SelectPaymentOptionException(InvalidOrderOperation):
+    pass
+
+class NoApplicableShippingOptionException(InvalidOrderOperation):
+    pass
+
 class OutOfStockException(InvalidOrderOperation):
     pass
 

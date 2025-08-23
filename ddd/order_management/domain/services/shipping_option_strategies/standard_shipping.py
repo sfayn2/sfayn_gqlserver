@@ -3,6 +3,9 @@ from ddd.order_management.domain.services.shipping_option_strategies import port
 
 class StandardShippingStrategy(ports.ShippingOptionStrategyAbstract):
 
+    def __init__(self, strategy: value_objects.ShippingOptionStrategy):
+        self.strategy = strategy
+
     def is_eligible(self, order: models.Order) -> bool:
         """
             Only allow packages under 30kg + Domestic shipping

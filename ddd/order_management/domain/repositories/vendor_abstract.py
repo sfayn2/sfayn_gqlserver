@@ -27,5 +27,5 @@ class VendorAbstract(ABC):
         self,
         tenant_id: str,
         vendor_id: str
-    ) -> List[value_objects.ShippingOptionStrategy]:
+    ) -> List[dtos.VendorShippingOptionSnapshotDTO]:
         raise NotImplementedError("Subclasses must implement this method")

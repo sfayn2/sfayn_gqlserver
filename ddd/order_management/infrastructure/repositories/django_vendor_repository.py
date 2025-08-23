@@ -5,6 +5,7 @@ from typing import List
 from ddd.order_management.domain import repositories, enums, value_objects, exceptions, models
 from order_management import models as django_snapshots
 from ddd.order_management.infrastructure import django_mappers
+from ddd.order_management.application import dtos
 
 class DjangoVendorRepositoryImpl(repositories.VendorAbstract):
 
@@ -73,13 +74,14 @@ class DjangoVendorRepositoryImpl(repositories.VendorAbstract):
         self,
         tenant_id: str,
         vendor_id: str
-    ) -> List[value_objects.ShippingOptionStrategy]:
+    ) -> List[dtos.VendorShippingOptionSnapshotDTO]:
         shipping_options = django_snapshots.VendorShippingOptionSnapshot.objects.filter(tenant_id=tenant_id, vendor_id=vendor_id, is_active=True)
         final_opts = []
         for option in shipping_options.values():
-            option.pop("id")
+            #option.pop("id")
             try:
-                final_opts.append(django_mappers.ShippingOptionStrategyMapper.to_domain(option))
+                #final_opts.append(django_mappers.ShippingOptionStrategyMapper.to_domain(option))
+                final_opts.append(dtos.VendorShippingOptionSnapshotDTO.model_validate(**option))
             except (ValueError) as e:
                 print(f"DjangoVendorRepository.get_shipping_options exception > {str(e)}")
                 continue

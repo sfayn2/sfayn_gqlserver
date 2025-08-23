@@ -220,6 +220,7 @@ class VendorShippingOptionSnapshot(models.Model):
 
     option_name = models.CharField(max_length=255, help_text="Just a name of this shipping Option. e.g. MyStandard")
     method = models.CharField(max_length=50, null=True, blank=True, choices=enums.ShippingMethod.choices)
+    provider = models.CharField(max_length=150)
 
     base_cost = models.DecimalField(
             decimal_places=settings.DEFAULT_DECIMAL_PLACES, 

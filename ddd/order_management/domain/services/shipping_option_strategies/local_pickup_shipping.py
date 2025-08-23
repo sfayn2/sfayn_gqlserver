@@ -8,6 +8,9 @@ def _get_current_time():
 
 class LocalPickupShippingStrategy(ports.ShippingOptionStrategyAbstract):
 
+    def __init__(self, strategy: value_objects.ShippingOptionStrategy):
+        self.strategy = strategy
+
     def is_near_by(self, order: models.Order):
         return (order.destination.city in self.strategy.conditions.get("near_by_cities") and 
                 order.destination.country == order.vendor_country

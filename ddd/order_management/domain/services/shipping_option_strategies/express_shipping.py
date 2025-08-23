@@ -8,6 +8,9 @@ def _get_current_time():
 
 class ExpressShippingStrategy(ports.ShippingOptionStrategyAbstract):
 
+    def __init__(self, strategy: value_objects.ShippingOptionStrategy):
+        self.strategy = strategy
+
     def is_before_cutoff(self):
         return _get_current_time() <= self.strategy.conditions.get("cutoff_time")
 

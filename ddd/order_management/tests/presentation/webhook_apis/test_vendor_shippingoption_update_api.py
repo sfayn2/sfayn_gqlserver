@@ -31,6 +31,7 @@ def valid_payload(tenant_id):
             tenant_id="tenant123",
             option_name="MyStandard",
             method="Standard",
+            provider="default",
             delivery_time="2-3 Days",
             conditions={"max_weight": 30},
             base_cost=Decimal("5"),
@@ -48,7 +49,7 @@ def valid_payload(tenant_id):
 @pytest.fixture
 def custom_headers():
     return {
-        "HTTP_X_Wss_Signature": "0a4ce7aab104cc49a939c7a9cce3f6dc30933e382244941528884986270eb279",
+        "HTTP_X_Wss_Signature": "b82acf766f7272ebc22ecbbf64861da25cca2fef377f15fcf0e1e610864271b6",
         "HTTP_X_Wss_Timestamp": str(int(time.time()))
     }
 
