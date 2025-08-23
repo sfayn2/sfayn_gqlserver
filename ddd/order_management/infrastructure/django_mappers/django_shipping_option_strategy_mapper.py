@@ -1,6 +1,7 @@
 import ast, json
 from ddd.order_management.domain import value_objects, models, enums
 
+#TODO to cleanup
 class ShippingOptionStrategyMapper:
 
     @staticmethod
@@ -8,6 +9,7 @@ class ShippingOptionStrategyMapper:
         return value_objects.ShippingOptionStrategy(
             option_name=django_filter.get("option_name"),
             method=enums.ShippingMethod(django_filter_results.get("method")),
+            provider=django_filter_results.get("provider"),
             delivery_time=django_filter_results.get("delivery_time"),
             conditions=json.loads(django_filter_results.get("conditions")),
             base_cost=value_objects.Money(

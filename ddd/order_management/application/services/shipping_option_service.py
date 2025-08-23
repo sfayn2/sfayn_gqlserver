@@ -6,6 +6,10 @@ from ddd.order_management.domain import (
     value_objects,
     exceptions,
 )
+from ddd.order_management.application import (
+    mappers
+)
+
 from ddd.order_management.domain.services import shipping_option_strategies
 
 #SHIPPING_OPTIONS = List[shipping_option_strategies.port.ShippingOptionStrategyAbstract]
@@ -32,7 +36,10 @@ class ShippingOptionService:
             key = (vendor_option.method, vendor_option.provider.lower())
             strategy_factories = self.shipping_options.get(key, [])
             for factory in strategy_factories:
-                strategy_ins = factory(order.tenant_id, vendor_option)
+                strategy_ins = factory(
+                    vendor_option.tenant_id, 
+                    mappers.ShippingOptionStrategyMapper.to_domain(vendor_option)
+                )
                 valid_shipping_options.append(strategy_ins)
 
 
