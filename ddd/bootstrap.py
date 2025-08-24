@@ -130,7 +130,9 @@ event_bus.INTERNAL_EVENT_WHITELIST = [
     "order_management.internal_events.VendorDetailsUpdatedEvent",
     "order_management.internal_events.VendorCouponUpdatedEvent",
     "order_management.internal_events.VendorOfferUpdatedEvent",
-    "order_management.internal_events.VendorShippingOptionUpdatedEvent"
+    "order_management.internal_events.VendorShippingOptionUpdatedEvent",
+    "order_management.internal_events.VendorPaymentOptionUpdatedEvent",
+    "order_management.internal_events.VendorTaxOptionUpdatedEvent"
 ]
 
 # Setup Redis event publishers
@@ -152,7 +154,9 @@ event_bus.EVENT_MODELS = {
     "order_management.internal_events.VendorDetailsUpdatedEvent": dtos.VendorDetailsUpdateIntegrationEvent,
     "order_management.internal_events.VendorCouponUpdatedEvent": dtos.VendorCouponUpdateIntegrationEvent,
     "order_management.internal_events.VendorOfferUpdatedEvent": dtos.VendorOfferUpdateIntegrationEvent,
-    "order_management.internal_events.VendorShippingOptionUpdatedEvent": dtos.VendorShippingOptionUpdateIntegrationEvent
+    "order_management.internal_events.VendorShippingOptionUpdatedEvent": dtos.VendorShippingOptionUpdateIntegrationEvent,
+    "order_management.internal_events.VendorPaymentOptionUpdatedEvent": dtos.VendorPaymentOptionUpdateIntegrationEvent,
+    "order_management.internal_events.VendorTaxOptionUpdatedEvent": dtos.VendorTaxOptionUpdateIntegrationEvent
 }
 
 
@@ -168,7 +172,9 @@ event_bus.ASYNC_EXTERNAL_EVENT_HANDLERS.update({
     "product_catalog.external_events.ProductUpdatedEvent": [],
     "vendor_registry.external_events.VendorUpdatedEvent":[],
     "vendor_registry.external_events.VendorOfferUpdatedEvent":[],
-    "vendor_registry.external_events.VendorShippingOptionUpdatedEvent":[]
+    "vendor_registry.external_events.VendorShippingOptionUpdatedEvent":[],
+    "vendor_registry.external_events.VendorPaymentOptionUpdatedEvent":[],
+    "vendor_registry.external_events.VendorTaxOptionUpdatedEvent":[]
 })
 
 
@@ -202,6 +208,18 @@ event_bus.ASYNC_INTERNAL_EVENT_HANDLERS.update({
         lambda event: handlers.handle_vendor_shippingoption_update_async_event(
             event=event,
             vendor_shippingoption_snapshot_repo=snapshots.DjangoVendorShippingOptionSnapshotRepo()
+        ),
+    ],
+    "order_management.internal_events.VendorPaymentOptionUpdatedEvent": [
+        lambda event: handlers.handle_vendor_paymentoption_update_async_event(
+            event=event,
+            vendor_paymentoption_snapshot_repo=snapshots.DjangoVendorPaymentOptionSnapshotRepo()
+        ),
+    ],
+    "order_management.internal_events.VendorTaxOptionUpdatedEvent": [
+        lambda event: handlers.handle_vendor_taxoption_update_async_event(
+            event=event,
+            vendor_taxoption_snapshot_repo=snapshots.DjangoVendorTaxOptionSnapshotRepo()
         ),
     ],
 })
@@ -336,6 +354,14 @@ message_bus.COMMAND_HANDLERS.update({
         event_publisher=event_bus.internal_publisher
     ),
     commands.PublishVendorShippingOptionUpdateCommand: lambda command: handlers.handle_publish_vendor_shippingoption_update(
+        command=command,
+        event_publisher=event_bus.internal_publisher
+    ),
+    commands.PublishVendorPaymentOptionUpdateCommand: lambda command: handlers.handle_publish_vendor_paymentoption_update(
+        command=command,
+        event_publisher=event_bus.internal_publisher
+    ),
+    commands.PublishVendorTaxOptionUpdateCommand: lambda command: handlers.handle_publish_vendor_taxoption_update(
         command=command,
         event_publisher=event_bus.internal_publisher
     )

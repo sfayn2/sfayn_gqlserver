@@ -12,3 +12,9 @@ class VendorOfferUpdateIntegrationEvent(IntegrationEvent):
 
 class VendorShippingOptionUpdateIntegrationEvent(IntegrationEvent):
     data: dtos.VendorShippingOptionSnapshotDTO
+
+class VendorPaymentOptionUpdateIntegrationEvent(IntegrationEvent):
+    data: dtos.VendorPaymentOptionSnapshotDTO
+
+class VendorTaxOptionUpdateIntegrationEvent(IntegrationEvent):
+    data: dtos.VendorTaxOptionSnapshotDTO

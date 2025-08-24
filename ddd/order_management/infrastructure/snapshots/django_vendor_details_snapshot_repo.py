@@ -7,7 +7,8 @@ from order_management import models as django_snapshots
 class DjangoVendorDetailsSnapshotRepo(ports.SnapshotRepoAbstract):
 
     def sync(self, event: dtos.VendorDetailsUpdateIntegrationEvent):
-        django_snapshots.VendorDetailsSnapshot.objects.filter(tenant_id=event.data.tenant_id, vendor_id=event.data.vendor_id).delete()
-        django_snapshots.VendorDetailsSnapshot.objects.create(
-            **event.model_dump().get("data")
+        django_snapshots.VendorDetailsSnapshot.objects.update_or_create(
+            tenant_id=event.data.tenant_id, 
+            vendor_id=event.data.vendor_id,
+            defaults=event.model_dump().get("data")
         )

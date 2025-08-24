@@ -9,7 +9,7 @@ class DjangoUserAuthorizationSnapshotRepo(ports.SnapshotRepoAbstract):
         self.role_map = role_map
 
     def sync(self, event: dtos.UserLoggedInIntegrationEvent):
-        django_snapshots.UserAuthorizationSnapshot.objects.filter(user_id=event.sub).delete()
+        #django_snapshots.UserAuthorizationSnapshot.objects.filter(user_id=event.sub).delete()
 
         for role in event.roles:
             permissions = self.role_map.get(role, [])
@@ -22,9 +22,11 @@ class DjangoUserAuthorizationSnapshotRepo(ports.SnapshotRepoAbstract):
                 scope["vendor_id"] = event.sub
             for perm in permissions:
 
-                django_snapshots.UserAuthorizationSnapshot.objects.create(
+                django_snapshots.UserAuthorizationSnapshot.objects.update_or_create(
                     user_id=event.sub,
-                    tenant_id=event.tenant_id,
-                    permission_codename=perm,
-                    scope=scope
+                    defaults={
+                        "tenant_id": event.tenant_id,
+                        "permission_codename": perm,
+                        "scope":scope
+                    }
                 )

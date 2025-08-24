@@ -7,7 +7,9 @@ from order_management import models as django_snapshots
 class DjangoVendorCouponSnapshotRepo(ports.SnapshotRepoAbstract):
 
     def sync(self, event: dtos.VendorCouponUpdateIntegrationEvent):
-        django_snapshots.VendorCouponSnapshot.objects.filter(tenant_id=event.data.tenant_id, vendor_id=event.data.vendor_id, coupon_code=event.data.coupon_code).delete()
-        django_snapshots.VendorCouponSnapshot.objects.create(
-            **event.model_dump().get("data")
+        django_snapshots.VendorCouponSnapshot.objects.update_or_create(
+            tenant_id=event.data.tenant_id, 
+            vendor_id=event.data.vendor_id, 
+            coupon_code=event.data.coupon_code,
+            defaults=event.model_dump().get("data")
         )

@@ -23,7 +23,8 @@ from .snapshot_dtos import (
     VendorProductSnapshotDTO,
     CustomerDetailsSnapshotDTO,
     CustomerAddressSnapshotDTO,
-    VendorPaymentOptionSnapshotDTO
+    VendorPaymentOptionSnapshotDTO,
+    VendorTaxOptionSnapshotDTO
 )
 
 # Integration events
@@ -33,6 +34,8 @@ from .integration_events.vendor_integration_events import (
     VendorDetailsUpdateIntegrationEvent,
     VendorCouponUpdateIntegrationEvent,
     VendorOfferUpdateIntegrationEvent,
-    VendorShippingOptionUpdateIntegrationEvent
+    VendorShippingOptionUpdateIntegrationEvent,
+    VendorPaymentOptionUpdateIntegrationEvent,
+    VendorTaxOptionUpdateIntegrationEvent
 )
 from .integration_events.base import IntegrationEvent
