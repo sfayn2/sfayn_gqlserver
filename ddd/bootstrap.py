@@ -21,7 +21,8 @@ from ddd.order_management.infrastructure import (
     snapshots,
     event_publishers,
     payment_gateways,
-    webhook_signatures
+    webhook_signatures,
+    clocks
 )
 from ddd.order_management.application import (
     handlers,
@@ -35,7 +36,8 @@ from ddd.order_management.application.services import (
     webhook_validation_service,
     payment_service,
     shipping_option_service,
-    offer_service
+    offer_service,
+    clock_service
 )
 
 load_dotenv(find_dotenv(filename=".env.test"))
@@ -65,14 +67,21 @@ access_control = access_control1.AccessControl1(
     jwt_handler=JWT_HANDLER
 )
 
+# Global clock; To evolve later on per tenant?
+clock_service = application_services.ClockService(
+    clock_options = [
+        clocks.UtcClock()
+    ]
+)
+
 
 # Configure supported shipping options (still subject to  eligibility)
 shipping_option_service = application_services.ShippingOptionService(
     shipping_options = {
         # enum.ShippingMethod, provider --> list of strategies?
         (enums.ShippingMethod.STANDARD, "oms-default"): [lambda tenant_id, strategy: shipping_option_strategies.StandardShippingStrategy(strategy=strategy)],
-        (enums.ShippingMethod.EXPRESS, "oms-default"): [lambda tenant_id, strategy: shipping_option_strategies.ExpressShippingStrategy(strategy=strategy)],
-        (enums.ShippingMethod.LOCAL_PICKUP, "oms-default"): [lambda tenant_id, strategy: shipping_option_strategies.LocalPickupShippingStrategy(strategy=strategy)],
+        (enums.ShippingMethod.EXPRESS, "oms-default"): [lambda tenant_id, strategy: shipping_option_strategies.ExpressShippingStrategy(strategy=strategy, clock=clock_service)],
+        (enums.ShippingMethod.LOCAL_PICKUP, "oms-default"): [lambda tenant_id, strategy: shipping_option_strategies.LocalPickupShippingStrategy(strategy=strategy, clock=clock_service)],
         (enums.ShippingMethod.FREE_SHIPPING, "oms-default"): [lambda tenant_id, strategy: shipping_option_strategies.FreeShippingStrategy(strategy=strategy)],
         (enums.ShippingMethod.OTHER, "fedex"): [
             lambda tenant_id, strategy: shipping_option_gateway.SampleFedexShippingGateway(
@@ -120,7 +129,7 @@ payment_service = application_services.PaymentService(
 
 # Configure Webhook Signature Verifier
 application_services.webhook_validation_service.SIGNATURE_VERIFIER = {
-    "wss": lambda tenant_id: webhook_signatures.WssSignatureVerifier(shared_secret=os.getenv(f"WH_SECRET_{tenant_id}"))
+    "wss": lambda tenant_id: webhook_signatures.WssSignatureVerifier(clock=clock_service, shared_secret=os.getenv(f"WH_SECRET_{tenant_id}"))
 }
 
 # Configure which events get published

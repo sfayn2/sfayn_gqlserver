@@ -6,6 +6,7 @@ from .customer_address_validation_abstract import CustomerAddressValidationAbstr
 from .email_sender_abstract import EmailSenderAbstract
 from .logging_abstract import LoggingAbstract
 from .payment_abstract import PaymentGatewayAbstract
+from .clock_abstract import ClockAbstract
 
 #Snapshots
 #from .vendor_details_snapshot_abstract import VendorDetailsSnapshotAbstract

@@ -1,11 +1,13 @@
+from __future__ import annotations
 # Our own Webhook Sender Service 
-import hmac, hashlib, time
+import hmac, hashlib
 from ddd.order_management.application import ports
 
 class WssSignatureVerifier(ports.WebhookSignatureVerifier):
-    def __init__(self, shared_secret: str, max_age: int = 3000):
+    def __init__(self, clock: ClockAbstract, shared_secret: str, max_age: int = 3000):
         self.secret = shared_secret
         self.max_age = max_age
+        self.clock = clock
 
     def verify(self, headers, body) -> bool:
         signature = headers.get("X-Wss-Signature", "")
@@ -16,7 +18,7 @@ class WssSignatureVerifier(ports.WebhookSignatureVerifier):
         # check freshness
         try:
             ts = int(timestamp)
-            if abs(int(time.time()) - ts) >= self.max_age:
+            if abs(int(self.clock.now()) - ts) >= self.max_age:
                 return False
         except ValueError:
             return False
