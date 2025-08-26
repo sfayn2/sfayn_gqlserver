@@ -32,12 +32,6 @@ from ddd.order_management.application import (
     dtos,
     services as application_services
 )
-from ddd.order_management.application.services import (
-    webhook_validation_service,
-    payment_service,
-    shipping_option_service,
-    offer_service,
-)
 
 load_dotenv(find_dotenv(filename=".env.test"))
 
@@ -89,8 +83,8 @@ shipping_option_service = application_services.ShippingOptionService(
 )
 
 
-# Configure Vendor offerings
-offer_service = application_services.OfferService(
+# Configure Vendor offerings/promotions
+promotion_service = application_services.PromotionService(
     offers = {
         (enums.OfferType.PERCENTAGE_DISCOUNT, "oms-default"): [lambda tenant_id, strategy: offer_strategies.PercentageDiscountOfferStrategy(strategy=strategy)],
         (enums.OfferType.FREE_GIFTS, "oms-default"): [lambda tenant_id, strategy: offer_strategies.FreeGiftsOfferStrategy(strategy=strategy)],
@@ -247,7 +241,7 @@ event_bus.EVENT_HANDLERS.update({
                 event=event, 
                 uow=uow,
                 vendor=repositories.DjangoVendorRepositoryImpl(),
-                offer_service=offer_service
+                promition_service=promotion_service
             )
         ],
     events.AppliedOffersEvent: [

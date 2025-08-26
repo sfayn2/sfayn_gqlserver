@@ -10,7 +10,7 @@ from ddd.order_management.domain.services.offer_strategies import (
 # Offer Strategy Service
 # ==================
 
-class OfferService:
+class PromotionService:
 
     def __init__(self, offers: List[ports.OfferStrategyAbstract]):
         self.offers = offers

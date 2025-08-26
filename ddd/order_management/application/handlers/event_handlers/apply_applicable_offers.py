@@ -6,7 +6,7 @@ from ddd.order_management.domain import events, exceptions
 
 def handle_apply_applicable_offers(
         event: events.DomainEvent, 
-        offer_service:  OfferStrategyServiceAbstract,
+        promotion_service:  PromotionService,
         vendor: VendorAbstract,
         uow: UnitOfWorkAbstract):
 
@@ -18,7 +18,7 @@ def handle_apply_applicable_offers(
             order.tenant_id,
             order.vendor_id
         )
-        applicable_offers = offer_service.evaluate_applicable_offers(order, vendor_offers)
+        applicable_offers = promotion_service.evaluate_applicable_offers(order, vendor_offers)
 
         order.apply_applicable_offers(applicable_offers)
 
