@@ -6,6 +6,7 @@ from dataclasses import dataclass, field
 from typing import Optional, List, Tuple, TYPE_CHECKING
 from ddd.order_management.domain.models.line_item import LineItem
 from ddd.order_management.domain import enums, exceptions, events, value_objects
+from ddd.order_management.domain.services import DomainClock
 
 
 @dataclass
@@ -44,7 +45,7 @@ class Order:
         self.order_id = f"ORD-{uuid.uuid4().hex[:12].upper()}"
 
     def _update_modified_date(self):
-        self.date_modified = datetime.now()
+        self.date_modified = DomainClock.now()
 
     def add_line_item(self, line_item: LineItem) -> None:
         if not line_item:

@@ -1,9 +1,8 @@
-import pytz
-from datetime import datetime, time
-from ddd.order_management.application import (
-    ports
+from datetime import datetime, timezone
+from ddd.order_management.domain import (
+    services
 )
 
-class UtcClock(ports.ClockAbstract):
-    def now(self) -> time:
-        return datetime.now(pytz.utc).time()
+class UTCClock(services.ClockAbstract):
+    def now(self) -> datetime:
+        return datetime.now(tz=timezone.utc)

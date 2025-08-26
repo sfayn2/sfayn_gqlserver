@@ -1,3 +1,4 @@
+from __future__ import annotations
 from datetime import datetime
 from typing import List, TYPE_CHECKING
 
@@ -21,7 +22,7 @@ class OrderService(ports.OrderServiceAbstract):
             tenant_id: str
     ) -> models.Order:
         order = models.Order(
-            date_created=datetime.now(),
+            date_created=DomainClock.now(),
             customer_details=customer_details,
             destination=shipping_address
         )
