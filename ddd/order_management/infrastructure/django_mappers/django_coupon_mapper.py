@@ -9,5 +9,5 @@ class CouponMapper:
             coupon_code=django_coupon.values_list("coupon_code", flat=True)[0],
             start_date=django_coupon.values_list("start_date", flat=True)[0],
             end_date=django_coupon.values_list("end_date", flat=True)[0],
-            is_active=django_coupon.values_list("is_active", flat=True)[0],
+            #is_active=django_coupon.values_list("is_active", flat=True)[0],
         )

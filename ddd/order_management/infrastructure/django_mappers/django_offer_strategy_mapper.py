@@ -28,5 +28,5 @@ class OfferStrategyMapper:
             priority=django_filter_results.get("priority"),
             start_date=django_filter_results.get("start_date"),
             end_date=django_filter_results.get("end_date"),
-            is_active=django_filter_results.get("is_active")
+            #is_active=django_filter_results.get("is_active")
         )

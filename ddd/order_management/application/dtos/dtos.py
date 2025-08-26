@@ -125,7 +125,7 @@ class OfferStrategyDTO(BaseModel):
     priority: int
     start_date: datetime
     end_date: datetime
-    is_active: bool
+    #is_active: bool
 
     class Config:
         use_enum_values = True
@@ -138,7 +138,7 @@ class ShippingOptionStrategyDTO(BaseModel):
     base_cost: MoneyDTO
     flat_rate: MoneyDTO
     currency: str
-    is_active: bool
+    #is_active: bool
 
     class Config:
         use_enum_values = True

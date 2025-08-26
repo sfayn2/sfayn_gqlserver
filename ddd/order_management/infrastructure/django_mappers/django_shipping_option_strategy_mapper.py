@@ -20,5 +20,5 @@ class ShippingOptionStrategyMapper:
                 amount=django_filter_results.get("flat_rate"),
                 currency=django_filter_results.get("currency")
             ),
-            is_active=django_filter_results.get("is_active")
+            #is_active=django_filter_results.get("is_active")
         )

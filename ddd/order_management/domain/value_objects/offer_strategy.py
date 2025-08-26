@@ -3,8 +3,8 @@ import pytz
 from dataclasses import dataclass
 from decimal import Decimal
 from typing import Optional, List, Dict, Union
-from datetime import datetime
 from ddd.order_management.domain import enums, exceptions
+from ddd.order_management.domain.services import DomainClock
 from .coupon import Coupon
 
 @dataclass(frozen=True) 
@@ -19,11 +19,11 @@ class OfferStrategy:
     priority: int
     start_date: datetime
     end_date: datetime
-    is_active: bool
+    #is_active: bool
 
     def __post_init__(self):
-        if not (self.is_active == True and datetime.now(pytz.utc) >= self.start_date and 
-                datetime.now(pytz.utc) <= self.end_date):
+        if not (DomainClock.now() >= self.start_date and 
+                DomainClock.now() <= self.end_date):
             raise exceptions.OfferStrategyException(f"Offer {self.name} is no longer valid.")
 
         if self.offer_type == enums.OfferType.PERCENTAGE_DISCOUNT:

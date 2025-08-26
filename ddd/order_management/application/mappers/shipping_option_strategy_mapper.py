@@ -19,5 +19,5 @@ class ShippingOptionStrategyMapper:
                 amount=dto.flat_rate,
                 currency=dto.currency
             ),
-            is_active=dto.is_active
+            #is_active=dto.is_active
         )

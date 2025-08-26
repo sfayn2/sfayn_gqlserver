@@ -15,7 +15,7 @@ class ShippingOptionStrategy:
     conditions: dict
     base_cost: Money
     flat_rate: Money
-    is_active: bool
+    #is_active: bool
     #currency: str
 
     def __post_init__(self):
