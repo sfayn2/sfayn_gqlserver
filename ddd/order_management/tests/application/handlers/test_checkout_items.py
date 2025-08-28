@@ -121,3 +121,4 @@ def test_handle_checkout_items():
     )
 
     assert response.success is True
+    assert response.message ==  "Cart items successfully checkout."
