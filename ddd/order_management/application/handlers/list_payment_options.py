@@ -9,13 +9,13 @@ from ddd.order_management.application import (
     queries
 )
 
-def handle_list_shipping_options(
-        query: queries.ListShippingOptionsQuery, 
+def handle_list_payment_options(
+        query: queries.ListPaymentOptionsQuery, 
         uow: UnitOfWorkAbstract,
         vendor_repo: VendorAbstract,
         access_control: AccessControl1Abstract,
-        shipping_option_service: ShippingOptionService
-) -> List[dtos.ShippingOptionDTO]:
+        payment_service: PaymentService
+) -> List[dtos.PaymentOptionDTO]:
 
     with uow:
 
@@ -23,20 +23,19 @@ def handle_list_shipping_options(
 
         access_control.ensure_user_is_authorized_for(
             token=command.token,
-            required_permission="list_shipping_options",
+            required_permission="list_payment_options",
             required_scope={"customer_id": order.customer_details.customer_id }
         )
 
-        vendor_shipping_options = vendor_repo.get_shipping_options(
+        vendor_payment_options = vendor_repo.get_payment_options(
                 tenant_id=order.tenant_id, 
                 vendor_id=order.vendor_id
             )
-        available_shipping_options = shipping_option_service.get_applicable_shipping_options(
+        available_payment_options = payment_service.get_applicable_payment_options(
             order=order,
-            vendor_shipping_options=vendor_shipping_options
+            vendor_payment_options=vendor_payment_options
         )
 
-        response_dto = [mappers.ShippingDetailsMapper.to_dto(opt) for opt in available_shipping_options]
-        #shipping_options_dto = mappers.ShippingOptionsResponseMapper.to_dtos(available_shipping_options)
+        #dto
+        return available_payment_options
 
-        return response_dto

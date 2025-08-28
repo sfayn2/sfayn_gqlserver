@@ -3,6 +3,7 @@ from datetime import datetime
 from typing import List, TYPE_CHECKING
 
 from ddd.order_management.domain.services.order import ports
+from ddd.order_management.domain.services import DomainClock
 
 from ddd.order_management.domain import (
     models,
@@ -22,13 +23,13 @@ class OrderService(ports.OrderServiceAbstract):
             tenant_id: str
     ) -> models.Order:
         order = models.Order(
+            tenant_id=tenant_id,
             date_created=DomainClock.now(),
             customer_details=customer_details,
             destination=shipping_address
         )
 
         order.generate_order_id()
-        order.tenant_id = tenant_id
         order.mark_as_draft()
         for line_item in line_items:
             order.add_line_item(line_item)

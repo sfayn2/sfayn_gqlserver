@@ -22,7 +22,7 @@ from ddd.order_management.infrastructure import (
     event_publishers,
     payment_gateways,
     webhook_signatures,
-    clocks
+    clocks,
 )
 from ddd.order_management.application import (
     handlers,
@@ -267,22 +267,21 @@ message_bus.COMMAND_HANDLERS.update({
         uow=repositories.DjangoOrderUnitOfWork(),
         vendor_repo=repositories.DjangoVendorRepositoryImpl(),
         order_service=domain_services.OrderService(),
-        address_validation_service=validation_services.DjangoCustomerAddressValidationService(),
-        stock_validation=validation_services.DjangoStockValidationService(),
+        stock_validation=validations.DjangoStockValidation(),
         access_control=access_control
     ),
     commands.ChangeOrderQuantityCommand: lambda command: handlers.handle_change_order_quantity(
         command=command,
         uow=repositories.DjangoOrderUnitOfWork(),
         access_control=access_control,
-        stock_validation=validation_services.DjangoStockValidationService()
+        stock_validation=validations.DjangoStockValidation()
     ),
     commands.AddLineItemsCommand: lambda command: handlers.handle_add_line_items(
         command=command,
         uow=repositories.DjangoOrderUnitOfWork(),
         vendor_repo=repositories.DjangoVendorRepositoryImpl(),
         access_control=access_control,
-        stock_validation=validation_services.DjangoStockValidationService()
+        stock_validation=validations.DjangoStockValidation()
     ),
     commands.ChangeDestinationCommand: lambda command: handlers.handle_change_destination(
         command=command,
@@ -292,7 +291,7 @@ message_bus.COMMAND_HANDLERS.update({
     commands.AddCouponCommand: lambda command: handlers.handle_add_coupon(
         command=command,
         uow=repositories.DjangoOrderUnitOfWork(),
-        coupon_validation=validation_services.DjangoCouponValidationService(),
+        coupon_validation=validations.DjangoCouponValidation(),
         access_control=access_control
     ),
     commands.SelectShippingOptionCommand: lambda command: handlers.handle_select_shipping_option(
@@ -306,14 +305,14 @@ message_bus.COMMAND_HANDLERS.update({
         command=command,
         uow=repositories.DjangoOrderUnitOfWork(),
         access_control=access_control,
-        stock_validation=validation_services.DjangoStockValidationService()
+        stock_validation=validations.DjangoStockValidation()
     ),
     commands.ConfirmOrderCommand: lambda command: handlers.handle_confirm_order(
         command=command, 
         uow=repositories.DjangoOrderUnitOfWork(),
         payment_service=payment_service,
         access_control=access_control,
-        stock_validation=validation_services.DjangoStockValidationService()
+        stock_validation=validations.DjangoStockValidation()
     ),
     commands.CancelOrderCommand: lambda command: handlers.handle_cancel_order(
         command=command,

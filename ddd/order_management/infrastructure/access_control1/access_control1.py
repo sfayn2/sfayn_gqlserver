@@ -14,7 +14,7 @@ class AccessControl1(ports.AccessControl1Abstract):
         self, token: str, required_permission: str, required_scope: dict = None
     ) -> dtos.UserLoggedInIntegrationEvent:
 
-        identity_claims = self.jwt_handler.decode(jwt_token)
+        identity_claims = self.jwt_handler.decode(token)
         token_type = identity_claims.get("token_type", "Bearer")
         #claims = self._fetch_userinfo(jwt_token, token_type)
 
@@ -24,7 +24,7 @@ class AccessControl1(ports.AccessControl1Abstract):
         #roles = identity_claims.get("roles")
 
 
-        matching_authorizations = django_snapshopts.UserAuthorization.objects.filter(
+        matching_authorizations = django_snapshots.UserAuthorizationSnapshot.objects.filter(
             user_id=valid_claims.sub,
             tenant_id=valid_claims.tenant_id,
             permission_codename=required_permission

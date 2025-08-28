@@ -5,6 +5,6 @@ from ddd.order_management.domain import models, value_objects, enums
 class CustomerDetailsMapper:
 
     @staticmethod
-    def to_domain(dto: dtos.CustomerDetailsDTO) -> value_objects.CustomerDetails:
-        return value_objects.CustomerDetails(**dto.model_dump())
+    def to_domain(dto: dtos.CustomerDetailsDTO, customer_id: str) -> value_objects.CustomerDetails:
+        return value_objects.CustomerDetails(**dto.model_dump(), customer_id=customer_id)
 

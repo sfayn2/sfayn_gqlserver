@@ -14,7 +14,7 @@ class MoneyDTO(BaseModel):
     amount: Decimal
     currency: str
 
-class ShippingDetailsDTO(BaseModel):
+class ShippingOptionDTO(BaseModel):
     method: enums.ShippingMethod
     delivery_time: str
     cost: MoneyDTO
@@ -23,7 +23,6 @@ class ShippingDetailsDTO(BaseModel):
         use_enum_values = True
 
 class CustomerDetailsDTO(BaseModel):
-    customer_id: str
     first_name: str
     last_name: str
     email: str
@@ -77,7 +76,7 @@ class OrderResponseDTO(BaseModel):
     order_status: str
     success: bool
     message: str
-    shipping_details: Optional[ShippingDetailsDTO]
+    shipping_details: Optional[ShippingOptionDTO]
     tax_details: List[str]
     offer_details: List[str]
     tax_amount: MoneyDTO
@@ -96,8 +95,8 @@ class OrderDTO(BaseModel):
     destination: AddressDTO
     line_items: List[LineItemDTO]
     customer_details: Optional[CustomerDetailsDTO]
-    shipping_details: Optional[ShippingDetailsDTO]
-    payment_details: Optional[PaymentDetailsDTO]
+    shipping_option: Optional[ShippingOptionDTO]
+    payment_option: Optional[PaymentOptionDTO]
     cancellation_reason: Optional[str]
     total_discounts_fee: Optional[MoneyDTO]
     offer_details: Optional[List[str]]

@@ -1,4 +1,5 @@
 import jwt
+from jwt import PyJWKClient
 
 class JwtTokenHandler:
     def __init__(self, public_key: str, issuer: str, audience: str, algorithm: str):

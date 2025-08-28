@@ -38,7 +38,7 @@ class ConfirmOrderCommand(Command1):
 
 class SelectShippingOptionCommand(Command1):
     order_id: str
-    shipping_details: dtos.ShippingDetailsDTO
+    shipping_details: dtos.ShippingOptionDTO
 
 class ShipOrderCommand(Command1):
     order_id: str

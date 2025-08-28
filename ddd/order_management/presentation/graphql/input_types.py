@@ -35,7 +35,6 @@ class AddressInput(graphene.InputObjectType):
     country = graphene.String(required=True)
 #
 class CustomerDetailsInput(graphene.InputObjectType):
-    customer_id = graphene.String(required=True)
     first_name = graphene.String(required=True)
     last_name = graphene.String(required=True)
     email = graphene.String(required=True)

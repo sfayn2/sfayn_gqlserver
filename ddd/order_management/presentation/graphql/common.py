@@ -10,8 +10,8 @@ def get_token_from_context(info):
         raise exceptions.AccessControlException("Missing token type")
 
     if auth_header:
-        if not auth_header.startswith(f"{self.token_type} "):
+        if not auth_header.startswith(f"{token_type} "):
             raise exceptions.AccessControlException("Unsupported token type.")
-        return auth_header.removeprefix(f"{self.token_type} ")
+        return auth_header.removeprefix(f"{token_type} ")
 
     return info.context.COOKIES.get("access_token")

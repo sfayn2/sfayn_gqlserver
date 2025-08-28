@@ -5,8 +5,8 @@ from ddd.order_management.domain import models, value_objects, enums
 class ShippingDetailsMapper:
 
     @staticmethod
-    def to_dto(shipping_details: value_objects.ShippingDetails) -> dtos.ShippingDetailsDTO:
-        return dtos.ShippingDetailsDTO(**asdict(shipping_details))
+    def to_dto(shipping_details: value_objects.ShippingDetails) -> dtos.ShippingOptionDTO:
+        return dtos.ShippingOptionDTO(**asdict(shipping_details))
 
     @staticmethod
     def to_domain(shipping_details_obj) -> value_objects.ShippingDetails:

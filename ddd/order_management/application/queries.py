@@ -11,6 +11,9 @@ class Query(BaseModel, frozen=True):
 class ListShippingOptionsQuery(Query):
     order_id: str
 
+class ListPaymentOptionsQuery(Query):
+    order_id: str
+
 class GetOrderQuery(Query):
     order_id: str
 

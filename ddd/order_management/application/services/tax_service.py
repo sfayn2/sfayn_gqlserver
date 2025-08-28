@@ -34,7 +34,6 @@ class TaxService:
                 valid_taxes.append(strategy_ins)
 
 
-        tax_amount = value_objects.Money.default()
         tax_results = []
         options = []
 

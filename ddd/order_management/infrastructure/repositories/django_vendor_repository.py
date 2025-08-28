@@ -13,7 +13,7 @@ class DjangoVendorRepositoryImpl(repositories.VendorAbstract):
         self, 
         tenant_id: str,
         vendor_id: str, 
-        product_skus_input: List[ProductSkuDTO]
+        product_skus_input: List[dtos.ProductSkusDTO]
     ) -> List[models.LineItem]:
         vendor_details = self._get_active_vendor_details(vendor_id)
 
