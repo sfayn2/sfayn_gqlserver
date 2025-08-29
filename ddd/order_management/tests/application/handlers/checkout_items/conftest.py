@@ -49,16 +49,12 @@ def fake_access_control():
     class FakeAccessControl:
         def ensure_user_is_authorized_for(
             self, token: str, required_permission: str, required_scope: dict = None
-        ) -> dtos.UserLoggedInIntegrationEvent:
-            identity = dtos.Identity(
+        ) -> dtos.Identity:
+            return dtos.Identity(
                 sub="user-1",
                 token_type="Bearer",
                 tenant_id="tenant_123",
                 roles=["customer"]
-            )
-            return dtos.UserLoggedInIntegrationEvent(
-                event_type="identity_gateway_service.external_events.UserLoggedInEvent",
-                data=identity
             )
     return FakeAccessControl
 
