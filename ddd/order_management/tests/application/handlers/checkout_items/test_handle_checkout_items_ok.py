@@ -8,6 +8,7 @@ from ddd.order_management.domain import (
 )
 from ddd.order_management.infrastructure import (
     repositories as infra_repo,
+    access_control1
 )
 
 
@@ -18,9 +19,14 @@ def test_handle_checkout_items_ok(
     fake_product_skus,
     fake_vendor_repo, 
     fake_stock_validation, 
-    fake_access_control, 
-    domain_clock
+    fake_jwt_handler, 
+    domain_clock,
+    seeded_user_auth_snapshot
 ):
+
+    access_control = access_control1.AccessControl1(
+        jwt_handler=fake_jwt_handler()
+    )
 
     command = commands.CheckoutItemsCommand(
         token="fake_jwt_token",
@@ -34,7 +40,7 @@ def test_handle_checkout_items_ok(
         uow=infra_repo.DjangoOrderUnitOfWork(),
         vendor_repo=fake_vendor_repo(),
         stock_validation=fake_stock_validation(),
-        access_control=fake_access_control(),
+        access_control=access_control,
         order_service=domain_services.OrderService()
     )
 

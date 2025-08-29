@@ -6,7 +6,7 @@ from ddd.order_management.domain import exceptions
 from ddd.order_management.application import ports, dtos
 
 class AccessControl1(ports.AccessControl1Abstract):
-    def __init__(self, jwt_handler: str):
+    def __init__(self, jwt_handler):
         self.jwt_handler = jwt_handler
         #self.userinfo_url = userinfo_url
 
@@ -16,17 +16,15 @@ class AccessControl1(ports.AccessControl1Abstract):
 
         identity_claims = self.jwt_handler.decode(token)
         token_type = identity_claims.get("token_type", "Bearer")
-        #claims = self._fetch_userinfo(jwt_token, token_type)
 
-        valid_claims = dtos.UserLoggedInIntegrationEvent.model_validate(**claims)
-        #user_id = identity_claims["sub"]
-        #tenant_id = identity_claims["tenant_id"]
-        #roles = identity_claims.get("roles")
-
+        valid_claims = dtos.UserLoggedInIntegrationEvent(
+            event_type="dummy?",
+            data=dtos.Identity.model_validate(identity_claims)
+        )
 
         matching_authorizations = django_snapshots.UserAuthorizationSnapshot.objects.filter(
-            user_id=valid_claims.sub,
-            tenant_id=valid_claims.tenant_id,
+            user_id=valid_claims.data.sub,
+            tenant_id=valid_claims.data.tenant_id,
             permission_codename=required_permission
         )
 
@@ -40,10 +38,3 @@ class AccessControl1(ports.AccessControl1Abstract):
             raise exceptions.AccessControlException("Access denied: permission not granted")
 
         return valid_claims
-
-    #def _fetch_userinfo(self, jwt_token: str, token_type: str) -> dict:
-    #    headers = {"Authorization": f"{token_type} {jwt_token}"}
-    #    response = requests.get(self.userinfo_url, headers=headers)
-    #    if response.status_code != 200:
-    #        raise exceptions.AccessControlException("Failed to fetch user info")
-    #    return response.json()

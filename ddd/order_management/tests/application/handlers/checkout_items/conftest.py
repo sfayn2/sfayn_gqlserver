@@ -221,3 +221,25 @@ def seeded_vendor_details_snapshot():
         country="Singapore",
         is_active=True
     )
+
+@pytest.fixture
+def fake_jwt_handler():
+    class FakeJWTHandler:
+        def decode(self, token: str) -> dict:
+            return {
+                "sub": "user-1",
+                "tenant_id": "tenant_123",
+                "token_type": "Bearer",
+                "roles": ["customer"]
+            }
+    return FakeJWTHandler
+
+@pytest.fixture
+def seeded_user_auth_snapshot():
+    return django_snapshots.UserAuthorizationSnapshot.objects.create(
+        user_id="user-1",
+        permission_codename="checkout_items",
+        tenant_id="tenant_123",
+        scope=json.dumps({ "customer_id": "user-1" }),
+        is_active=True
+    )
