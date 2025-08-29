@@ -211,3 +211,13 @@ def seeded_vendor_product_snapshot():
             is_active=True
         )
     ]
+
+@pytest.fixture
+def seeded_vendor_details_snapshot():
+    return django_snapshots.VendorDetailsSnapshot.objects.create(
+        vendor_id="vendor-1",
+        tenant_id="tenant_123",
+        name="VendorA",
+        country="Singapore",
+        is_active=True
+    )

@@ -23,6 +23,7 @@ class ShippingOptionDTO(BaseModel):
         use_enum_values = True
 
 class CustomerDetailsDTO(BaseModel):
+    customer_id: Optional[str] = None
     first_name: str
     last_name: str
     email: str
@@ -76,7 +77,7 @@ class OrderResponseDTO(BaseModel):
     order_status: str
     success: bool
     message: str
-    shipping_details: Optional[ShippingOptionDTO]
+    shipping_details: Optional[ShippingOptionDTO] = None
     tax_details: List[str]
     offer_details: List[str]
     tax_amount: MoneyDTO
@@ -94,21 +95,21 @@ class OrderDTO(BaseModel):
     date_created: datetime 
     destination: AddressDTO
     line_items: List[LineItemDTO]
-    customer_details: Optional[CustomerDetailsDTO]
-    shipping_option: Optional[ShippingOptionDTO]
-    payment_option: Optional[PaymentOptionDTO]
-    cancellation_reason: Optional[str]
-    total_discounts_fee: Optional[MoneyDTO]
-    offer_details: Optional[List[str]]
-    tax_details: Optional[List[str]]
-    tax_amount: Optional[MoneyDTO]
-    total_amount: Optional[MoneyDTO]
-    final_amount: Optional[MoneyDTO]
+    customer_details: Optional[CustomerDetailsDTO] = None
+    shipping_option: Optional[ShippingOptionDTO] = None
+    payment_option: Optional[PaymentOptionDTO] = None
+    cancellation_reason: Optional[str] = None
+    total_discounts_fee: Optional[MoneyDTO] = None
+    offer_details: Optional[List[str]] = None
+    tax_details: Optional[List[str]] = None
+    tax_amount: Optional[MoneyDTO] = None
+    total_amount: Optional[MoneyDTO] = None
+    final_amount: Optional[MoneyDTO] = None
     shipping_reference: Optional[str] = Field(json_schema_extra=AliasChoices('shipping_tracking_reference', 'shipping_reference'))
-    coupons: Optional[List[CouponDTO]]
+    coupons: Optional[List[CouponDTO]] = None
     order_status: enums.OrderStatus
     currency: str
-    date_modified: Optional[datetime]
+    date_modified: Optional[datetime] = None
 
     class Config:
         use_enum_values = True
@@ -119,7 +120,7 @@ class OfferStrategyDTO(BaseModel):
     discount_value: int | Decimal
     conditions: str
     required_coupon: bool
-    coupons: Optional[List[CouponDTO]]
+    coupons: Optional[List[CouponDTO]] = None
     stackable: bool
     priority: int
     start_date: datetime

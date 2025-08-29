@@ -25,7 +25,6 @@ class DjangoVendorRepositoryImpl(repositories.VendorAbstract):
         vendor_ids = [sku.vendor_id for sku in product_skus_input]
         skus = [sku.product_sku for sku in product_skus_input]
 
-
         available_products = list(django_snapshots.VendorProductSnapshot.objects.filter(
                 tenant_id=tenant_id,
                 vendor_id__in=vendor_ids, 
@@ -45,9 +44,9 @@ class DjangoVendorRepositoryImpl(repositories.VendorAbstract):
             for input_sku in product_skus_input:
                 if (input_sku.product_sku == snapshot.product_sku and
                     input_sku.vendor_id == snapshot.vendor_id and
-                    input_sku.tenant_id == snapshot.tenant_id
+                    tenant_id == snapshot.tenant_id
                 ):
-                    vendor_details = self._get_active_vendor_details(input_sku.vendor_id)
+                    vendor_details = self._get_active_vendor_details(tenant_id, input_sku.vendor_id)
                     snapshot.order_quantity = input_sku.order_quantity
                     snapshot.vendor_name = vendor_details.name
                     snapshot.vendor_country = vendor_details.country
@@ -55,6 +54,7 @@ class DjangoVendorRepositoryImpl(repositories.VendorAbstract):
                     line_items.append(
                         django_mappers.LineItemMapper.to_domain(snapshot)
                     )
+                    continue
 
         return line_items
 

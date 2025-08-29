@@ -23,7 +23,7 @@ def handle_checkout_items(
                 required_permission="checkout_items"
             )
             tenant_id = user_ctx.data.tenant_id
-            customer_id = user_ctx.data.sub
+            command.customer_details.customer_id = user_ctx.data.sub
 
             # Decision: allow user to fill in customer details + address in front end
             #customer_details = customer_repo.get_customer_details(command.customer_id)
@@ -43,10 +43,8 @@ def handle_checkout_items(
                 command.product_skus
             )
 
-
-
             draft_order = order_service.create_draft_order(
-                customer_details=mappers.CustomerDetailsMapper.to_domain(command.customer_details, customer_id),
+                customer_details=mappers.CustomerDetailsMapper.to_domain(command.customer_details),
                 shipping_address=mappers.AddressMapper.to_domain(command.address),
                 line_items=vendor_line_items,
                 tenant_id=tenant_id
