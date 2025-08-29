@@ -12,19 +12,17 @@ class AccessControl1(ports.AccessControl1Abstract):
 
     def ensure_user_is_authorized_for(
         self, token: str, required_permission: str, required_scope: dict = None
-    ) -> dtos.UserLoggedInIntegrationEvent:
+    ) -> dtos.Identity:
 
         identity_claims = self.jwt_handler.decode(token)
         token_type = identity_claims.get("token_type", "Bearer")
 
-        valid_claims = dtos.UserLoggedInIntegrationEvent(
-            event_type="dummy?",
-            data=dtos.Identity.model_validate(identity_claims)
-        )
+        valid_claims = dtos.Identity.model_validate(identity_claims)
 
+        #TODO: this should not be here? lets inject 
         matching_authorizations = django_snapshots.UserAuthorizationSnapshot.objects.filter(
-            user_id=valid_claims.data.sub,
-            tenant_id=valid_claims.data.tenant_id,
+            user_id=valid_claims.sub,
+            tenant_id=valid_claims.tenant_id,
             permission_codename=required_permission
         )
 

@@ -22,8 +22,8 @@ def handle_checkout_items(
                 token=command.token,
                 required_permission="checkout_items"
             )
-            tenant_id = user_ctx.data.tenant_id
-            command.customer_details.customer_id = user_ctx.data.sub
+            tenant_id = user_ctx.tenant_id
+            command.customer_details.customer_id = user_ctx.sub
 
             # Decision: allow user to fill in customer details + address in front end
             #customer_details = customer_repo.get_customer_details(command.customer_id)
