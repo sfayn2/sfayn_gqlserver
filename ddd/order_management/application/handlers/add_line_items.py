@@ -26,19 +26,19 @@ def handle_add_line_items(
                 required_scope={"customer_id": order.customer_details.customer_id}
             )
 
+            stock_validation.ensure_items_in_stock(
+                order.tenant_id,
+                command.product_skus
+            )
+
             line_items = vendor_repo.get_line_items(
                 order.tenant_id,
-                order.vendor_id, 
                 command.product_skus
             )
 
             for line_item in line_items:
                 order.add_line_item(line_item)
 
-            stock_validation.ensure_items_in_stock(
-                order.tenant_id,
-                order.line_items
-            )
 
             uow.order.save(order)
             uow.commit()
