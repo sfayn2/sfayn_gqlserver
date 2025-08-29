@@ -145,4 +145,5 @@ class ShippingOptionStrategyDTO(BaseModel):
 class ProductSkusDTO(BaseModel):
     product_sku: str
     order_quantity: int
+    vendor_id: str
 

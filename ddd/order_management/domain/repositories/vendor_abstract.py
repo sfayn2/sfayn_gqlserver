@@ -9,7 +9,6 @@ class VendorAbstract(ABC):
     def get_line_items(
         self, 
         tenant_id: str,
-        vendor_id: str, 
         product_skus_input: List[ProductSkuDTO]
     ) -> List[models.LineItem]:
         raise NotImplementedError("Subclasses must implement this method")

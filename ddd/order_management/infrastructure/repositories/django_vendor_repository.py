@@ -2,7 +2,13 @@ from __future__ import annotations
 import pytz, uuid
 from datetime import datetime
 from typing import List
-from ddd.order_management.domain import repositories, enums, value_objects, exceptions, models
+from ddd.order_management.domain import (
+    repositories, 
+    enums, 
+    value_objects, 
+    exceptions, 
+    models
+)
 from order_management import models as django_snapshots
 from ddd.order_management.infrastructure import django_mappers
 from ddd.order_management.application import dtos
@@ -12,38 +18,43 @@ class DjangoVendorRepositoryImpl(repositories.VendorAbstract):
     def get_line_items(
         self, 
         tenant_id: str,
-        vendor_id: str, 
         product_skus_input: List[dtos.ProductSkusDTO]
     ) -> List[models.LineItem]:
-        vendor_details = self._get_active_vendor_details(vendor_id)
 
-        product_sku_map = {sku.product_sku: sku.order_quantity for sku in product_skus_input}
+        #product_sku_map = {sku.product_sku: sku.order_quantity for sku in product_skus_input}
+        vendor_ids = [sku.vendor_id for sku in product_skus_input]
+        skus = [sku.product_sku for sku in product_skus_input]
+
 
         available_products = list(django_snapshots.VendorProductSnapshot.objects.filter(
                 tenant_id=tenant_id,
-                vendor_id=vendor_id, 
-                product_sku__in=product_sku_map.keys(),
+                vendor_id__in=vendor_ids, 
+                product_sku__in=skus,
                 is_active=True
             )
         )
 
         if not available_products:
             raise exceptions.VendorProductNotFoundException(
-                f"Vendor {vendor_id} does not offer products: { ','.join(product_sku_map.keys()) } not available"
+                f"Vendor {','.join(vendor_ids)} does not offer products: { ','.join(skus) } not available"
             )
 
         line_items = []
         for snapshot in available_products:
             #do this to fit w LineItemMapper expected fields
-            snapshot.order_quantity = product_sku_map.get(snapshot.product_sku)
-            snapshot.vendor_name = vendor_details.name
-            snapshot.vendor_country = vendor_details.country
-            snapshot.is_free_gift = False
-            snapshot.is_taxable = True
+            for input_sku in product_skus_input:
+                if (input_sku.product_sku == snapshot.product_sku and
+                    input_sku.vendor_id == snapshot.vendor_id and
+                    input_sku.tenant_id == snapshot.tenant_id
+                ):
+                    vendor_details = self._get_active_vendor_details(input_sku.vendor_id)
+                    snapshot.order_quantity = input_sku.order_quantity
+                    snapshot.vendor_name = vendor_details.name
+                    snapshot.vendor_country = vendor_details.country
 
-            line_items.append(
-                django_mappers.LineItemMapper.to_domain(snapshot)
-            )
+                    line_items.append(
+                        django_mappers.LineItemMapper.to_domain(snapshot)
+                    )
 
         return line_items
 

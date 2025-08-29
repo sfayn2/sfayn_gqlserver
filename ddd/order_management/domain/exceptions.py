@@ -43,8 +43,6 @@ class NoApplicablePaymentOptionException(InvalidOrderOperation):
 class NoApplicableTaxOptionException(InvalidOrderOperation):
     pass
 
-    
-
 class PaymentNotSettledException(InvalidOrderOperation):
     pass
 
@@ -57,6 +55,7 @@ class VendorNotFoundException(InvalidOrderOperation):
 class VendorProductNotFoundException(InvalidOrderOperation):
     pass
 
+# below Exceptions will not be include error msg in response
 class Forbidden(Exception):
     pass
 

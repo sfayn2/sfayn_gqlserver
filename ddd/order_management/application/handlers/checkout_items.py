@@ -33,16 +33,16 @@ def handle_checkout_items(
             #    address=command.address
             #)
 
-            vendor_line_items = vendor_repo.get_line_items(
+            stock_validation.ensure_items_in_stock(
                 tenant_id,
-                command.vendor_id, 
                 command.product_skus
             )
 
-            stock_validation.ensure_items_in_stock(
+            vendor_line_items = vendor_repo.get_line_items(
                 tenant_id,
-                vendor_line_items
+                command.product_skus
             )
+
 
 
             draft_order = order_service.create_draft_order(

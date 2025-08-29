@@ -296,6 +296,8 @@ class VendorProductSnapshot(models.Model):
     package_length = models.CharField(max_length=100, null=True, blank=True, help_text="value should be coming from product itself or to fill in later once it goes to warehouse fulfillment? ")
     package_width = models.CharField(max_length=100, null=True, blank=True, help_text="value should be coming from product itself or to fill in later once it goes to warehouse fulfillment?")
     package_height = models.CharField(max_length=100, null=True, blank=True, help_text="value should be coming from product itself or to fill in later once it goes to warehouse fulfillment?")
+    is_free_gift = models.BooleanField(default=False, null=True, blank=True)
+    is_taxable = models.BooleanField(default=True, null=True, blank=True)
     is_active = models.BooleanField(default=True)
     last_update_dt = models.DateTimeField(auto_now=True) 
 
