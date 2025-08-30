@@ -10,7 +10,6 @@ class JwtTokenHandler:
         self.algorithm = algorithm
 
     def decode(self, token: str, secret: Optional[str] = None) -> dict:
-        import pdb;pdb.set_trace()
 
         if not secret:
             jwks_client = PyJWKClient(self.public_key)
