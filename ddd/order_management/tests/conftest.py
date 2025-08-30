@@ -8,7 +8,8 @@ from ddd.order_management.domain import (
     repositories as domain_ports,
     services as domain_services,
     value_objects,
-    exceptions
+    exceptions,
+    enums
 )
 from ddd.order_management.application import (
     dtos, 
@@ -49,7 +50,7 @@ def fake_customer_details():
 def fake_address():
     return dtos.AddressDTO(
             street="street1",
-            city="city1",
+            city="Singapore",
             postal=1234,
             country="Singapore",
             state="Singapore"
@@ -316,6 +317,9 @@ def fake_jwt_handler():
 # JWT fixtures
 # ==========
 
+# =================
+# Seeded Fixtures
+# ==============
 @pytest.fixture
 def seeded_user_auth_snapshot():
     return django_snapshots.UserAuthorizationSnapshot.objects.create(
@@ -325,3 +329,65 @@ def seeded_user_auth_snapshot():
         scope=json.dumps({ "customer_id": "user-1" }),
         is_active=True
     )
+
+@pytest.fixture
+def seeded_order():
+    return django_snapshots.Order.objects.create(
+                order_id="ORD-1",
+                order_status=enums.OrderStatus.DRAFT.value,
+                cancellation_reason="",
+                customer_id="user-1",
+                customer_first_name="first name1",
+                customer_last_name="last name1",
+                customer_email="email@gmail.com",
+                coupons=json.dumps([]),
+                delivery_street="street1",
+                delivery_city="Singapore",
+                delivery_postal=1234,
+                delivery_country="Singapore",
+                delivery_state="Singapore",
+                shipping_method=None,
+                shipping_delivery_time=None,
+                shipping_cost=None,
+                shipping_tracking_reference=None,
+                tax_details=json.dumps([]),
+                tax_amount=Decimal("0"),
+                total_discounts_fee=Decimal("0"),
+                total_amount=Decimal("0"),
+                offer_details=json.dumps([]),
+                final_amount=Decimal("0"),
+                payment_method=None,
+                payment_reference=None,
+                payment_amount=Decimal("0"),
+                payment_status=None,
+                currency="SGD",
+                tenant_id="tenant_123"
+    )
+
+@pytest.fixture
+def seeded_line_items():
+    return django_snapshots.OrderLine.objects.create(
+        order_id="ORD-1",
+        vendor_id="vendor-1",
+        vendor_name="Vendor1",
+        vendor_country="Singapore",
+        product_sku="sku1",
+        product_name="my product",
+        product_category="T-SHIRT",
+        is_free_gift=False,
+        is_taxable=True,
+        options=json.dumps({"Size": "M", "Color": "RED"}),
+        product_price=Decimal("20"),
+        product_currency="SGD",
+        order_quantity=10,
+        package_weight=1,
+        package_length=1,
+        package_width=1,
+        package_height=1,
+        total_price=200
+    )
+
+
+# =================
+# Seeded Fixtures
+# ==============
