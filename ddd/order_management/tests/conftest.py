@@ -1,4 +1,5 @@
-import pytest, json
+import pytest, json, jwt
+from datetime import datetime, timedelta
 from typing import List
 from decimal import Decimal
 from order_management import models as django_snapshots
@@ -13,7 +14,8 @@ from ddd.order_management.application import (
     dtos, 
 )
 from ddd.order_management.infrastructure import (
-    clocks
+    clocks,
+    access_control1
 )
 
 @pytest.fixture
@@ -47,6 +49,7 @@ def fake_product_skus():
 @pytest.fixture
 def fake_access_control():
     class FakeAccessControl:
+
         def ensure_user_is_authorized_for(
             self, token: str, required_permission: str, required_scope: dict = None
         ) -> dtos.Identity:
@@ -218,10 +221,38 @@ def seeded_vendor_details_snapshot():
         is_active=True
     )
 
+# =======================
+# JWT fixtures
+# ==========
+SECRET = "top-secret"
+
+@pytest.fixture
+def fake_jwt_token():
+    payload = {
+        "sub": "user-1",
+        "aud": "my-app",
+        "iss":"https://issuer.test",
+        "tenant_id": "tenant_123",
+        "token_type": "Bearer",
+        "roles": ["customer"],
+        "exp": datetime.now() + timedelta(minutes=5)
+    }
+    return jwt.encode(payload, SECRET, algorithm="RS256")
+
 @pytest.fixture
 def fake_jwt_handler():
     class FakeJWTHandler:
         def decode(self, token: str) -> dict:
+            #jwt_handler = access_control1.JwtTokenHandler(
+            #    public_key="fake_public",
+            #    algorithm="RS256",
+            #    audience="my-app",
+            #    issuer="https://issuer.test"
+            #)
+            #return jwt_handler.decode(
+            #    fake_jwt_token(),
+            #    SECRET
+            #)
             return {
                 "sub": "user-1",
                 "tenant_id": "tenant_123",
@@ -229,6 +260,10 @@ def fake_jwt_handler():
                 "roles": ["customer"]
             }
     return FakeJWTHandler
+
+# =======================
+# JWT fixtures
+# ==========
 
 @pytest.fixture
 def seeded_user_auth_snapshot():

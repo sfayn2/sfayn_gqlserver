@@ -13,13 +13,14 @@ from ddd.order_management.infrastructure import (
 
 
 @pytest.mark.django_db
-def test_handle_checkout_items_ok(
+def test_checkout_items_ok(
     fake_customer_details,
     fake_address,
     fake_product_skus,
     fake_vendor_repo, 
     fake_stock_validation, 
     fake_jwt_handler, 
+    fake_access_control,
     domain_clock,
     seeded_user_auth_snapshot
 ):
@@ -40,7 +41,7 @@ def test_handle_checkout_items_ok(
         uow=infra_repo.DjangoOrderUnitOfWork(),
         vendor_repo=fake_vendor_repo(),
         stock_validation=fake_stock_validation(),
-        access_control=access_control,
+        access_control=fake_access_control(),
         order_service=domain_services.OrderService()
     )
 

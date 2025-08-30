@@ -1,6 +1,6 @@
 from __future__ import annotations
 import requests
-from typing import Tuple
+from typing import Tuple, Optional
 from order_management import models as django_snapshots
 from ddd.order_management.domain import exceptions
 from ddd.order_management.application import ports, dtos
@@ -11,7 +11,7 @@ class AccessControl1(ports.AccessControl1Abstract):
         #self.userinfo_url = userinfo_url
 
     def ensure_user_is_authorized_for(
-        self, token: str, required_permission: str, required_scope: dict = None
+        self, token: str, required_permission: str, required_scope: Optional[dict] = None
     ) -> dtos.Identity:
 
         identity_claims = self.jwt_handler.decode(token)

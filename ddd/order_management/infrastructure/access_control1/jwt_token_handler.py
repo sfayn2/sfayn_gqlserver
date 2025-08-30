@@ -1,5 +1,6 @@
 import jwt
 from jwt import PyJWKClient
+from typing import Optional
 
 class JwtTokenHandler:
     def __init__(self, public_key: str, issuer: str, audience: str, algorithm: str):
@@ -8,15 +9,17 @@ class JwtTokenHandler:
         self.audience = audience
         self.algorithm = algorithm
 
-    def decode(self, token: str) -> dict:
+    def decode(self, token: str, secret: Optional[str] = None) -> dict:
+        import pdb;pdb.set_trace()
 
-        jwks_client = PyJWKClient(self.public_key)
-        signing_key = jwks_client.get_signing_key_from_jwt(token)
+        if not secret:
+            jwks_client = PyJWKClient(self.public_key)
+            secret = jwks_client.get_signing_key_from_jwt(token).key
 
         try:
             return jwt.decode(
                 token,
-                signing_key.key,
+                secret,
                 algorithms=[self.algorithm],
                 issuer=self.issuer,
                 audience=self.audience

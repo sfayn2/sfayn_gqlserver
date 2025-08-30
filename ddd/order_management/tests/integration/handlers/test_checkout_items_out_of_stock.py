@@ -13,7 +13,7 @@ from ddd.order_management.infrastructure import (
 
 
 @pytest.mark.django_db
-def test_handle_checkout_items_out_of_stock(
+def test_checkout_items_out_of_stock(
     fake_customer_details,
     fake_address,
     fake_product_skus,

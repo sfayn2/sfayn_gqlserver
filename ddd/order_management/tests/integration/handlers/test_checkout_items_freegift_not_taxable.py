@@ -13,7 +13,7 @@ from ddd.order_management.infrastructure import (
 
 
 @pytest.mark.django_db
-def test_handle_checkout_items_freegift_not_taxable(
+def test_checkout_items_freegift_not_taxable(
     fake_customer_details,
     fake_address,
     fake_product_skus,
