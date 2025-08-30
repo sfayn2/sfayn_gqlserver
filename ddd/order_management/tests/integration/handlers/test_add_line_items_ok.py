@@ -8,7 +8,8 @@ from ddd.order_management.domain import (
 )
 from ddd.order_management.infrastructure import (
     repositories as infra_repo,
-    access_control1
+    access_control1,
+    validations
 )
 
 
@@ -17,14 +18,14 @@ def test_add_line_items_ok(
     fake_customer_details,
     fake_address,
     fake_product_skus,
-    fake_vendor_repo, 
-    fake_stock_validation, 
     fake_jwt_handler, 
     fake_access_control,
     domain_clock,
-    seeded_user_auth_snapshot,
     seeded_order,
-    seeded_line_items
+    seeded_line_items,
+    seeded_user_auth_snapshot,
+    seeded_vendor_product_snapshot,
+    seeded_vendor_details_snapshot
 ):
 
     access_control = access_control1.AccessControl1(
@@ -40,9 +41,9 @@ def test_add_line_items_ok(
     response = handlers.handle_add_line_items(
         command=command,
         uow=infra_repo.DjangoOrderUnitOfWork(),
-        vendor_repo=fake_vendor_repo(),
+        vendor_repo=infra_repo.DjangoVendorRepositoryImpl(),
+        stock_validation=validations.DjangoStockValidation(),
         access_control=fake_access_control(),
-        stock_validation=fake_stock_validation(),
     )
 
 

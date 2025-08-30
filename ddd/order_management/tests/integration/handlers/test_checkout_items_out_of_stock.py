@@ -16,7 +16,7 @@ from ddd.order_management.infrastructure import (
 def test_checkout_items_out_of_stock(
     fake_customer_details,
     fake_address,
-    fake_product_skus,
+    fake_product_skus_out_of_stock,
     fake_access_control, 
     domain_clock,
     seeded_vendor_product_snapshot,
@@ -27,7 +27,7 @@ def test_checkout_items_out_of_stock(
         token="fake_jwt_token",
         customer_details=fake_customer_details,
         address=fake_address,
-        product_skus=fake_product_skus
+        product_skus=fake_product_skus_out_of_stock
     )
 
     response = handlers.handle_checkout_items(
@@ -40,4 +40,4 @@ def test_checkout_items_out_of_stock(
     )
 
     assert response.success is False
-    assert response.message ==  "Product sku1 has only 0 remaining stock/s."
+    assert response.message ==  "Product sku1_out_of_stock has only 999 remaining stock/s."
