@@ -20,9 +20,7 @@ def test_checkout_items_freegift_not_taxable(
     fake_product_skus_w_free_gift,
     fake_access_control, 
     domain_clock,
-    seeded_user_auth_snapshot,
-    seeded_vendor_product_snapshot,
-    seeded_vendor_details_snapshot
+    seeded_all
 ):
 
     command = commands.CheckoutItemsCommand(

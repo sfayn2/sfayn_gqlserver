@@ -19,8 +19,7 @@ def test_checkout_items_out_of_stock(
     fake_product_skus_out_of_stock,
     fake_access_control, 
     domain_clock,
-    seeded_vendor_product_snapshot,
-    seeded_vendor_details_snapshot
+    seeded_all
 ):
 
     command = commands.CheckoutItemsCommand(

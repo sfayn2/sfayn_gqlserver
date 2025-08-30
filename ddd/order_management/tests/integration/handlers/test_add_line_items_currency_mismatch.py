@@ -21,11 +21,7 @@ def test_add_line_items_currency_mismatch(
     fake_jwt_handler, 
     fake_access_control,
     domain_clock,
-    seeded_order,
-    seeded_line_items,
-    seeded_user_auth_snapshot,
-    seeded_vendor_product_snapshot,
-    seeded_vendor_details_snapshot
+    seeded_all
 ):
 
     access_control = access_control1.AccessControl1(
