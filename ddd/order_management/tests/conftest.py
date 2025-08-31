@@ -43,6 +43,7 @@ ORDER_SEEDS = (
     ("ORD-1", enums.OrderStatus.DRAFT.value,"", USER1, "first name1", "last name1", "email@gmail.com", json.dumps([]), "street1", "Singapore", 1234, "Singapore", "Singapore", None, None, None, None, json.dumps([]), Decimal("0"), Decimal("0"), Decimal("0"), json.dumps([]), Decimal("0"), None, None, Decimal("0"), None, "SGD", TENANT1),
     ("ORD-NONDRAFT-1", enums.OrderStatus.PENDING.value,"", USER1, "first name1", "last name1", "email@gmail.com", json.dumps([]), "street1", "Singapore", 1234, "Singapore", "Singapore", None, None, None, None, json.dumps([]), Decimal("0"), Decimal("0"), Decimal("0"), json.dumps([]), Decimal("0"), None, None, Decimal("0"), None, "SGD", TENANT1),
     ("ORD-REMOVEITEMS-1", enums.OrderStatus.DRAFT.value,"", USER1, "first name1", "last name1", "email@gmail.com", json.dumps([]), "street1", "Singapore", 1234, "Singapore", "Singapore", None, None, None, None, json.dumps([]), Decimal("0"), Decimal("0"), Decimal("0"), json.dumps([]), Decimal("0"), None, None, Decimal("0"), None, "SGD", TENANT1),
+    ("ORD-CHANGEQTY-1", enums.OrderStatus.DRAFT.value,"", USER1, "first name1", "last name1", "email@gmail.com", json.dumps([]), "street1", "Singapore", 1234, "Singapore", "Singapore", None, None, None, None, json.dumps([]), Decimal("0"), Decimal("0"), Decimal("0"), json.dumps([]), Decimal("0"), None, None, Decimal("0"), None, "SGD", TENANT1),
 )
 
 # Columns order_id, vendor_id, vendor_name, vendor_country, product_sku, product_name, product_category, is_free_gift, is_taxable, options, product_price, product_currency, order_quantity, package_weight, package_length, package_width, package_height, total_price
@@ -52,6 +53,8 @@ ORDER_LINE_SEEDS = (
     ("ORD-NONDRAFT-1", VENDOR1, "VendorA", "Singapore", "sku_already_exists", "my product", "T-SHIRT", False, True, json.dumps({"Size": "M", "Color": "RED"}), Decimal("20"), "SGD", 10, 1, 1, 1, 1, 200),
     ("ORD-REMOVEITEMS-1", VENDOR1, "VendorA", "Singapore", "sku_remove1", "my product", "T-SHIRT", False, True, json.dumps({"Size": "M", "Color": "RED"}), Decimal("20"), "SGD", 10, 1, 1, 1, 1, 200),
     ("ORD-REMOVEITEMS-1", VENDOR1, "VendorA", "Singapore", "sku_remove2", "my product", "T-SHIRT", False, True, json.dumps({"Size": "M", "Color": "RED"}), Decimal("20"), "SGD", 10, 1, 1, 1, 1, 200),
+    ("ORD-CHANGEQTY-1", VENDOR1, "VendorA", "Singapore", "sku_change1", "my product", "T-SHIRT", False, True, json.dumps({"Size": "M", "Color": "RED"}), Decimal("20"), "SGD", 10, 1, 1, 1, 1, 200),
+    ("ORD-CHANGEQTY-1", VENDOR1, "VendorA", "Singapore", "sku_change2", "my product", "T-SHIRT", False, True, json.dumps({"Size": "M", "Color": "RED"}), Decimal("20"), "SGD", 10, 1, 1, 1, 1, 200),
 )
 
 # Columns product_id, vendor_id, tenant_id, product_sku, product_name, product_category, options, product_price, stock, product_currency, package_weight, package_length, package_width, package_height, is_free_gift, is_taxable, is_active
@@ -66,6 +69,8 @@ VENDOR_PRODUCT_SEEDS = (
     ("prod-7", VENDOR1, TENANT1, "sku_already_exists", "sample product", "T-SHIRT", json.dumps({"Color": "RED", "Size": "M" }), 20, 999, "SGD", "1", "1", "1", "1", False, True, True),
     ("prod-8", VENDOR1, TENANT1, "sku_remove1", "sample product", "T-SHIRT", json.dumps({"Color": "RED", "Size": "M" }), 20, 999, "SGD", "1", "1", "1", "1", False, True, True),
     ("prod-9", VENDOR1, TENANT1, "sku_remove2", "sample product", "T-SHIRT", json.dumps({"Color": "RED", "Size": "M" }), 20, 999, "SGD", "1", "1", "1", "1", False, True, True),
+    ("prod-changeqty-1", VENDOR1, TENANT1, "sku_change1", "sample product", "T-SHIRT", json.dumps({"Color": "RED", "Size": "M" }), 20, 999, "SGD", "1", "1", "1", "1", False, True, True),
+    ("prod-changeqty-2", VENDOR1, TENANT1, "sku_change2", "sample product", "T-SHIRT", json.dumps({"Color": "RED", "Size": "M" }), 20, 999, "SGD", "1", "1", "1", "1", False, True, True),
 )
 
 # Columns vendor_id, tenant_id, name, country, is_active

@@ -58,8 +58,9 @@ class ChangeDestinationCommand(Command1):
 
 class ChangeOrderQuantityCommand(Command1):
     order_id: constr(min_length=1, strip_whitespace=True)
-    product_sku: constr(min_length=1, strip_whitespace=True)
-    new_quantity: int
+    product_skus: List[dtos.ProductSkusDTO]
+    #product_sku: constr(min_length=1, strip_whitespace=True)
+    #new_quantity: int
 
 class AddLineItemsCommand(Command1):
     order_id: constr(min_length=1, strip_whitespace=True)

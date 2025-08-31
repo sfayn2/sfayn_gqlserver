@@ -12,8 +12,9 @@ from ddd.order_management.presentation.graphql import object_types, input_types,
 class ChangeOrderQuantityMutation(relay.ClientIDMutation):
     class Input:
         order_id = graphene.String(required=True)
-        product_sku = graphene.String(required=True)
-        new_quantity = graphene.Int(required=True)
+        product_skus = graphene.List(input_types.ProductSkusInput, required=True)
+        #product_sku = graphene.String(required=True)
+        #new_quantity = graphene.Int(required=True)
 
     result = graphene.Field(object_types.ResponseType)
 

@@ -27,14 +27,15 @@ def handle_change_order_quantity(
                 required_scope={"customer_id": order.customer_details.customer_id }
             )
 
-            order.change_order_quantity(
-                product_sku=command.product_sku,
-                new_quantity=command.new_quantity
-            )
+            for sku in command.product_skus:
+                order.change_order_quantity(
+                    product_sku=sku.product_sku,
+                    new_quantity=sku.order_quantity
+                )
 
             stock_validation.ensure_items_in_stock(
                 order.tenant_id,
-                order.line_items
+                command.product_skus
             )
 
             uow.order.save(order)
@@ -42,7 +43,7 @@ def handle_change_order_quantity(
 
             return dtos.ResponseDTO(
                 success=True,
-                message=f"Order {order.order_id} successfully changed order quantity of Product SKU {command.product_sku}."
+                message=f"Order {order.order_id} successfully changed order quantity of Product SKU {','.join([sku.product_sku for sku in command.product_skus])}."
 
             )
 
