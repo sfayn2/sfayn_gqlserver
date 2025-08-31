@@ -53,7 +53,8 @@ VENDOR_PRODUCT_SEEDS = (
     ("prod-1", VENDOR1, TENANT1, "sku1_ok", "sample product for checkout items", "T-SHIRT", json.dumps({"Color": "RED", "Size": "M" }), 20, 999, "SGD", "1", "1", "1", "1", False, True, True),
     ("prod-1", VENDOR1, TENANT1, "sku1_out_of_stock", "sample product for checkout items", "T-SHIRT", json.dumps({"Color": "RED", "Size": "M" }), 20, 999, "SGD", "1", "1", "1", "1", False, True, True),
     ("prod-2", VENDOR1, TENANT1, "sku_w_free_gift", "sample product for checkout items", "T-SHIRT", json.dumps({"Color": "RED", "Size": "M" }), 20, 999, "SGD", "1", "1", "1", "1", True, True, True),
-    ("prod-3", VENDOR1, TENANT1, "sku_currency_mismatch", "sample product for add line items", "T-SHIRT", json.dumps({"Color": "RED", "Size": "M" }), 20, 999, "USD", "1", "1", "1", "1", False, True, True)
+    ("prod-3", VENDOR1, TENANT1, "sku_currency_mismatch", "sample product for add line items", "T-SHIRT", json.dumps({"Color": "RED", "Size": "M" }), 20, 999, "USD", "1", "1", "1", "1", False, True, True),
+    ("prod-4", VENDOR1, TENANT1, "sku_free_gift_zero_price", "sample product for add line items", "T-SHIRT", json.dumps({"Color": "RED", "Size": "M" }), 20, 999, "USD", "1", "1", "1", "1", True, False, True)
 )
 
 # Columns vendor_id, tenant_id, name, country, is_active
