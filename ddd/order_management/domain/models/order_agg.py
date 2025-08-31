@@ -58,7 +58,7 @@ class Order:
         if self.line_items:
             # this validation is only applicable for those w existing line items
             self._validate_line_item(line_item)
-            if line_item in self.line_items:
+            if line_item.product_sku in [item.product_sku for item in self.line_items]:
                 raise exceptions.InvalidOrderOperation(f"Order {self.order_id} Line item with SKU {line_item.product_sku} already exists.")
 
         self.line_items.append(line_item)
