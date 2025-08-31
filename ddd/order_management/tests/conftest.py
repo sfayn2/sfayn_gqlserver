@@ -45,7 +45,7 @@ ORDER_SEEDS = (
 
 # Columns order_id, vendor_id, vendor_name, vendor_country, product_sku, product_name, product_category, is_free_gift, is_taxable, options, product_price, product_currency, order_quantity, package_weight, package_length, package_width, package_height, total_price
 ORDER_LINE_SEEDS = (
-    ("ORD-1", VENDOR1, "Vendor1", "Singapore", "sku1", "my product", "T-SHIRT", False, True, json.dumps({"Size": "M", "Color": "RED"}), Decimal("20"), "SGD", 10, 1, 1, 1, 1, 200),
+    ("ORD-1", VENDOR1, "Vendor1", "Singapore", "sku1_ok", "my product", "T-SHIRT", False, True, json.dumps({"Size": "M", "Color": "RED"}), Decimal("20"), "SGD", 10, 1, 1, 1, 1, 200),
 )
 
 # Columns product_id, vendor_id, tenant_id, product_sku, product_name, product_category, options, product_price, stock, product_currency, package_weight, package_length, package_width, package_height, is_free_gift, is_taxable, is_active
@@ -54,12 +54,14 @@ VENDOR_PRODUCT_SEEDS = (
     ("prod-1", VENDOR1, TENANT1, "sku1_out_of_stock", "sample product for checkout items", "T-SHIRT", json.dumps({"Color": "RED", "Size": "M" }), 20, 999, "SGD", "1", "1", "1", "1", False, True, True),
     ("prod-2", VENDOR1, TENANT1, "sku_w_free_gift", "sample product for checkout items", "T-SHIRT", json.dumps({"Color": "RED", "Size": "M" }), 20, 999, "SGD", "1", "1", "1", "1", True, True, True),
     ("prod-3", VENDOR1, TENANT1, "sku_currency_mismatch", "sample product for add line items", "T-SHIRT", json.dumps({"Color": "RED", "Size": "M" }), 20, 999, "USD", "1", "1", "1", "1", False, True, True),
-    ("prod-4", VENDOR1, TENANT1, "sku_free_gift_zero_price", "sample product for add line items", "T-SHIRT", json.dumps({"Color": "RED", "Size": "M" }), 20, 999, "USD", "1", "1", "1", "1", True, False, True)
+    ("prod-4", VENDOR1, TENANT1, "sku_free_gift_zero_price", "sample product for add line items", "T-SHIRT", json.dumps({"Color": "RED", "Size": "M" }), 20, 999, "USD", "1", "1", "1", "1", True, False, True),
+    ("prod-5", VENDOR2, TENANT1, "sku_vendor_mismatch", "sample product for add line items", "T-SHIRT", json.dumps({"Color": "RED", "Size": "M" }), 20, 999, "SGD", "1", "1", "1", "1", False, True, True)
 )
 
 # Columns vendor_id, tenant_id, name, country, is_active
 VENDOR_SEEDS = (
     (VENDOR1, TENANT1, "VendorA", "Singapore", True),
+    (VENDOR2, TENANT1, "VendorB", "Singapore", True),
 )
 # === Test Data ========
 
