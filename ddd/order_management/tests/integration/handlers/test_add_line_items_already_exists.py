@@ -15,7 +15,7 @@ from ddd.order_management.infrastructure import (
 
 @pytest.fixture
 def fake_product_skus_already_exists(test_constants):
-    return [dtos.ProductSkusDTO(vendor_id=test_constants["vendor1"], product_sku="sku1_ok", order_quantity=10)]
+    return [dtos.ProductSkusDTO(vendor_id=test_constants["vendor1"], product_sku="sku_already_exists", order_quantity=10)]
 
 @pytest.mark.django_db
 def test_add_line_items_vendor_mismatch(
@@ -48,4 +48,4 @@ def test_add_line_items_vendor_mismatch(
 
 
     assert response.success is False
-    assert response.message == "Order ORD-1 Line item with SKU sku1_ok already exists."
+    assert response.message == "Order ORD-1 Line item with SKU sku_already_exists already exists."
