@@ -42,6 +42,7 @@ USER_SEEDS = (
 ORDER_SEEDS = (
     ("ORD-1", enums.OrderStatus.DRAFT.value,"", USER1, "first name1", "last name1", "email@gmail.com", json.dumps([]), "street1", "Singapore", 1234, "Singapore", "Singapore", None, None, None, None, json.dumps([]), Decimal("0"), Decimal("0"), Decimal("0"), json.dumps([]), Decimal("0"), None, None, Decimal("0"), None, "SGD", TENANT1),
     ("ORD-NONDRAFT-1", enums.OrderStatus.PENDING.value,"", USER1, "first name1", "last name1", "email@gmail.com", json.dumps([]), "street1", "Singapore", 1234, "Singapore", "Singapore", None, None, None, None, json.dumps([]), Decimal("0"), Decimal("0"), Decimal("0"), json.dumps([]), Decimal("0"), None, None, Decimal("0"), None, "SGD", TENANT1),
+    ("ORD-REMOVEITEMS-1", enums.OrderStatus.DRAFT.value,"", USER1, "first name1", "last name1", "email@gmail.com", json.dumps([]), "street1", "Singapore", 1234, "Singapore", "Singapore", None, None, None, None, json.dumps([]), Decimal("0"), Decimal("0"), Decimal("0"), json.dumps([]), Decimal("0"), None, None, Decimal("0"), None, "SGD", TENANT1),
 )
 
 # Columns order_id, vendor_id, vendor_name, vendor_country, product_sku, product_name, product_category, is_free_gift, is_taxable, options, product_price, product_currency, order_quantity, package_weight, package_length, package_width, package_height, total_price
@@ -49,17 +50,22 @@ ORDER_LINE_SEEDS = (
     ("ORD-1", VENDOR1, "VendorA", "Singapore", "sku_ok", "my product", "T-SHIRT", False, True, json.dumps({"Size": "M", "Color": "RED"}), Decimal("20"), "SGD", 10, 1, 1, 1, 1, 200),
     ("ORD-1", VENDOR1, "VendorA", "Singapore", "sku_already_exists", "my product", "T-SHIRT", False, True, json.dumps({"Size": "M", "Color": "RED"}), Decimal("20"), "SGD", 10, 1, 1, 1, 1, 200),
     ("ORD-NONDRAFT-1", VENDOR1, "VendorA", "Singapore", "sku_already_exists", "my product", "T-SHIRT", False, True, json.dumps({"Size": "M", "Color": "RED"}), Decimal("20"), "SGD", 10, 1, 1, 1, 1, 200),
+    ("ORD-REMOVEITEMS-1", VENDOR1, "VendorA", "Singapore", "sku_remove1", "my product", "T-SHIRT", False, True, json.dumps({"Size": "M", "Color": "RED"}), Decimal("20"), "SGD", 10, 1, 1, 1, 1, 200),
+    ("ORD-REMOVEITEMS-1", VENDOR1, "VendorA", "Singapore", "sku_remove2", "my product", "T-SHIRT", False, True, json.dumps({"Size": "M", "Color": "RED"}), Decimal("20"), "SGD", 10, 1, 1, 1, 1, 200),
 )
 
 # Columns product_id, vendor_id, tenant_id, product_sku, product_name, product_category, options, product_price, stock, product_currency, package_weight, package_length, package_width, package_height, is_free_gift, is_taxable, is_active
 VENDOR_PRODUCT_SEEDS = (
+    ("prod-0", VENDOR1, TENANT1, "sku_ok", "sample product", "T-SHIRT", json.dumps({"Color": "RED", "Size": "M" }), 20, 999, "SGD", "1", "1", "1", "1", False, True, True),
     ("prod-1", VENDOR1, TENANT1, "sku1_ok", "sample product", "T-SHIRT", json.dumps({"Color": "RED", "Size": "M" }), 20, 999, "SGD", "1", "1", "1", "1", False, True, True),
-    ("prod-1", VENDOR1, TENANT1, "sku1_out_of_stock", "sample product", "T-SHIRT", json.dumps({"Color": "RED", "Size": "M" }), 20, 999, "SGD", "1", "1", "1", "1", False, True, True),
-    ("prod-2", VENDOR1, TENANT1, "sku_w_free_gift", "sample product", "T-SHIRT", json.dumps({"Color": "RED", "Size": "M" }), 20, 999, "SGD", "1", "1", "1", "1", True, True, True),
-    ("prod-3", VENDOR1, TENANT1, "sku_currency_mismatch", "sample product", "T-SHIRT", json.dumps({"Color": "RED", "Size": "M" }), 20, 999, "USD", "1", "1", "1", "1", False, True, True),
-    ("prod-4", VENDOR1, TENANT1, "sku_free_gift_zero_price", "sample product", "T-SHIRT", json.dumps({"Color": "RED", "Size": "M" }), 20, 999, "USD", "1", "1", "1", "1", True, False, True),
-    ("prod-5", VENDOR2, TENANT1, "sku_vendor_mismatch", "sample product", "T-SHIRT", json.dumps({"Color": "RED", "Size": "M" }), 20, 999, "SGD", "1", "1", "1", "1", False, True, True),
-    ("prod-6", VENDOR1, TENANT1, "sku_already_exists", "sample product", "T-SHIRT", json.dumps({"Color": "RED", "Size": "M" }), 20, 999, "SGD", "1", "1", "1", "1", False, True, True)
+    ("prod-2", VENDOR1, TENANT1, "sku1_out_of_stock", "sample product", "T-SHIRT", json.dumps({"Color": "RED", "Size": "M" }), 20, 999, "SGD", "1", "1", "1", "1", False, True, True),
+    ("prod-3", VENDOR1, TENANT1, "sku_w_free_gift", "sample product", "T-SHIRT", json.dumps({"Color": "RED", "Size": "M" }), 20, 999, "SGD", "1", "1", "1", "1", True, True, True),
+    ("prod-4", VENDOR1, TENANT1, "sku_currency_mismatch", "sample product", "T-SHIRT", json.dumps({"Color": "RED", "Size": "M" }), 20, 999, "USD", "1", "1", "1", "1", False, True, True),
+    ("prod-5", VENDOR1, TENANT1, "sku_free_gift_zero_price", "sample product", "T-SHIRT", json.dumps({"Color": "RED", "Size": "M" }), 20, 999, "USD", "1", "1", "1", "1", True, False, True),
+    ("prod-6", VENDOR2, TENANT1, "sku_vendor_mismatch", "sample product", "T-SHIRT", json.dumps({"Color": "RED", "Size": "M" }), 20, 999, "SGD", "1", "1", "1", "1", False, True, True),
+    ("prod-7", VENDOR1, TENANT1, "sku_already_exists", "sample product", "T-SHIRT", json.dumps({"Color": "RED", "Size": "M" }), 20, 999, "SGD", "1", "1", "1", "1", False, True, True),
+    ("prod-8", VENDOR1, TENANT1, "sku_remove1", "sample product", "T-SHIRT", json.dumps({"Color": "RED", "Size": "M" }), 20, 999, "SGD", "1", "1", "1", "1", False, True, True),
+    ("prod-9", VENDOR1, TENANT1, "sku_remove2", "sample product", "T-SHIRT", json.dumps({"Color": "RED", "Size": "M" }), 20, 999, "SGD", "1", "1", "1", "1", False, True, True),
 )
 
 # Columns vendor_id, tenant_id, name, country, is_active
@@ -192,6 +198,36 @@ def fake_jwt_handler():
 @pytest.fixture(scope="session", autouse=True)
 def seeded_all(django_db_setup, django_db_blocker):
     with django_db_blocker.unblock():
+        for vp in VENDOR_PRODUCT_SEEDS:
+            django_snapshots.VendorProductSnapshot.objects.create(
+                product_id=vp[0],
+                vendor_id=vp[1],
+                tenant_id=vp[2],
+                product_sku=vp[3],
+                product_name=vp[4],
+                product_category=vp[5],
+                options=vp[6],
+                product_price=vp[7],
+                stock=vp[8],
+                product_currency=vp[9],
+                package_weight=vp[10],
+                package_length=vp[11],
+                package_width=vp[12],
+                package_height=vp[13],
+                is_free_gift=vp[14],
+                is_taxable=vp[15],
+                is_active=vp[16]
+            )
+
+        for vs in VENDOR_SEEDS:
+            django_snapshots.VendorDetailsSnapshot.objects.create(
+                vendor_id=vs[0], 
+                tenant_id=vs[1], 
+                name=vs[2], 
+                country=vs[3], 
+                is_active=vs[4]
+            )
+
         for us in USER_SEEDS:
             django_snapshots.UserAuthorizationSnapshot.objects.create(
                 user_id=us[0], 
@@ -256,36 +292,6 @@ def seeded_all(django_db_setup, django_db_blocker):
                 total_price=ol[17]
             )
 
-
-        for vp in VENDOR_PRODUCT_SEEDS:
-            django_snapshots.VendorProductSnapshot.objects.create(
-                product_id=vp[0],
-                vendor_id=vp[1],
-                tenant_id=vp[2],
-                product_sku=vp[3],
-                product_name=vp[4],
-                product_category=vp[5],
-                options=vp[6],
-                product_price=vp[7],
-                stock=vp[8],
-                product_currency=vp[9],
-                package_weight=vp[10],
-                package_length=vp[11],
-                package_width=vp[12],
-                package_height=vp[13],
-                is_free_gift=vp[14],
-                is_taxable=vp[15],
-                is_active=vp[16]
-            )
-
-        for vs in VENDOR_SEEDS:
-            django_snapshots.VendorDetailsSnapshot.objects.create(
-                vendor_id=vs[0], 
-                tenant_id=vs[1], 
-                name=vs[2], 
-                country=vs[3], 
-                is_active=vs[4]
-            )
 
 
 

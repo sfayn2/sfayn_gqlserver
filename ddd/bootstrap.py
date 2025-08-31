@@ -283,6 +283,12 @@ message_bus.COMMAND_HANDLERS.update({
         access_control=access_control,
         stock_validation=validations.DjangoStockValidation()
     ),
+    commands.RemoveLineItemsCommand: lambda command: handlers.handle_remove_line_items(
+        command=command,
+        uow=repositories.DjangoOrderUnitOfWork(),
+        vendor_repo=repositories.DjangoVendorRepositoryImpl(),
+        access_control=access_control,
+    ),
     commands.ChangeDestinationCommand: lambda command: handlers.handle_change_destination(
         command=command,
         uow=repositories.DjangoOrderUnitOfWork(),
