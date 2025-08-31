@@ -25,6 +25,7 @@ from ddd.order_management.infrastructure import (
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives import serialization
 
+# === Test Data ========
 USER1 = "user-1"
 USER2 = "user-2"
 TENANT1 = "tenant_123"
@@ -32,6 +33,43 @@ TENANT2 = "tenant_456"
 VENDOR1 = "vendor-1"
 VENDOR2 = "vendor-2"
 
+# Columns user_id, permission_codename, tenant_id, scope, is_active
+USER_SEEDS = (
+    (USER1, "checkout_items", TENANT1, json.dumps({ "customer_id": USER1 }), True),
+)
+
+# Columns order_id, order_status, cancellation_reason, customer_id, customer_first_name, customer_last_name, customer_email, coupons, delivery_street, delivery_city, delivery_postal, delivery_country, delivery_state, shipping_method, shipping_delivery_time, shipping_cost, shipping_tracking_reference, tax_details, tax_amount, total_discounts_fee, total_amount, offer_details, final_amount, payment_method, payment_reference, payment_amount, payment_status, currency, tenant_id
+ORDER_SEEDS = (
+    ("ORD-1", enums.OrderStatus.DRAFT.value,"", USER1, "first name1", "last name1", "email@gmail.com", json.dumps([]), "street1", "Singapore", 1234, "Singapore", "Singapore", None, None, None, None, json.dumps([]), Decimal("0"), Decimal("0"), Decimal("0"), json.dumps([]), Decimal("0"), None, None, Decimal("0"), None, "SGD", TENANT1),
+)
+
+# Columns order_id, vendor_id, vendor_name, vendor_country, product_sku, product_name, product_category, is_free_gift, is_taxable, options, product_price, product_currency, order_quantity, package_weight, package_length, package_width, package_height, total_price
+ORDER_LINE_SEEDS = (
+    ("ORD-1", VENDOR1, "Vendor1", "Singapore", "sku1", "my product", "T-SHIRT", False, True, json.dumps({"Size": "M", "Color": "RED"}), Decimal("20"), "SGD", 10, 1, 1, 1, 1, 200),
+)
+
+# Columns product_id, vendor_id, tenant_id, product_sku, product_name, product_category, options, product_price, stock, product_currency, package_weight, package_length, package_width, package_height, is_free_gift, is_taxable, is_active
+VENDOR_PRODUCT_SEEDS = (
+    ("prod-1", VENDOR1, TENANT1, "sku1_ok", "sample product for checkout items", "T-SHIRT", json.dumps({"Color": "RED", "Size": "M" }), 20, 999, "SGD", "1", "1", "1", "1", False, True, True),
+    ("prod-1", VENDOR1, TENANT1, "sku1_out_of_stock", "sample product for checkout items", "T-SHIRT", json.dumps({"Color": "RED", "Size": "M" }), 20, 999, "SGD", "1", "1", "1", "1", False, True, True),
+    ("prod-2", VENDOR1, TENANT1, "sku_w_free_gift", "sample product for checkout items", "T-SHIRT", json.dumps({"Color": "RED", "Size": "M" }), 20, 999, "SGD", "1", "1", "1", "1", True, True, True),
+    ("prod-3", VENDOR1, TENANT1, "sku_currency_mismatch", "sample product for add line items", "T-SHIRT", json.dumps({"Color": "RED", "Size": "M" }), 20, 999, "USD", "1", "1", "1", "1", False, True, True)
+)
+
+# Columns vendor_id, tenant_id, name, country, is_active
+VENDOR_SEEDS = (
+    (VENDOR1, TENANT1, "VendorA", "Singapore", True),
+)
+# === Test Data ========
+
+@pytest.fixture(scope="session", autouse=True)
+def test_constants():
+    return {
+        "vendor1": VENDOR1,
+        "vendor2": VENDOR2,
+        "user1": USER1,
+        "user2": USER2
+    }
 
 
 
@@ -65,29 +103,6 @@ def fake_address():
             country="Singapore",
             state="Singapore"
         )
-
-# ===========
-# fake products input
-# TODO should be moving to consumer; this is not global
-# ========
-@pytest.fixture
-def fake_product_skus():
-    return [dtos.ProductSkusDTO(vendor_id=VENDOR1, product_sku="sku1_ok", order_quantity=22)]
-
-@pytest.fixture
-def fake_product_skus_out_of_stock():
-    return [dtos.ProductSkusDTO(vendor_id=VENDOR1, product_sku="sku1_out_of_stock", order_quantity=1000)]
-
-@pytest.fixture
-def fake_product_skus_w_free_gift():
-    return [dtos.ProductSkusDTO(vendor_id=VENDOR1, product_sku="sku_w_free_gift", order_quantity=22)]
-
-@pytest.fixture
-def fake_product_skus_different_currency():
-    return [dtos.ProductSkusDTO(vendor_id=VENDOR1, product_sku="sku_currency_mismatch", order_quantity=22)]
-# ===========
-# fake products input
-# ========
 
 
 @pytest.fixture
@@ -167,120 +182,103 @@ def fake_jwt_handler():
 # =================
 # Seeded Fixtures
 # ==============
-@pytest.fixture
-def seeded_all():
-    USER_SEEDS = (
-        (USER1, "checkout_items", TENANT1, json.dumps({ "customer_id": USER1 }), True),
-    )
-    for us in USER_SEEDS:
-        django_snapshots.UserAuthorizationSnapshot.objects.create(
-            user_id=us[0], 
-            permission_codename=us[1],
-            tenant_id=us[2], 
-            scope=us[3],
-            is_active=us[4]
-        )
+@pytest.fixture(scope="session", autouse=True)
+def seeded_all(django_db_setup, django_db_blocker):
+    with django_db_blocker.unblock():
+        for us in USER_SEEDS:
+            django_snapshots.UserAuthorizationSnapshot.objects.create(
+                user_id=us[0], 
+                permission_codename=us[1],
+                tenant_id=us[2], 
+                scope=us[3],
+                is_active=us[4]
+            )
 
-    ORDER_SEEDS = (
-        ("ORD-1", enums.OrderStatus.DRAFT.value,"", USER1, "first name1", "last name1", "email@gmail.com", json.dumps([]), "street1", "Singapore", 1234, "Singapore", "Singapore", None, None, None, None, json.dumps([]), Decimal("0"), Decimal("0"), Decimal("0"), json.dumps([]), Decimal("0"), None, None, Decimal("0"), None, "SGD", TENANT1),
-    )
-    for os in ORDER_SEEDS:
-        django_snapshots.Order.objects.create(
-            order_id=os[0], 
-            order_status=os[1],
-            cancellation_reason=os[2], 
-            customer_id=os[3], 
-            customer_first_name=os[4],
-            customer_last_name=os[5], 
-            customer_email=os[6], 
-            coupons=os[7],
-            delivery_street=os[8], 
-            delivery_city=os[9], 
-            delivery_postal=os[10],
-            delivery_country=os[11], 
-            delivery_state=os[12], 
-            shipping_method=os[13],
-            shipping_delivery_time=os[14], 
-            shipping_cost=os[15], 
-            shipping_tracking_reference=os[16],
-            tax_details=os[17], 
-            tax_amount=os[18], 
-            total_discounts_fee=os[19],
-            total_amount=os[20], 
-            offer_details=os[21], 
-            final_amount=os[22],
-            payment_method=os[23], 
-            payment_reference=os[24], 
-            payment_amount=os[25],
-            payment_status=os[26], 
-            currency=os[27], 
-            tenant_id=os[28]
-        )
+        for os in ORDER_SEEDS:
+            django_snapshots.Order.objects.create(
+                order_id=os[0], 
+                order_status=os[1],
+                cancellation_reason=os[2], 
+                customer_id=os[3], 
+                customer_first_name=os[4],
+                customer_last_name=os[5], 
+                customer_email=os[6], 
+                coupons=os[7],
+                delivery_street=os[8], 
+                delivery_city=os[9], 
+                delivery_postal=os[10],
+                delivery_country=os[11], 
+                delivery_state=os[12], 
+                shipping_method=os[13],
+                shipping_delivery_time=os[14], 
+                shipping_cost=os[15], 
+                shipping_tracking_reference=os[16],
+                tax_details=os[17], 
+                tax_amount=os[18], 
+                total_discounts_fee=os[19],
+                total_amount=os[20], 
+                offer_details=os[21], 
+                final_amount=os[22],
+                payment_method=os[23], 
+                payment_reference=os[24], 
+                payment_amount=os[25],
+                payment_status=os[26], 
+                currency=os[27], 
+                tenant_id=os[28]
+            )
 
-    ORDER_LINE_SEEDS = (
-        ("ORD-1", VENDOR1, "Vendor1", "Singapore", "sku1", "my product", "T-SHIRT", False, True, json.dumps({"Size": "M", "Color": "RED"}), Decimal("20"), "SGD", 10, 1, 1, 1, 1, 200),
-    )
-    for ol in ORDER_LINE_SEEDS:
-        django_snapshots.OrderLine.objects.create(
-            order_id=ol[0],
-            vendor_id=ol[1],
-            vendor_name=ol[2],
-            vendor_country=ol[3],
-            product_sku=ol[4],
-            product_name=ol[5],
-            product_category=ol[6],
-            is_free_gift=ol[7],
-            is_taxable=ol[8],
-            options=ol[9],
-            product_price=ol[10],
-            product_currency=ol[11],
-            order_quantity=ol[12],
-            package_weight=ol[13], 
-            package_length=ol[14], 
-            package_width=ol[15],
-            package_height=ol[16], 
-            total_price=ol[17]
-        )
+        for ol in ORDER_LINE_SEEDS:
+            django_snapshots.OrderLine.objects.create(
+                order_id=ol[0],
+                vendor_id=ol[1],
+                vendor_name=ol[2],
+                vendor_country=ol[3],
+                product_sku=ol[4],
+                product_name=ol[5],
+                product_category=ol[6],
+                is_free_gift=ol[7],
+                is_taxable=ol[8],
+                options=ol[9],
+                product_price=ol[10],
+                product_currency=ol[11],
+                order_quantity=ol[12],
+                package_weight=ol[13], 
+                package_length=ol[14], 
+                package_width=ol[15],
+                package_height=ol[16], 
+                total_price=ol[17]
+            )
 
-    VENDOR_PRODUCT_SEEDS = (
-        ("prod-1", VENDOR1, TENANT1, "sku1_ok", "sample product for checkout items", "T-SHIRT", json.dumps({"Color": "RED", "Size": "M" }), 20, 999, "SGD", "1", "1", "1", "1", False, True, True),
-        ("prod-1", VENDOR1, TENANT1, "sku1_out_of_stock", "sample product for checkout items", "T-SHIRT", json.dumps({"Color": "RED", "Size": "M" }), 20, 999, "SGD", "1", "1", "1", "1", False, True, True),
-        ("prod-2", VENDOR1, TENANT1, "sku_w_free_gift", "sample product for checkout items", "T-SHIRT", json.dumps({"Color": "RED", "Size": "M" }), 20, 999, "SGD", "1", "1", "1", "1", True, True, True),
-        ("prod-3", VENDOR1, TENANT1, "sku_currency_mismatch", "sample product for add line items", "T-SHIRT", json.dumps({"Color": "RED", "Size": "M" }), 20, 999, "USD", "1", "1", "1", "1", False, True, True)
-    )
 
-    for vp in VENDOR_PRODUCT_SEEDS:
-        django_snapshots.VendorProductSnapshot.objects.create(
-            product_id=vp[0],
-            vendor_id=vp[1],
-            tenant_id=vp[2],
-            product_sku=vp[3],
-            product_name=vp[4],
-            product_category=vp[5],
-            options=vp[6],
-            product_price=vp[7],
-            stock=vp[8],
-            product_currency=vp[9],
-            package_weight=vp[10],
-            package_length=vp[11],
-            package_width=vp[12],
-            package_height=vp[13],
-            is_free_gift=vp[14],
-            is_taxable=vp[15],
-            is_active=vp[16]
-        )
+        for vp in VENDOR_PRODUCT_SEEDS:
+            django_snapshots.VendorProductSnapshot.objects.create(
+                product_id=vp[0],
+                vendor_id=vp[1],
+                tenant_id=vp[2],
+                product_sku=vp[3],
+                product_name=vp[4],
+                product_category=vp[5],
+                options=vp[6],
+                product_price=vp[7],
+                stock=vp[8],
+                product_currency=vp[9],
+                package_weight=vp[10],
+                package_length=vp[11],
+                package_width=vp[12],
+                package_height=vp[13],
+                is_free_gift=vp[14],
+                is_taxable=vp[15],
+                is_active=vp[16]
+            )
 
-    VENDOR_SEEDS = (
-        (VENDOR1, TENANT1, "VendorA", "Singapore", True),
-    )
-    for vs in VENDOR_SEEDS:
-        django_snapshots.VendorDetailsSnapshot.objects.create(
-            vendor_id=vs[0], 
-            tenant_id=vs[1], 
-            name=vs[2], 
-            country=vs[3], 
-            is_active=vs[4]
-        )
+        for vs in VENDOR_SEEDS:
+            django_snapshots.VendorDetailsSnapshot.objects.create(
+                vendor_id=vs[0], 
+                tenant_id=vs[1], 
+                name=vs[2], 
+                country=vs[3], 
+                is_active=vs[4]
+            )
 
 
 

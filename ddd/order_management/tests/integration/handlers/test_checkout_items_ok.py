@@ -1,7 +1,8 @@
 import pytest, os, json, time
 from ddd.order_management.application import (
     commands,
-    handlers
+    handlers,
+    dtos
 )
 from ddd.order_management.domain import (
     services as domain_services,
@@ -12,6 +13,9 @@ from ddd.order_management.infrastructure import (
     validations
 )
 
+@pytest.fixture
+def fake_product_skus(test_constants):
+    return [dtos.ProductSkusDTO(vendor_id=test_constants["vendor1"], product_sku="sku1_ok", order_quantity=22)]
 
 @pytest.mark.django_db
 def test_checkout_items_ok(
