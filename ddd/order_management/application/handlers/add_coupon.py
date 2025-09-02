@@ -20,13 +20,14 @@ def handle_add_coupon(
     try:
         with uow:
 
-            order = uow.order.get(order_id=command.order_id)
-
+            user_ctx = access_control.get_user_context(command.token)
             access_control.ensure_user_is_authorized_for(
-                token=command.token,
+                user_ctx,
                 required_permission="add_coupon",
-                required_scope={"customer_id": order.customer_details.customer_id}
+                required_scope={"customer_id": user_ctx.sub }
             )
+
+            order = uow.order.get(order_id=command.order_id, tenant_id=user_ctx.tenant_id)
 
             valid_coupon  = coupon_validation.ensure_coupon_is_valid(
                     tenant_id=order.tenant_id,

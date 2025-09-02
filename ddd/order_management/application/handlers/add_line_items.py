@@ -13,12 +13,12 @@ def handle_add_line_items(
         uow: UnitOfWorkAbstract,
         vendor_repo: VendorAbstract,
         stock_validation: StockValidationAbstract,
-        access_control: AccessControl1Abstract
+        access_control: AccessControl1Abstract,
+        user_ctx: dtos.UserContextDTO
 ) -> dtos.ResponseDTO:
     try:
         with uow:
 
-            user_ctx = access_control.get_user_context(command.token)
             access_control.ensure_user_is_authorized_for(
                 user_ctx,
                 required_permission="add_line_items",

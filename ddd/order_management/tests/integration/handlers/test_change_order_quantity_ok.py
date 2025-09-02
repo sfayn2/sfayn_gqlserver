@@ -36,16 +36,18 @@ def test_change_order_quantity_ok(
     )
 
     command = commands.ChangeOrderQuantityCommand(
-        token="fake_jwt_token",
         order_id="ORD-CHANGEQTY-1",
         product_skus=fake_product_skus
     )
+
+    user_ctx = fake_access_control().get_user_context(token="fake_jwt_token")
 
     response = handlers.handle_change_order_quantity(
         command=command,
         uow=infra_repo.DjangoOrderUnitOfWork(),
         stock_validation=validations.DjangoStockValidation(),
         access_control=fake_access_control(),
+        user_ctx=user_ctx
     )
 
 

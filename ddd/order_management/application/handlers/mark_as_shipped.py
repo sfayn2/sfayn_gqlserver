@@ -13,18 +13,18 @@ from ddd.order_management.domain import exceptions
 def handle_mark_as_shipped(
         command: commands.ShipOrderCommand, 
         access_control: AccessControl1Abstract,
+        user_ctx: dtos.UserContextDTO,
         uow: UnitOfWorkAbstract) -> dtos.ResponseDTO:
     try:
         with uow:
 
-            order = uow.order.get(order_id=command.order_id)
-
             access_control.ensure_user_is_authorized_for(
-                token=command.token,
+                user_ctx,
                 required_permission="mark_as_shipped",
-                required_scope={"vendor_id": order.vendor_id }
+                required_scope={"vendor_id": user_ctx.sub }
             )
 
+            order = uow.order.get(order_id=command.order_id, tenant_id=user_ctx.tenant_id)
             order.mark_as_shipped()
 
             uow.order.save(order)

@@ -12,12 +12,12 @@ def handle_remove_line_items(
         command: commands.RemoveLineItemsCommand, 
         uow: UnitOfWorkAbstract,
         access_control: AccessControl1Abstract,
-        vendor_repo: VendorAbstract
+        vendor_repo: VendorAbstract,
+        user_ctx: dtos.UserContextDTO
 ) -> dtos.ResponseDTO:
     try:
         with uow:
 
-            user_ctx = access_control.get_user_context(command.token)
             access_control.ensure_user_is_authorized_for(
                 user_ctx,
                 required_permission="remove_line_items",

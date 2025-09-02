@@ -27,11 +27,12 @@ def test_checkout_items_out_of_stock(
 ):
 
     command = commands.CheckoutItemsCommand(
-        token="fake_jwt_token",
         customer_details=fake_customer_details,
         address=fake_address,
         product_skus=fake_product_skus_out_of_stock
     )
+
+    user_ctx = fake_access_control().get_user_context(token="fake_jwt_token")
 
     response = handlers.handle_checkout_items(
         command=command,
@@ -39,7 +40,8 @@ def test_checkout_items_out_of_stock(
         vendor_repo=infra_repo.DjangoVendorRepositoryImpl(),
         stock_validation=validations.DjangoStockValidation(),
         access_control=fake_access_control(),
-        order_service=domain_services.OrderService()
+        order_service=domain_services.OrderService(),
+        user_ctx=user_ctx
     )
 
     assert response.success is False

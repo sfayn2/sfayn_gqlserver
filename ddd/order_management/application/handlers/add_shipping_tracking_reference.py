@@ -13,17 +13,18 @@ from ddd.order_management.domain import exceptions
 def handle_add_shipping_tracking_reference(
         command: commands.AddShippingTrackingReferenceCommand, 
         access_control: AccessControl1Abstract,
+        user_ctx: dtos.UserContextDTO,
         uow: UnitOfWorkAbstract) -> dtos.ResponseDTO:
     try:
         with uow:
 
-            order = uow.order.get(order_id=command.order_id)
-
             access_control.ensure_user_is_authorized_for(
-                token=command.token,
+                user_ctx,
                 required_permission="add_shipping_tracking_reference",
-                required_scope={"vendor_id": order.vendor_id }
+                required_scope={"vendor_id": user_ctx.sub }
             )
+
+            order = uow.order.get(order_id=command.order_id, tenant_id=user_ctx.tenant_id)
 
             order.add_shipping_tracking_reference(shipping_reference=command.shipping_reference)
 

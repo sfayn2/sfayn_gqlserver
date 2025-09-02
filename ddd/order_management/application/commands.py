@@ -9,68 +9,65 @@ from ddd.order_management.domain import enums
 class Command(BaseModel, frozen=True):
     pass
 
-class Command1(Command):
-    token: str
-
-class CheckoutItemsCommand(Command1):
+class CheckoutItemsCommand(Command):
     customer_details: dtos.CustomerDetailsDTO
     address: dtos.AddressDTO
     product_skus: List[dtos.ProductSkusDTO]
 
-class PlaceOrderCommand(Command1):
+class PlaceOrderCommand(Command):
     order_id: str
     
-class AddShippingTrackingReferenceCommand(Command1):
+class AddShippingTrackingReferenceCommand(Command):
     order_id: str
     shipping_reference: str
 
-class AddCouponCommand(Command1):
+class AddCouponCommand(Command):
     order_id: str
     coupon_code: str
 
-class ConfirmOrderCommand(Command1):
+class ConfirmOrderCommand(Command):
     order_id: str
     transaction_id: str
     payment_method: enums.PaymentMethod
     provider: str
 
-class SelectShippingOptionCommand(Command1):
+class SelectShippingOptionCommand(Command):
     order_id: str
     shipping_details: dtos.ShippingOptionDTO
 
-class ShipOrderCommand(Command1):
+class ShipOrderCommand(Command):
     order_id: str
 
-class CancelOrderCommand(Command1):
+class CancelOrderCommand(Command):
     order_id: str
     cancellation_reason: str
 
-class CompleteOrderCommand(Command1):
+class CompleteOrderCommand(Command):
     order_id: str
 
-class ApplyPaymentCommand(Command1):
+class ApplyPaymentCommand(Command):
     order_id: str
     payment: dtos.PaymentDetailsDTO
 
-class ChangeDestinationCommand(Command1):
+class ChangeDestinationCommand(Command):
     order_id: str
     address: dtos.AddressDTO
 
-class ChangeOrderQuantityCommand(Command1):
+class ChangeOrderQuantityCommand(Command):
     order_id: constr(min_length=1, strip_whitespace=True)
     product_skus: List[dtos.ProductSkusDTO]
     #product_sku: constr(min_length=1, strip_whitespace=True)
     #new_quantity: int
 
-class AddLineItemsCommand(Command1):
+class AddLineItemsCommand(Command):
     order_id: constr(min_length=1, strip_whitespace=True)
     product_skus: List[dtos.ProductSkusDTO]
 
-class RemoveLineItemsCommand(Command1):
+class RemoveLineItemsCommand(Command):
     order_id: constr(min_length=1, strip_whitespace=True)
     product_skus: List[dtos.ProductSkusDTO]
 
-class LoginCallbackCommand(Command1):
+class LoginCallbackCommand(Command):
     code: constr(min_length=1, strip_whitespace=True)
     redirect_uri: constr(min_length=1, strip_whitespace=True)
     next_path: constr(min_length=1, strip_whitespace=True)

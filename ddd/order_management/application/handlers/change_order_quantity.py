@@ -14,12 +14,12 @@ def handle_change_order_quantity(
         command: commands.ChangeOrderQuantityCommand, 
         uow: UnitOfWorkAbstract,
         access_control: AccessControl1Abstract,
-        stock_validation: StockValidationAbstract
+        stock_validation: StockValidationAbstract,
+        user_ctx: dtos.UserContextDTO
     ) -> dtos.ResponseDTO:
     try:
         with uow:
 
-            user_ctx = access_control.get_user_context(command.token)
             access_control.ensure_user_is_authorized_for(
                 user_ctx,
                 required_permission="change_order_quantity",

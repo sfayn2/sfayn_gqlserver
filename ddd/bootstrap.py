@@ -262,129 +262,152 @@ event_bus.EVENT_HANDLERS.update({
 
 # Command Handlers (write operations)
 message_bus.COMMAND_HANDLERS.update({
-    commands.CheckoutItemsCommand: lambda command: handlers.handle_checkout_items(
+    commands.CheckoutItemsCommand: lambda command, **deps: handlers.handle_checkout_items(
         command=command,
         uow=repositories.DjangoOrderUnitOfWork(),
         vendor_repo=repositories.DjangoVendorRepositoryImpl(),
         order_service=domain_services.OrderService(),
         stock_validation=validations.DjangoStockValidation(),
-        access_control=access_control
+        access_control=access_control,
+        **deps
     ),
-    commands.ChangeOrderQuantityCommand: lambda command: handlers.handle_change_order_quantity(
+    commands.ChangeOrderQuantityCommand: lambda command, **deps: handlers.handle_change_order_quantity(
         command=command,
         uow=repositories.DjangoOrderUnitOfWork(),
         access_control=access_control,
-        stock_validation=validations.DjangoStockValidation()
+        stock_validation=validations.DjangoStockValidation(),
+        **deps
     ),
-    commands.AddLineItemsCommand: lambda command: handlers.handle_add_line_items(
+    commands.AddLineItemsCommand: lambda command, **deps: handlers.handle_add_line_items(
         command=command,
         uow=repositories.DjangoOrderUnitOfWork(),
         vendor_repo=repositories.DjangoVendorRepositoryImpl(),
         access_control=access_control,
-        stock_validation=validations.DjangoStockValidation()
+        stock_validation=validations.DjangoStockValidation(),
+        **deps
     ),
-    commands.RemoveLineItemsCommand: lambda command: handlers.handle_remove_line_items(
+    commands.RemoveLineItemsCommand: lambda command, **deps: handlers.handle_remove_line_items(
         command=command,
         uow=repositories.DjangoOrderUnitOfWork(),
         vendor_repo=repositories.DjangoVendorRepositoryImpl(),
         access_control=access_control,
+        **deps
     ),
-    commands.ChangeDestinationCommand: lambda command: handlers.handle_change_destination(
+    commands.ChangeDestinationCommand: lambda command, **deps: handlers.handle_change_destination(
         command=command,
         uow=repositories.DjangoOrderUnitOfWork(),
-        access_control=access_control
+        access_control=access_control,
+        **deps
     ),
-    commands.AddCouponCommand: lambda command: handlers.handle_add_coupon(
+    commands.AddCouponCommand: lambda command, **deps: handlers.handle_add_coupon(
         command=command,
         uow=repositories.DjangoOrderUnitOfWork(),
         coupon_validation=validations.DjangoCouponValidation(),
-        access_control=access_control
+        access_control=access_control,
+        **deps
     ),
-    commands.SelectShippingOptionCommand: lambda command: handlers.handle_select_shipping_option(
+    commands.SelectShippingOptionCommand: lambda command, **deps: handlers.handle_select_shipping_option(
         command=command, 
         uow=repositories.DjangoOrderUnitOfWork(),
         vendor_repo=repositories.DjangoVendorRepositoryImpl(),
         access_control=access_control,
-        shipping_option_service=shipping_option_service
+        shipping_option_service=shipping_option_service,
+        **deps
     ),
-    commands.PlaceOrderCommand: lambda command: handlers.handle_place_order(
+    commands.PlaceOrderCommand: lambda command, **deps: handlers.handle_place_order(
         command=command,
         uow=repositories.DjangoOrderUnitOfWork(),
         access_control=access_control,
-        stock_validation=validations.DjangoStockValidation()
+        stock_validation=validations.DjangoStockValidation(),
+        **deps
     ),
-    commands.ConfirmOrderCommand: lambda command: handlers.handle_confirm_order(
+    commands.ConfirmOrderCommand: lambda command, **deps: handlers.handle_confirm_order(
         command=command, 
         uow=repositories.DjangoOrderUnitOfWork(),
         payment_service=payment_service,
         access_control=access_control,
-        stock_validation=validations.DjangoStockValidation()
+        stock_validation=validations.DjangoStockValidation(),
+        **deps
     ),
-    commands.CancelOrderCommand: lambda command: handlers.handle_cancel_order(
+    commands.CancelOrderCommand: lambda command, **deps: handlers.handle_cancel_order(
         command=command,
         access_control=access_control,
-        uow=repositories.DjangoOrderUnitOfWork()
+        uow=repositories.DjangoOrderUnitOfWork(),
+        **deps
     ),
-    commands.ShipOrderCommand: lambda command: handlers.handle_mark_as_shipped(
+    commands.ShipOrderCommand: lambda command, **deps: handlers.handle_mark_as_shipped(
         command=command,
         access_control=access_control,
-        uow=repositories.DjangoOrderUnitOfWork()
+        uow=repositories.DjangoOrderUnitOfWork(),
+        **deps
     ),
-    commands.AddShippingTrackingReferenceCommand: lambda command: handlers.handle_add_shipping_tracking_reference(
+    commands.AddShippingTrackingReferenceCommand: lambda command, **deps: handlers.handle_add_shipping_tracking_reference(
         command=command,
         access_control=access_control,
-        uow=repositories.DjangoOrderUnitOfWork()
+        uow=repositories.DjangoOrderUnitOfWork(),
+        **deps
     ),
-    commands.CompleteOrderCommand: lambda command: handlers.handle_mark_as_completed(
+    commands.CompleteOrderCommand: lambda command, **deps: handlers.handle_mark_as_completed(
         command=command,
         access_control=access_control,
-        uow=repositories.DjangoOrderUnitOfWork()
+        uow=repositories.DjangoOrderUnitOfWork(),
+        **deps
     ),
-    commands.PublishProductUpdateCommand: lambda command: handlers.handle_publish_product_update(
+    commands.PublishProductUpdateCommand: lambda command, **deps: handlers.handle_publish_product_update(
         command=command,
-        event_publisher=event_bus.internal_publisher
+        event_publisher=event_bus.internal_publisher,
+        **deps
     ),
-    commands.PublishVendorDetailsUpdateCommand: lambda command: handlers.handle_publish_vendor_details_update(
+    commands.PublishVendorDetailsUpdateCommand: lambda command, **deps: handlers.handle_publish_vendor_details_update(
         command=command,
-        event_publisher=event_bus.internal_publisher
+        event_publisher=event_bus.internal_publisher,
+        **deps
     ),
-    commands.PublishVendorCouponUpdateCommand: lambda command: handlers.handle_publish_vendor_coupon_update(
+    commands.PublishVendorCouponUpdateCommand: lambda command, **deps: handlers.handle_publish_vendor_coupon_update(
         command=command,
-        event_publisher=event_bus.internal_publisher
+        event_publisher=event_bus.internal_publisher,
+        **deps
     ),
-    commands.PublishVendorOfferUpdateCommand: lambda command: handlers.handle_publish_vendor_offer_update(
+    commands.PublishVendorOfferUpdateCommand: lambda command, **deps: handlers.handle_publish_vendor_offer_update(
         command=command,
-        event_publisher=event_bus.internal_publisher
+        event_publisher=event_bus.internal_publisher,
+        **deps
     ),
-    commands.PublishVendorShippingOptionUpdateCommand: lambda command: handlers.handle_publish_vendor_shippingoption_update(
+    commands.PublishVendorShippingOptionUpdateCommand: lambda command, **deps: handlers.handle_publish_vendor_shippingoption_update(
         command=command,
-        event_publisher=event_bus.internal_publisher
+        event_publisher=event_bus.internal_publisher,
+        **deps
     ),
-    commands.PublishVendorPaymentOptionUpdateCommand: lambda command: handlers.handle_publish_vendor_paymentoption_update(
+    commands.PublishVendorPaymentOptionUpdateCommand: lambda command, **deps: handlers.handle_publish_vendor_paymentoption_update(
         command=command,
-        event_publisher=event_bus.internal_publisher
+        event_publisher=event_bus.internal_publisher,
+        **deps
     ),
-    commands.PublishVendorTaxOptionUpdateCommand: lambda command: handlers.handle_publish_vendor_taxoption_update(
+    commands.PublishVendorTaxOptionUpdateCommand: lambda command, **deps: handlers.handle_publish_vendor_taxoption_update(
         command=command,
-        event_publisher=event_bus.internal_publisher
+        event_publisher=event_bus.internal_publisher,
+        **deps
     )
 })
 
 #Query Handlers (read operations)
 message_bus.QUERY_HANDLERS.update({
-    queries.ListShippingOptionsQuery: lambda query: handlers.handle_list_shipping_options(
+    queries.ListShippingOptionsQuery: lambda query, **deps: handlers.handle_list_shipping_options(
         query=query, 
         uow=repositories.DjangoOrderUnitOfWork(),
         vendor_repo=repositories.DjangoVendorRepositoryImpl(),
-        shipping_option_service=shipping_option_service
+        shipping_option_service=shipping_option_service,
+        **deps
     ),
-    queries.ListCustomerAddressesQuery: lambda query: handlers.handle_list_customer_addresses(
+    queries.ListCustomerAddressesQuery: lambda query, **deps: handlers.handle_list_customer_addresses(
         query=query, 
         uow=repositories.DjangoOrderUnitOfWork(),
-        customer_repo=repositories.DjangoCustomerRepositoryImpl()
+        customer_repo=repositories.DjangoCustomerRepositoryImpl(),
+        **deps
     ),
-    queries.GetOrderQuery: lambda query: handlers.handle_get_order(
+    queries.GetOrderQuery: lambda query, **deps: handlers.handle_get_order(
         query=query, 
-        uow=repositories.DjangoOrderUnitOfWork()
+        uow=repositories.DjangoOrderUnitOfWork(),
+        **deps
     ),
 })

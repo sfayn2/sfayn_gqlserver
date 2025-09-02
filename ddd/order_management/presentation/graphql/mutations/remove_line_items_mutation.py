@@ -4,6 +4,9 @@ from ddd.order_management.application import (
     message_bus, commands
   )
 from ddd.order_management.presentation.graphql import object_types, input_types, common
+from ddd.order_management.infrastructure import (
+    access_control1,
+)
 
 class RemoveLineItemsMutation(relay.ClientIDMutation):
     class Input:
@@ -14,7 +17,8 @@ class RemoveLineItemsMutation(relay.ClientIDMutation):
 
     @classmethod
     def mutate_and_get_payload(cls, root, info, **input):
-        input["token"] = common.get_token_from_context(info)
+        token = common.get_token_from_context(info)
+        user_ctx = access_control1.get_user_context(token)
         command = commands.RemoveLineItemsCommand.model_validate(input)
-        result = message_bus.handle(command)
+        result = message_bus.handle(command, user_ctx=user_ctx)
         return cls(result=object_types.ResponseType(**result.model_dump()))

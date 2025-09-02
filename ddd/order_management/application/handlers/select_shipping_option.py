@@ -15,17 +15,18 @@ def handle_select_shipping_option(
         vendor_repo: VendorAbstract,
         access_control: AccessControl1Abstract,
         shipping_option_service: ShippingOptionStrategyServiceAbstract,
+        user_ctx: dtos.UserContextDTO
         ) -> dtos.ResponseDTO:
     try:
         with uow:
 
-            order = uow.order.get(order_id=command.order_id)
-
             access_control.ensure_user_is_authorized_for(
-                token=command.token,
+                user_ctx,
                 required_permission="select_shipping_option",
-                required_scope={"customer_id": order.customer_details.customer_id }
+                required_scope={"vendor_id": user_ctx.sub }
             )
+
+            order = uow.order.get(order_id=command.order_id, tenant_id=user_ctx.tenant_id)
 
             vendor_shipping_options = vendor_repo.get_shipping_options(
                 tenant_id=order.tenant_id,

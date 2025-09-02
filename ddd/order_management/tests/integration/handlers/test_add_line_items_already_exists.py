@@ -33,10 +33,11 @@ def test_add_line_items_vendor_mismatch(
     )
 
     command = commands.AddLineItemsCommand(
-        token="fake_jwt_token",
         order_id="ORD-1",
         product_skus=fake_product_skus_already_exists
     )
+
+    user_ctx = fake_access_control().get_user_context(token="fake_jwt_token")
 
     response = handlers.handle_add_line_items(
         command=command,
@@ -44,6 +45,7 @@ def test_add_line_items_vendor_mismatch(
         vendor_repo=infra_repo.DjangoVendorRepositoryImpl(),
         stock_validation=validations.DjangoStockValidation(),
         access_control=fake_access_control(),
+        user_ctx=user_ctx
     )
 
 

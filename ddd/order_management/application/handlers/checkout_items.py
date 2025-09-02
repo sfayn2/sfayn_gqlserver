@@ -14,11 +14,11 @@ def handle_checkout_items(
         vendor_repo: VendorAbstract,
         stock_validation: StockValidationAbstract,
         access_control: AccessControl1Abstract,
+        user_ctx: dtos.UserContextDTO,
         order_service: OrderServiceAbstract) -> dtos.ResponseDTO:
     try:
         with uow:
 
-            user_ctx = access_control.get_user_context(command.token)
             access_control.ensure_user_is_authorized_for(
                 user_ctx,
                 required_permission="checkout_items"

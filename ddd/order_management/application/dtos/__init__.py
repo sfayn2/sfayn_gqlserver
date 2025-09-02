@@ -15,6 +15,7 @@ from .dtos import (
     OfferStrategyDTO,
     ShippingOptionStrategyDTO,
     ProductSkusDTO,
+    UserContextDTO
 )
 from .snapshot_dtos import (
     VendorDetailsSnapshotDTO,
@@ -29,7 +30,7 @@ from .snapshot_dtos import (
 )
 
 # Integration events
-from .integration_events.auth_integration_events import UserLoggedInIntegrationEvent, Identity
+from .integration_events.auth_integration_events import UserLoggedInIntegrationEvent
 from .integration_events.product_integration_events import ProductUpdateIntegrationEvent
 from .integration_events.vendor_integration_events import (
     VendorDetailsUpdateIntegrationEvent,

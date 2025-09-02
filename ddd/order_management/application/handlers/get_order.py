@@ -12,15 +12,16 @@ from ddd.order_management.application import (
 def handle_get_order(
         query: queries.GetOrderQuery, 
         access_control: AccessControl1Abstract,
+        user_ctx: dtos.UserContextDTO,
         uow: UnitOfWorkAbstract) -> dtos.OrderResponseDTO:
 
-    order = uow.order.get(order_id=query.order_id)
-
     access_control.ensure_user_is_authorized_for(
-        token=command.token,
+        user_ctx,
         required_permission="get_order",
-        required_scope={"customer_id": order.customer_details.customer_id }
+        required_scope={"customer_id": user_ctx.sub }
     )
+
+    order = uow.order.get(order_id=query.order_id, tenant_id=user_ctx.tenant_id)
 
     return mappers.OrderMapper.to_dto(
             order=order

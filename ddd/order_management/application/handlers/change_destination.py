@@ -13,18 +13,20 @@ from ddd.order_management.domain import exceptions
 def handle_change_destination(
         command: commands.ChangeDestinationCommand, 
         uow: UnitOfWorkAbstract,
-        access_control: AccessControl1Abstract
+        access_control: AccessControl1Abstract,
+        user_ctx: dtos.UserContextDTO
     ) -> dtos.ResponseDTO:
     try:
         with uow:
 
-            order = uow.order.get(order_id=command.order_id)
-
             access_control.ensure_user_is_authorized_for(
-                token=command.token,
+                user_ctx,
                 required_permission="change_destination",
-                required_scope={"customer_id": order.customer_details.customer_id }
+                required_scope={"customer_id": user_ctx.sub }
             )
+
+            order = uow.order.get(order_id=command.order_id, tenant_id=user_ctx.tenant_id)
+
 
             # Decision: allow to change w adhoc address
             #validation_service.ensure_customer_address_is_valid(

@@ -148,3 +148,9 @@ class ProductSkusDTO(BaseModel):
     order_quantity: int
     vendor_id: str
 
+class UserContextDTO(BaseModel):
+    sub: str
+    token_type: str
+    tenant_id: str
+    roles: List[str] = Field(default_factory=list)
+

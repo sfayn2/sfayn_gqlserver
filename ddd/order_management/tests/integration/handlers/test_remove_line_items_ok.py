@@ -32,16 +32,18 @@ def test_remove_line_items_ok(
     )
 
     command = commands.RemoveLineItemsCommand(
-        token="fake_jwt_token",
         order_id="ORD-REMOVEITEMS-1",
         product_skus=fake_product_skus
     )
+
+    user_ctx = fake_access_control().get_user_context(token="fake_jwt_token")
 
     response = handlers.handle_remove_line_items(
         command=command,
         uow=infra_repo.DjangoOrderUnitOfWork(),
         vendor_repo=infra_repo.DjangoVendorRepositoryImpl(),
         access_control=fake_access_control(),
+        user_ctx=user_ctx
     )
 
 

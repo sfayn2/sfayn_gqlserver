@@ -14,17 +14,18 @@ def handle_place_order(
         command: commands.PlaceOrderCommand, 
         stock_validation: StockValidationAbstract,
         access_control: AccessControl1Abstract,
+        user_ctx: dtos.UserContextDTO,
         uow: UnitOfWorkAbstract) -> dtos.ResponseDTO:
     try:
         with uow:
 
-            order = uow.order.get(order_id=command.order_id)
-
             access_control.ensure_user_is_authorized_for(
-                token=command.token,
+                user_ctx,
                 required_permission="place_order",
-                required_scope={"customer_id": order.customer_details.customer_id }
+                required_scope={"vendor_id": user_ctx.sub }
             )
+
+            order = uow.order.get(order_id=command.order_id, tenant_id=user_ctx.tenant_id)
 
             stock_validation.ensure_items_in_stock(
                 order.tenant_id,

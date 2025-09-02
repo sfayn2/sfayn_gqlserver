@@ -126,8 +126,8 @@ def fake_address():
 @pytest.fixture
 def fake_access_control():
     class FakeAccessControl:
-        def get_user_context(self, token: str) -> dtos.Identity:
-            return dtos.Identity(
+        def get_user_context(self, token: str) -> dtos.UserContextDTO:
+            return dtos.UserContextDTO(
                 sub=USER1,
                 token_type="Bearer",
                 tenant_id=TENANT1,
@@ -135,8 +135,8 @@ def fake_access_control():
             )
 
         def ensure_user_is_authorized_for(
-            self, user_context: dtos.Identity, required_permission: str, required_scope: Optional[dict] = None
-        ) -> dtos.Identity:
+            self, user_context: dtos.UserContextDTO, required_permission: str, required_scope: Optional[dict] = None
+        ) -> dtos.UserContextDTO:
             return user_context
     return FakeAccessControl
 

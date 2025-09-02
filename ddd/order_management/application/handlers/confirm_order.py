@@ -15,20 +15,21 @@ def handle_confirm_order(
         uow: UnitOfWorkAbstract, 
         payment_service: application_services.PaymentService,
         access_control: AccessControl1Abstract,
-        stock_validation: StockValidationAbstract
+        stock_validation: StockValidationAbstract,
+        user_ctx: dtos.UserContextDTO
     ) -> dtos.ResponseDTO:
 
     try:
 
         with uow:
 
-            order = uow.order.get(order_id=command.order_id)
-
             access_control.ensure_user_is_authorized_for(
-                token=command.token,
+                user_ctx,
                 required_permission="confirm_order",
-                required_scope={"customer_id": order.customer_details.customer_id }
+                required_scope={"customer_id": user_ctx.sub }
             )
+
+            order = uow.order.get(order_id=command.order_id, tenant_id=user_ctx.tenant_id)
 
             stock_validation.ensure_items_in_stock(
                 order.tenant_id,

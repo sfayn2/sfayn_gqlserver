@@ -9,20 +9,20 @@ class AccessControl1(ports.AccessControl1Abstract):
     def __init__(self, jwt_handler):
         self.jwt_handler = jwt_handler
 
-    def get_user_context(self, token: str) -> dtos.Identity:
+    def get_user_context(self, token: str) -> dtos.UserContextDTO:
         identity_claims = self.jwt_handler.decode(token)
         token_type = identity_claims.get("token_type", "Bearer")
 
-        return dtos.Identity.model_validate(identity_claims)
+        return dtos.UserContextDTO.model_validate(identity_claims)
 
     def ensure_user_is_authorized_for(
-        self, user_context: dtos.Identity, required_permission: str, required_scope: Optional[dict] = None
-    ) -> dtos.Identity:
+        self, user_context: dtos.UserContextDTO, required_permission: str, required_scope: Optional[dict] = None
+    ) -> dtos.UserContextDTO:
 
         #identity_claims = self.jwt_handler.decode(token)
         #token_type = identity_claims.get("token_type", "Bearer")
 
-        #valid_claims = dtos.Identity.model_validate(identity_claims)
+        #valid_claims = dtos.UserContextDTO.model_validate(identity_claims)
 
         #TODO: this should not be here? lets inject 
         matching_authorizations = django_snapshots.UserAuthorizationSnapshot.objects.filter(
