@@ -19,13 +19,14 @@ def handle_change_order_quantity(
     try:
         with uow:
 
-            order = uow.order.get(order_id=command.order_id)
-
+            user_ctx = access_control.get_user_context(command.token)
             access_control.ensure_user_is_authorized_for(
-                token=command.token,
+                user_ctx,
                 required_permission="change_order_quantity",
-                required_scope={"customer_id": order.customer_details.customer_id }
+                required_scope={"customer_id": user_ctx.sub }
             )
+
+            order = uow.order.get(order_id=command.order_id, tenant_id=user_ctx.tenant_id)
 
             for sku in command.product_skus:
                 order.change_order_quantity(

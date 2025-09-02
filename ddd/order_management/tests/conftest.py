@@ -1,6 +1,6 @@
 import pytest, json, jwt
 from datetime import datetime, timedelta
-from typing import List
+from typing import List, Optional
 from decimal import Decimal
 from order_management import models as django_snapshots
 from ddd.order_management.domain import (
@@ -126,16 +126,18 @@ def fake_address():
 @pytest.fixture
 def fake_access_control():
     class FakeAccessControl:
-
-        def ensure_user_is_authorized_for(
-            self, token: str, required_permission: str, required_scope: dict = None
-        ) -> dtos.Identity:
+        def get_user_context(self, token: str) -> dtos.Identity:
             return dtos.Identity(
                 sub=USER1,
                 token_type="Bearer",
                 tenant_id=TENANT1,
                 roles=["customer"]
             )
+
+        def ensure_user_is_authorized_for(
+            self, user_context: dtos.Identity, required_permission: str, required_scope: Optional[dict] = None
+        ) -> dtos.Identity:
+            return user_context
     return FakeAccessControl
 
 @pytest.fixture(scope="session", autouse=True)

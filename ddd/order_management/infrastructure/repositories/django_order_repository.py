@@ -4,8 +4,8 @@ from ddd.order_management.infrastructure import django_mappers
 
 #ok to return Domain for repository
 class DjangoOrderRepositoryImpl(repositories.OrderAbstract):
-    def get(self, order_id) -> models.Order:
-        django_order = django_models.Order.objects.get(order_id=order_id)
+    def get(self, order_id: str, tenant_id: str) -> models.Order:
+        django_order = django_models.Order.objects.get(order_id=order_id, tenant_id=tenant_id)
         order_domain = django_mappers.OrderMapper.to_domain(django_order)
         self.seen.add(order_domain) #Track Entitry for Uow
         return order_domain

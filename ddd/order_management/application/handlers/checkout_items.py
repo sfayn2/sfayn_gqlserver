@@ -18,8 +18,9 @@ def handle_checkout_items(
     try:
         with uow:
 
-            user_ctx = access_control.ensure_user_is_authorized_for(
-                token=command.token,
+            user_ctx = access_control.get_user_context(command.token)
+            access_control.ensure_user_is_authorized_for(
+                user_ctx,
                 required_permission="checkout_items"
             )
             tenant_id = user_ctx.tenant_id

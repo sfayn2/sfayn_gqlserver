@@ -17,13 +17,14 @@ def handle_remove_line_items(
     try:
         with uow:
 
-            order = uow.order.get(order_id=command.order_id)
-
+            user_ctx = access_control.get_user_context(command.token)
             access_control.ensure_user_is_authorized_for(
-                token=command.token,
+                user_ctx,
                 required_permission="remove_line_items",
-                required_scope={"customer_id": order.customer_details.customer_id }
+                required_scope={"customer_id": user_ctx.sub }
             )
+
+            order = uow.order.get(order_id=command.order_id, tenant_id=user_ctx.tenant_id)
 
             line_items = vendor_repo.get_line_items(
                 order.tenant_id, 
