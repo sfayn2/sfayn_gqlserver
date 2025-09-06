@@ -416,18 +416,22 @@ class Order:
     def perform_activity(self, current_step: str, performed_by: str, user_input: Optional[Dict] = None):
 
         if not self.activities:
-            raise exceptions.InvalidOrderOperation(f"No activity step found.")
+            raise exceptions.InvalidOrderOperation(f"No activity steps configured.")
 
-        pending_step = [act for act in self.activities.sort(key=lambda a: a["sequence"]) if act.is_pending]
+        pending_steps = [act for act in sorted(activities, key=lambda a: a["sequence"]) if act.is_pending]
+        if not pending_steps:
+            raise exceptions.InvalidOrderOperation(f"No pending activities left.")
 
-        if pending_step.step != current_step:
-            raise exceptions.InvalidOrderOperation(f"Activity Step {current_step} not allowed in status {self.order_status}")
+        next_step = pending_steps[0]
+        if next_step.step != current_step:
+            raise exceptions.InvalidOrderOperation(f"Expected step {next_step.step}, got {current_step}")
 
-        pending_step.performed_by = performed_by
-        pending_step.user_input = user_input
-        pending_step.mark_as_done()
+        next_step.mark_as_done()
+        next_step.performed_by = performed_by
+        next_step.user_input = user_input
 
-        self.order_status = pending_step.order_status
+        self.order_status = next_step.order_status
+        self._update_modified_date()
 
 
 

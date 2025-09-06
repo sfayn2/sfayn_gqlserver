@@ -19,7 +19,7 @@ class OrderActivity:
 
 
     def mark_as_done(self):
-        if self.step_status == enums.StepStatus.DONE:
+        if not self.is_pending:
             raise exceptions.OrderActivityException(f"Order Activity {self.step} is already done.")
         self.step_status = enums.StepStatus.DONE
         self.performed_by = performed_by
