@@ -38,12 +38,12 @@ USER_SEEDS = (
     (USER1, "checkout_items", TENANT1, json.dumps({ "customer_id": USER1 }), True),
 )
 
-# Columns order_id, order_status, cancellation_reason, customer_id, customer_first_name, customer_last_name, customer_email, coupons, delivery_street, delivery_city, delivery_postal, delivery_country, delivery_state, shipping_method, shipping_delivery_time, shipping_cost, shipping_tracking_reference, tax_details, tax_amount, total_discounts_fee, total_amount, offer_details, final_amount, payment_method, payment_reference, payment_amount, payment_status, currency, tenant_id
+# Columns order_id, order_stage, cancellation_reason, customer_id, customer_first_name, customer_last_name, customer_email, coupons, delivery_street, delivery_city, delivery_postal, delivery_country, delivery_state, shipping_method, shipping_delivery_time, shipping_cost, shipping_tracking_reference, tax_details, tax_amount, total_discounts_fee, total_amount, offer_details, final_amount, payment_method, payment_reference, payment_amount, payment_status, currency, tenant_id
 ORDER_SEEDS = (
-    ("ORD-1", enums.OrderStatus.DRAFT.value,"", USER1, "first name1", "last name1", "email@gmail.com", json.dumps([]), "street1", "Singapore", 1234, "Singapore", "Singapore", None, None, None, None, json.dumps([]), Decimal("0"), Decimal("0"), Decimal("0"), json.dumps([]), Decimal("0"), None, None, Decimal("0"), None, "SGD", TENANT1),
-    ("ORD-NONDRAFT-1", enums.OrderStatus.PENDING.value,"", USER1, "first name1", "last name1", "email@gmail.com", json.dumps([]), "street1", "Singapore", 1234, "Singapore", "Singapore", None, None, None, None, json.dumps([]), Decimal("0"), Decimal("0"), Decimal("0"), json.dumps([]), Decimal("0"), None, None, Decimal("0"), None, "SGD", TENANT1),
-    ("ORD-REMOVEITEMS-1", enums.OrderStatus.DRAFT.value,"", USER1, "first name1", "last name1", "email@gmail.com", json.dumps([]), "street1", "Singapore", 1234, "Singapore", "Singapore", None, None, None, None, json.dumps([]), Decimal("0"), Decimal("0"), Decimal("0"), json.dumps([]), Decimal("0"), None, None, Decimal("0"), None, "SGD", TENANT1),
-    ("ORD-CHANGEQTY-1", enums.OrderStatus.DRAFT.value,"", USER1, "first name1", "last name1", "email@gmail.com", json.dumps([]), "street1", "Singapore", 1234, "Singapore", "Singapore", None, None, None, None, json.dumps([]), Decimal("0"), Decimal("0"), Decimal("0"), json.dumps([]), Decimal("0"), None, None, Decimal("0"), None, "SGD", TENANT1),
+    ("ORD-1", enums.OrderStage.DRAFT.value,"", USER1, "first name1", "last name1", "email@gmail.com", json.dumps([]), "street1", "Singapore", 1234, "Singapore", "Singapore", None, None, None, None, json.dumps([]), Decimal("0"), Decimal("0"), Decimal("0"), json.dumps([]), Decimal("0"), None, None, Decimal("0"), None, "SGD", TENANT1),
+    ("ORD-NONDRAFT-1", enums.OrderStage.PENDING.value,"", USER1, "first name1", "last name1", "email@gmail.com", json.dumps([]), "street1", "Singapore", 1234, "Singapore", "Singapore", None, None, None, None, json.dumps([]), Decimal("0"), Decimal("0"), Decimal("0"), json.dumps([]), Decimal("0"), None, None, Decimal("0"), None, "SGD", TENANT1),
+    ("ORD-REMOVEITEMS-1", enums.OrderStage.DRAFT.value,"", USER1, "first name1", "last name1", "email@gmail.com", json.dumps([]), "street1", "Singapore", 1234, "Singapore", "Singapore", None, None, None, None, json.dumps([]), Decimal("0"), Decimal("0"), Decimal("0"), json.dumps([]), Decimal("0"), None, None, Decimal("0"), None, "SGD", TENANT1),
+    ("ORD-CHANGEQTY-1", enums.OrderStage.DRAFT.value,"", USER1, "first name1", "last name1", "email@gmail.com", json.dumps([]), "street1", "Singapore", 1234, "Singapore", "Singapore", None, None, None, None, json.dumps([]), Decimal("0"), Decimal("0"), Decimal("0"), json.dumps([]), Decimal("0"), None, None, Decimal("0"), None, "SGD", TENANT1),
 )
 
 # Columns order_id, vendor_id, vendor_name, vendor_country, product_sku, product_name, product_category, is_free_gift, is_taxable, options, product_price, product_currency, order_quantity, package_weight, package_length, package_width, package_height, total_price
@@ -247,7 +247,7 @@ def seeded_all(django_db_setup, django_db_blocker):
         for os in ORDER_SEEDS:
             django_snapshots.Order.objects.create(
                 order_id=os[0], 
-                order_status=os[1],
+                order_stage=os[1],
                 cancellation_reason=os[2], 
                 customer_id=os[3], 
                 customer_first_name=os[4],

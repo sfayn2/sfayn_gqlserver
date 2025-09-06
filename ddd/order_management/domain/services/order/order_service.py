@@ -20,6 +20,7 @@ class OrderService(ports.OrderServiceAbstract):
             customer_details: value_objects.CustomerDetails,
             shipping_address: value_objects.Address,
             line_items: List[models.LineItem],
+            tenant_workflow: List[models.OrderActivity],
             tenant_id: str
     ) -> models.Order:
         order = models.Order(
@@ -33,6 +34,8 @@ class OrderService(ports.OrderServiceAbstract):
         order.mark_as_draft()
         for line_item in line_items:
             order.add_line_item(line_item)
+
+        order.load_tenant_activities = tenant_workflow
 
         #order.update_line_items(line_items)
         

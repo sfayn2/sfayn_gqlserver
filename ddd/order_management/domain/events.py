@@ -33,27 +33,27 @@ class DomainEvent(ABC):
 @dataclass(frozen=True)    
 class PlacedOrderEvent(DomainEvent):
     order_id: str
-    order_status: enums.OrderStatus
+    order_stage: enums.OrderStage
 
 @dataclass(frozen=True)    
 class ConfirmedOrderEvent(DomainEvent):
     order_id: str
-    order_status: enums.OrderStatus
+    order_stage: enums.OrderStage
 
 @dataclass(frozen=True)    
 class ShippedOrderEvent(DomainEvent):
     order_id: str
-    order_status: enums.OrderStatus
+    order_stage: enums.OrderStage
 
 @dataclass(frozen=True)    
 class CanceledOrderEvent(DomainEvent):
     order_id: str
-    order_status: enums.OrderStatus
+    order_stage: enums.OrderStage
 
 @dataclass(frozen=True)    
 class CompletedOrderEvent(DomainEvent):
     order_id: str
-    order_status: enums.OrderStatus
+    order_stage: enums.OrderStage
 
 @dataclass(frozen=True)    
 class AppliedPaymentEvent(DomainEvent):
@@ -63,35 +63,35 @@ class AppliedPaymentEvent(DomainEvent):
 @dataclass(frozen=True)    
 class CheckedOutEvent(DomainEvent):
     order_id: str
-    order_status: enums.OrderStatus
+    order_stage: enums.OrderStage
 
 @dataclass(frozen=True)    
 class SelectedShippingOptionEvent(DomainEvent):
     order_id: str
-    order_status: enums.OrderStatus
+    order_stage: enums.OrderStage
 
 @dataclass(frozen=True)    
 class AppliedOffersEvent(DomainEvent):
     order_id: str
-    order_status: enums.OrderStatus
+    order_stage: enums.OrderStage
 
 @dataclass(frozen=True)    
 class AppliedCouponEvent(DomainEvent):
     order_id: str
-    order_status: enums.OrderStatus
+    order_stage: enums.OrderStage
 
 @dataclass(frozen=True)    
 class RemovedCouponEvent(DomainEvent):
     order_id: str
-    order_status: enums.OrderStatus
+    order_stage: enums.OrderStage
 
 @dataclass(frozen=True)    
 class ChangedDestinationEvent(DomainEvent):
     order_id: str
-    order_status: enums.OrderStatus
+    order_stage: enums.OrderStage
     #TODO destination payload?
 
 @dataclass(frozen=True)    
 class AppliedTaxesEvent(DomainEvent):
     order_id: str
-    order_status: enums.OrderStatus
+    order_stage: enums.OrderStage

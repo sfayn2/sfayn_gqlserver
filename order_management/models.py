@@ -10,13 +10,21 @@ from ddd.order_management.domain import enums, models as domain_models, value_ob
 class Order(models.Model):
     order_id = models.CharField(max_length=100, primary_key=True, help_text="ORD-1234")
 
-    order_status = models.CharField(
+    order_stage = models.CharField(
         max_length=25, 
         blank=True, 
         null=True, 
-        choices=enums.OrderStatus.choices, 
-        default=enums.OrderStatus.DRAFT
+        choices=enums.OrderStage.choices, 
+        default=enums.OrderStage.DRAFT
     ) 
+
+    # sub status / workflow status
+    order_status = models.CharField(
+        max_length=25, 
+        blank=True, 
+        null=True
+    ) 
+
     cancellation_reason = models.CharField(max_length=255, blank=True, null=True, help_text="both entity like vendor or customer can cancel the order?")
 
     customer_id = models.CharField(max_length=150, blank=True, null=True)
@@ -117,7 +125,7 @@ class Order(models.Model):
 
 
     def __str__(self):
-        return f"Order {self.order_id} | {self.customer_first_name} {self.customer_last_name} | Status {self.order_status}  | Total: {self.final_amount} {self.currency}"
+        return f"Order {self.order_id} | {self.customer_first_name} {self.customer_last_name} | Status {self.order_stage}  | Total: {self.final_amount} {self.currency}"
 
 class OrderLine(models.Model):
     #id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False) #uuid for global unique id
@@ -159,10 +167,45 @@ class OrderLine(models.Model):
     def __str__(self):
         return f"{self.order.order_id} | {self.product_name} (SKU: {self.product_sku}) | Quantity: {self.order_quantity} | Total: {self.product_price * self.order_quantity} {self.product_currency}"
 
+class OrderActivities(models.Model):
+    order = models.ForeignKey(
+        "order_management.Order", 
+        on_delete=models.CASCADE,
+        related_name="order_activities", 
+        null=True, 
+        blank=True
+    )
+    order_status = models.CharField(
+        max_length=25, 
+        blank=True, 
+        null=True
+    ) 
+    step = models.CharField(max_length=50, help_text="should match w command handler name, e.g. PendingApprovalCommand")
+    sequence = models.PositiveIntegerField(help_text="sequence of steps")
+    performed_by = models.CharField(max_length=50, help_text="system or user or reviewer or other")
+    user_input = models.CharField(max_length=500, help_text='{"comment": "Looks good"}')
+    optional_step = models.BooleanField(default=False, help_text="can skip")
+    step_status = models.CharField(
+        max_length=25, 
+        blank=True, 
+        null=True, 
+        choices=enums.StepStatus.choices
+    ) 
+    executed_at = models.DateTimeField(auto_now=True) 
+
 
 #==============
 # for Vendor Snapshots
 #==============
+class TenantWorkflowSnapshot(models.Model):
+    tenant_id = models.CharField(max_length=150)
+    workflow = models.CharField(max_length=500, help_text='eg. [ {"status": "NoPendingActions", "optional": true, "commands": ["PlaceOrderCommand"] } ]')
+    is_active = models.BooleanField(default=True, help_text="To quickly control whether the is valid")
+    last_update_dt = models.DateTimeField(auto_now=True) 
+
+    def __str__(self):
+        return f"{self.vendor_id} | {self.name} | IsActive: {self.is_active} | {self.last_update_dt}"
+
 class VendorDetailsSnapshot(models.Model):
     vendor_id = models.CharField(max_length=150)
     tenant_id = models.CharField(max_length=150)

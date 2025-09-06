@@ -27,7 +27,7 @@ class PaymentDetailsType(graphene.ObjectType):
 
 class OrderResponseType(graphene.ObjectType):
     order_id = graphene.String()
-    order_status = graphene.String()
+    order_stage = graphene.String()
     success = graphene.Boolean()
     message = graphene.String()
     tax_details = graphene.List(graphene.String)
@@ -86,7 +86,7 @@ class OrderType(graphene.ObjectType):
     final_amount = graphene.Field(MoneyType)
     shipping_reference = graphene.String()
     coupons = graphene.List(CouponType)
-    order_status = graphene.String()
+    order_stage = graphene.String()
     currency = graphene.String()
     date_modified = graphene.DateTime()
 

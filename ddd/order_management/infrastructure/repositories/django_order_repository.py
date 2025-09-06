@@ -18,4 +18,8 @@ class DjangoOrderRepositoryImpl(repositories.OrderAbstract):
             django_line_item = django_mappers.LineItemMapper.to_django(order.order_id, line_item)
             django_models.OrderLine.objects.update_or_create(**django_line_item)
 
+        for act in order.activities:
+            django_order_activity = django_mappers.OrderActivityMapper.to_django(order.order_id, act)
+            django_models.OrderActivities.objects.update_or_create(**django_order_activity)
+
         self.seen.add(order) #Track Entitry for Uow

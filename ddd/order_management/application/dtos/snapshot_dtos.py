@@ -124,3 +124,9 @@ class CustomerAddressSnapshotDTO(BaseModel):
     is_default: bool
     is_active: bool
 
+
+class TenantWorkflowSnapshotDTO(BaseModel):
+    tenant_id: str
+    workflow: dict
+    is_active: bool
+

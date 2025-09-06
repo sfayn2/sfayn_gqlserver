@@ -15,8 +15,10 @@ class Order:
     tenant_id: str
     destination: value_objects.Address
     customer_details: value_objects.CustomerDetails
-    order_status: Optional[enums.OrderStatus] = None
+    order_stage: Optional[enums.OrderStage] = None
+    order_status: str = "NoPendingActions"
     order_id: Optional[str] = None
+    activities: List[OrderActivity] = field(default_factory=list)
     shipping_details: Optional[value_objects.ShippingDetails] = None
     line_items: List[LineItem] = field(default_factory=list)
     payment_details: Optional[value_objects.PaymentDetails] = None
@@ -52,7 +54,7 @@ class Order:
             raise exceptions.InvalidOrderOperation("Please provide line item to add.")
         if line_item.is_free_gift and line_item.product_price.amount > 0:
             raise exceptions.InvalidOrderOperation("Free gifts must have a price of zero.")
-        if self.order_status != enums.OrderStatus.DRAFT:
+        if self.order_stage != enums.OrderStage.DRAFT:
             raise exceptions.InvalidOrderOperation("Only draft order can add line item.")
 
         if self.line_items:
@@ -69,7 +71,7 @@ class Order:
             raise exceptions.InvalidOrderOperation("Please provide line item to remove.")
         if line_item not in self.line_items:
             raise exceptions.InvalidOrderOperation("No line items exist in the order to remove.")
-        if self.order_status != enums.OrderStatus.DRAFT:
+        if self.order_stage != enums.OrderStage.DRAFT:
             raise exceptions.InvalidOrderOperation("Only draft order can remove line items.")
 
         if len(self.line_items) <= 1:
@@ -83,13 +85,13 @@ class Order:
     def update_shipping_details(self, shipping_details: value_objects.ShippingDetails) -> None:
         if not shipping_details:
             raise exceptions.InvalidOrderOperation("Shipping details must be provided.")
-        if self.order_status != enums.OrderStatus.DRAFT:
+        if self.order_stage != enums.OrderStage.DRAFT:
             raise exceptions.InvalidOrderOperation("Only draft order can update shipping details.")
         self.shipping_details = shipping_details
         self._update_modified_date()
 
     def change_order_quantity(self, product_sku: str, new_quantity: int):
-        if self.order_status != enums.OrderStatus.DRAFT:
+        if self.order_stage != enums.OrderStage.DRAFT:
             raise exceptions.InvalidOrderOperation("Only draft order can update order quantity.")
         for line_item in self.line_items:
             if line_item.product_sku == product_sku:
@@ -103,7 +105,7 @@ class Order:
 
 
     def place_order(self):
-        if self.order_status != enums.OrderStatus.DRAFT:
+        if self.order_stage != enums.OrderStage.DRAFT:
             raise exceptions.InvalidOrderOperation("Only draft order can be place order.")
         if not self.line_items:
             raise exceptions.InvalidOrderOperation("Cannot place an order without line items.")
@@ -118,13 +120,13 @@ class Order:
         if not self.shipping_details:
             raise exceptions.InvalidOrderOperation("Order must have a selected shipping option")
 
-        self.order_status = enums.OrderStatus.PENDING
+        self.order_stage = enums.OrderStage.PENDING
         self._update_modified_date()
 
         event = events.PlacedOrderEvent(
             tenant_id=self.tenant_id,
             order_id=self.order_id,
-            order_status=self.order_status,
+            order_stage=self.order_stage,
         )
 
         self.raise_event(event)
@@ -147,25 +149,25 @@ class Order:
 
 
     def confirm_order(self, is_verified: bool):
-        if self.order_status != enums.OrderStatus.PENDING:
+        if self.order_stage != enums.OrderStage.PENDING:
             raise exceptions.InvalidOrderOperation("Only pending orders can be confirmed.")
 
         if not is_verified:
             raise exceptions.InvalidOrderOperation("Order cannot be confirmed without verified payment.")
 
-        self.order_status = enums.OrderStatus.CONFIRMED
+        self.order_stage = enums.OrderStage.CONFIRMED
         self._update_modified_date()
 
         event = events.ConfirmedOrderEvent(
             tenant_id=self.tenant_id,
             order_id=self.order_id,
-            order_status=self.order_status,
+            order_stage=self.order_stage,
         )
 
         self.raise_event(event)
 
     def apply_applicable_offers(self, offers: List[OfferStrategyAbstract]):
-        if self.order_status not in (enums.OrderStatus.DRAFT, enums.OrderStatus.PENDING):
+        if self.order_stage not in (enums.OrderStage.DRAFT, enums.OrderStage.PENDING):
             raise exceptions.InvalidOrderOperation("Only draft order can apply offers (Free shipping, Free gifts, etc)")
         if self.offer_details:
             raise exceptions.InvalidOrderOperation("Offers have already been applied.")
@@ -187,14 +189,14 @@ class Order:
         event = events.AppliedOffersEvent(
             tenant_id=self.tenant_id,
             order_id=self.order_id,
-            order_status=self.order_status,
+            order_stage=self.order_stage,
         )
 
         self.raise_event(event)
 
 
     def apply_tax_results(self, tax_results: List[value_objects.TaxResult]):
-        if self.order_status != enums.OrderStatus.DRAFT:
+        if self.order_stage != enums.OrderStage.DRAFT:
             raise exceptions.InvalidOrderOperation("Only draft order can calculate taxes.")
         if not self.destination:
             raise exceptions.InvalidOrderOperation("Shipping address is required for tax calculation.")
@@ -227,7 +229,7 @@ class Order:
         event = events.AppliedTaxesEvent(
             tenant_id=self.tenant_id,
             order_id=self.order_id,
-            order_status=self.order_status,
+            order_stage=self.order_stage,
         )
 
         self.raise_event(event)
@@ -235,58 +237,58 @@ class Order:
     def _update_payment_details(self, payment_details: value_objects.PaymentDetails):
         if not payment_details:
             raise exceptions.InvalidOrderOperation("Payment details cannot be none.")
-        if self.order_status != enums.OrderStatus.PENDING:
+        if self.order_stage != enums.OrderStage.PENDING:
             raise exceptions.InvalidOrderOperation("Only pending order can update payment details.")
 
         self.payment_details = payment_details
 
     def mark_as_shipped(self):
-        if self.order_status != enums.OrderStatus.CONFIRMED:
+        if self.order_stage != enums.OrderStage.CONFIRMED:
             raise exceptions.InvalidOrderOperation("Only confirm order can mark as shipped.")
-        self.order_status = enums.OrderStatus.SHIPPED
+        self.order_stage = enums.OrderStage.SHIPPED
         self._update_modified_date()
 
         event = events.ShippedOrderEvent(
             tenant_id=self.tenant_id,
             order_id=self.order_id,
-            order_status=self.order_status,
+            order_stage=self.order_stage,
         )
 
         self.raise_event(event)
 
     def mark_as_draft(self):
-        if self.order_status != None:
+        if self.order_stage != None:
             raise exceptions.InvalidOrderOperation("Only new order w checked-out items can mark as draft.")
-        self.order_status = enums.OrderStatus.DRAFT
+        self.order_stage = enums.OrderStage.DRAFT
         self._update_modified_date()
 
         event = events.CheckedOutEvent(
             tenant_id=self.tenant_id,
             order_id=self.order_id,
-            order_status=self.order_status,
+            order_stage=self.order_stage,
         )
 
         self.raise_event(event)
 
     def cancel_order(self, cancellation_reason: str):
-        if not self.order_status in (enums.OrderStatus.PENDING, enums.OrderStatus.CONFIRMED):
+        if not self.order_stage in (enums.OrderStage.PENDING, enums.OrderStage.CONFIRMED):
             raise exceptions.InvalidOrderOperation("Cannot cancel a completed or already cancelled order or shipped order or draft order")
         if not cancellation_reason:
             raise exceptions.InvalidOrderOperation("Cannot cancel without a cancellation reason.")
-        self.order_status = enums.OrderStatus.CANCELLED
+        self.order_stage = enums.OrderStage.CANCELLED
         self.cancellation_reason = cancellation_reason
         self._update_modified_date()
 
         event = events.CanceledOrderEvent(
             tenant_id=self.tenant_id,
             order_id=self.order_id,
-            order_status=self.order_status,
+            order_stage=self.order_stage,
         )
 
         self.raise_event(event)
     
     def mark_as_completed(self):
-        if self.order_status != enums.OrderStatus.SHIPPED:
+        if self.order_stage != enums.OrderStage.SHIPPED:
             raise exceptions.InvalidOrderOperation("Only shipped order can mark as completed.")
 
         if not self.payment_details or (self.payment_details and self.payment_details.status != enums.PaymentStatus.PAID):
@@ -298,19 +300,19 @@ class Order:
         #if self.payment_details.method == enums.PaymentMethod.COD and not self.payment_details:
         #    raise exceptions.InvalidOrderOperation(f"Cannot mark as completed with outstanding payments for {enums.PaymentMethod.COD}.")
 
-        self.order_status = enums.OrderStatus.COMPLETED
+        self.order_stage = enums.OrderStage.COMPLETED
         self._update_modified_date()
 
         event = events.CompletedOrderEvent(
             tenant_id=self.tenant_id,
             order_id=self.order_id,
-            order_status=self.order_status,
+            order_stage=self.order_stage,
         )
 
         self.raise_event(event)
 
     def add_shipping_tracking_reference(self, shipping_reference: str):
-        if self.order_status != enums.OrderStatus.SHIPPED:
+        if self.order_stage != enums.OrderStage.SHIPPED:
             raise exceptions.InvalidOrderOperation("Only shipped order can add tracking reference.")
         if not shipping_reference.startswith("http"):
             raise exceptions.InvalidOrderOperation("The Shipping tracking reference url is invalid.")
@@ -319,14 +321,14 @@ class Order:
         self._update_modified_date()
 
     def _update_offer_details(self, offer_details: List[str]):
-        if self.order_status != enums.OrderStatus.DRAFT:
+        if self.order_stage != enums.OrderStage.DRAFT:
             raise exceptions.InvalidOrderOperation("Only draft order can update offer details.")
         self.offer_details = offer_details
 
     def apply_valid_coupon(self, coupon: value_objects.Coupon):
         if not coupon:
             raise exceptions.InvalidOrderOperation("Coupon cannot be none.")
-        if self.order_status != enums.OrderStatus.DRAFT:
+        if self.order_stage != enums.OrderStage.DRAFT:
             raise exceptions.InvalidOrderOperation("Only draft order can apply coupon.")
         if coupon in self.coupons:
             raise exceptions.InvalidOrderOperation(f"Coupon {coupon.coupon_code} already applied in the order.")
@@ -337,7 +339,7 @@ class Order:
         event = events.AppliedCouponEvent(
             tenant_id=self.tenant_id,
             order_id=self.order_id,
-            order_status=self.order_status,
+            order_stage=self.order_stage,
         )
 
         self.raise_event(event)
@@ -345,7 +347,7 @@ class Order:
     def remove_coupon(self, coupon: value_objects.Coupon):
         if not coupon:
             raise exceptions.InvalidOrderOperation("Coupon cannot be none.")
-        if self.order_status != enums.OrderStatus.DRAFT:
+        if self.order_stage != enums.OrderStage.DRAFT:
             raise exceptions.InvalidOrderOperation("Only draft order can remove coupon.")
 
         self.coupons.remove(coupon)
@@ -354,7 +356,7 @@ class Order:
         event = events.RemovedCouponEvent(
             tenant_id=self.tenant_id,
             order_id=self.order_id,
-            order_status=self.order_status,
+            order_stage=self.order_stage,
         )
 
         self.raise_event(event)
@@ -362,7 +364,7 @@ class Order:
     def change_destination(self, destination: value_objects.Address):
         if not destination:
             raise exceptions.InvalidOrderOperation("Destination cannot be none.")
-        if self.order_status != enums.OrderStatus.DRAFT:
+        if self.order_stage != enums.OrderStage.DRAFT:
             raise exceptions.InvalidOrderOperation("Only draft order can change destination.")
         self.destination = destination
         self._update_modified_date()
@@ -370,13 +372,13 @@ class Order:
         event = events.ChangedDestinationEvent(
             tenant_id=self.tenant_id,
             order_id=self.order_id,
-            order_status=self.order_status,
+            order_stage=self.order_stage,
         )
 
         self.raise_event(event)
     
     def select_shipping_option(self, shipping_option: value_objects.ShippingDetails, shipping_options: List[value_objects.ShippingDetails]):
-        if self.order_status != enums.OrderStatus.DRAFT:
+        if self.order_stage != enums.OrderStage.DRAFT:
             raise exceptions.InvalidOrderOperation("Only draft order can select shipping option.")
         for option in shipping_options:
             if option == shipping_option:
@@ -385,7 +387,7 @@ class Order:
                 event = events.SelectedShippingOptionEvent(
                     tenant_id=self.tenant_id,
                     order_id=self.order_id,
-                    order_status=self.order_status,
+                    order_stage=self.order_stage,
                 )
 
                 self.raise_event(event)
@@ -400,16 +402,41 @@ class Order:
         )
 
     def update_total_discounts_fee(self, total_discounts: value_objects.Money):
-        if self.order_status != enums.OrderStatus.DRAFT:
+        if self.order_stage != enums.OrderStage.DRAFT:
             raise exceptions.InvalidOrderOperation("Only draft order can update total discount fees.")
         self.total_discounts_fee = total_discounts
+
+    def load_tenant_activities(self, activities: List[models.OrderActivity]):
+        if self.order_stage != enums.OrderStage.DRAFT:
+            raise exceptions.InvalidOrderOperation("Only draft order can load tenant activities.")
+
+        if activities:
+            self.activities = activities
+
+    def perform_activity(self, current_step: str, performed_by: str, user_input: Optional[Dict] = None):
+
+        if not self.activities:
+            raise exceptions.InvalidOrderOperation(f"No activity step found.")
+
+        pending_step = [act for act in self.activities.sort(key=lambda a: a["sequence"]) if act.is_pending]
+
+        if pending_step.step != current_step:
+            raise exceptions.InvalidOrderOperation(f"Activity Step {current_step} not allowed in status {self.order_status}")
+
+        pending_step.performed_by = performed_by
+        pending_step.user_input = user_input
+        pending_step.mark_as_done()
+
+        self.order_status = pending_step.order_status
+
+
 
     @property
     def sub_total(self):
         return self.total_amount.subtract(self.total_discounts_fee).add(self.shipping_details.cost if self.shipping_details else value_objects.Money(Decimal("0"), self.currency))
 
     def calculate_final_amount(self):
-        if self.order_status != enums.OrderStatus.DRAFT:
+        if self.order_stage != enums.OrderStage.DRAFT:
             raise exceptions.InvalidOrderOperation("Only draft order can calculate final amount.")
 
         #TODO revisit calculation

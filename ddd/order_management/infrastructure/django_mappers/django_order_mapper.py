@@ -35,7 +35,8 @@ class OrderMapper:
                     'final_amount': order.final_amount.amount if order.final_amount else None, 
                     'shipping_tracking_reference': order.shipping_reference, 
                     'coupons': json.dumps([coupon.coupon_code for coupon in order.coupons]), 
-                    'order_status': order.order_status.value, 
+                    'order_stage': order.order_stage.value, 
+                    'order_status': order.order_status, 
                     'currency': order.currency,
                     'tenant_id': order.tenant_id,
                     'date_modified': order.date_modified
@@ -73,6 +74,9 @@ class OrderMapper:
             line_items=[
                 django_mappers.LineItemMapper.to_domain(item) for item in django_order_object.line_items.all()
             ],
+            activities=[
+                django_mappers.OrderActivityMapper.to_domain(item) for item in django_order_object.order_activities.all()
+            ],
             customer_details=django_mappers.CustomerDetailsMapper.to_domain(django_order_object),
             shipping_details=django_mappers.ShippingDetailsMapper.to_domain(django_order_object) if django_order_object.shipping_method else None,
             payment_details=django_mappers.PaymentDetailsMapper.to_domain(django_order_object) if django_order_object.payment_method else None,
@@ -97,6 +101,7 @@ class OrderMapper:
             ),
             shipping_reference=django_order_object.shipping_tracking_reference,
             coupons=django_coupons,
-            order_status=enums.OrderStatus(django_order_object.order_status)
+            order_stage=enums.OrderStage(django_order_object.order_stage),
+            order_status=django_order_object.order_status
         )
 

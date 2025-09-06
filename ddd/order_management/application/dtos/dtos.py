@@ -74,6 +74,7 @@ class LineItemDTO(BaseModel):
 
 class OrderResponseDTO(BaseModel):
     order_id: str
+    order_stage: str
     order_status: str
     success: bool
     message: str
@@ -107,7 +108,8 @@ class OrderDTO(BaseModel):
     final_amount: Optional[MoneyDTO] = None
     shipping_reference: Optional[str] = Field(json_schema_extra=AliasChoices('shipping_tracking_reference', 'shipping_reference'))
     coupons: Optional[List[CouponDTO]] = None
-    order_status: enums.OrderStatus
+    order_stage: enums.OrderStage
+    order_status: str
     currency: str
     date_modified: Optional[datetime] = None
 
@@ -153,4 +155,5 @@ class UserContextDTO(BaseModel):
     token_type: str
     tenant_id: str
     roles: List[str] = Field(default_factory=list)
+
 

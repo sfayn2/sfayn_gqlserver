@@ -81,6 +81,28 @@ class DjangoVendorRepositoryImpl(repositories.VendorAbstract):
                 continue
         return final_offers
 
+    def get_tenant_workflow(
+        self,
+        tenant_id: str,
+    ) -> List[dtos.TenantWorkflowSnapshotDTO]:
+        tenant_workflow = django_snapshots.TenantWorkflowSnapshot.objects.filter(tenant_id=tenant_id, is_active=True)
+        final_opts = []
+        for option in tenant_workflow.values():
+            try:
+                workflow = json.loads(option.workflow)
+                for flow in workflow:
+                    option.status = flow.status
+                    option.optional_step = flow.optional
+                    for command in flow.commands:
+                        option.step = command
+                        final_opts.append(
+                            django_mappers.OrderActivityMapper.to_domain(option)
+                        )
+            except (ValueError) as e:
+                print(f"DjangoVendorRepository.load_tenant_workflow exception > {str(e)}")
+                continue
+        return final_opts
+
 
     def get_shipping_options(
         self,

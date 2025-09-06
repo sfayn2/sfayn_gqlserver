@@ -26,7 +26,8 @@ from .snapshot_dtos import (
     CustomerDetailsSnapshotDTO,
     CustomerAddressSnapshotDTO,
     VendorPaymentOptionSnapshotDTO,
-    VendorTaxOptionSnapshotDTO
+    VendorTaxOptionSnapshotDTO,
+    TenantWorkflowSnapshotDTO
 )
 
 # Integration events

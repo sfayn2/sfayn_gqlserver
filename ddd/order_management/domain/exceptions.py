@@ -64,3 +64,6 @@ class AccessControlException(Exception):
 
 class IntegrationException(Exception):
     pass
+
+class OrderActivityException(InvalidOrderOperation):
+    pass

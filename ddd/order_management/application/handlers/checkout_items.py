@@ -48,6 +48,7 @@ def handle_checkout_items(
                 customer_details=mappers.CustomerDetailsMapper.to_domain(command.customer_details),
                 shipping_address=mappers.AddressMapper.to_domain(command.address),
                 line_items=vendor_line_items,
+                tenant_workflow=vendor_repo.get_tenant_workflow(tenant_id),
                 tenant_id=tenant_id
             )
 
