@@ -5,12 +5,13 @@ from dataclasses import dataclass, asdict
 from pydantic import BaseModel
 from ddd.order_management.domain import value_objects, enums
 
-if TYPE_CHECKING:
-    from ddd.order_management.domain import models
 
 @dataclass(frozen=True)    
 class DomainEvent(ABC):
     tenant_id: str
+    order_id: str
+    order_stage: enums.OrderStage
+    activity_status: str
 
     def event_type(self) -> str:
         return f"order_management.events.{self.__class__.__name__}"
@@ -32,66 +33,56 @@ class DomainEvent(ABC):
 
 @dataclass(frozen=True)    
 class PlacedOrderEvent(DomainEvent):
-    order_id: str
-    order_stage: enums.OrderStage
+    pass
 
 @dataclass(frozen=True)    
 class ConfirmedOrderEvent(DomainEvent):
-    order_id: str
-    order_stage: enums.OrderStage
+    pass
 
 @dataclass(frozen=True)    
 class ShippedOrderEvent(DomainEvent):
-    order_id: str
-    order_stage: enums.OrderStage
+    pass
 
 @dataclass(frozen=True)    
 class CanceledOrderEvent(DomainEvent):
-    order_id: str
-    order_stage: enums.OrderStage
+    pass
 
 @dataclass(frozen=True)    
 class CompletedOrderEvent(DomainEvent):
-    order_id: str
-    order_stage: enums.OrderStage
+    pass
 
 @dataclass(frozen=True)    
 class AppliedPaymentEvent(DomainEvent):
-    order_id: str
-    amount: value_objects.Money
+    pass
 
 @dataclass(frozen=True)    
 class CheckedOutEvent(DomainEvent):
-    order_id: str
-    order_stage: enums.OrderStage
+    pass
 
 @dataclass(frozen=True)    
 class SelectedShippingOptionEvent(DomainEvent):
-    order_id: str
-    order_stage: enums.OrderStage
+    pass
 
 @dataclass(frozen=True)    
 class AppliedOffersEvent(DomainEvent):
-    order_id: str
-    order_stage: enums.OrderStage
+    pass
 
 @dataclass(frozen=True)    
 class AppliedCouponEvent(DomainEvent):
-    order_id: str
-    order_stage: enums.OrderStage
+    pass
 
 @dataclass(frozen=True)    
 class RemovedCouponEvent(DomainEvent):
-    order_id: str
-    order_stage: enums.OrderStage
+    pass
 
 @dataclass(frozen=True)    
 class ChangedDestinationEvent(DomainEvent):
-    order_id: str
-    order_stage: enums.OrderStage
-    #TODO destination payload?
+    pass
 
 @dataclass(frozen=True)    
 class AppliedTaxesEvent(DomainEvent):
-    order_id: str
-    order_stage: enums.OrderStage
+    pass
+
+@dataclass(frozen=True)    
+class ActivityEvent(DomainEvent):
+    step_name: str

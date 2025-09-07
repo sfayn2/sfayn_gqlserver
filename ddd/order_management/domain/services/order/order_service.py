@@ -31,11 +31,11 @@ class OrderService(ports.OrderServiceAbstract):
         )
 
         order.generate_order_id()
+        order.load_tenant_activities = tenant_workflow
         order.mark_as_draft()
         for line_item in line_items:
             order.add_line_item(line_item)
 
-        order.load_tenant_activities = tenant_workflow
 
         #order.update_line_items(line_items)
         

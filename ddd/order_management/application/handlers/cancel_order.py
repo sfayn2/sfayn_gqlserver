@@ -26,6 +26,10 @@ def handle_cancel_order(
 
             order = uow.order.get(order_id=command.order_id, tenant_id=user_ctx.tenant_id)
 
+            order.mark_activity_done(
+                command.step_name,
+                user_ctx.sub
+            )
             order.cancel_order(command.cancellation_reason)
 
             uow.order.save(order)

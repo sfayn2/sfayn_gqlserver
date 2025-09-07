@@ -25,6 +25,10 @@ def handle_mark_as_completed(
             )
 
             order = uow.order.get(order_id=command.order_id, tenant_id=user_ctx.tenant_id)
+            order.mark_activity_done(
+                command.step_name,
+                user_ctx.sub
+            )
             order.mark_as_completed()
 
             uow.order.save(order)

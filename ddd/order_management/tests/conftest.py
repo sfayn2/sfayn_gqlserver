@@ -38,12 +38,12 @@ USER_SEEDS = (
     (USER1, "checkout_items", TENANT1, json.dumps({ "customer_id": USER1 }), True),
 )
 
-# Columns order_id, order_stage, cancellation_reason, customer_id, customer_first_name, customer_last_name, customer_email, coupons, delivery_street, delivery_city, delivery_postal, delivery_country, delivery_state, shipping_method, shipping_delivery_time, shipping_cost, shipping_tracking_reference, tax_details, tax_amount, total_discounts_fee, total_amount, offer_details, final_amount, payment_method, payment_reference, payment_amount, payment_status, currency, tenant_id
+# Columns order_id, order_stage, activity_status, cancellation_reason, customer_id, customer_first_name, customer_last_name, customer_email, coupons, delivery_street, delivery_city, delivery_postal, delivery_country, delivery_state, shipping_method, shipping_delivery_time, shipping_cost, shipping_tracking_reference, tax_details, tax_amount, total_discounts_fee, total_amount, offer_details, final_amount, payment_method, payment_reference, payment_amount, payment_status, currency, tenant_id
 ORDER_SEEDS = (
-    ("ORD-1", enums.OrderStage.DRAFT.value,"", USER1, "first name1", "last name1", "email@gmail.com", json.dumps([]), "street1", "Singapore", 1234, "Singapore", "Singapore", None, None, None, None, json.dumps([]), Decimal("0"), Decimal("0"), Decimal("0"), json.dumps([]), Decimal("0"), None, None, Decimal("0"), None, "SGD", TENANT1),
-    ("ORD-NONDRAFT-1", enums.OrderStage.PENDING.value,"", USER1, "first name1", "last name1", "email@gmail.com", json.dumps([]), "street1", "Singapore", 1234, "Singapore", "Singapore", None, None, None, None, json.dumps([]), Decimal("0"), Decimal("0"), Decimal("0"), json.dumps([]), Decimal("0"), None, None, Decimal("0"), None, "SGD", TENANT1),
-    ("ORD-REMOVEITEMS-1", enums.OrderStage.DRAFT.value,"", USER1, "first name1", "last name1", "email@gmail.com", json.dumps([]), "street1", "Singapore", 1234, "Singapore", "Singapore", None, None, None, None, json.dumps([]), Decimal("0"), Decimal("0"), Decimal("0"), json.dumps([]), Decimal("0"), None, None, Decimal("0"), None, "SGD", TENANT1),
-    ("ORD-CHANGEQTY-1", enums.OrderStage.DRAFT.value,"", USER1, "first name1", "last name1", "email@gmail.com", json.dumps([]), "street1", "Singapore", 1234, "Singapore", "Singapore", None, None, None, None, json.dumps([]), Decimal("0"), Decimal("0"), Decimal("0"), json.dumps([]), Decimal("0"), None, None, Decimal("0"), None, "SGD", TENANT1),
+    ("ORD-1", enums.OrderStage.DRAFT.value, "NoPendingActivities", "", USER1, "first name1", "last name1", "email@gmail.com", json.dumps([]), "street1", "Singapore", 1234, "Singapore", "Singapore", None, None, None, None, json.dumps([]), Decimal("0"), Decimal("0"), Decimal("0"), json.dumps([]), Decimal("0"), None, None, Decimal("0"), None, "SGD", TENANT1),
+    ("ORD-NONDRAFT-1", enums.OrderStage.PENDING.value, "NoPendingActivities", "", USER1, "first name1", "last name1", "email@gmail.com", json.dumps([]), "street1", "Singapore", 1234, "Singapore", "Singapore", None, None, None, None, json.dumps([]), Decimal("0"), Decimal("0"), Decimal("0"), json.dumps([]), Decimal("0"), None, None, Decimal("0"), None, "SGD", TENANT1),
+    ("ORD-REMOVEITEMS-1", enums.OrderStage.DRAFT.value, "NoPendingActivities", "", USER1, "first name1", "last name1", "email@gmail.com", json.dumps([]), "street1", "Singapore", 1234, "Singapore", "Singapore", None, None, None, None, json.dumps([]), Decimal("0"), Decimal("0"), Decimal("0"), json.dumps([]), Decimal("0"), None, None, Decimal("0"), None, "SGD", TENANT1),
+    ("ORD-CHANGEQTY-1", enums.OrderStage.DRAFT.value, "NoPendingActivities", "", USER1, "first name1", "last name1", "email@gmail.com", json.dumps([]), "street1", "Singapore", 1234, "Singapore", "Singapore", None, None, None, None, json.dumps([]), Decimal("0"), Decimal("0"), Decimal("0"), json.dumps([]), Decimal("0"), None, None, Decimal("0"), None, "SGD", TENANT1),
 )
 
 # Columns order_id, vendor_id, vendor_name, vendor_country, product_sku, product_name, product_category, is_free_gift, is_taxable, options, product_price, product_currency, order_quantity, package_weight, package_length, package_width, package_height, total_price
@@ -55,6 +55,15 @@ ORDER_LINE_SEEDS = (
     ("ORD-REMOVEITEMS-1", VENDOR1, "VendorA", "Singapore", "sku_remove2", "my product", "T-SHIRT", False, True, json.dumps({"Size": "M", "Color": "RED"}), Decimal("20"), "SGD", 10, 1, 1, 1, 1, 200),
     ("ORD-CHANGEQTY-1", VENDOR1, "VendorA", "Singapore", "sku_change1", "my product", "T-SHIRT", False, True, json.dumps({"Size": "M", "Color": "RED"}), Decimal("20"), "SGD", 10, 1, 1, 1, 1, 200),
     ("ORD-CHANGEQTY-1", VENDOR1, "VendorA", "Singapore", "sku_change2", "my product", "T-SHIRT", False, True, json.dumps({"Size": "M", "Color": "RED"}), Decimal("20"), "SGD", 10, 1, 1, 1, 1, 200),
+)
+
+# order_id, order_stage, activity_status, step, sequence, performed_by, user_input, optional_step, step_status
+ORDER_ACTIVITIES = (
+    ("ORD-WORKFLOW-1", "PENDING", "PendingApproval", "approve", 1, "apvr-1", "", False, "WAITING"),
+    ("ORD-WORKFLOW-1", "PENDING", "PendingApproval", "reject", 1, "apvr-1", "", False, "WAITING"),
+    ("ORD-WORKFLOW-1", "CONFIRMED", "PendingConfirmation", "confirm_order", 2, "user-1", "", False, "WAITING")
+    ("ORD-WORKFLOW-1", "SHIPPED", "PendingShipment", "mark_as_shipped", 3, "vendor-1", "", False, "WAITING")
+    ("ORD-WORKFLOW-1", "COMPLETED", "PendingCompletion", "mark_as_completed", 4, "vendor-1", "", False, "WAITING")
 )
 
 # Columns product_id, vendor_id, tenant_id, product_sku, product_name, product_category, options, product_price, stock, product_currency, package_weight, package_length, package_width, package_height, is_free_gift, is_taxable, is_active

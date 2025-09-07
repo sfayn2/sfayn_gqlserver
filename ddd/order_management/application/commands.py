@@ -7,7 +7,10 @@ from ddd.order_management.application import dtos
 from ddd.order_management.domain import enums
 
 class Command(BaseModel, frozen=True):
-    pass
+
+    @property
+    def step_name(self) -> str:
+        return self.__class__.__name__.replace("Command", "").lower()
 
 class CheckoutItemsCommand(Command):
     customer_details: dtos.CustomerDetailsDTO

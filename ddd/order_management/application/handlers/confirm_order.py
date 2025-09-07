@@ -53,6 +53,11 @@ def handle_confirm_order(
                 payment_details
             )
 
+            order.mark_activity_done(
+                command.step_name,
+                user_ctx.sub
+            )
+
             order.confirm_order(is_payment_verified)
 
             uow.order.save(order)

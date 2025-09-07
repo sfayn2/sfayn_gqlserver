@@ -131,6 +131,7 @@ class Order:
             tenant_id=self.tenant_id,
             order_id=self.order_id,
             order_stage=self.order_stage,
+            activity_status=self.activity_status
         )
 
         self.raise_event(event)
@@ -170,6 +171,7 @@ class Order:
             tenant_id=self.tenant_id,
             order_id=self.order_id,
             order_stage=self.order_stage,
+            activity_status=self.activity_status
         )
 
         self.raise_event(event)
@@ -198,6 +200,7 @@ class Order:
             tenant_id=self.tenant_id,
             order_id=self.order_id,
             order_stage=self.order_stage,
+            activity_status=self.activity_status
         )
 
         self.raise_event(event)
@@ -238,6 +241,7 @@ class Order:
             tenant_id=self.tenant_id,
             order_id=self.order_id,
             order_stage=self.order_stage,
+            activity_status=self.activity_status
         )
 
         self.raise_event(event)
@@ -264,6 +268,7 @@ class Order:
             tenant_id=self.tenant_id,
             order_id=self.order_id,
             order_stage=self.order_stage,
+            activity_status=self.activity_status
         )
 
         self.raise_event(event)
@@ -278,6 +283,7 @@ class Order:
             tenant_id=self.tenant_id,
             order_id=self.order_id,
             order_stage=self.order_stage,
+            activity_status=self.activity_status
         )
 
         self.raise_event(event)
@@ -327,6 +333,7 @@ class Order:
             tenant_id=self.tenant_id,
             order_id=self.order_id,
             order_stage=self.order_stage,
+            activity_status=self.activity_status
         )
 
         self.raise_event(event)
@@ -360,6 +367,7 @@ class Order:
             tenant_id=self.tenant_id,
             order_id=self.order_id,
             order_stage=self.order_stage,
+            activity_status=self.activity_status
         )
 
         self.raise_event(event)
@@ -377,6 +385,7 @@ class Order:
             tenant_id=self.tenant_id,
             order_id=self.order_id,
             order_stage=self.order_stage,
+            activity_status=self.activity_status
         )
 
         self.raise_event(event)
@@ -393,6 +402,7 @@ class Order:
             tenant_id=self.tenant_id,
             order_id=self.order_id,
             order_stage=self.order_stage,
+            activity_status=self.activity_status
         )
 
         self.raise_event(event)
@@ -408,6 +418,7 @@ class Order:
                     tenant_id=self.tenant_id,
                     order_id=self.order_id,
                     order_stage=self.order_stage,
+                    activity_status=self.activity_status
                 )
 
                 self.raise_event(event)
@@ -462,7 +473,15 @@ class Order:
         self.activity_status = next_step.activity_status
         self._update_modified_date()
 
-        #TODO raise event?
+        event = events.ActivityEvent(
+            tenant_id=self.tenant_id,
+            order_id=self.order_id,
+            order_stage=self.order_stage,
+            activity_status=self.activity_status,
+            step_name=self.next_step.step
+        )
+
+        self.raise_event(event)
 
     def _all_required_activities_for_stage_done(self, stage: enums.OrderStage) -> bool:
         # check if all activities for a given stage are done/approved or skipped
