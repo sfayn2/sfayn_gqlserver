@@ -33,7 +33,7 @@ def handle_place_order(
             )
 
             order.mark_activity_done(
-                command.__class__.__name__
+                command.__class__.__name__,
                 user_ctx.sub
             )
 

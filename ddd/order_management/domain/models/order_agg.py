@@ -436,7 +436,7 @@ class Order:
     def mark_activity_done(self, current_step: str, performed_by: str, user_input: Optional[Dict] = None):
 
         if not self.activities:
-            return True # do nothing
+            return  # tenant doesnt require any other activity
             #raise exceptions.InvalidOrderOperation(f"No activity steps configured.")
 
         all_steps = [act.step for act in sorted(self.activities, key=lambda a: a["sequence"])]
