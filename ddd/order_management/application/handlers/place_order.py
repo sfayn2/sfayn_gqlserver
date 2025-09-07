@@ -31,6 +31,12 @@ def handle_place_order(
                 order.tenant_id,
                 order.line_items
             )
+
+            order.mark_activity_done(
+                command.__class__.__name__
+                user_ctx.sub
+            )
+
             order.place_order()
 
             uow.order.save(order)

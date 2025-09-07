@@ -7,7 +7,7 @@
 A modular, multi-tenant **Order Management System** built with **Domain Driven Design (DDD)**. Designed to plug into any product catalog, vendor registry, or identity provider.
 
 ## Key Features
-- Full checkout + order lifecycle
+- Full checkout + order lifecycle (customizable workflow)
 - JWT-secured, tenant-scope APIs
 - Supports single-tenant or multi-tenant setups.
 - Supports strong decoupling between bounded contexts (Snapshot Architecture)
@@ -73,6 +73,7 @@ This Project is currently under active development. Major changes are ongoing.
 The OMS relies on local snapshot models for product, vendor, customer, and user-related data. These  snapshots are used for read consistency and calculated decisions at the time of checkout or order placement.
 
 ### Support snapshots
+- TenantWorkflowSnapshot
 - VendorProductSnapshot
 - VendorDetailsSnapshot
 - VendorCouponSnapshot

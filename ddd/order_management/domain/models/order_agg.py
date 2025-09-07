@@ -16,7 +16,7 @@ class Order:
     destination: value_objects.Address
     customer_details: value_objects.CustomerDetails
     order_stage: Optional[enums.OrderStage] = None
-    order_status: str = "NoPendingActions"
+    activity_status: str = "NoPendingActions"
     order_id: Optional[str] = None
     activities: List[OrderActivity] = field(default_factory=list)
     shipping_details: Optional[value_objects.ShippingDetails] = None
@@ -111,6 +111,10 @@ class Order:
             raise exceptions.InvalidOrderOperation("Cannot place an order without line items.")
         if not self.customer_details:
             raise exceptions.InvalidOrderOperation("Customer details must be provided.")
+
+        if not self._all_required_activities_for_stage_done(enums.OrderStage.DRAFT):
+            raise exceptions.InvalidOrderOperation(f"Cannot place an order, some activities in {enums.OrderStage.DRAFT} stage are still pending.")
+
         if any(item.product_price.currency != self.line_items[0].product_price.currency for item in self.line_items):
             raise exceptions.InvalidOrderOperation("All line items must have the same currency.")
 
@@ -151,6 +155,10 @@ class Order:
     def confirm_order(self, is_verified: bool):
         if self.order_stage != enums.OrderStage.PENDING:
             raise exceptions.InvalidOrderOperation("Only pending orders can be confirmed.")
+
+        if not self._all_required_activities_for_stage_done(enums.OrderStage.PENDING):
+            raise exceptions.InvalidOrderOperation(f"Order cannot be confirmed, some activities in {enums.OrderStage.PENDING} stage are still pending.")
+
 
         if not is_verified:
             raise exceptions.InvalidOrderOperation("Order cannot be confirmed without verified payment.")
@@ -245,6 +253,10 @@ class Order:
     def mark_as_shipped(self):
         if self.order_stage != enums.OrderStage.CONFIRMED:
             raise exceptions.InvalidOrderOperation("Only confirm order can mark as shipped.")
+
+        if not self._all_required_activities_for_stage_done(enums.OrderStage.CONFIRMED):
+            raise exceptions.InvalidOrderOperation(f"Order cannot mark as shipped, some activities in {enums.OrderStage.CONFIRMED} stage are still pending.")
+
         self.order_stage = enums.OrderStage.SHIPPED
         self._update_modified_date()
 
@@ -273,6 +285,11 @@ class Order:
     def cancel_order(self, cancellation_reason: str):
         if not self.order_stage in (enums.OrderStage.PENDING, enums.OrderStage.CONFIRMED):
             raise exceptions.InvalidOrderOperation("Cannot cancel a completed or already cancelled order or shipped order or draft order")
+
+        # Cancel anytime
+        #if not self._all_required_activities_for_stage_done(enums.OrderStage.CONFIRMED):
+        #    raise exceptions.InvalidOrderOperation(f"Order cannot mark as shipped, some activities in {enums.OrderStage.CONFIRMED} stage are still pending.")
+
         if not cancellation_reason:
             raise exceptions.InvalidOrderOperation("Cannot cancel without a cancellation reason.")
         self.order_stage = enums.OrderStage.CANCELLED
@@ -290,6 +307,9 @@ class Order:
     def mark_as_completed(self):
         if self.order_stage != enums.OrderStage.SHIPPED:
             raise exceptions.InvalidOrderOperation("Only shipped order can mark as completed.")
+
+        if not self._all_required_activities_for_stage_done(enums.OrderStage.SHIPPED):
+            raise exceptions.InvalidOrderOperation(f"Cannot mark as completed, some activities in {enums.OrderStage.SHIPPED} stage are still pending.")
 
         if not self.payment_details or (self.payment_details and self.payment_details.status != enums.PaymentStatus.PAID):
             raise exceptions.InvalidOrderOperation(f"Cannot mark as completed with outstanding payments.")
@@ -413,26 +433,48 @@ class Order:
         if activities:
             self.activities = activities
 
-    def perform_activity(self, current_step: str, performed_by: str, user_input: Optional[Dict] = None):
+    def mark_activity_done(self, current_step: str, performed_by: str, user_input: Optional[Dict] = None):
 
         if not self.activities:
-            raise exceptions.InvalidOrderOperation(f"No activity steps configured.")
+            return True # do nothing
+            #raise exceptions.InvalidOrderOperation(f"No activity steps configured.")
 
-        pending_steps = [act for act in sorted(activities, key=lambda a: a["sequence"]) if act.is_pending]
+        all_steps = [act.step for act in sorted(self.activities, key=lambda a: a["sequence"])]
+        if not current_step in all_steps:
+            return True # not applicable since the step is not define in the flow
+
+        pending_steps = [act for act in sorted(self.activities, key=lambda a: a["sequence"]) if act.is_pending]
         if not pending_steps:
-            raise exceptions.InvalidOrderOperation(f"No pending activities left.")
+            self.activity_status = "NoPendingActions"
+            self._update_modified_date()
 
         next_step = pending_steps[0]
         if next_step.step != current_step:
             raise exceptions.InvalidOrderOperation(f"Expected step {next_step.step}, got {current_step}")
 
-        next_step.mark_as_done()
-        next_step.performed_by = performed_by
-        next_step.user_input = user_input
+        if current_step.startswith("approve"):
+            next_step.mark_as_approved(performed_by, user_input)
+        elif current_step.startswith("reject"):
+            next_step.mark_as_rejected(performed_by, user_input)
+        else:
+            next_step.mark_as_done(performed_by, user_input)
 
-        self.order_status = next_step.order_status
+        self.activity_status = next_step.activity_status
         self._update_modified_date()
 
+        #TODO raise event?
+
+    def _all_required_activities_for_stage_done(self, stage: enums.OrderStage) -> bool:
+        # check if all activities for a given stage are done/approved or skipped
+        stage_activities = [act for act in self.activities if act.stage == stage]
+        if not stage_activities:
+            return True # No activities config for this stage, fall back to allow transition
+
+        for act in stage_activities:
+            if act.is_pending():
+                return False
+        
+        return True
 
 
     @property

@@ -7,6 +7,8 @@ def generate_choices(cls):
 class StepStatus(Enum):
     WAITING = "WAITING"
     DONE = "DONE"
+    APPROVED = "APPROVED"
+    REJECTED = "REJECTED"
     OPTIONAL = "OPTIONAL"
     SKIPPED = "SKIPPED"
 

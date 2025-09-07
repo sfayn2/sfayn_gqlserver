@@ -8,7 +8,7 @@ from ddd.order_management.domain.services import DomainClock
 @dataclass
 class OrderActivity:
     order_id: str
-    order_status: int # workflow status
+    activity_status: int # workflow status
     sequence: int
     step: str
     step_status: enums.StepStatus
@@ -18,13 +18,29 @@ class OrderActivity:
     optional_step: bool = False
 
 
-    def mark_as_done(self):
-        if not self.is_pending:
+    def mark_as_done(self, performed_by: str, user_input: Optional[dict] = None):
+        if self.step_status == enums.StepStatus.DONE:
             raise exceptions.OrderActivityException(f"Order Activity {self.step} is already done.")
         self.step_status = enums.StepStatus.DONE
         self.performed_by = performed_by
         self.user_input = user_input
         self.executed_at = DomainClock.now()
 
+    def mark_as_approved(self, performed_by: str, user_input: Optional[dict] = None):
+        if self.step_status == enums.StepStatus.APPROVED:
+            raise exceptions.OrderActivityException(f"Order Activity {self.step} is already approved.")
+        self.step_status = enums.StepStatus.APPROVED
+        self.performed_by = performed_by
+        self.user_input = user_input
+        self.executed_at = DomainClock.now()
+
+    def mark_as_rejected(self, performed_by: str, user_input: Optional[dict] = None):
+        if self.step_status == enums.StepStatus.REJECTED:
+            raise exceptions.OrderActivityException(f"Order Activity {self.step} is already rejected.")
+        self.step_status = enums.StepStatus.REJECTED
+        self.performed_by = performed_by
+        self.user_input = user_input
+        self.executed_at = DomainClock.now()
+
     def is_pending(self) -> bool:
-        return self.step_status in {enums.StepStatus.WAITING, enums.StepStatus.OPTIONAL}
+        return self.step_status in {enums.StepStatus.WAITING, enums.StepStatus.REJECTED}

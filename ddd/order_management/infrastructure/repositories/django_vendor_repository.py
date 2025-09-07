@@ -89,15 +89,9 @@ class DjangoVendorRepositoryImpl(repositories.VendorAbstract):
         final_opts = []
         for option in tenant_workflow.values():
             try:
-                workflow = json.loads(option.workflow)
-                for flow in workflow:
-                    option.status = flow.status
-                    option.optional_step = flow.optional
-                    for command in flow.commands:
-                        option.step = command
-                        final_opts.append(
-                            django_mappers.OrderActivityMapper.to_domain(option)
-                        )
+                final_opts.append(
+                    django_mappers.OrderActivityMapper.to_domain(option)
+                )
             except (ValueError) as e:
                 print(f"DjangoVendorRepository.load_tenant_workflow exception > {str(e)}")
                 continue

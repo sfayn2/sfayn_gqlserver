@@ -23,7 +23,7 @@ class OrderActivityMapper:
 
         return models.OrderActivity(
             order_id=django_order_activity.order_id,
-            order_status=django_order_activity.order_status,
+            activity_status=django_order_activity.activity_status,
             step=django_order_activity.step,
             step_status=django_order_activity.step_status,
             performed_by=django_order_activity.performed_by,

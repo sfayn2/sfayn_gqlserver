@@ -36,7 +36,7 @@ class OrderMapper:
                     'shipping_tracking_reference': order.shipping_reference, 
                     'coupons': json.dumps([coupon.coupon_code for coupon in order.coupons]), 
                     'order_stage': order.order_stage.value, 
-                    'order_status': order.order_status, 
+                    'activity_status': order.activity_status, 
                     'currency': order.currency,
                     'tenant_id': order.tenant_id,
                     'date_modified': order.date_modified
@@ -102,6 +102,6 @@ class OrderMapper:
             shipping_reference=django_order_object.shipping_tracking_reference,
             coupons=django_coupons,
             order_stage=enums.OrderStage(django_order_object.order_stage),
-            order_status=django_order_object.order_status
+            activity_status=django_order_object.activity_status
         )
 

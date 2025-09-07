@@ -19,7 +19,7 @@ class Order(models.Model):
     ) 
 
     # sub status / workflow status
-    order_status = models.CharField(
+    activity_status = models.CharField(
         max_length=25, 
         blank=True, 
         null=True
@@ -175,7 +175,14 @@ class OrderActivities(models.Model):
         null=True, 
         blank=True
     )
-    order_status = models.CharField(
+    order_stage = models.CharField(
+        max_length=25, 
+        blank=True, 
+        null=True, 
+        choices=enums.OrderStage.choices, 
+        default=enums.OrderStage.DRAFT
+    ) 
+    activity_status = models.CharField(
         max_length=25, 
         blank=True, 
         null=True
@@ -199,12 +206,27 @@ class OrderActivities(models.Model):
 #==============
 class TenantWorkflowSnapshot(models.Model):
     tenant_id = models.CharField(max_length=150)
-    workflow = models.CharField(max_length=500, help_text='eg. [ {"status": "NoPendingActions", "optional": true, "commands": ["PlaceOrderCommand"] } ]')
+    order_stage = models.CharField(
+        max_length=25, 
+        blank=True, 
+        null=True, 
+        choices=enums.OrderStage.choices, 
+        default=enums.OrderStage.DRAFT
+    ) 
+    activity_status = models.CharField(
+        max_length=25, 
+        blank=True, 
+        null=True
+    ) 
+    step = models.CharField(max_length=50, help_text="should match w command handler name, e.g. PendingApprovalCommand")
+    sequence = models.PositiveIntegerField(help_text="sequence of steps")
+    optional_step = models.BooleanField(default=False, help_text="can skip")
+
     is_active = models.BooleanField(default=True, help_text="To quickly control whether the is valid")
     last_update_dt = models.DateTimeField(auto_now=True) 
 
     def __str__(self):
-        return f"{self.vendor_id} | {self.name} | IsActive: {self.is_active} | {self.last_update_dt}"
+        return f"{self.tenant_id} | IsActive: {self.is_active} | {self.last_update_dt}"
 
 class VendorDetailsSnapshot(models.Model):
     vendor_id = models.CharField(max_length=150)
