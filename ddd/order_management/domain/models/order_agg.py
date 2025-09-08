@@ -444,6 +444,27 @@ class Order:
         if activities:
             self.activities = activities
 
+            activities_sorted = [act for act in sorted(self.activities, key=lambda a: a["sequence"])]
+
+            seen_stages = []
+            for act in activities_sorted:
+                if act.order_stage not in seen_stages:
+                    seen_stages.append(act.order_stage)
+
+            # full expected stage order
+            expected_stages = [
+                enums.OrderStage.DRAFT,
+                enums.OrderStage.PENDING,
+                enums.OrderStage.CONFIRMED,
+                enums.OrderStage.SHIPPED,
+                enums.OrderStage.COMPLETED,
+            ]
+
+            if seen_stages != expected_stages:
+                raise exceptions.InvalidOrderOperation(
+                    f"Tenant activities stages invalid. Expected {expected_stages}, got {seen_stages}"
+                )
+
     def mark_activity_done(self, current_step: str, 
         performed_by: str, user_input: Optional[Dict] = None,
         outcome: enums.StepOutcome = enums.StepOutcome.DONE):
@@ -453,8 +474,8 @@ class Order:
             #raise exceptions.InvalidOrderOperation(f"No activity steps configured.")
 
         all_steps = [act.step for act in sorted(self.activities, key=lambda a: a["sequence"])]
-        if not current_step in all_steps:
-            return True # not applicable since the step is not define in the flow
+        if current_step not in all_steps:
+            raise exceptions.InvalidOrderOperation(f"Incomplete step, missing {current_step}")
 
         pending_steps = [act for act in sorted(self.activities, key=lambda a: a["sequence"]) if act.is_pending]
         if not pending_steps:
