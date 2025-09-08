@@ -394,6 +394,12 @@ message_bus.COMMAND_HANDLERS.update({
         access_control=access_control,
         **deps
     ),
+    commands.ReviewOrderCommand: lambda command, **deps: handlers.handle_review_order(
+        command=command,
+        uow=repositories.DjangoOrderUnitOfWork(),
+        access_control=access_control,
+        **deps
+    ),
 })
 
 #Query Handlers (read operations)
