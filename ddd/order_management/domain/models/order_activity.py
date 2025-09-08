@@ -8,6 +8,7 @@ from ddd.order_management.domain.services import DomainClock
 @dataclass
 class OrderActivity:
     order_id: str
+    order_stage: enums.OrderStage
     activity_status: int # workflow status
     sequence: int
     step_name: str

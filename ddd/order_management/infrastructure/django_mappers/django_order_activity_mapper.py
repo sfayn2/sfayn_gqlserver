@@ -7,7 +7,7 @@ class OrderActivityMapper:
     @staticmethod
     def to_django(order_id, order_activity: models.OrderActivity) -> dict:
         return {
-                "step": order_activity.step,
+                "step_name": order_activity.step_name,
                 "order_id": order_id,
                 "defaults":  {
                     'performed_by': order_activity.performed_by, 
@@ -23,8 +23,9 @@ class OrderActivityMapper:
 
         return models.OrderActivity(
             order_id=django_order_activity.order_id,
+            order_stage=django_order_activity.order_stage,
             activity_status=django_order_activity.activity_status,
-            step=django_order_activity.step,
+            step_name=django_order_activity.step_name,
             outcome=django_order_activity.outcome,
             performed_by=django_order_activity.performed_by,
             user_input=json.loads(django_order_activity.user_input),
