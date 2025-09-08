@@ -20,6 +20,9 @@ from .publish_vendor_shippingoption_update import handle_publish_vendor_shipping
 from .publish_vendor_paymentoption_update import handle_publish_vendor_paymentoption_update
 from .publish_vendor_taxoption_update import handle_publish_vendor_taxoption_update
 
+# Other activities
+from .other_activities.escalate_reviewer import handle_escalate_reviewer
+
 # Queries
 from .get_order import handle_get_order
 from .list_shipping_options import handle_list_shipping_options

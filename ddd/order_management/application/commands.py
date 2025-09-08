@@ -75,6 +75,10 @@ class LoginCallbackCommand(Command):
     redirect_uri: constr(min_length=1, strip_whitespace=True)
     next_path: constr(min_length=1, strip_whitespace=True)
 
+class EscalateReviewerCommand(Command):
+    order_id: constr(min_length=1, strip_whitespace=True)
+    user_input: str
+
 # ----------------
 # Applicable to Webhook APIs / Integration events
 # -----------

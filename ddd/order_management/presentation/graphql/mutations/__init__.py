@@ -11,3 +11,7 @@ from .change_destination_mutation import ChangeDestinationMutation
 from .change_order_quantity_mutation import ChangeOrderQuantityMutation
 from .add_line_items_mutation import AddLineItemsMutation
 from .remove_line_items_mutation import RemoveLineItemsMutation
+
+
+#Other activities
+from .other_activities.escalate_reviewer_mutation import EscalateReviewerMutation

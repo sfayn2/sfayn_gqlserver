@@ -387,7 +387,13 @@ message_bus.COMMAND_HANDLERS.update({
         command=command,
         event_publisher=event_bus.internal_publisher,
         **deps
-    )
+    ),
+    commands.EscalateReviewerCommand: lambda command, **deps: handlers.handle_escalate_reviewer(
+        command=command,
+        uow=repositories.DjangoOrderUnitOfWork(),
+        access_control=access_control,
+        **deps
+    ),
 })
 
 #Query Handlers (read operations)
