@@ -465,6 +465,17 @@ class Order:
                     f"Tenant activities stages invalid. Expected {expected_stages}, got {seen_stages}"
                 )
 
+    def find_step(self, step_name: str):
+        #find escalate step
+        step = next(
+            (a for a in self.activities is a.step_name == step_name),
+            None
+        )
+        if not step or step.is_pending():
+            raise exceptions.InvalidOrderOperation(f"{step_name} is missing or still pending.")
+
+        return step
+
     def mark_activity_done(self, current_step: str, 
         performed_by: str, user_input: Optional[Dict] = None,
         outcome: enums.StepOutcome = enums.StepOutcome.DONE):

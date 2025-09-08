@@ -28,22 +28,13 @@ def handle_review_order(
 
             order = uow.order.get(order_id=command.order_id, tenant_id=user_ctx.tenant_id)
 
-            #find escalate step
-            escalate_step = next(
-                (a for a in order.activities is a.step_name == "escalate_reviewer"),
-                None
-            )
-            if not escalate_step or escalate_step.is_pending():
-                raise exceptions.InvalidOrderOperation("Order has not been escalated yet.")
+            escalate_step = order.find_step("escalate_reviewer")
 
             reviewer = escalate_step.user_input.get("reviewer")
             if user_ctx.sub != reviewer:
-                raise exceptions.InvalidOrderOperation("You are not the assigned reviewerOrder has not been escalated yet..")
+                raise exceptions.InvalidOrderOperation("You are not the assigned reviewer.")
 
-            if command.is_approved = True:
-                decision = enums.StepOutcome.APPROVED
-            else
-                decision = enums.StepOutcome.REJECTED
+            decision = enums.StepOutcome.APPROVED if command.is_approved else enums.StepOutcome.REJECTED
 
             order.mark_activity_done(
                 current_step=command.step_name,
@@ -58,7 +49,7 @@ def handle_review_order(
 
             return dtos.ResponseDTO(
                 success=True,
-                message=f"Order {order.order_id} successfully review order."
+                message=f"Order {order.order_id} successfully reviewed."
             )
 
 
