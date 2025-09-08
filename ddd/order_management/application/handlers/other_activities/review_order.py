@@ -36,16 +36,20 @@ def handle_review_order(
             if not escalate_step or escalate_step.is_pending():
                 raise exceptions.InvalidOrderOperation("Order has not been escalated yet.")
 
+            reviewer = escalate_step.user_input.get("reviewer")
+            if user_ctx.sub != reviewer:
+                raise exceptions.InvalidOrderOperation("You are not the assigned reviewerOrder has not been escalated yet..")
+
             if command.is_approved = True:
-                outcome = enums.StepOutcome.APPROVED
+                decision = enums.StepOutcome.APPROVED
             else
-                outcome = enums.StepOutcome.REJECTED
+                decision = enums.StepOutcome.REJECTED
 
             order.mark_activity_done(
                 current_step=command.step_name,
                 performed_by=user_ctx.sub,
                 user_input={"comments": command.comments},
-                outcome=outcome
+                outcome=decision
             )
 
 
@@ -54,7 +58,7 @@ def handle_review_order(
 
             return dtos.ResponseDTO(
                 success=True,
-                message=f"Order {order.order_id} successfully escalate to reviewer."
+                message=f"Order {order.order_id} successfully review order."
             )
 
 
