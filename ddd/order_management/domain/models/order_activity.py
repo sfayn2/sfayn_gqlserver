@@ -11,7 +11,7 @@ class OrderActivity:
     activity_status: int # workflow status
     sequence: int
     step: str
-    step_status: enums.StepStatus
+    outcome: enums.StepOutcome
     performed_by: Optional[str] = None
     user_input: Optional[Dict] = None
     executed_at: Optional[datetime] = None
@@ -19,28 +19,28 @@ class OrderActivity:
 
 
     def mark_as_done(self, performed_by: str, user_input: Optional[dict] = None):
-        if self.step_status == enums.StepStatus.DONE:
+        if self.outcome == enums.StepOutcome.DONE:
             raise exceptions.OrderActivityException(f"Order Activity {self.step} is already done.")
-        self.step_status = enums.StepStatus.DONE
+        self.outcome = enums.StepOutcome.DONE
         self.performed_by = performed_by
         self.user_input = user_input
         self.executed_at = DomainClock.now()
 
     def mark_as_approved(self, performed_by: str, user_input: Optional[dict] = None):
-        if self.step_status == enums.StepStatus.APPROVED:
+        if self.outcome == enums.StepOutcome.APPROVED:
             raise exceptions.OrderActivityException(f"Order Activity {self.step} is already approved.")
-        self.step_status = enums.StepStatus.APPROVED
+        self.outcome = enums.StepOutcome.APPROVED
         self.performed_by = performed_by
         self.user_input = user_input
         self.executed_at = DomainClock.now()
 
     def mark_as_rejected(self, performed_by: str, user_input: Optional[dict] = None):
-        if self.step_status == enums.StepStatus.REJECTED:
+        if self.outcome == enums.StepOutcome.REJECTED:
             raise exceptions.OrderActivityException(f"Order Activity {self.step} is already rejected.")
-        self.step_status = enums.StepStatus.REJECTED
+        self.outcome = enums.StepOutcome.REJECTED
         self.performed_by = performed_by
         self.user_input = user_input
         self.executed_at = DomainClock.now()
 
     def is_pending(self) -> bool:
-        return self.step_status in {enums.StepStatus.WAITING, enums.StepStatus.REJECTED}
+        return self.outcome in {enums.StepOutcome.WAITING, enums.StepOutcome.REJECTED}

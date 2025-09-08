@@ -4,13 +4,12 @@ def generate_choices(cls):
     #TODO not applicable anymore since key value matches
     return tuple((i.value, i.name.replace("_"," ").title()) for i in cls)
 
-class StepStatus(Enum):
+class StepOutcome(Enum):
     WAITING = "WAITING"
     DONE = "DONE"
     APPROVED = "APPROVED"
     REJECTED = "REJECTED"
-    OPTIONAL = "OPTIONAL"
-    SKIPPED = "SKIPPED"
+    #SKIPPED = "SKIPPED"
 
     @classmethod
     def choices(cls):

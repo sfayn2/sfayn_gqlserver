@@ -57,7 +57,7 @@ ORDER_LINE_SEEDS = (
     ("ORD-CHANGEQTY-1", VENDOR1, "VendorA", "Singapore", "sku_change2", "my product", "T-SHIRT", False, True, json.dumps({"Size": "M", "Color": "RED"}), Decimal("20"), "SGD", 10, 1, 1, 1, 1, 200),
 )
 
-# order_id, order_stage, activity_status, step, sequence, performed_by, user_input, optional_step, step_status
+# order_id, order_stage, activity_status, step, sequence, performed_by, user_input, optional_step, outcome
 ORDER_ACTIVITIES = (
     ("ORD-WORKFLOW-1", "PENDING", "PendingApproval", "approve", 1, "apvr-1", "", False, "WAITING"),
     ("ORD-WORKFLOW-1", "PENDING", "PendingApproval", "reject", 1, "apvr-1", "", False, "WAITING"),

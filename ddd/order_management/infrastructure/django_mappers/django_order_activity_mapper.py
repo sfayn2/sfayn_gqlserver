@@ -14,7 +14,7 @@ class OrderActivityMapper:
                     'user_input': json.dumps(order_activity.user_input), 
                     'order_activity': order_activity.sequence, 
                     'optional_step': order_activity.optional_step, 
-                    'step_status': order_activity.step_status, 
+                    'outcome': order_activity.outcome, 
                     'executed_at': order_activity.executed_at
                 }
             }
@@ -25,7 +25,7 @@ class OrderActivityMapper:
             order_id=django_order_activity.order_id,
             activity_status=django_order_activity.activity_status,
             step=django_order_activity.step,
-            step_status=django_order_activity.step_status,
+            outcome=django_order_activity.outcome,
             performed_by=django_order_activity.performed_by,
             user_input=json.loads(django_order_activity.user_input),
             executed_at=django_order_activity.executed_at,

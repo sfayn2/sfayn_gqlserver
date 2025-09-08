@@ -444,7 +444,9 @@ class Order:
         if activities:
             self.activities = activities
 
-    def mark_activity_done(self, current_step: str, performed_by: str, user_input: Optional[Dict] = None):
+    def mark_activity_done(self, current_step: str, 
+        performed_by: str, user_input: Optional[Dict] = None,
+        outcome: enums.StepOutcome = enums.StepOutcome.DONE):
 
         if not self.activities:
             return  # tenant doesnt require any other activity
@@ -463,12 +465,7 @@ class Order:
         if next_step.step != current_step:
             raise exceptions.InvalidOrderOperation(f"Expected step {next_step.step}, got {current_step}")
 
-        if current_step.startswith("approve"):
-            next_step.mark_as_approved(performed_by, user_input)
-        elif current_step.startswith("reject"):
-            next_step.mark_as_rejected(performed_by, user_input)
-        else:
-            next_step.mark_as_done(performed_by, user_input)
+        next_step.mark_as_done(performed_by, user_input, outcome)
 
         self.activity_status = next_step.activity_status
         self._update_modified_date()

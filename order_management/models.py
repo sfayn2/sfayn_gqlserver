@@ -187,16 +187,16 @@ class OrderActivities(models.Model):
         blank=True, 
         null=True
     ) 
-    step = models.CharField(max_length=50, help_text="should match w command handler name, e.g. PendingApprovalCommand")
+    step_name = models.CharField(max_length=50, help_text="should match w command handler name, e.g. PendingApprovalCommand")
     sequence = models.PositiveIntegerField(help_text="sequence of steps")
     performed_by = models.CharField(max_length=50, help_text="system or user or reviewer or other")
     user_input = models.CharField(max_length=500, help_text='{"comment": "Looks good"}')
     optional_step = models.BooleanField(default=False, help_text="can skip")
-    step_status = models.CharField(
+    outcome = models.CharField(
         max_length=25, 
         blank=True, 
         null=True, 
-        choices=enums.StepStatus.choices
+        choices=enums.StepOutcome.choices
     ) 
     executed_at = models.DateTimeField(auto_now=True) 
 
@@ -218,7 +218,7 @@ class TenantWorkflowSnapshot(models.Model):
         blank=True, 
         null=True
     ) 
-    step = models.CharField(max_length=50, help_text="should match w command handler name, e.g. PendingApprovalCommand")
+    step_name = models.CharField(max_length=50, help_text="should match w command handler name, e.g. PendingApprovalCommand")
     sequence = models.PositiveIntegerField(help_text="sequence of steps")
     optional_step = models.BooleanField(default=False, help_text="can skip")
 
