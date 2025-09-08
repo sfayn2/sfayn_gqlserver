@@ -59,10 +59,9 @@ ORDER_LINE_SEEDS = (
 
 # order_id, order_stage, activity_status, step, sequence, performed_by, user_input, optional_step, outcome
 ORDER_ACTIVITIES = (
-    ("ORD-WORKFLOW-1", "PENDING", "PendingApproval", "approve", 1, "apvr-1", "", False, "WAITING"),
-    ("ORD-WORKFLOW-1", "PENDING", "PendingApproval", "reject", 1, "apvr-1", "", False, "WAITING"),
-    ("ORD-WORKFLOW-1", "CONFIRMED", "PendingConfirmation", "confirm_order", 2, "user-1", "", False, "WAITING")
-    ("ORD-WORKFLOW-1", "SHIPPED", "PendingShipment", "mark_as_shipped", 3, "vendor-1", "", False, "WAITING")
+    ("ORD-WORKFLOW-1", "PENDING", "ApprovePayment", "approve_payment", 1, "apvr-1", "", False, "WAITING"),
+    ("ORD-WORKFLOW-1", "CONFIRMED", "PendingConfirmation", "confirm_order", 2, "user-1", "", False, "WAITING"),
+    ("ORD-WORKFLOW-1", "SHIPPED", "PendingShipment", "mark_as_shipped", 3, "vendor-1", "", False, "WAITING"),
     ("ORD-WORKFLOW-1", "COMPLETED", "PendingCompletion", "mark_as_completed", 4, "vendor-1", "", False, "WAITING")
 )
 
@@ -257,33 +256,34 @@ def seeded_all(django_db_setup, django_db_blocker):
             django_snapshots.Order.objects.create(
                 order_id=os[0], 
                 order_stage=os[1],
-                cancellation_reason=os[2], 
-                customer_id=os[3], 
-                customer_first_name=os[4],
-                customer_last_name=os[5], 
-                customer_email=os[6], 
-                coupons=os[7],
-                delivery_street=os[8], 
-                delivery_city=os[9], 
-                delivery_postal=os[10],
-                delivery_country=os[11], 
-                delivery_state=os[12], 
-                shipping_method=os[13],
-                shipping_delivery_time=os[14], 
-                shipping_cost=os[15], 
-                shipping_tracking_reference=os[16],
-                tax_details=os[17], 
-                tax_amount=os[18], 
-                total_discounts_fee=os[19],
-                total_amount=os[20], 
-                offer_details=os[21], 
-                final_amount=os[22],
-                payment_method=os[23], 
-                payment_reference=os[24], 
-                payment_amount=os[25],
-                payment_status=os[26], 
-                currency=os[27], 
-                tenant_id=os[28]
+                activity_status=os[2],
+                cancellation_reason=os[3], 
+                customer_id=os[4], 
+                customer_first_name=os[5],
+                customer_last_name=os[6], 
+                customer_email=os[7], 
+                coupons=os[8],
+                delivery_street=os[9], 
+                delivery_city=os[10], 
+                delivery_postal=os[11],
+                delivery_country=os[12], 
+                delivery_state=os[13], 
+                shipping_method=os[14],
+                shipping_delivery_time=os[15], 
+                shipping_cost=os[16], 
+                shipping_tracking_reference=os[17],
+                tax_details=os[18], 
+                tax_amount=os[19], 
+                total_discounts_fee=os[20],
+                total_amount=os[21], 
+                offer_details=os[22], 
+                final_amount=os[23],
+                payment_method=os[24], 
+                payment_reference=os[25], 
+                payment_amount=os[26],
+                payment_status=os[27], 
+                currency=os[28], 
+                tenant_id=os[29]
             )
 
         for ol in ORDER_LINE_SEEDS:
