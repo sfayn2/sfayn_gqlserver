@@ -76,8 +76,14 @@ class LoginCallbackCommand(Command):
     next_path: constr(min_length=1, strip_whitespace=True)
 
 class EscalateReviewerCommand(Command):
-    order_id: constr(min_length=1, strip_whitespace=True)
-    user_input: str
+    order_id: str
+    reviewer: str
+    comments: str
+
+class ReviewOrderCommand(Command):
+    order_id: str
+    is_approved: bool
+    comments: str
 
 # ----------------
 # Applicable to Webhook APIs / Integration events

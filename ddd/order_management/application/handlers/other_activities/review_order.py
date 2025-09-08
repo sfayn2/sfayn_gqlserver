@@ -10,8 +10,8 @@ from ddd.order_management.application import (
 from ddd.order_management.domain import exceptions
 
 
-def handle_escalate_reviewer(
-        command: commands.EscalateReviewerCommand, 
+def handle_review_order(
+        command: commands.ReviewOrderCommand, 
         uow: UnitOfWorkAbstract,
         access_control: AccessControl1Abstract
 ) -> dtos.ResponseDTO:
@@ -22,16 +22,30 @@ def handle_escalate_reviewer(
             user_ctx = access_control.get_user_context(command.token)
             access_control.ensure_user_is_authorized_for(
                 user_ctx,
-                required_permission="escalate_reviewer",
+                required_permission="review_order",
                 required_scope={"customer_id": user_ctx.sub }
             )
 
             order = uow.order.get(order_id=command.order_id, tenant_id=user_ctx.tenant_id)
 
+            #find escalate step
+            escalate_step = next(
+                (a for a in order.activities is a.step_name == "escalate_reviewer"),
+                None
+            )
+            if not escalate_step or escalate_step.is_pending():
+                raise exceptions.InvalidOrderOperation("Order has not been escalated yet.")
+
+            if command.is_approved = True:
+                outcome = enums.StepOutcome.APPROVED
+            else
+                outcome = enums.StepOutcome.REJECTED
+
             order.mark_activity_done(
                 current_step=command.step_name,
                 performed_by=user_ctx.sub,
-                user_input=command.user_input
+                user_input={"comments": command.comments},
+                outcome=outcome
             )
 
 

@@ -13,10 +13,10 @@ from ddd.order_management.infrastructure import (
 # ==========================
 # Mutations 
 # ===================
-class EscalateReviewerMutation(relay.ClientIDMutation):
+class ReviewOrderMutation(relay.ClientIDMutation):
     class Input:
         order_id = graphene.String(required=True)
-        reviewer = graphene.String(required=True)
+        is_approved = graphene.Boolean(required=True)
         comments = graphene.String(required=True)
 
     result = graphene.Field(object_types.ResponseType)

@@ -31,7 +31,7 @@ def handle_escalate_reviewer(
             order.mark_activity_done(
                 current_step=command.step_name,
                 performed_by=user_ctx.sub,
-                user_input=command.user_input
+                user_input={"reviewer": command.reviewer, "comments": command.comments }
             )
 
 

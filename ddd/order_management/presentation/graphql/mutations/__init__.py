@@ -15,3 +15,4 @@ from .remove_line_items_mutation import RemoveLineItemsMutation
 
 #Other activities
 from .other_activities.escalate_reviewer_mutation import EscalateReviewerMutation
+from .other_activities.review_order_mutation import ReviewOrderMutation
