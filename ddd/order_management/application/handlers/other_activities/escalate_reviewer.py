@@ -19,7 +19,6 @@ def handle_escalate_reviewer(
     try:
         with uow:
 
-            user_ctx = access_control.get_user_context(command.token)
             access_control.ensure_user_is_authorized_for(
                 user_ctx,
                 required_permission="escalate_reviewer",

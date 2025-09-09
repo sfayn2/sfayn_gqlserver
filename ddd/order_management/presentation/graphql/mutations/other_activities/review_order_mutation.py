@@ -26,7 +26,7 @@ class ReviewOrderMutation(relay.ClientIDMutation):
         token = common.get_token_from_context(info)
         user_ctx = access_control1.get_user_context(token)
 
-        command = commands.EscalateReviewerCommand.model_validate(input)
+        command = commands.ReviewOrderCommand.model_validate(input)
         result = message_bus.handle(command, user_ctx=user_ctx)
 
         return cls(result=object_types.ResponseType(**result.model_dump()))
