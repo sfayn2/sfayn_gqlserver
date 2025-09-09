@@ -75,6 +75,8 @@ class LoginCallbackCommand(Command):
     redirect_uri: constr(min_length=1, strip_whitespace=True)
     next_path: constr(min_length=1, strip_whitespace=True)
 
+#======================
+#TODO move to another command file e.g other_activities_commands
 class EscalateReviewerCommand(Command):
     order_id: str
     reviewer: str
@@ -84,7 +86,10 @@ class ReviewOrderCommand(Command):
     order_id: str
     is_approved: bool
     comments: str
+#======================
 
+
+#TODO move to another command file e.g webhook_commands
 # ----------------
 # Applicable to Webhook APIs / Integration events
 # -----------
