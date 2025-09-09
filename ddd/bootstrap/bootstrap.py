@@ -35,7 +35,7 @@ from ddd.order_management.application import (
 
 from . import (
     other_activities_handlers,
-    webhook_handlers
+    webhook_publish_handlers
 )
 
 load_dotenv(find_dotenv(filename=".env.test"))
@@ -358,7 +358,7 @@ message_bus.COMMAND_HANDLERS.update({
         uow=repositories.DjangoOrderUnitOfWork(),
         **deps
     ),
-    **webhook_handlers.COMMAND_HANDLERS,
+    **webhook_publish_handlers.COMMAND_HANDLERS,
     **other_activities_handlers.COMMAND_HANDLERS
 })
 
