@@ -21,7 +21,7 @@ from .webhook_publish_handlers.publish_vendor_paymentoption_update import handle
 from .webhook_publish_handlers.publish_vendor_taxoption_update import handle_publish_vendor_taxoption_update
 
 # Other activities
-from .other_activities.escalate_reviewer import handle_escalate_reviewer
+from .other_activities_handlers.escalate_reviewer import handle_escalate_reviewer
 
 # Queries
 from .get_order import handle_get_order
