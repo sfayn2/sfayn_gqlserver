@@ -33,6 +33,11 @@ from ddd.order_management.application import (
     services as application_services
 )
 
+from . import (
+    other_activities_handlers,
+    webhook_handlers
+)
+
 load_dotenv(find_dotenv(filename=".env.test"))
 
 #Depending on the framework arch this might be inside manage.py , app.py, or main.py ?
@@ -353,53 +358,8 @@ message_bus.COMMAND_HANDLERS.update({
         uow=repositories.DjangoOrderUnitOfWork(),
         **deps
     ),
-    commands.PublishProductUpdateCommand: lambda command, **deps: handlers.handle_publish_product_update(
-        command=command,
-        event_publisher=event_bus.internal_publisher,
-        **deps
-    ),
-    commands.PublishVendorDetailsUpdateCommand: lambda command, **deps: handlers.handle_publish_vendor_details_update(
-        command=command,
-        event_publisher=event_bus.internal_publisher,
-        **deps
-    ),
-    commands.PublishVendorCouponUpdateCommand: lambda command, **deps: handlers.handle_publish_vendor_coupon_update(
-        command=command,
-        event_publisher=event_bus.internal_publisher,
-        **deps
-    ),
-    commands.PublishVendorOfferUpdateCommand: lambda command, **deps: handlers.handle_publish_vendor_offer_update(
-        command=command,
-        event_publisher=event_bus.internal_publisher,
-        **deps
-    ),
-    commands.PublishVendorShippingOptionUpdateCommand: lambda command, **deps: handlers.handle_publish_vendor_shippingoption_update(
-        command=command,
-        event_publisher=event_bus.internal_publisher,
-        **deps
-    ),
-    commands.PublishVendorPaymentOptionUpdateCommand: lambda command, **deps: handlers.handle_publish_vendor_paymentoption_update(
-        command=command,
-        event_publisher=event_bus.internal_publisher,
-        **deps
-    ),
-    commands.PublishVendorTaxOptionUpdateCommand: lambda command, **deps: handlers.handle_publish_vendor_taxoption_update(
-        command=command,
-        event_publisher=event_bus.internal_publisher,
-        **deps
-    ),
-    commands.EscalateReviewerCommand: lambda command, **deps: handlers.handle_escalate_reviewer(
-        command=command,
-        uow=repositories.DjangoOrderUnitOfWork(),
-        access_control=access_control,
-        **deps
-    ),
-    commands.ReviewOrderCommand: lambda command, **deps: handlers.handle_review_order(
-        command=command,
-        uow=repositories.DjangoOrderUnitOfWork(),
-        access_control=access_control,
-        **deps
-    ),
+    **webhook_handlers.COMMAND_HANDLERS,
+    **other_activities_handlers.COMMAND_HANDLERS
 })
 
 #Query Handlers (read operations)
