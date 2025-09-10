@@ -33,11 +33,6 @@ from ddd.order_management.application import (
     services as application_services
 )
 
-from . import (
-    other_activities_handlers,
-    webhook_publish_handlers
-)
-
 load_dotenv(find_dotenv(filename=".env.test"))
 
 #Depending on the framework arch this might be inside manage.py , app.py, or main.py ?
@@ -358,8 +353,8 @@ message_bus.COMMAND_HANDLERS.update({
         uow=repositories.DjangoOrderUnitOfWork(),
         **deps
     ),
-    **webhook_publish_handlers.COMMAND_HANDLERS,
-    **other_activities_handlers.COMMAND_HANDLERS
+    **handlers.webhook_publish_command_handlers.get_command_handlers(commands, handlers, event_bus),
+    **handlers.other_activities_command_handlers.get_command_handlers(commands, handlers, repositories.DjangoOrderUnitOfWork(), access_control)
 })
 
 #Query Handlers (read operations)

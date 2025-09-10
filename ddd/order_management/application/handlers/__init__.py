@@ -12,6 +12,9 @@ from .change_destination import handle_change_destination
 from .change_order_quantity import handle_change_order_quantity
 from .add_line_items import handle_add_line_items
 from .remove_line_items import handle_remove_line_items
+
+# Webhook publish
+from .webhook_publish_handlers import webhook_publish_command_handlers
 from .webhook_publish_handlers.publish_product_update import handle_publish_product_update
 from .webhook_publish_handlers.publish_vendor_details_update import handle_publish_vendor_details_update
 from .webhook_publish_handlers.publish_vendor_coupon_update import handle_publish_vendor_coupon_update
@@ -21,6 +24,7 @@ from .webhook_publish_handlers.publish_vendor_paymentoption_update import handle
 from .webhook_publish_handlers.publish_vendor_taxoption_update import handle_publish_vendor_taxoption_update
 
 # Other activities
+from .other_activities_handlers import other_activities_command_handlers
 from .other_activities_handlers.escalate_reviewer import handle_escalate_reviewer
 
 # Queries
