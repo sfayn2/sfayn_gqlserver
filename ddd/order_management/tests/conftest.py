@@ -85,7 +85,7 @@ VENDOR_PRODUCT_SEEDS = (
 # Columns vendor_id, tenant_id, offer_id, coupon_code, start_date, end_date, is_active
 VENDOR_COUPON_SEEDS = (
     (VENDOR1, TENANT1, "OFFER-1", "VALID-COUPON25", datetime.now(timezone.utc), datetime.now(timezone.utc) + timedelta(minutes=5), True),
-    (VENDOR1, TENANT1, "OFFER-1", "EXPIRED-COUPON25", datetime(2024, 8, 13, 14, 30, 29, tzinfo=timezone.utc), datetime(2024, 11, 11, 23, 59, 59), True),
+    (VENDOR1, TENANT1, "OFFER-1", "EXPIRED-COUPON25", datetime(2024, 8, 13, 14, 30, 29, tzinfo=timezone.utc), datetime(2024, 11, 11, 23, 59, 59, tzinfo=timezone.utc), True),
     (VENDOR1, TENANT1, "OFFER-1", "NOT-ACTIVE-COUPON25", datetime.now(timezone.utc), datetime.now(timezone.utc) + timedelta(minutes=5), False),
 
 )
