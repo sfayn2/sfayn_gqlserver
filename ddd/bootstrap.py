@@ -43,7 +43,7 @@ ROLE_MAP = {
     "customer": ["checkout_items", "add_line_items", "remove_line_items", 
     "add_coupon", "remove_coupon", "change_destination", "change_order_quantity", 
     "select_shipping_option", "list_shipping_options", "list_customer_addresses"
-    "place_order", "confirm_order", "cancel_order", "get_order"],
+    "place_order", "confirm_order", "cancel_order", "get_order", "escalate_reviewer", "review_order"],
     "vendor": ["mark_as_shipped", "add_shipping_tracking_reference", "mark_as_completed"]
 }
 
@@ -300,6 +300,13 @@ message_bus.COMMAND_HANDLERS.update({
         **deps
     ),
     commands.AddCouponCommand: lambda command, **deps: handlers.handle_add_coupon(
+        command=command,
+        uow=repositories.DjangoOrderUnitOfWork(),
+        coupon_validation=validations.DjangoCouponValidation(),
+        access_control=access_control,
+        **deps
+    ),
+    commands.RemoveCouponCommand: lambda command, **deps: handlers.handle_remove_coupon(
         command=command,
         uow=repositories.DjangoOrderUnitOfWork(),
         coupon_validation=validations.DjangoCouponValidation(),

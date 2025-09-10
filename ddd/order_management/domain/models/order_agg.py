@@ -378,6 +378,9 @@ class Order:
         if self.order_stage != enums.OrderStage.DRAFT:
             raise exceptions.InvalidOrderOperation("Only draft order can remove coupon.")
 
+        if not self.coupons:
+            raise exceptions.InvalidOrderOperation(f"There has no coupon/s applied on this order.")
+
         self.coupons.remove(coupon)
         self._update_modified_date()
 

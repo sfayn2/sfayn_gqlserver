@@ -25,8 +25,8 @@ def test_add_coupon_ok(
     )
 
     command = commands.AddCouponCommand(
-        order_id="ORD-1",
-        coupon_code="VALID2-COUPON25"
+        order_id="ORD-NONDRAFT-1",
+        coupon_code="VALID-COUPON25"
     )
 
     user_ctx = fake_access_control().get_user_context(token="fake_jwt_token")
@@ -40,5 +40,5 @@ def test_add_coupon_ok(
     )
 
 
-    assert response.success is True
-    assert response.message == "Order ORD-1 successfully add coupon."
+    assert response.success is False
+    assert response.message == "Only draft order can apply coupon."

@@ -17,6 +17,7 @@ class Mutation(graphene.ObjectType):
     add_line_items = mutations.add_line_items_mutation.AddLineItemsMutation.Field()
     remove_line_items = mutations.remove_line_items_mutation.RemoveLineItemsMutation.Field()
     add_coupon = mutations.add_coupon_mutation.AddCouponMutation.Field()
+    remove_coupon = mutations.remove_coupon_mutation.RemoveCouponMutation.Field()
     select_shipping_option = mutations.select_shipping_option_mutation.SelectShippingOptionMutation.Field()
     place_order = mutations.place_order_mutation.PlaceOrderMutation.Field()
     confirm_order = mutations.confirm_order_mutation.ConfirmOrderMutation.Field()

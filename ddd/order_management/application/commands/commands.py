@@ -28,6 +28,10 @@ class AddCouponCommand(Command):
     order_id: str
     coupon_code: str
 
+class RemoveCouponCommand(Command):
+    order_id: str
+    coupon_code: str
+
 class ConfirmOrderCommand(Command):
     order_id: str
     transaction_id: str

@@ -14,7 +14,7 @@ from ddd.order_management.infrastructure import (
 )
 
 @pytest.mark.django_db
-def test_add_coupon_ok(
+def test_remove_coupon_ok(
     fake_jwt_handler, 
     fake_access_control,
     domain_clock,
@@ -24,14 +24,14 @@ def test_add_coupon_ok(
         jwt_handler=fake_jwt_handler()
     )
 
-    command = commands.AddCouponCommand(
+    command = commands.RemoveCouponCommand(
         order_id="ORD-1",
-        coupon_code="VALID2-COUPON25"
+        coupon_code="VALID-COUPON25"
     )
 
     user_ctx = fake_access_control().get_user_context(token="fake_jwt_token")
 
-    response = handlers.handle_add_coupon(
+    response = handlers.handle_remove_coupon(
         command=command,
         uow=infra_repo.DjangoOrderUnitOfWork(),
         access_control=fake_access_control(),
@@ -41,4 +41,4 @@ def test_add_coupon_ok(
 
 
     assert response.success is True
-    assert response.message == "Order ORD-1 successfully add coupon."
+    assert response.message == "Order ORD-1 successfully remove coupon."

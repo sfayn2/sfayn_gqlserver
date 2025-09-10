@@ -4,6 +4,7 @@ from .commands import (
     PlaceOrderCommand,
     AddShippingTrackingReferenceCommand,
     AddCouponCommand,
+    RemoveCouponCommand,
     ConfirmOrderCommand,
     SelectShippingOptionCommand,
     ShipOrderCommand,

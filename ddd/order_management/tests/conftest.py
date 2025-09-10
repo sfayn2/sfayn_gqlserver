@@ -40,7 +40,7 @@ USER_SEEDS = (
 
 # Columns order_id, order_stage, activity_status, cancellation_reason, customer_id, customer_first_name, customer_last_name, customer_email, coupons, delivery_street, delivery_city, delivery_postal, delivery_country, delivery_state, shipping_method, shipping_delivery_time, shipping_cost, shipping_tracking_reference, tax_details, tax_amount, total_discounts_fee, total_amount, offer_details, final_amount, payment_method, payment_reference, payment_amount, payment_status, currency, tenant_id
 ORDER_SEEDS = (
-    ("ORD-1", enums.OrderStage.DRAFT.value, "NoPendingActivities", "", USER1, "first name1", "last name1", "email@gmail.com", json.dumps([]), "street1", "Singapore", 1234, "Singapore", "Singapore", None, None, None, None, json.dumps([]), Decimal("0"), Decimal("0"), Decimal("0"), json.dumps([]), Decimal("0"), None, None, Decimal("0"), None, "SGD", TENANT1),
+    ("ORD-1", enums.OrderStage.DRAFT.value, "NoPendingActivities", "", USER1, "first name1", "last name1", "email@gmail.com", json.dumps(["VALID-COUPON25"]), "street1", "Singapore", 1234, "Singapore", "Singapore", None, None, None, None, json.dumps([]), Decimal("0"), Decimal("0"), Decimal("0"), json.dumps([]), Decimal("0"), None, None, Decimal("0"), None, "SGD", TENANT1),
     ("ORD-NONDRAFT-1", enums.OrderStage.PENDING.value, "NoPendingActivities", "", USER1, "first name1", "last name1", "email@gmail.com", json.dumps([]), "street1", "Singapore", 1234, "Singapore", "Singapore", None, None, None, None, json.dumps([]), Decimal("0"), Decimal("0"), Decimal("0"), json.dumps([]), Decimal("0"), None, None, Decimal("0"), None, "SGD", TENANT1),
     ("ORD-REMOVEITEMS-1", enums.OrderStage.DRAFT.value, "NoPendingActivities", "", USER1, "first name1", "last name1", "email@gmail.com", json.dumps([]), "street1", "Singapore", 1234, "Singapore", "Singapore", None, None, None, None, json.dumps([]), Decimal("0"), Decimal("0"), Decimal("0"), json.dumps([]), Decimal("0"), None, None, Decimal("0"), None, "SGD", TENANT1),
     ("ORD-CHANGEQTY-1", enums.OrderStage.DRAFT.value, "NoPendingActivities", "", USER1, "first name1", "last name1", "email@gmail.com", json.dumps([]), "street1", "Singapore", 1234, "Singapore", "Singapore", None, None, None, None, json.dumps([]), Decimal("0"), Decimal("0"), Decimal("0"), json.dumps([]), Decimal("0"), None, None, Decimal("0"), None, "SGD", TENANT1),
@@ -85,6 +85,7 @@ VENDOR_PRODUCT_SEEDS = (
 # Columns vendor_id, tenant_id, offer_id, coupon_code, start_date, end_date, is_active
 VENDOR_COUPON_SEEDS = (
     (VENDOR1, TENANT1, "OFFER-1", "VALID-COUPON25", datetime.now(timezone.utc), datetime.now(timezone.utc) + timedelta(minutes=5), True),
+    (VENDOR1, TENANT1, "OFFER-1", "VALID2-COUPON25", datetime.now(timezone.utc), datetime.now(timezone.utc) + timedelta(minutes=5), True),
     (VENDOR1, TENANT1, "OFFER-1", "EXPIRED-COUPON25", datetime(2024, 8, 13, 14, 30, 29, tzinfo=timezone.utc), datetime(2024, 11, 11, 23, 59, 59, tzinfo=timezone.utc), True),
     (VENDOR1, TENANT1, "OFFER-1", "NOT-ACTIVE-COUPON25", datetime.now(timezone.utc), datetime.now(timezone.utc) + timedelta(minutes=5), False),
 

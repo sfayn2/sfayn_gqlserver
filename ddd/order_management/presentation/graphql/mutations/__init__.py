@@ -6,6 +6,7 @@ from .mark_as_shipped_mutation import MarkAsShippedMutation
 from .mark_as_completed_mutation import MarkAsCompletedMutation
 from .add_shipping_tracking_reference_mutation import AddShippingTrackingReferenceMutation
 from .add_coupon_mutation import AddCouponMutation
+from .remove_coupon_mutation import RemoveCouponMutation
 from .cancel_order_mutation import CancelOrderMutation
 from .change_destination_mutation import ChangeDestinationMutation
 from .change_order_quantity_mutation import ChangeOrderQuantityMutation
