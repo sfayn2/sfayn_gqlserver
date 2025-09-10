@@ -59,10 +59,10 @@ ORDER_LINE_SEEDS = (
 
 # order_id, order_stage, activity_status, step, sequence, performed_by, user_input, optional_step, outcome
 ORDER_ACTIVITIES = (
-    ("ORD-WORKFLOW-1", "PENDING", "ApprovePayment", "approve_payment", 1, "apvr-1", "", False, "WAITING"),
-    ("ORD-WORKFLOW-1", "CONFIRMED", "PendingConfirmation", "confirm_order", 2, "user-1", "", False, "WAITING"),
-    ("ORD-WORKFLOW-1", "SHIPPED", "PendingShipment", "mark_as_shipped", 3, "vendor-1", "", False, "WAITING"),
-    ("ORD-WORKFLOW-1", "COMPLETED", "PendingCompletion", "mark_as_completed", 4, "vendor-1", "", False, "WAITING")
+    ("ORD-WORKFLOW-TENANT1", "PENDING", "PlaceOrder", "place_order", 1, "user-1", "", False, "WAITING"),
+    ("ORD-WORKFLOW-TENANT1", "CONFIRMED", "ConfirmOrder", "confirm_order", 2, "user-1", "", False, "WAITING"),
+    ("ORD-WORKFLOW-TENANT1", "SHIPPED", "MarkShipped", "mark_as_shipped", 3, "vendor-1", "", False, "WAITING"),
+    ("ORD-WORKFLOW-TENANT1", "COMPLETED", "MarkCompleted", "mark_as_completed", 4, "vendor-1", "", False, "WAITING")
 )
 
 # Columns product_id, vendor_id, tenant_id, product_sku, product_name, product_category, options, product_price, stock, product_currency, package_weight, package_length, package_width, package_height, is_free_gift, is_taxable, is_active

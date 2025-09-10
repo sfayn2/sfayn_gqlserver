@@ -70,54 +70,5 @@ class RemoveLineItemsCommand(Command):
     order_id: constr(min_length=1, strip_whitespace=True)
     product_skus: List[dtos.ProductSkusDTO]
 
-class LoginCallbackCommand(Command):
-    code: constr(min_length=1, strip_whitespace=True)
-    redirect_uri: constr(min_length=1, strip_whitespace=True)
-    next_path: constr(min_length=1, strip_whitespace=True)
-
-#======================
-#TODO move to another command file e.g other_activities_commands
-class EscalateReviewerCommand(Command):
-    order_id: str
-    reviewer: str
-    comments: str
-
-class ReviewOrderCommand(Command):
-    order_id: str
-    is_approved: bool
-    comments: str
-#======================
 
 
-#TODO move to another command file e.g webhook_commands
-# ----------------
-# Applicable to Webhook APIs / Integration events
-# -----------
-class Command2(Command):
-    event_type: str
-
-# {
-#    "event_type": "events.ProductUpdateEvent",
-#    "tenant_id": "tenant1",
-#    "data": { ... }
-# }
-class PublishProductUpdateCommand(Command2):
-    data: dtos.VendorProductSnapshotDTO
-
-class PublishVendorDetailsUpdateCommand(Command2):
-    data: dtos.VendorDetailsSnapshotDTO
-
-class PublishVendorCouponUpdateCommand(Command2):
-    data: dtos.VendorCouponSnapshotDTO
-
-class PublishVendorOfferUpdateCommand(Command2):
-    data: dtos.VendorOfferSnapshotDTO
-
-class PublishVendorShippingOptionUpdateCommand(Command2):
-    data: dtos.VendorShippingOptionSnapshotDTO
-
-class PublishVendorPaymentOptionUpdateCommand(Command2):
-    data: dtos.VendorPaymentOptionSnapshotDTO
-
-class PublishVendorTaxOptionUpdateCommand(Command2):
-    data: dtos.VendorTaxOptionSnapshotDTO

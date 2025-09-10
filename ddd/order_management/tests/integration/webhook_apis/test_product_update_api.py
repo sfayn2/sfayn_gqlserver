@@ -9,9 +9,9 @@ from ddd.order_management.application import (
     commands
 )
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'sfayn_gqlserver.settings')
-import django
-django.setup()
+#os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'sfayn_gqlserver.settings')
+#import django
+#django.setup()
 
 #from ddd.order_management.infrastructure import bootstrap_handlers
 #bootstrap_handlers.register()

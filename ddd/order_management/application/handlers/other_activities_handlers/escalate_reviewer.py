@@ -13,7 +13,8 @@ from ddd.order_management.domain import exceptions
 def handle_escalate_reviewer(
         command: commands.EscalateReviewerCommand, 
         uow: UnitOfWorkAbstract,
-        access_control: AccessControl1Abstract
+        access_control: AccessControl1Abstract,
+        user_ctx: dtos.UserContextDTO
 ) -> dtos.ResponseDTO:
 
     try:
