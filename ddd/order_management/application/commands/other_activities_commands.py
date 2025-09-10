@@ -2,7 +2,6 @@ from pydantic import BaseModel, constr
 from ddd.order_management.application import dtos
 from .commands import Command
 
-
 class EscalateReviewerCommand(Command):
     order_id: str
     reviewer: str

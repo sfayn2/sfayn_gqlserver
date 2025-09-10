@@ -18,7 +18,8 @@ class DjangoCouponValidation(ports.CouponValidationAbstract):
         vendor_coupon_snapshot = django_snapshots.VendorCouponSnapshot.objects.filter(
             tenant_id=tenant_id,
             coupon_code=coupon_code, 
-            vendor_id=vendor_id
+            vendor_id=vendor_id,
+            is_active=True
         )
 
         if vendor_coupon_snapshot.exists():

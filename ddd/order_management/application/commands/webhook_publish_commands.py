@@ -2,15 +2,6 @@ from pydantic import BaseModel, constr
 from ddd.order_management.application import dtos
 from .commands import Command
 
-# ----------------
-# Applicable to Webhook APIs / Integration events
-# -----------
-#class Command(BaseModel, frozen=True):
-#
-#    @property
-#    def step_name(self) -> str:
-#        return self.__class__.__name__.replace("Command", "").lower()
-
 class Command2(Command):
     event_type: str
 

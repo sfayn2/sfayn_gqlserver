@@ -1,5 +1,5 @@
 import pytest, json, jwt
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import List, Optional
 from decimal import Decimal
 from order_management import models as django_snapshots
@@ -55,6 +55,7 @@ ORDER_LINE_SEEDS = (
     ("ORD-REMOVEITEMS-1", VENDOR1, "VendorA", "Singapore", "sku_remove2", "my product", "T-SHIRT", False, True, json.dumps({"Size": "M", "Color": "RED"}), Decimal("20"), "SGD", 10, 1, 1, 1, 1, 200),
     ("ORD-CHANGEQTY-1", VENDOR1, "VendorA", "Singapore", "sku_change1", "my product", "T-SHIRT", False, True, json.dumps({"Size": "M", "Color": "RED"}), Decimal("20"), "SGD", 10, 1, 1, 1, 1, 200),
     ("ORD-CHANGEQTY-1", VENDOR1, "VendorA", "Singapore", "sku_change2", "my product", "T-SHIRT", False, True, json.dumps({"Size": "M", "Color": "RED"}), Decimal("20"), "SGD", 10, 1, 1, 1, 1, 200),
+    ("ORD-1", VENDOR1, "VendorA", "Singapore", "sku_add_coupon", "my product", "T-SHIRT", False, True, json.dumps({"Size": "M", "Color": "RED"}), Decimal("20"), "SGD", 10, 1, 1, 1, 1, 200),
 )
 
 # order_id, order_stage, activity_status, step, sequence, performed_by, user_input, optional_step, outcome
@@ -79,6 +80,14 @@ VENDOR_PRODUCT_SEEDS = (
     ("prod-9", VENDOR1, TENANT1, "sku_remove2", "sample product", "T-SHIRT", json.dumps({"Color": "RED", "Size": "M" }), 20, 999, "SGD", "1", "1", "1", "1", False, True, True),
     ("prod-changeqty-1", VENDOR1, TENANT1, "sku_change1", "sample product", "T-SHIRT", json.dumps({"Color": "RED", "Size": "M" }), 20, 999, "SGD", "1", "1", "1", "1", False, True, True),
     ("prod-changeqty-2", VENDOR1, TENANT1, "sku_change2", "sample product", "T-SHIRT", json.dumps({"Color": "RED", "Size": "M" }), 20, 999, "SGD", "1", "1", "1", "1", False, True, True),
+)
+
+# Columns vendor_id, tenant_id, offer_id, coupon_code, start_date, end_date, is_active
+VENDOR_COUPON_SEEDS = (
+    (VENDOR1, TENANT1, "OFFER-1", "VALID-COUPON25", datetime.now(timezone.utc), datetime.now(timezone.utc) + timedelta(minutes=5), True),
+    (VENDOR1, TENANT1, "OFFER-1", "EXPIRED-COUPON25", datetime(2024, 8, 13, 14, 30, 29, tzinfo=timezone.utc), datetime(2024, 11, 11, 23, 59, 59), True),
+    (VENDOR1, TENANT1, "OFFER-1", "NOT-ACTIVE-COUPON25", datetime.now(timezone.utc), datetime.now(timezone.utc) + timedelta(minutes=5), False),
+
 )
 
 # Columns vendor_id, tenant_id, name, country, is_active
@@ -129,6 +138,7 @@ def fake_address():
             country="Singapore",
             state="Singapore"
         )
+
 
 
 @pytest.fixture
@@ -213,6 +223,19 @@ def fake_jwt_handler():
 @pytest.fixture(scope="session", autouse=True)
 def seeded_all(django_db_setup, django_db_blocker):
     with django_db_blocker.unblock():
+# Columns vendor_id, tenant_id, offer_id, coupon_code, start_date, end_date, is_active
+
+        for vc in VENDOR_COUPON_SEEDS:
+            django_snapshots.VendorCouponSnapshot.objects.create(
+                vendor_id=vc[0],
+                tenant_id=vc[1],
+                offer_id=vc[2],
+                coupon_code=vc[3], 
+                start_date=vc[4],
+                end_date=vc[5],
+                is_active=vc[6]
+            )
+
         for vp in VENDOR_PRODUCT_SEEDS:
             django_snapshots.VendorProductSnapshot.objects.create(
                 product_id=vp[0],
