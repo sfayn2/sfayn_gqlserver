@@ -10,7 +10,7 @@ charset-normalizer==3.4.0
 cryptography==45.0.4
 curtsies==0.4.2
 cwcwidth==0.1.9
-Django==5.1.4
+Django==5.2.6
 django-cors-headers==4.6.0
 exceptiongroup==1.2.2
 graphene==3.4.3
