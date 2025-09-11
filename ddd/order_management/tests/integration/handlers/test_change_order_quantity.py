@@ -15,20 +15,32 @@ from ddd.order_management.infrastructure import (
 
 @pytest.fixture
 def fake_product_skus(test_constants):
-    return [
-        dtos.ProductSkusDTO(vendor_id=test_constants["vendor1"], product_sku="sku_change1", order_quantity=21),
-        dtos.ProductSkusDTO(vendor_id=test_constants["vendor1"], product_sku="sku_change2", order_quantity=21),
-    ]
+    return {
+        "valid" : [
+            dtos.ProductSkusDTO(vendor_id=test_constants["vendor1"], product_sku="sku_change1", order_quantity=21),
+            dtos.ProductSkusDTO(vendor_id=test_constants["vendor1"], product_sku="sku_change2", order_quantity=21),
+        ]
+    }
 
 
 @pytest.mark.django_db
-def test_change_order_quantity_ok(
+@pytest.mark.parametrize(
+    "order_id, product_key, expected_success, expected_message",
+    [
+        ("ORD-CHANGEQTY-1", "valid", True, "Order ORD-CHANGEQTY-1 successfully changed order quantity of Product SKU sku_change1,sku_change2."),
+    ]
+)
+def test_change_order_quantity(
     fake_customer_details,
     fake_address,
     fake_product_skus,
     fake_jwt_handler, 
     fake_access_control,
     domain_clock,
+    order_id,
+    product_key,
+    expected_success,
+    expected_message
 ):
 
     access_control = access_control1.AccessControl1(
@@ -36,8 +48,8 @@ def test_change_order_quantity_ok(
     )
 
     command = commands.ChangeOrderQuantityCommand(
-        order_id="ORD-CHANGEQTY-1",
-        product_skus=fake_product_skus
+        order_id=order_id,
+        product_skus=fake_product_skus[product_key]
     )
 
     user_ctx = fake_access_control().get_user_context(token="fake_jwt_token")
@@ -51,5 +63,5 @@ def test_change_order_quantity_ok(
     )
 
 
-    assert response.success is True
-    assert response.message == "Order ORD-CHANGEQTY-1 successfully changed order quantity of Product SKU sku_change1,sku_change2."
+    assert response.success is expected_success
+    assert response.message == expected_message

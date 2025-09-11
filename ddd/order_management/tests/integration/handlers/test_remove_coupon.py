@@ -14,10 +14,20 @@ from ddd.order_management.infrastructure import (
 )
 
 @pytest.mark.django_db
-def test_remove_coupon_ok(
+@pytest.mark.parametrize(
+    "order_id, coupon_code, expected_success, expected_message",
+    [
+        ("ORD-1", "VALID-COUPON25", True, "Order ORD-1 successfully remove coupon."),
+    ]
+)
+def test_remove_coupon(
     fake_jwt_handler, 
     fake_access_control,
     domain_clock,
+    order_id,
+    coupon_code,
+    expected_success,
+    expected_message
 ):
 
     access_control = access_control1.AccessControl1(
@@ -25,8 +35,8 @@ def test_remove_coupon_ok(
     )
 
     command = commands.RemoveCouponCommand(
-        order_id="ORD-1",
-        coupon_code="VALID-COUPON25"
+        order_id=order_id,
+        coupon_code=coupon_code
     )
 
     user_ctx = fake_access_control().get_user_context(token="fake_jwt_token")
@@ -40,5 +50,5 @@ def test_remove_coupon_ok(
     )
 
 
-    assert response.success is True
-    assert response.message == "Order ORD-1 successfully remove coupon."
+    assert response.success is expected_success
+    assert response.message == expected_message
