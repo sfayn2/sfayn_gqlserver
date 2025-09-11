@@ -14,10 +14,24 @@ from ddd.order_management.infrastructure import (
 )
 
 @pytest.mark.django_db
-def test_add_coupon_ok(
+@pytest.mark.parametrize(
+    "order_id, coupon_code, expected_success, expected_message",
+    [
+        ("ORD-1", "VALID2-COUPON25", True, "Order ORD-1 successfully add coupon."),
+        ("ORD-1", "EXPIRED-COUPON25", False, "Coupon code EXPIRED-COUPON25 no longer valid."),
+        ("ORD-1", "NOT-ACTIVE-COUPON25", False, "Coupon NOT-ACTIVE-COUPON25 is not offered by vendor vendor-1"),
+        ("ORD-NONDRAFT-1", "VALID-COUPON25", False, "Only draft order can apply coupon."),
+
+    ]
+)
+def test_add_coupon(
     fake_jwt_handler, 
     fake_access_control,
     domain_clock,
+    order_id,
+    coupon_code,
+    expected_success,
+    expected_message,
 ):
 
     access_control = access_control1.AccessControl1(
@@ -25,8 +39,8 @@ def test_add_coupon_ok(
     )
 
     command = commands.AddCouponCommand(
-        order_id="ORD-NONDRAFT-1",
-        coupon_code="VALID-COUPON25"
+        order_id=order_id,
+        coupon_code=coupon_code
     )
 
     user_ctx = fake_access_control().get_user_context(token="fake_jwt_token")
@@ -40,5 +54,5 @@ def test_add_coupon_ok(
     )
 
 
-    assert response.success is False
-    assert response.message == "Only draft order can apply coupon."
+    assert response.success is expected_success
+    assert response.message == expected_message
