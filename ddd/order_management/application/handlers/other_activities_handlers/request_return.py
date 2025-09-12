@@ -46,7 +46,7 @@ def handle_request_return(
                 requested_skus = {line.product_sku: line.order_quantity for line in command.product_skus}
                 order_line_items = order.get_line_items()
 
-                if set(request_skus.keys()) != {line.product_sku for line in order_line_items}:
+                if set(requested_skus.keys()) != {line.product_sku for line in order_line_items}:
                     raise exceptions.InvalidOrderOperation("Partial return not allowed: missing SKUs.")
 
                 for line in order_line_items:
@@ -63,7 +63,7 @@ def handle_request_return(
             order.mark_activity_done(
                 current_step=command.step_name,
                 performed_by=user_ctx.sub,
-                user_input={"comments": command.comments, "return_skus": command.product_skus }
+                user_input={"comments": command.comments, "return_skus": command.product_skus.model_dump() }
             )
 
 
@@ -72,7 +72,7 @@ def handle_request_return(
 
             return dtos.ResponseDTO(
                 success=True,
-                message=f"Order {order.order_id} successfully request product return, may subject to approval."
+                message=f"Order {order.order_id} successfully request product return, may be subject to approval."
             )
 
 

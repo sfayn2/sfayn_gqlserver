@@ -33,17 +33,26 @@ def handle_process_refund(
             order = uow.order.get(order_id=command.order_id, tenant_id=user_ctx.tenant_id)
 
             request_return_step = order.find_step("request_return")
-            returned_skus = request_return_step.user_input.get("return_skus")
+            returned_skus = request_return_step.user_input.get("return_skus", [])
 
             process_refund_step = order.find_step("process_refund")
-            policy = process_refund_step.conditions
+            conditions = process_refund_step.conditions or {}
 
-            amount = sum(line.total_price.amount for line in self.line_items if line.product_sku in returned_skus),
-            amount -= amount * (policy.get("restocking_fee_percent", 0) / 100)
+            returned_sku_set = {sku.product_sku for sku in returned_skus}
+
+            amount = sum(
+                li.total_price.amount 
+                for li in order.get_line_items() 
+                if li.product_sku in returned_sku_set
+            )
+
+            restocking_fee_percent = conditions.get("restocking_fee_percent", 0)
+            if restocking_fee_percent > 0:
+                amount -= amount * (conditions.get(restocking_fee_percent / 100)
 
 
-            max_amount = policy.get("max_refund_amount"):
-            if max_amount:
+            max_amount = conditions.get("max_refund_amount")
+            if max_amount is not None:
                 amount = min(amount, max_amount)
 
             refunded_amount = value_objects.Money(
@@ -54,7 +63,7 @@ def handle_process_refund(
             order.mark_activity_done(
                 current_step=command.step_name,
                 performed_by=user_ctx.sub,
-                user_input={"comments": command.comments, "refunded_amount": refunded_amount }
+                user_input={"comments": command.comments, "refunded_amount": refunded_amount.as_dict() }
             )
 
 
@@ -63,7 +72,7 @@ def handle_process_refund(
 
             return dtos.ResponseDTO(
                 success=True,
-                message=f"Order {order.order_id} successfully request product return, may subject to approval."
+                message=f"Order {order.order_id} successfully process refund."
             )
 
 
