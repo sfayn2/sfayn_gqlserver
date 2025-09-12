@@ -30,18 +30,29 @@ def handle_request_return(
             order = uow.order.get(order_id=command.order_id, tenant_id=user_ctx.tenant_id)
 
             request_return_step = order.find_step("request_return")
-            policy = request_return_step.conditions
-            if policy.get("non_returnable_sku_patterns"):
-                sku_patterns = policy.get("non_returnable_sku_patterns")
-                if sku_patterns:
+            conditions = request_return_step.conditions
+            if conditions.get("non_returnable_sku_patterns"):
+                sku_patterns = conditions.get("non_returnable_sku_patterns")
+                for sku_pattern in sku_patterns:
                     for line in command.product_skus:
-                        if re.search(sku_patterns, line.product_sku):
+                        if re.search(sku_pattern, line.product_sku):
                             raise exceptions.InvalidOrderOperation(f"Returns not allowed for this product sku {line.product_sku}.")
-            if (policy.get("allow_partial_return") and 
-                policy.get("allow_partial_return") == False and 
-                len(command.product_skus) < len(order.get_line_items())):
-                raise exceptions.InvalidOrderOperation("Partial return not allowed")
-            if policy.get("days_to_return") and (DomainClock.now() - order.get_date_modified).days > days:
+            if (conditions.get("allow_partial_return") and 
+                conditions.get("allow_partial_return") == False and 
+                requested_skus = {line.product_sku: line.order_quantity for line in command.product_skus}
+
+                if len(command.product_skus) < len(order.get_line_items())):
+                    raise exceptions.InvalidOrderOperation("Partial return not allowed")
+
+                for line in order.get_line_items():
+                    if request_skus.get(line.product_sku) != line.order_quantity:
+                        raise exceptions.InvalidOrderOperation(
+                            f"Partial return not allowed: must return fully qty of {line.product_sku}"
+                        )
+                        
+
+            allowed_days = conditions.get("days_to_return")
+            if allowed_days and (DomainClock.now() - order.get_date_modified).days > allowed_days:
                 raise exceptions.InvalidOrderOperation("Return window expired")
 
             order.mark_activity_done(
