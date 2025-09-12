@@ -20,7 +20,7 @@ class OrderService(ports.OrderServiceAbstract):
             customer_details: value_objects.CustomerDetails,
             shipping_address: value_objects.Address,
             line_items: List[models.LineItem],
-            tenant_workflow: List[models.OrderActivity],
+            tenant_workflow: List[models.OtherActivity],
             tenant_id: str
     ) -> models.Order:
         order = models.Order(

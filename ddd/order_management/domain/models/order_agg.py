@@ -18,7 +18,7 @@ class Order:
     order_stage: Optional[enums.OrderStage] = None
     activity_status: str = "NoPendingActions"
     order_id: Optional[str] = None
-    activities: List[OrderActivity] = field(default_factory=list)
+    activities: List[OtherActivity] = field(default_factory=list)
     shipping_details: Optional[value_objects.ShippingDetails] = None
     line_items: List[LineItem] = field(default_factory=list)
     payment_details: Optional[value_objects.PaymentDetails] = None
@@ -440,7 +440,7 @@ class Order:
             raise exceptions.InvalidOrderOperation("Only draft order can update total discount fees.")
         self.total_discounts_fee = total_discounts
 
-    def load_tenant_activities(self, activities: List[models.OrderActivity]):
+    def load_tenant_activities(self, activities: List[models.OtherActivity]):
         if self.order_stage != enums.OrderStage.DRAFT:
             raise exceptions.InvalidOrderOperation("Only draft order can load tenant activities.")
 

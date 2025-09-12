@@ -187,6 +187,12 @@ class OrderActivities(models.Model):
         blank=True, 
         null=True
     ) 
+    conditions = models.CharField(
+        max_length=150, 
+        blank=True, 
+        null=True,
+        help_text='optional condition ex. {"non_refundable": false }'
+    )
     step_name = models.CharField(max_length=50, help_text="should match w command handler name, e.g. PendingApprovalCommand")
     sequence = models.PositiveIntegerField(help_text="sequence of steps")
     performed_by = models.CharField(max_length=50, help_text="system or user or reviewer or other")
@@ -218,6 +224,12 @@ class TenantWorkflowSnapshot(models.Model):
         blank=True, 
         null=True
     ) 
+    conditions = models.CharField(
+        max_length=150, 
+        blank=True, 
+        null=True,
+        help_text='optional condition ex. {"non_refundable": false }'
+    )
     step_name = models.CharField(max_length=50, help_text="should match w command handler name, e.g. PendingApprovalCommand")
     sequence = models.PositiveIntegerField(help_text="sequence of steps")
     optional_step = models.BooleanField(default=False, help_text="can skip")

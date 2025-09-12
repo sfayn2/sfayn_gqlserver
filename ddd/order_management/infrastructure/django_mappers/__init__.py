@@ -7,4 +7,4 @@ from .django_address_mapper import AddressMapper
 from .django_customer_details_mapper import CustomerDetailsMapper
 from .django_payment_details_mapper import PaymentDetailsMapper
 from .django_shipping_details_mapper import ShippingDetailsMapper
-from .django_order_activity_mapper import OrderActivityMapper
+from .django_other_activity_mapper import OtherActivityMapper

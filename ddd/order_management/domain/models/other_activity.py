@@ -6,13 +6,14 @@ from ddd.order_management.domain.services import DomainClock
 
 
 @dataclass
-class OrderActivity:
+class OtherActivity:
     order_id: str
     order_stage: enums.OrderStage
     activity_status: int # workflow status
     sequence: int
     step_name: str
     outcome: enums.StepOutcome
+    condition: Optional[str] = None
     performed_by: Optional[str] = None
     user_input: Optional[Dict] = None
     executed_at: Optional[datetime] = None
@@ -22,13 +23,13 @@ class OrderActivity:
         outcome: enums.StepOutcome = enums.StepOutcome.DONE):
 
         if not performed_by:
-            raise exceptions.OrderActivityException(f"performed_by must be provided")
+            raise exceptions.OtherActivityException(f"performed_by must be provided")
 
         if not self.is_pending():
-            raise exceptions.OrderActivityException(f"Activity {self.step_name} is already finalized {self.outcome}.")
+            raise exceptions.OtherActivityException(f"Activity {self.step_name} is already finalized {self.outcome}.")
 
         if self.outcome == outcome:
-            raise exceptions.OrderActivityException(f"Activity {self.step_name} is already {outcome}.")
+            raise exceptions.OtherActivityException(f"Activity {self.step_name} is already {outcome}.")
 
         self.outcome = outcome
         self.performed_by = performed_by

@@ -58,12 +58,14 @@ ORDER_LINE_SEEDS = (
     ("ORD-1", VENDOR1, "VendorA", "Singapore", "sku_add_coupon", "my product", "T-SHIRT", False, True, json.dumps({"Size": "M", "Color": "RED"}), Decimal("20"), "SGD", 10, 1, 1, 1, 1, 200),
 )
 
-# order_id, order_stage, activity_status, step, sequence, performed_by, user_input, optional_step, outcome
+# order_id, order_stage, activity_status, step, sequence, performed_by, user_input, optional_step, outcome, conditions
 ORDER_ACTIVITIES = (
-    ("ORD-WORKFLOW-TENANT1", "PENDING", "PlaceOrder", "place_order", 1, "user-1", "", False, "WAITING"),
-    ("ORD-WORKFLOW-TENANT1", "CONFIRMED", "ConfirmOrder", "confirm_order", 2, "user-1", "", False, "WAITING"),
-    ("ORD-WORKFLOW-TENANT1", "SHIPPED", "MarkShipped", "mark_as_shipped", 3, "vendor-1", "", False, "WAITING"),
-    ("ORD-WORKFLOW-TENANT1", "COMPLETED", "MarkCompleted", "mark_as_completed", 4, "vendor-1", "", False, "WAITING")
+    ("ORD-WORKFLOW-TENANT1", "PENDING", "PlaceOrder", "place_order", 1, "user-1", "", False, "WAITING", ""),
+    ("ORD-WORKFLOW-TENANT1", "CONFIRMED", "ConfirmOrder", "confirm_order", 2, "user-1", "", False, "WAITING", ""),
+    ("ORD-WORKFLOW-TENANT1", "SHIPPED", "MarkShipped", "mark_as_shipped", 3, "vendor-1", "", False, "WAITING", ""),
+    ("ORD-WORKFLOW-TENANT1", "SHIPPED", "ReturnOrder", "return_item", 4, "vendor-1", "", False, "WAITING", ""),
+    ("ORD-WORKFLOW-TENANT1", "SHIPPED", "ProcessRefund", "process_refund", 5, "vendor-1", "", False, "WAITING", ""),
+    ("ORD-WORKFLOW-TENANT1", "COMPLETED", "MarkCompleted", "mark_as_completed", 6, "vendor-1", "", False, "WAITING", "")
 )
 
 # Columns product_id, vendor_id, tenant_id, product_sku, product_name, product_category, options, product_price, stock, product_currency, package_weight, package_length, package_width, package_height, is_free_gift, is_taxable, is_active

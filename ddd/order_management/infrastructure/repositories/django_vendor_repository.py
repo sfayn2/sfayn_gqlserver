@@ -90,7 +90,7 @@ class DjangoVendorRepositoryImpl(repositories.VendorAbstract):
         for option in tenant_workflow.values():
             try:
                 final_opts.append(
-                    django_mappers.OrderActivityMapper.to_domain(option)
+                    django_mappers.OtherActivityMapper.to_domain(option)
                 )
             except (ValueError) as e:
                 print(f"DjangoVendorRepository.load_tenant_workflow exception > {str(e)}")
