@@ -530,6 +530,9 @@ class Order:
     def get_date_modified(self):
         return self.date_modified
 
+    def get_line_items(self):
+        return self.line_items
+
     @property
     def sub_total(self):
         return self.total_amount.subtract(self.total_discounts_fee).add(self.shipping_details.cost if self.shipping_details else value_objects.Money(Decimal("0"), self.currency))

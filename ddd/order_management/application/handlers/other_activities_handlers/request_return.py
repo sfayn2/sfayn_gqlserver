@@ -46,7 +46,7 @@ def handle_request_return(
                 requested_skus = {line.product_sku: line.order_quantity for line in command.product_skus}
                 order_line_items = order.get_line_items()
 
-                if set(request_skus.keys()) != {line.product_sku for line order_line_items}:
+                if set(request_skus.keys()) != {line.product_sku for line in order_line_items}:
                     raise exceptions.InvalidOrderOperation("Partial return not allowed: missing SKUs.")
 
                 for line in order_line_items:
