@@ -38,17 +38,17 @@ def handle_process_refund(
             process_refund_step = order.find_step("process_refund")
             conditions = process_refund_step.conditions or {}
 
-            returned_sku_set = {sku.product_sku for sku in returned_skus}
+            returned_sku_set = {sku.product_sku:sku.order_quantity for sku in returned_skus}
 
             amount = sum(
-                li.total_price.amount 
+                li.product_price.amount * returned_sku_set[li.product_sku] 
                 for li in order.get_line_items() 
-                if li.product_sku in returned_sku_set
+                if li.product_sku in returned_sku_set.keys()
             )
 
             restocking_fee_percent = conditions.get("restocking_fee_percent", 0)
             if restocking_fee_percent > 0:
-                amount -= amount * (conditions.get(restocking_fee_percent / 100)
+                amount -= amount * (restocking_fee_percent / 100)
 
 
             max_amount = conditions.get("max_refund_amount")
