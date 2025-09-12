@@ -75,7 +75,7 @@ def handle_process_refund(
 
             return dtos.ResponseDTO(
                 success=True,
-                message=f"Order {order.order_id} successfully process refund."
+                message=f"Order {order.order_id} successfully processed refund."
             )
 
 
