@@ -38,10 +38,13 @@ def handle_process_refund(
             process_refund_step = order.find_step("process_refund")
             conditions = process_refund_step.conditions or {}
 
-            returned_sku_set = {sku.product_sku:sku.order_quantity for sku in returned_skus}
+            returned_sku_set = {
+                sku["product_sku"]:sku["order_quantity"] 
+                for sku in returned_skus
+            }
 
             amount = sum(
-                li.product_price.amount * returned_sku_set[li.product_sku] 
+                li.product_price.amount * min(returned_sku_set[li.product_sku], li.order_quantity) 
                 for li in order.get_line_items() 
                 if li.product_sku in returned_sku_set.keys()
             )
