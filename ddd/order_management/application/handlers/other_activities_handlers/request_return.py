@@ -30,22 +30,27 @@ def handle_request_return(
             order = uow.order.get(order_id=command.order_id, tenant_id=user_ctx.tenant_id)
 
             request_return_step = order.find_step("request_return")
-            conditions = request_return_step.conditions
-            if conditions.get("non_returnable_sku_patterns"):
-                sku_patterns = conditions.get("non_returnable_sku_patterns")
-                for sku_pattern in sku_patterns:
-                    for line in command.product_skus:
-                        if re.search(sku_pattern, line.product_sku):
-                            raise exceptions.InvalidOrderOperation(f"Returns not allowed for this product sku {line.product_sku}.")
-            if (conditions.get("allow_partial_return") and 
-                conditions.get("allow_partial_return") == False and 
+            conditions = request_return_step.conditions or {}
+
+            non_returnable_patterns =  conditions.get("non_returnable_sku_patterns", [])
+            for sku_pattern in non_returnable_patterns:
+                for line in command.product_skus:
+                    if re.search(sku_pattern, line.product_sku):
+                        raise exceptions.InvalidOrderOperation(
+                            f"Returns not allowed for this product sku {line.product_sku}."
+                        )
+
+
+            allow_partial = conditions.get("allow_partial_return", True)
+            if allow_partial is False:
                 requested_skus = {line.product_sku: line.order_quantity for line in command.product_skus}
+                order_line_items = order.get_line_items()
 
-                if len(command.product_skus) < len(order.get_line_items())):
-                    raise exceptions.InvalidOrderOperation("Partial return not allowed")
+                if set(request_skus.keys()) != {line.product_sku for line order_line_items}:
+                    raise exceptions.InvalidOrderOperation("Partial return not allowed: missing SKUs.")
 
-                for line in order.get_line_items():
-                    if request_skus.get(line.product_sku) != line.order_quantity:
+                for line in order_line_items:
+                    if requested_skus.get(line.product_sku) != line.order_quantity:
                         raise exceptions.InvalidOrderOperation(
                             f"Partial return not allowed: must return fully qty of {line.product_sku}"
                         )
