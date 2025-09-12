@@ -17,3 +17,5 @@ from .remove_line_items_mutation import RemoveLineItemsMutation
 #Other activities
 from .other_activities.escalate_reviewer_mutation import EscalateReviewerMutation
 from .other_activities.review_order_mutation import ReviewOrderMutation
+from .other_activities.request_return_mutation import RequestReturnMutation
+from .other_activities.process_refund_mutation import ProcessRefundMutation

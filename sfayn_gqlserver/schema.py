@@ -25,6 +25,10 @@ class Mutation(graphene.ObjectType):
     mark_as_shipped_order = mutations.mark_as_shipped_mutation.MarkAsShippedMutation.Field()
     add_shipping_tracking_reference = mutations.add_shipping_tracking_reference_mutation.AddShippingTrackingReferenceMutation.Field()
     mark_as_completed_order = mutations.mark_as_completed_mutation.MarkAsCompletedMutation.Field()
+    request_return = mutations.request_return_mutation.RequestReturnMutation.Field()
+    process_refund = mutations.process_refund_mutation.ProcessRefundMutation.Field()
+    escalate_reviewer = mutations.escalate_reviewer_mutation.EscalateReviewerMutation.Field()
+    review_order = mutations.review_order_mutation.ReviewOrderMutation.Field()
 
 schema = graphene.Schema(query=Query, mutation=Mutation)
 

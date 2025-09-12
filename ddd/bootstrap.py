@@ -44,7 +44,7 @@ load_dotenv(find_dotenv(filename=".env.test"))
 #    "customer": ["checkout_items", "add_line_items", "remove_line_items", 
 #    "add_coupon", "remove_coupon", "change_destination", "change_order_quantity", 
 #    "select_shipping_option", "list_shipping_options", "list_customer_addresses"
-#    "place_order", "confirm_order", "cancel_order", "get_order", "escalate_reviewer", "review_order"],
+#    "place_order", "confirm_order", "cancel_order", "get_order", "escalate_reviewer", "review_order", "request_return", "process_refund"],
 #    "vendor": ["mark_as_shipped", "add_shipping_tracking_reference", "mark_as_completed"],
 #    "guest": ["checkout_items"]
 #}

@@ -527,6 +527,8 @@ class Order:
         
         return True
 
+    def get_date_modified(self):
+        return self.date_modified
 
     @property
     def sub_total(self):

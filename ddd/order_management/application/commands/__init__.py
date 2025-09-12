@@ -19,7 +19,9 @@ from .commands import (
 
 from .other_activities_commands import (
     ReviewOrderCommand,
-    EscalateReviewerCommand
+    EscalateReviewerCommand,
+    RequestReturnCommand,
+    ProcessRefundCommand
 )
 
 

@@ -14,4 +14,16 @@ def get_command_handlers(commands, handlers, uow, access_control):
             access_control=access_control,
             **deps
         ),
+        commands.RequestReturnCommand: lambda command, **deps: handlers.handle_request_return(
+            command=command,
+            uow=repositories.DjangoOrderUnitOfWork(),
+            access_control=access_control,
+            **deps
+        ),
+        commands.ProcessRefundCommand: lambda command, **deps: handlers.handle_process_refund(
+            command=command,
+            uow=repositories.DjangoOrderUnitOfWork(),
+            access_control=access_control,
+            **deps
+        ),
     }
