@@ -38,14 +38,17 @@ load_dotenv(find_dotenv(filename=".env.test"))
 #Depending on the framework arch this might be inside manage.py , app.py, or main.py ?
 #if project grows, breakdown handlers by feature
 
+# Moved to TenantRolePermissionSnapshot ==========
 # Define role permissions
-ROLE_MAP = {
-    "customer": ["checkout_items", "add_line_items", "remove_line_items", 
-    "add_coupon", "remove_coupon", "change_destination", "change_order_quantity", 
-    "select_shipping_option", "list_shipping_options", "list_customer_addresses"
-    "place_order", "confirm_order", "cancel_order", "get_order", "escalate_reviewer", "review_order"],
-    "vendor": ["mark_as_shipped", "add_shipping_tracking_reference", "mark_as_completed"]
-}
+#ROLE_MAP = {
+#    "customer": ["checkout_items", "add_line_items", "remove_line_items", 
+#    "add_coupon", "remove_coupon", "change_destination", "change_order_quantity", 
+#    "select_shipping_option", "list_shipping_options", "list_customer_addresses"
+#    "place_order", "confirm_order", "cancel_order", "get_order", "escalate_reviewer", "review_order"],
+#    "vendor": ["mark_as_shipped", "add_shipping_tracking_reference", "mark_as_completed"],
+#    "guest": ["checkout_items"]
+#}
+# ====================
 
 # JWT handler for access acontrol
 JWT_HANDLER = access_control1.JwtTokenHandler(
@@ -163,7 +166,7 @@ event_bus.ASYNC_EXTERNAL_EVENT_HANDLERS.update({
     "identity_gateway_service.external_events.UserLoggedInEvent": [
             lambda event: handlers.handle_user_logged_in_async_event(
                 event=event,
-                auth_snapshot_repo=snapshots.DjangoUserAuthorizationSnapshotRepo(ROLE_MAP),
+                auth_snapshot_repo=snapshots.DjangoUserAuthorizationSnapshotRepo(),
                 customer_snapshot_repo=snapshots.DjangoCustomerSnapshotRepo()
             ),
         ],

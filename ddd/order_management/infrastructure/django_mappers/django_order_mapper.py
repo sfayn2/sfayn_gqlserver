@@ -75,7 +75,7 @@ class OrderMapper:
                 django_mappers.LineItemMapper.to_domain(item) for item in django_order_object.line_items.all()
             ],
             activities=[
-                django_mappers.OtherActivityMapper.to_domain(item) for item in django_order_object.order_activities.all()
+                django_mappers.OtherActivityMapper.to_domain(item) for item in django_order_object.other_activities.all()
             ],
             customer_details=django_mappers.CustomerDetailsMapper.to_domain(django_order_object),
             shipping_details=django_mappers.ShippingDetailsMapper.to_domain(django_order_object) if django_order_object.shipping_method else None,

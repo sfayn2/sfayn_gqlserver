@@ -59,7 +59,7 @@ ORDER_LINE_SEEDS = (
 )
 
 # order_id, order_stage, activity_status, step, sequence, performed_by, user_input, optional_step, outcome, conditions
-ORDER_ACTIVITIES = (
+OTHER_ACTIVITIES = (
     ("ORD-WORKFLOW-TENANT1", "PENDING", "PlaceOrder", "place_order", 1, "user-1", "", False, "WAITING", ""),
     ("ORD-WORKFLOW-TENANT1", "CONFIRMED", "ConfirmOrder", "confirm_order", 2, "user-1", "", False, "WAITING", ""),
     ("ORD-WORKFLOW-TENANT1", "SHIPPED", "MarkShipped", "mark_as_shipped", 3, "vendor-1", "", False, "WAITING", ""),

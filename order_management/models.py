@@ -167,11 +167,11 @@ class OrderLine(models.Model):
     def __str__(self):
         return f"{self.order.order_id} | {self.product_name} (SKU: {self.product_sku}) | Quantity: {self.order_quantity} | Total: {self.product_price * self.order_quantity} {self.product_currency}"
 
-class OrderActivities(models.Model):
+class OtherActivities(models.Model):
     order = models.ForeignKey(
         "order_management.Order", 
         on_delete=models.CASCADE,
-        related_name="order_activities", 
+        related_name="other_activities", 
         null=True, 
         blank=True
     )
@@ -207,9 +207,9 @@ class OrderActivities(models.Model):
     executed_at = models.DateTimeField(auto_now=True) 
 
 
-#==============
-# for Vendor Snapshots
-#==============
+# ================
+# Tenant Snapshot
+# =======================
 class TenantWorkflowSnapshot(models.Model):
     tenant_id = models.CharField(max_length=150)
     order_stage = models.CharField(
@@ -238,7 +238,25 @@ class TenantWorkflowSnapshot(models.Model):
     last_update_dt = models.DateTimeField(auto_now=True) 
 
     def __str__(self):
-        return f"{self.tenant_id} | IsActive: {self.is_active} | {self.last_update_dt}"
+        return f"{self.tenant_id} | {self.step_name} | IsActive: {self.is_active} | {self.last_update_dt}"
+
+class TenantRolePermissionSnapshot(models.Model):
+    tenant_id = models.CharField(max_length=150)
+    role = models.CharField(max_length=150)
+    permission_codename = models.CharField(max_length=255)
+    is_active = models.BooleanField(default=True)
+    last_update_dt = models.DateTimeField(auto_now=True) 
+
+    class Meta:
+        unique_together = ('tenant_id', 'role', 'permission_codename') 
+
+    def __str__(self):
+        return f"{self.tenant_id} | {self.role} | IsActive: {self.is_active} | {self.last_update_dt}"
+
+
+#==============
+# for Vendor Snapshots
+#==============
 
 class VendorDetailsSnapshot(models.Model):
     vendor_id = models.CharField(max_length=150)
@@ -433,15 +451,15 @@ class CustomerAddressSnapshot(models.Model):
 # Local Authorization / Scope Based
 # =========
 class UserAuthorizationSnapshot(models.Model):
+    tenant_id = models.CharField(max_length=150)
     user_id = models.CharField(max_length=150)
     permission_codename = models.CharField(max_length=255)
-    tenant_id = models.CharField(max_length=150)
     scope = models.CharField(max_length=150, help_text='ex. { "customer_id": "c-1234" }')
     is_active = models.BooleanField(default=True)
     last_update_dt = models.DateTimeField(auto_now=True) 
 
     class Meta:
-        unique_together = ('user_id', 'permission_codename', 'scope') 
+        unique_together = ('tenant_id', 'user_id', 'permission_codename', 'scope') 
 
     def __str__(self):
         return f"{self.tenant_id} | {self.user_id} | {self.permission_codename} | {self.scope}"

@@ -5,14 +5,19 @@ from order_management import models as django_snapshots
 
 
 class DjangoUserAuthorizationSnapshotRepo(ports.SnapshotRepoAbstract):
-    def __init__(self, role_map: Dict[str, List[str]]):
-        self.role_map = role_map
+    #def __init__(self, role_map: Dict[str, List[str]]):
+    #    self.role_map = role_map
 
     def sync(self, event: dtos.UserLoggedInIntegrationEvent):
-        #django_snapshots.UserAuthorizationSnapshot.objects.filter(user_id=event.sub).delete()
 
         for role in event.roles:
-            permissions = self.role_map.get(role, [])
+            #permissions = self.role_map.get(role, [])
+            permissions = django_snapshots.TenantRolePermissionSnapshot.objects.filter(
+                tenant_id=event.tenant_id, 
+                role=role, 
+                is_active=True
+            ).values_list("permission_codename", flat=True)
+
             scope = {}
 
             # customer_id or vendor_id
@@ -24,8 +29,8 @@ class DjangoUserAuthorizationSnapshotRepo(ports.SnapshotRepoAbstract):
 
                 django_snapshots.UserAuthorizationSnapshot.objects.update_or_create(
                     user_id=event.sub,
+                    tenant_id=event.tenant_id,
                     defaults={
-                        "tenant_id": event.tenant_id,
                         "permission_codename": perm,
                         "scope":scope
                     }
