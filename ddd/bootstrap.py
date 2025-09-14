@@ -6,11 +6,6 @@ from ddd.order_management.domain import (
     value_objects,
     services as domain_services
 )
-from ddd.order_management.domain.services import (
-    shipping_option_strategies,
-    offer_strategies,
-    tax_strategies
-)
 from ddd.order_management.infrastructure import (
     event_bus, 
     validations, 
@@ -41,12 +36,8 @@ load_dotenv(find_dotenv(filename=".env.test"))
 # Moved to TenantRolePermissionSnapshot ==========
 # Define role permissions
 #ROLE_MAP = {
-#    "customer": ["checkout.checkout_items", "checkout.add_line_items", "remove_line_items", 
-#    "add_coupon", "remove_coupon", "change_destination", "change_order_quantity", 
-#    "select_shipping_option", "list_shipping_options", "list_customer_addresses"
-#    "place_order", "confirm_order", "cancel_order", "get_order", "oms.escalate_reviewer", "oms.review_order", "oms.request_return", "process_refund"],
-#    "vendor": ["oms.mark_as_shipped", "oms.add_shipping_tracking_reference", "oms.mark_as_completed"],
-#    "guest": ["checkout_items"]
+#    "vendor": ["oms.mark_as_shipped", "oms.add_shipping_tracking_reference", "oms.mark_as_completed", "oms.get_order"
+#    "oms.escalate_reviewer", "oms.review_order", "oms.request_return", "oms.process_refund"],
 #}
 # ====================
 
@@ -66,59 +57,6 @@ access_control = access_control1.AccessControl1(
 # Global clock; To evolve later on per tenant?
 domain_services.DomainClock.configure(clocks.UTCClock())
 
-
-# Configure supported shipping options (still subject to  eligibility)
-shipping_option_service = application_services.ShippingOptionService(
-    shipping_options = {
-        # enum.ShippingMethod, provider --> list of strategies?
-        (enums.ShippingMethod.STANDARD, "oms-default"): [lambda tenant_id, strategy: shipping_option_strategies.StandardShippingStrategy(strategy=strategy)],
-        (enums.ShippingMethod.EXPRESS, "oms-default"): [lambda tenant_id, strategy: shipping_option_strategies.ExpressShippingStrategy(strategy=strategy)],
-        (enums.ShippingMethod.LOCAL_PICKUP, "oms-default"): [lambda tenant_id, strategy: shipping_option_strategies.LocalPickupShippingStrategy(strategy=strategy)],
-        (enums.ShippingMethod.FREE_SHIPPING, "oms-default"): [lambda tenant_id, strategy: shipping_option_strategies.FreeShippingStrategy(strategy=strategy)],
-        (enums.ShippingMethod.OTHER, "fedex"): [
-            lambda tenant_id, strategy: shipping_option_gateway.SampleFedexShippingGateway(
-                strategy=strategy,
-                api_base_url=os.getenv(f"CARRIER1_BASE_URL_{tenant_id}"),
-                api_key=os.getenv(f"CARRIER1_API_KEY_{tenant_id}")
-            ),
-        ]
-    }
-)
-
-
-# Configure Vendor offerings/promotions
-promotion_service = application_services.PromotionService(
-    offers = {
-        (enums.OfferType.PERCENTAGE_DISCOUNT, "oms-default"): [lambda tenant_id, strategy: offer_strategies.PercentageDiscountOfferStrategy(strategy=strategy)],
-        (enums.OfferType.FREE_GIFTS, "oms-default"): [lambda tenant_id, strategy: offer_strategies.FreeGiftsOfferStrategy(strategy=strategy)],
-        (enums.OfferType.COUPON_PERCENTAGE_DISCOUNT, "oms-default"): [lambda tenant_id, strategy: offer_strategies.PercentageDiscountCouponOfferStrategy(strategy=strategy)],
-        (enums.OfferType.PERCENTAGE_DISCOUNT, "oms-default"): [lambda tenant_id, strategy: offer_strategies.PercentageDiscountOfferStrategy(strategy=strategy)],
-    }
-)
-
-# Configure Tax Service
-tax_service = application_services.TaxService(
-    tax_options = {
-        (enums.TaxType.GST, "oms-default"): [lambda tenant_id, strategy: tax_strategies.CountryBasedTaxStrategy(strategy=strategy)],
-        (enums.TaxType.STATE_TAX, "oms-default"): [lambda tenant_id, strategy: tax_strategies.StateBasedTaxStrategy(strategy=strategy)],
-    }
-)
-
-
-
-# Configure supported payment options
-payment_service = application_services.PaymentService(
-    payment_options = {
-        (enums.PaymentMethod.DIGITAL_WALLET, "oms-default"): [
-            lambda tenant_id: payment_gateways.PayPalPaymentGateway(
-                client_id=os.getenv(f"PAYPAL_CLIENT_ID_{tenant_id}"),
-                client_secret=os.getenv(f"PAYPAL_CLIENT_SECRET_{tenant_id}"),
-                client_url=os.getenv(f"PAYPAL_CLIENT_URL_{tenant_id}")
-            ),
-        ],
-    }
-)
-
 # Configure Webhook Signature Verifier
 application_services.webhook_validation_service.SIGNATURE_VERIFIER = {
     "wss": lambda tenant_id: webhook_signatures.WssSignatureVerifier(shared_secret=os.getenv(f"WH_SECRET_{tenant_id}"))
@@ -126,15 +64,7 @@ application_services.webhook_validation_service.SIGNATURE_VERIFIER = {
 
 # Configure which events get published
 event_bus.EXTERNAL_EVENT_WHITELIST = []
-event_bus.INTERNAL_EVENT_WHITELIST = [
-    "order_management.internal_events.ProductUpdatedEvent",
-    "order_management.internal_events.VendorDetailsUpdatedEvent",
-    "order_management.internal_events.VendorCouponUpdatedEvent",
-    "order_management.internal_events.VendorOfferUpdatedEvent",
-    "order_management.internal_events.VendorShippingOptionUpdatedEvent",
-    "order_management.internal_events.VendorPaymentOptionUpdatedEvent",
-    "order_management.internal_events.VendorTaxOptionUpdatedEvent"
-]
+event_bus.INTERNAL_EVENT_WHITELIST = []
 
 # Setup Redis event publishers
 event_bus.internal_publisher = event_publishers.RedisStreamPublisher(
@@ -166,12 +96,6 @@ event_bus.ASYNC_EXTERNAL_EVENT_HANDLERS.update({
                 customer_snapshot_repo=snapshots.DjangoCustomerSnapshotRepo()
             ),
         ],
-    "product_catalog.external_events.ProductUpdatedEvent": [],
-    "vendor_registry.external_events.VendorUpdatedEvent":[],
-    "vendor_registry.external_events.VendorOfferUpdatedEvent":[],
-    "vendor_registry.external_events.VendorShippingOptionUpdatedEvent":[],
-    "vendor_registry.external_events.VendorPaymentOptionUpdatedEvent":[],
-    "vendor_registry.external_events.VendorTaxOptionUpdatedEvent":[]
 })
 
 

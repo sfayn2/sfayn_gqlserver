@@ -2,22 +2,18 @@
 
 [![Django CI](https://github.com/sfayn2/sfayn_gqlserver/actions/workflows/django.yml/badge.svg)](https://github.com/sfayn2/sfayn_gqlserver/actions/workflows/django.yml)
 
-# Order Management API (DDD + GraphQL + JWT-secured OMS)
+# Lightweight, Integration-Focused Order Management API (DDD + GraphQL + JWT-secured)
 
-A modular, multi-tenant **Order Management System** built with **Domain Driven Design (DDD)**. Designed to integrate with any storefront, or identity provider.
+A lightweight, multi-tenant **OMS** built with **Domain Driven Design (DDD)**. Focuses on workflow customization and easy integration with external storefronts, or fullfillment services.
 
 ## Key Features
-- Order lifecycle (customizable workflow)
-- JWT-secured, tenant-scope APIs
+- Customizable Workflows - tenants can define sub-states and optional steps.
+- JWT-secured APIs - tenant-scoped access control
 - Supports single-tenant or multi-tenant setups.
 - Supports strong decoupling between bounded contexts (Snapshot Architecture)
 - Prevents cross-tenant data access or leakage
 - Ensures isolation in multi-tenant Saas deployments
-- Works out of the box with our [checkout cart](https://github.com/sfayn2/checkout_cart), [vendor registry](https://github.com/sfayn2/vendor_registry), [identify gateway](https://github.com/sfayn2/identity_gateway), & [webhook sender service](https://github.com/sfayn2/webhook_sender_service)
-- Supports snapshot sync from external systems or manual CSV import (by request)
-
-
-> OMS-agnostic: Can integrate with any system via snapshot sync or available webhooks APIs.
+- Integrate with external storefronts, fullfillment system via webhook APIs
 
 
 ## Work in Progress
@@ -34,11 +30,6 @@ This Project is currently under active development. Major changes are ongoing.
     - `tenant_id`: Tenant Scope
     - `roles`: Customer or Vendor or Both
 
-
-## User Sync Requirement
-
-- if using our [identity gateway](https://github.com/sfayn2/identity_gateway) can emit UserEventLoggedInEvent, users are **auto-synced**
-- else, frontend must call [syncUser]() manually to the OMS before calling GraphQL Order lifecycle flow APIs.
 
 
 ## Example flow
@@ -61,11 +52,12 @@ This Project is currently under active development. Major changes are ongoing.
 
 ## Snapshot Strategy
 
-The OMS relies on local snapshot models for tenant, vendor, and user-related data. These  snapshots are used for read consistency and calculated decisions at the time of checkout or order placement.
+The OMS relies on local snapshot models for tenant, vendor, and user-related data.
 
 ### Support snapshots
 - TenantWorkflowSnapshot
 - TenantRolemapSnapshot
+- FullfillmentSnapshot?
 - UserAuthorizationSnapshot
 
 
@@ -76,7 +68,7 @@ The OMS relies on local snapshot models for tenant, vendor, and user-related dat
     - [checkout_cart](https://github.com/sfayn2/checkout_cart)
     - [tenant registry](https://github.com/sfayn2/tenant_registry)
     - [webhook sender service](https://github.com/sfayn2/webhook_sender_service)
-    - [identify gateway](https://github.com/sfayn2/identity_gateway)
+    - [identity gateway](https://github.com/sfayn2/identity_gateway)
 
 Snapshots are automatically updated via internal event sync. No extra integration is required.
 
@@ -85,9 +77,12 @@ if you're using an external storefront, orders can be synced via:
     - Supported strategies:
         - Custom backend sync service (by request)
         - Manual CSV import (see below)
-        - Event-driven updates (using existing OMS webhook APIs handler)
+        - Event-driven updates (using existing OMS webhook receiver APIs handler)
 
-### Manual Snapshot Import (by request)
+3. **3rd Party Integration**
+    - Fullfillment / 3PL services
+
+### Manual Snapshot / Order Import (by request)
 For simpler onboarding, we support manual snapshot import via `.csv` upload on request.
 
 > Ask us for CSV template formats to start importing your data manually.

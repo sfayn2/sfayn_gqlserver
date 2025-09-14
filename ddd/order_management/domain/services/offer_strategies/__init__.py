@@ -1,5 +1,0 @@
-from .free_gifts import FreeGiftsOfferStrategy
-from .free_shipping import FreeShippingOfferStrategy
-from .percentage_discount_by_coupon import PercentageDiscountCouponOfferStrategy
-from .percentage_discount import PercentageDiscountOfferStrategy
-from .ports import OfferStrategyAbstract
