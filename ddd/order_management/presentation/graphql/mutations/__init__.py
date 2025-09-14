@@ -1,17 +1,7 @@
-from .checkout_items_mutation import CheckoutItemsMutation
-from .confirm_order_mutation import ConfirmOrderMutation
-from .place_order_mutation import PlaceOrderMutation
-from .select_shipping_option_mutation import SelectShippingOptionMutation
 from .mark_as_shipped_mutation import MarkAsShippedMutation
 from .mark_as_completed_mutation import MarkAsCompletedMutation
 from .add_shipping_tracking_reference_mutation import AddShippingTrackingReferenceMutation
-from .add_coupon_mutation import AddCouponMutation
-from .remove_coupon_mutation import RemoveCouponMutation
 from .cancel_order_mutation import CancelOrderMutation
-from .change_destination_mutation import ChangeDestinationMutation
-from .change_order_quantity_mutation import ChangeOrderQuantityMutation
-from .add_line_items_mutation import AddLineItemsMutation
-from .remove_line_items_mutation import RemoveLineItemsMutation
 
 
 #Other activities

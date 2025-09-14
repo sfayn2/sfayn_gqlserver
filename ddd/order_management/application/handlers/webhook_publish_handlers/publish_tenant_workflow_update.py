@@ -7,12 +7,12 @@ from ddd.order_management.application import (
 )
 from ddd.order_management.domain import events, exceptions
 
-def handle_publish_vendor_shippingoption_update(
-    command: commands.PublishVendorShippingOptionUpdateCommand, 
+def handle_publish_tenant_workflow_update(
+    command: commands.PublishTenantWorkflowUpdateCommand, 
     event_publisher: ports.EventPublisherAbstract
 ):
     try:
-        event = dtos.VendorShippingOptionUpdateIntegrationEvent(
+        event = dtos.TenantWorkflowUpdateIntegrationEvent(
             **command.model_dump()
         )
 
@@ -20,7 +20,7 @@ def handle_publish_vendor_shippingoption_update(
 
         return dtos.ResponseDTO(
             success=True,
-            message="Vendor Shipping Option update has been published."
+            message="Tenant Workflow update has been published."
         )
 
     except exceptions.InvalidOrderOperation as e:

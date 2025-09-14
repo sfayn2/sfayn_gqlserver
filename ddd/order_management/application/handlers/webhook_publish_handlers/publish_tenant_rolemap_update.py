@@ -7,12 +7,12 @@ from ddd.order_management.application import (
 )
 from ddd.order_management.domain import events, exceptions
 
-def handle_publish_product_update(
-    command: commands.PublishProductUpdateCommand, 
+def handle_publish_tenant_rolemap_update(
+    command: commands.PublishTenantRolemapUpdateCommand, 
     event_publisher: ports.EventPublisherAbstract
 ):
     try:
-        event = dtos.ProductUpdateIntegrationEvent(
+        event = dtos.TenantRolemapUpdateIntegrationEvent(
             **command.model_dump()
         )
 
@@ -20,7 +20,7 @@ def handle_publish_product_update(
 
         return dtos.ResponseDTO(
             success=True,
-            message="Product update has been published."
+            message="Tenant Rolemap update has been published."
         )
 
     except exceptions.InvalidOrderOperation as e:

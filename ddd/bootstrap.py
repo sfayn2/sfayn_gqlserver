@@ -41,11 +41,11 @@ load_dotenv(find_dotenv(filename=".env.test"))
 # Moved to TenantRolePermissionSnapshot ==========
 # Define role permissions
 #ROLE_MAP = {
-#    "customer": ["checkout_items", "add_line_items", "remove_line_items", 
+#    "customer": ["checkout.checkout_items", "checkout.add_line_items", "remove_line_items", 
 #    "add_coupon", "remove_coupon", "change_destination", "change_order_quantity", 
 #    "select_shipping_option", "list_shipping_options", "list_customer_addresses"
-#    "place_order", "confirm_order", "cancel_order", "get_order", "escalate_reviewer", "review_order", "request_return", "process_refund"],
-#    "vendor": ["mark_as_shipped", "add_shipping_tracking_reference", "mark_as_completed"],
+#    "place_order", "confirm_order", "cancel_order", "get_order", "oms.escalate_reviewer", "oms.review_order", "oms.request_return", "process_refund"],
+#    "vendor": ["oms.mark_as_shipped", "oms.add_shipping_tracking_reference", "oms.mark_as_completed"],
 #    "guest": ["checkout_items"]
 #}
 # ====================
@@ -151,13 +151,9 @@ event_bus.external_publisher = event_publishers.RedisStreamPublisher(
 
 # Map event types to validation models; define to support event payloads decoder w validation
 event_bus.EVENT_MODELS = {
-    "order_management.internal_events.ProductUpdatedEvent": dtos.ProductUpdateIntegrationEvent,
-    "order_management.internal_events.VendorDetailsUpdatedEvent": dtos.VendorDetailsUpdateIntegrationEvent,
-    "order_management.internal_events.VendorCouponUpdatedEvent": dtos.VendorCouponUpdateIntegrationEvent,
-    "order_management.internal_events.VendorOfferUpdatedEvent": dtos.VendorOfferUpdateIntegrationEvent,
-    "order_management.internal_events.VendorShippingOptionUpdatedEvent": dtos.VendorShippingOptionUpdateIntegrationEvent,
-    "order_management.internal_events.VendorPaymentOptionUpdatedEvent": dtos.VendorPaymentOptionUpdateIntegrationEvent,
-    "order_management.internal_events.VendorTaxOptionUpdatedEvent": dtos.VendorTaxOptionUpdateIntegrationEvent
+    "order_management.internal_events.TenantWorkflowUpdatedEvent": dtos.TenantWorkflowUpdateIntegrationEvent,
+    "order_management.internal_events.TenantWorkflowUpdatedEvent": dtos.TenantRolemapUpdateIntegrationEvent,
+    "order_management.internal_events.TenantWorkflowUpdatedEvent": dtos.TenantCreateOrderIntegrationEvent,
 }
 
 
@@ -181,46 +177,22 @@ event_bus.ASYNC_EXTERNAL_EVENT_HANDLERS.update({
 
 # Internal async (redis/kafka/etc?) event handlers (within this service)
 event_bus.ASYNC_INTERNAL_EVENT_HANDLERS.update({
-    "order_management.internal_events.ProductUpdatedEvent": [
-        lambda event: handlers.handle_product_update_async_event(
+    "order_management.internal_events.TenantWorkflowUpdatedEvent": [
+        lambda event: handlers.handle_tenant_workflow_update_async_event(
             event=event,
-            product_snapshot_repo=snapshots.DjangoVendorProductSnapshotRepo()
+            tenant_workflow_snapshot_repo=snapshots.DjangoVendorProductSnapshotRepo()
         ),
     ],
-    "order_management.internal_events.VendorDetailsUpdatedEvent": [
-        lambda event: handlers.handle_vendor_details_update_async_event(
+    "order_management.internal_events.TenantRolemapUpdatedEvent": [
+        lambda event: handlers.handle_tenant_rolemap_update_async_event(
             event=event,
-            vendor_details_snapshot_repo=snapshots.DjangoVendorDetailsSnapshotRepo()
+            tenant_rolemap_snapshot_repo=snapshots.DjangoVendorProductSnapshotRepo()
         ),
     ],
-    "order_management.internal_events.VendorCouponUpdatedEvent": [
-        lambda event: handlers.handle_vendor_coupon_update_async_event(
+    "order_management.internal_events.TenantCreateOrderEvent": [
+        lambda event: handlers.handle_tenant_create_order_async_event(
             event=event,
-            vendor_coupon_snapshot_repo=snapshots.DjangoVendorCouponSnapshotRepo()
-        ),
-    ],
-    "order_management.internal_events.VendorOfferUpdatedEvent": [
-        lambda event: handlers.handle_vendor_offer_update_async_event(
-            event=event,
-            vendor_offer_snapshot_repo=snapshots.DjangoVendorOfferSnapshotRepo()
-        ),
-    ],
-    "order_management.internal_events.VendorShippingOptionUpdatedEvent": [
-        lambda event: handlers.handle_vendor_shippingoption_update_async_event(
-            event=event,
-            vendor_shippingoption_snapshot_repo=snapshots.DjangoVendorShippingOptionSnapshotRepo()
-        ),
-    ],
-    "order_management.internal_events.VendorPaymentOptionUpdatedEvent": [
-        lambda event: handlers.handle_vendor_paymentoption_update_async_event(
-            event=event,
-            vendor_paymentoption_snapshot_repo=snapshots.DjangoVendorPaymentOptionSnapshotRepo()
-        ),
-    ],
-    "order_management.internal_events.VendorTaxOptionUpdatedEvent": [
-        lambda event: handlers.handle_vendor_taxoption_update_async_event(
-            event=event,
-            vendor_taxoption_snapshot_repo=snapshots.DjangoVendorTaxOptionSnapshotRepo()
+            tenant_create_order_snapshot_repo=snapshots.DjangoVendorProductSnapshotRepo()
         ),
     ],
 })
@@ -239,112 +211,10 @@ event_bus.EVENT_HANDLERS.update({
                 email=email_sender.MyEmailSender()
             )
         ],
-    events.SelectedShippingOptionEvent: [
-            lambda event, uow: handlers.handle_apply_applicable_offers(
-                event=event, 
-                uow=uow,
-                vendor=repositories.DjangoVendorRepositoryImpl(),
-                promition_service=promotion_service
-            )
-        ],
-    events.AppliedOffersEvent: [
-            lambda event, uow: handlers.handle_apply_tax_results(
-                event=event, 
-                uow=uow,
-                tax_service=tax_service
-            )
-        ],
-    events.AppliedTaxesEvent: [
-            lambda event, uow: handlers.handle_logged_order(
-                event=event, 
-                uow=uow,
-                logging=loggings.SampleLogging()
-            ),
-        ],
 })
 
 # Command Handlers (write operations)
 message_bus.COMMAND_HANDLERS.update({
-    commands.CheckoutItemsCommand: lambda command, **deps: handlers.handle_checkout_items(
-        command=command,
-        uow=repositories.DjangoOrderUnitOfWork(),
-        vendor_repo=repositories.DjangoVendorRepositoryImpl(),
-        order_service=domain_services.OrderService(),
-        stock_validation=validations.DjangoStockValidation(),
-        access_control=access_control,
-        **deps
-    ),
-    commands.ChangeOrderQuantityCommand: lambda command, **deps: handlers.handle_change_order_quantity(
-        command=command,
-        uow=repositories.DjangoOrderUnitOfWork(),
-        access_control=access_control,
-        stock_validation=validations.DjangoStockValidation(),
-        **deps
-    ),
-    commands.AddLineItemsCommand: lambda command, **deps: handlers.handle_add_line_items(
-        command=command,
-        uow=repositories.DjangoOrderUnitOfWork(),
-        vendor_repo=repositories.DjangoVendorRepositoryImpl(),
-        access_control=access_control,
-        stock_validation=validations.DjangoStockValidation(),
-        **deps
-    ),
-    commands.RemoveLineItemsCommand: lambda command, **deps: handlers.handle_remove_line_items(
-        command=command,
-        uow=repositories.DjangoOrderUnitOfWork(),
-        vendor_repo=repositories.DjangoVendorRepositoryImpl(),
-        access_control=access_control,
-        **deps
-    ),
-    commands.ChangeDestinationCommand: lambda command, **deps: handlers.handle_change_destination(
-        command=command,
-        uow=repositories.DjangoOrderUnitOfWork(),
-        access_control=access_control,
-        **deps
-    ),
-    commands.AddCouponCommand: lambda command, **deps: handlers.handle_add_coupon(
-        command=command,
-        uow=repositories.DjangoOrderUnitOfWork(),
-        coupon_validation=validations.DjangoCouponValidation(),
-        access_control=access_control,
-        **deps
-    ),
-    commands.RemoveCouponCommand: lambda command, **deps: handlers.handle_remove_coupon(
-        command=command,
-        uow=repositories.DjangoOrderUnitOfWork(),
-        coupon_validation=validations.DjangoCouponValidation(),
-        access_control=access_control,
-        **deps
-    ),
-    commands.SelectShippingOptionCommand: lambda command, **deps: handlers.handle_select_shipping_option(
-        command=command, 
-        uow=repositories.DjangoOrderUnitOfWork(),
-        vendor_repo=repositories.DjangoVendorRepositoryImpl(),
-        access_control=access_control,
-        shipping_option_service=shipping_option_service,
-        **deps
-    ),
-    commands.PlaceOrderCommand: lambda command, **deps: handlers.handle_place_order(
-        command=command,
-        uow=repositories.DjangoOrderUnitOfWork(),
-        access_control=access_control,
-        stock_validation=validations.DjangoStockValidation(),
-        **deps
-    ),
-    commands.ConfirmOrderCommand: lambda command, **deps: handlers.handle_confirm_order(
-        command=command, 
-        uow=repositories.DjangoOrderUnitOfWork(),
-        payment_service=payment_service,
-        access_control=access_control,
-        stock_validation=validations.DjangoStockValidation(),
-        **deps
-    ),
-    commands.CancelOrderCommand: lambda command, **deps: handlers.handle_cancel_order(
-        command=command,
-        access_control=access_control,
-        uow=repositories.DjangoOrderUnitOfWork(),
-        **deps
-    ),
     commands.ShipOrderCommand: lambda command, **deps: handlers.handle_mark_as_shipped(
         command=command,
         access_control=access_control,
@@ -369,19 +239,6 @@ message_bus.COMMAND_HANDLERS.update({
 
 #Query Handlers (read operations)
 message_bus.QUERY_HANDLERS.update({
-    queries.ListShippingOptionsQuery: lambda query, **deps: handlers.handle_list_shipping_options(
-        query=query, 
-        uow=repositories.DjangoOrderUnitOfWork(),
-        vendor_repo=repositories.DjangoVendorRepositoryImpl(),
-        shipping_option_service=shipping_option_service,
-        **deps
-    ),
-    queries.ListCustomerAddressesQuery: lambda query, **deps: handlers.handle_list_customer_addresses(
-        query=query, 
-        uow=repositories.DjangoOrderUnitOfWork(),
-        customer_repo=repositories.DjangoCustomerRepositoryImpl(),
-        **deps
-    ),
     queries.GetOrderQuery: lambda query, **deps: handlers.handle_get_order(
         query=query, 
         uow=repositories.DjangoOrderUnitOfWork(),

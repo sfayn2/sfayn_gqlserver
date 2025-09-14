@@ -10,23 +10,16 @@ class Command2(Command):
 #    "tenant_id": "tenant1",
 #    "data": { ... }
 # }
-class PublishProductUpdateCommand(Command2):
-    data: dtos.VendorProductSnapshotDTO
 
-class PublishVendorDetailsUpdateCommand(Command2):
-    data: dtos.VendorDetailsSnapshotDTO
+#TODO data
+class PublishTenantWorkflowUpdateCommand(Command2):
+    pass
+    #data: dtos.VendorProductSnapshotDTO
 
-class PublishVendorCouponUpdateCommand(Command2):
-    data: dtos.VendorCouponSnapshotDTO
+class PublishTenantRolemapUpdateCommand(Command2):
+    pass
+    #data: dtos.VendorProductSnapshotDTO
 
-class PublishVendorOfferUpdateCommand(Command2):
-    data: dtos.VendorOfferSnapshotDTO
-
-class PublishVendorShippingOptionUpdateCommand(Command2):
-    data: dtos.VendorShippingOptionSnapshotDTO
-
-class PublishVendorPaymentOptionUpdateCommand(Command2):
-    data: dtos.VendorPaymentOptionSnapshotDTO
-
-class PublishVendorTaxOptionUpdateCommand(Command2):
-    data: dtos.VendorTaxOptionSnapshotDTO
+class PublishTenantCreateOrderCommand(Command2):
+    pass
+    #data: dtos.VendorProductSnapshotDTO

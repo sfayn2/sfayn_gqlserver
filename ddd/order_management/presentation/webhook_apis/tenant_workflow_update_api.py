@@ -6,7 +6,7 @@ from ddd.order_management.application import (
 from ddd.order_management.application.services import validate_webhook
 
 @csrf_exempt
-def vendor_shippingoption_update_api(request, provider: str, tenant_id: str):
+def tenant_workflow_update_api(request, provider: str, tenant_id: str):
 
     if request.method != "POST":
         return HttpResponseBadRequest("Only POST is allowed")
@@ -18,7 +18,7 @@ def vendor_shippingoption_update_api(request, provider: str, tenant_id: str):
                 request
             )
         
-        command = commands.PublishVendorShippingOptionUpdateCommand.model_validate(payload)
+        command = commands.PublishTenantWorkflowUpdateCommand.model_validate(payload)
         result = message_bus.handle(command)
         return JsonResponse(result.model_dump())
     except Exception as e:

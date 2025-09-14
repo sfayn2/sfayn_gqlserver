@@ -7,12 +7,12 @@ from ddd.order_management.application import (
 )
 from ddd.order_management.domain import events, exceptions
 
-def handle_publish_vendor_coupon_update(
-    command: commands.PublishVendorCouponUpdateCommand, 
+def handle_publish_tenant_create_order(
+    command: commands.PublishTenantCreateOrderCommand, 
     event_publisher: ports.EventPublisherAbstract
 ):
     try:
-        event = dtos.VendorCouponUpdateIntegrationEvent(
+        event = dtos.TenantCreateOrderIntegrationEvent(
             **command.model_dump()
         )
 
@@ -20,7 +20,7 @@ def handle_publish_vendor_coupon_update(
 
         return dtos.ResponseDTO(
             success=True,
-            message="Vendor Coupon update has been published."
+            message="Tenant Create order has been published."
         )
 
     except exceptions.InvalidOrderOperation as e:
