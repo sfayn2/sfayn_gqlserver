@@ -2,12 +2,12 @@
 
 [![Django CI](https://github.com/sfayn2/sfayn_gqlserver/actions/workflows/django.yml/badge.svg)](https://github.com/sfayn2/sfayn_gqlserver/actions/workflows/django.yml)
 
-# Order Management API (DDD + GraphQL + JWT-secured)
+# Order Management API (DDD + GraphQL + JWT-secured OMS)
 
 A modular, multi-tenant **Order Management System** built with **Domain Driven Design (DDD)**. Designed to integrate with any storefront, or identity provider.
 
 ## Key Features
-- Full checkout + order lifecycle (customizable workflow)
+- Order lifecycle (customizable workflow)
 - JWT-secured, tenant-scope APIs
 - Supports single-tenant or multi-tenant setups.
 - Supports strong decoupling between bounded contexts (Snapshot Architecture)
