@@ -44,7 +44,7 @@ class Order(models.Model):
     delivery_country = models.CharField(max_length=50)
     delivery_state = models.CharField(max_length=10, blank=True, null=True, help_text="Mandatory in countries like US, Canada, India but irrelevant in small countries")
 
-    shipping_method = models.CharField(max_length=50, null=True, blank=True, help_text="Customer shipping option (not internal shipping method), i.e. Free Shipping, Local Pickup", choices=enums.ShippingMethod.choices)
+    shipping_method = models.CharField(max_length=50, null=True, blank=True, help_text="Customer shipping option (not internal shipping method), i.e. Free Shipping, Local Pickup")
     shipping_delivery_time = models.CharField(max_length=150, null=True, blank=True, help_text="i.e. 2-3 days delivery")
     shipping_cost = models.DecimalField(
         decimal_places=settings.DEFAULT_DECIMAL_PLACES, 
@@ -102,7 +102,7 @@ class Order(models.Model):
         help_text="overall total - discounts + ship cost + tax, etc. ?", 
     )
 
-    payment_method = models.CharField(max_length=50, null=True, blank=True, choices=enums.PaymentMethod.choices)
+    payment_method = models.CharField(max_length=50, null=True, blank=True)
     payment_reference = models.CharField(
         max_length=25, 
         blank=True, 
@@ -258,179 +258,10 @@ class TenantRolePermissionSnapshot(models.Model):
 # for Vendor Snapshots
 #==============
 
-class VendorDetailsSnapshot(models.Model):
-    vendor_id = models.CharField(max_length=150)
-    tenant_id = models.CharField(max_length=150)
-    name = models.CharField(max_length=200)
-    country = models.CharField(max_length=50, help_text="Can use to determine if the order is domestic compared w destination")
-    is_active = models.BooleanField(default=True, help_text="To quickly control whether the is valid")
-    last_update_dt = models.DateTimeField(auto_now=True) 
+class WarehouseAddressSnapshot(models.Model):
 
-    def __str__(self):
-        return f"{self.vendor_id} | {self.name} | IsActive: {self.is_active} | {self.last_update_dt}"
-
-class VendorCouponSnapshot(models.Model):
-    vendor_id = models.CharField(max_length=150)
-    tenant_id = models.CharField(max_length=150)
-    offer_id = models.CharField(max_length=150)
-    coupon_code = models.CharField(max_length=50, help_text="e.g WELCOME25")
-    start_date = models.DateTimeField(help_text="Only valid on start of this date")
-    end_date = models.DateTimeField(help_text="Only valid on before end date")
-    is_active = models.BooleanField(default=False, help_text="To quickly control whether this offer is still valid")
-    last_update_dt = models.DateTimeField(auto_now=True) 
-
-    def __str__(self):
-        return f"{self.tenant_id} | {self.vendor_id} | {self.coupon_code} | Validity: {self.start_date} - {self.end_date} | Active: {self.is_active} | LastUpdate: {self.last_update_dt}"
-
-class VendorOfferSnapshot(models.Model):
-    vendor_id = models.CharField(max_length=150)
-    tenant_id = models.CharField(max_length=150)
-    offer_id = models.CharField(max_length=150)
-    name = models.CharField(max_length=255)
-    provider = models.CharField(max_length=150, help_text="this is also being used to associate implementation handler and offer Type")
-    offer_type = models.CharField(max_length=50, choices=enums.OfferType.choices)
-    discount_value = models.DecimalField(
-            decimal_places=settings.DEFAULT_DECIMAL_PLACES, 
-            max_digits=settings.DEFAULT_MAX_DIGITS,
-            help_text="Percentage or Fix amount?", 
-            default=Decimal("0.0")
-        )
-    conditions = models.CharField(max_length=150, help_text='ex. min_purchase, applicable_products')
-    stackable = models.BooleanField(default=False, help_text="Set to True, To combine w other stackable")
-    priority = models.PositiveIntegerField(default=0, help_text="The highest number will be prioritized on multistack or single stack")
-    required_coupon = models.BooleanField(default=False, help_text="Set to True, To make use of coupons to apply")
-    start_date = models.DateTimeField(help_text="Only valid on start of this date; To ignore if required_coupon is True", blank=True, null=True)
-    end_date = models.DateTimeField(help_text="Only valid on before end date; To ignore if required_coupon is True", blank=True, null=True)
-    is_active = models.BooleanField(default=False, help_text="To quickly control whether this offer is still valid")
-    last_update_dt = models.DateTimeField(auto_now=True) 
-
-
-    def __str__(self):
-        return f"{self.tenant_id} | {self.vendor_id} | {self.name} ( {self.offer_type} ) | Required Coupon : {self.required_coupon} | {self.start_date} - {self.end_date} | Is Active: {self.is_active} | LastUpdate: {self.last_update_dt}"
-
-class VendorPaymentOptionSnapshot(models.Model):
-    vendor_id = models.CharField(max_length=150)
-    tenant_id = models.CharField(max_length=150)
-
-    option_name = models.CharField(max_length=255, help_text="Just a name of this payment Option. e.g. Credit Card (Stripe) ")
-    method = models.CharField(max_length=50, null=True, blank=True, choices=enums.PaymentMethod.choices)
-    provider = models.CharField(max_length=150, help_text="this is also being used to associate implementation handler and payment method")
-    conditions = models.CharField(max_length=150, help_text='ex. { "country": "US" }')
-    is_active = models.BooleanField(default=False, help_text="To quickly control whether this option is still valid")
-    last_update_dt = models.DateTimeField(auto_now=True) 
-
-    def __str__(self):
-        return f"{self.tenant_id} | {self.vendor_id} | {self.option_name}  | LastUpdate: {self.last_update_dt}"
-
-
-class VendorTaxOptionSnapshot(models.Model):
-    vendor_id = models.CharField(max_length=150)
-    tenant_id = models.CharField(max_length=150)
-
-    tax_type = models.CharField(max_length=50, null=True, blank=True, choices=enums.TaxType.choices)
-    provider = models.CharField(max_length=150, help_text="this is also being used to associate implementation handler and tax type")
-    inclusive = models.BooleanField(default=False)
-
-    rate = models.DecimalField(
-            decimal_places=settings.DEFAULT_DECIMAL_PLACES, 
-            max_digits=settings.DEFAULT_MAX_DIGITS,
-            help_text="", 
-            default=Decimal("0.0")
-        )
-    conditions = models.CharField(max_length=150, help_text='ex. { "state_tax_rate": { "CA": 0.075, "NY": 0.04, "TX": 0.0625 } }')
-
-    is_active = models.BooleanField(default=False, help_text="To quickly control whether this option is still valid")
-    last_update_dt = models.DateTimeField(auto_now=True) 
-
-    def __str__(self):
-        return f"{self.tenant_id} | {self.vendor_id} | {self.tax_type} | {self.conditions} | LastUpdate: {self.last_update_dt}"
-
-class VendorShippingOptionSnapshot(models.Model):
-    vendor_id = models.CharField(max_length=150)
-    tenant_id = models.CharField(max_length=150)
-
-    option_name = models.CharField(max_length=255, help_text="Just a name of this shipping Option. e.g. MyStandard")
-    method = models.CharField(max_length=50, null=True, blank=True, choices=enums.ShippingMethod.choices)
-    provider = models.CharField(max_length=150, help_text="this is also being used to associate implementation handler and shipping method")
-
-    base_cost = models.DecimalField(
-            decimal_places=settings.DEFAULT_DECIMAL_PLACES, 
-            max_digits=settings.DEFAULT_MAX_DIGITS,
-            help_text="", 
-            default=Decimal("0.0")
-        )
-    currency = models.CharField(max_length=50, help_text="Default currency specific to this Shipping option base cost or flat rate", default=settings.DEFAULT_CURRENCY)
-
-    conditions = models.CharField(max_length=150, help_text='ex. { "max_weight": 30 }')
-
-    flat_rate = models.DecimalField(
-            decimal_places=settings.DEFAULT_DECIMAL_PLACES, 
-            max_digits=settings.DEFAULT_MAX_DIGITS,
-            help_text="", 
-            default=Decimal("0.0")
-        )
-    delivery_time = models.CharField(max_length=255)
-    is_active = models.BooleanField(default=False, help_text="To quickly control whether this option is still valid")
-    last_update_dt = models.DateTimeField(auto_now=True) 
-
-    def __str__(self):
-        return f"{self.tenant_id} | {self.vendor_id} | {self.option_name} | {self.delivery_time} | {self.conditions} | LastUpdate: {self.last_update_dt}"
-
-class VendorProductSnapshot(models.Model):
-    product_id = models.CharField(max_length=150)
-    vendor_id = models.CharField(max_length=150)
-    tenant_id = models.CharField(max_length=150)
-    product_sku = models.CharField(max_length=50)
-    product_name = models.CharField(max_length=255)
-    product_category = models.CharField(max_length=100, help_text="some countries uses category to calculate tax")
-    options = models.CharField(max_length=150, help_text='ex. {"Size": "M", "Color": "RED"}') # anticipated to have complex tables to support multi dimension variants, decided to use JSONField
-    product_price = models.DecimalField(max_digits=10, decimal_places=2)
-    stock = models.PositiveIntegerField()
-    product_currency = models.CharField(max_length=50, help_text="Currency for calculation requirements & validation. e.g. SGD")
-    package_weight = models.CharField(max_length=100, null=True, blank=True, help_text="value should be coming from product itself or to fill in later once it goes to warehouse fulfillment?")
-    package_length = models.CharField(max_length=100, null=True, blank=True, help_text="value should be coming from product itself or to fill in later once it goes to warehouse fulfillment? ")
-    package_width = models.CharField(max_length=100, null=True, blank=True, help_text="value should be coming from product itself or to fill in later once it goes to warehouse fulfillment?")
-    package_height = models.CharField(max_length=100, null=True, blank=True, help_text="value should be coming from product itself or to fill in later once it goes to warehouse fulfillment?")
-    is_free_gift = models.BooleanField(default=False, null=True, blank=True)
-    is_taxable = models.BooleanField(default=True, null=True, blank=True)
-    is_active = models.BooleanField(default=True)
-    last_update_dt = models.DateTimeField(auto_now=True) 
-
-    class Meta:
-        unique_together = ('product_sku', 'tenant_id', 'vendor_id') #ensure one default per addres type
-
-    def __str__(self):
-        return f"({self.tenant_id} | {self.vendor_id}) | {self.product_sku} | {self.product_name} | {self.stock} | {self.is_active}"
-
-
-#===========================
-# For Customer snapshot
-#===================
-class CustomerDetailsSnapshot(models.Model):
-    customer_id = models.CharField(max_length=150)
-    tenant_id = models.CharField(max_length=150)
-    user_id = models.CharField(max_length=150, null=True, blank=True)
-    first_name = models.CharField(max_length=255, null=True, blank=True)
-    last_name = models.CharField(max_length=255, null=True, blank=True)
-    email = models.EmailField(max_length=255, blank=True, null=True)
-    is_active = models.BooleanField(default=True)
-    last_update_dt = models.DateTimeField(auto_now=True) 
-
-    def __str__(self):
-        return f"{self.tenant_id} | {self.customer_id} | {self.first_name} {self.last_name} | {self.email}"
-
-class CustomerAddressSnapshot(models.Model):
-    ADDRESS_TYPE_CHOICES = (
-        ('billing', 'Billing'),
-        ('shipping', 'Shipping'),
-    )
-
-    customer_id = models.CharField(max_length=150)
-
-    address_type = models.CharField(
-        max_length=10,
-        choices=ADDRESS_TYPE_CHOICES
-    )
+    warehouse_id = models.CharField(max_length=150)
+    warehouse_name = models.CharField(max_length=150)
 
     street = models.CharField(max_length=255)
     city = models.CharField(max_length=100)
@@ -442,10 +273,10 @@ class CustomerAddressSnapshot(models.Model):
     last_update_dt = models.DateTimeField(auto_now=True) 
 
     def __str__(self):
-        return f"{self.customer_id} | {self.address_type.capitalize()} Address: {self.street}, {self.city}, {self.country}"
+        return f"{self.warehouse_id} | Address: {self.street}, {self.city}, {self.country}"
 
     class Meta:
-        unique_together = ('customer_id', 'address_type', 'is_default') #ensure one default per addres type
+        unique_together = ('warehouse_id', 'address_type', 'is_default') #ensure one default per addres type
 
 # =========
 # Local Authorization / Scope Based

@@ -1,4 +1,5 @@
-import uuid
+from __future__ import annotations
+from typing import Optional
 from dataclasses import dataclass
 from ddd.order_management.domain import value_objects, exceptions
 from decimal import Decimal
@@ -13,7 +14,7 @@ class LineItem:
     #vendor_name: str
     product_category: str
     options: dict
-    package: value_objects.Package
+    package: Optional[value_objects.Package] = None
     is_free_gift: bool = False
     is_taxable: bool = True
 
@@ -26,17 +27,12 @@ class LineItem:
         if self.product_price.amount < 0:
             raise exceptions.InvalidOrderOperation("Product price cannot be negative.")
 
-        if any(d <= 0 for d in self.package.dimensions):
+        if self.package and any(d <= 0 for d in self.package.dimensions):
             raise exceptions.InvalidOrderOperation("Package dimensions must be positive value.")
 
-        #TODO? really?
-        if self.is_free_gift and self.is_taxable:
-            raise exceptions.InvalidOrderOperation("Free gift is not taxable.")
-
-    def update_order_quantity(self, new_quantity: int):
-        if new_quantity <= 0:
-            raise exceptions.InvalidOrderOperation("Order quantity must be greater than zero.")
-        self.order_quantity = new_quantity
+        ##TODO? really?
+        #if self.is_free_gift and self.is_taxable:
+        #    raise exceptions.InvalidOrderOperation("Free gift is not taxable.")
 
     @property
     def total_price(self) -> value_objects.Money:

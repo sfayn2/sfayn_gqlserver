@@ -7,7 +7,7 @@ from .money import Money
 @dataclass(frozen=True)
 class PaymentDetails:
     order_id: str
-    method: enum.PaymentMethod
+    method: str
     paid_amount: Money
     transaction_id: str
     status: enum.PaymentStatus
@@ -31,6 +31,6 @@ class PaymentDetails:
         if self.paid_amount and self.paid_amount.amount < Decimal("0"):
             raise exceptions.PaymentDetailsException("Paid amount cannot be negative.")
 
-        if not self.method != enums.PaymentMethod.COD and not self.transaction_id:
-            raise exceptions.PaymentDetailsException("Transaction ID is required for non-COD payments.")
+        #if not self.method != enums.PaymentMethod.COD and not self.transaction_id:
+        #    raise exceptions.PaymentDetailsException("Transaction ID is required for non-COD payments.")
 

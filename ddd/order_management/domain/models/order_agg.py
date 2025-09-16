@@ -52,6 +52,8 @@ class Order:
     def add_line_item(self, line_item: LineItem) -> None:
         if not line_item:
             raise exceptions.InvalidOrderOperation("Please provide line item to add.")
+        
+        #OMS side only
         if self.order_stage != enums.OrderStage.PENDING:
             raise exceptions.InvalidOrderOperation("Only pending order can add line item.")
 

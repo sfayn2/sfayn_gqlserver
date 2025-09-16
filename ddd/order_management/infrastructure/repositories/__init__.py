@@ -1,4 +1,2 @@
-from .django_customer_repository import DjangoCustomerRepositoryImpl
 from .django_order_repository import DjangoOrderRepositoryImpl
-from .django_vendor_repository import DjangoVendorRepositoryImpl
 from .unit_of_work import DjangoOrderUnitOfWork

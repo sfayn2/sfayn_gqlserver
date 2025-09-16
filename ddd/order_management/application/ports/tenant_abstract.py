@@ -3,7 +3,7 @@ from typing import List
 from abc import ABC, abstractmethod
 from ddd.order_management.domain import value_objects
 
-class VendorAbstract(ABC):
+class TenantAbstract(ABC):
 
     @abstractmethod
     def get_tenant_workflow(
@@ -11,3 +11,7 @@ class VendorAbstract(ABC):
         tenant_id: str,
     ) -> List[dtos.TenantWorkflowSnapshotDTO]:
         raise NotImplementedError("Subclasses must implement this method")
+
+    def sync(self, event: dtos.TenantWorkflowUpdateIntegrationEvent):
+        raise NotImplementedError("Subclasses must implement this method")
+

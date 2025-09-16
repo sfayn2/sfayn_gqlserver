@@ -12,7 +12,7 @@ class CustomerDetails:
 
     def __post_init__(self):
         if not self.first_name or not self.last_name or not self.email:
-            raise exceptions.CustomerDetailsException("Customer details fields (street, city, postal, country, state) cannot be empty.")
+            raise exceptions.CustomerDetailsException("Customer details fields (first_name, last_name, email) cannot be empty.")
 
         if not re.match(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', self.email):
             raise exceptions.CustomerDetailsException("Customer email is not valid.")

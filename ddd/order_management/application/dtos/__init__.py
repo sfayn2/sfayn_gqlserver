@@ -12,21 +12,10 @@ from .dtos import (
     OrderResponseDTO,
     CouponDTO,
     OrderDTO,
-    OfferStrategyDTO,
-    ShippingOptionStrategyDTO,
     ProductSkusDTO,
     UserContextDTO
 )
 from .snapshot_dtos import (
-    VendorDetailsSnapshotDTO,
-    VendorCouponSnapshotDTO,
-    VendorOfferSnapshotDTO,
-    VendorShippingOptionSnapshotDTO,
-    VendorProductSnapshotDTO,
-    CustomerDetailsSnapshotDTO,
-    CustomerAddressSnapshotDTO,
-    VendorPaymentOptionSnapshotDTO,
-    VendorTaxOptionSnapshotDTO,
     TenantWorkflowSnapshotDTO
 )
 

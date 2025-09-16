@@ -1,19 +1,16 @@
 from __future__ import annotations
-import pytz, uuid
-from datetime import datetime
-from typing import List
-from ddd.order_management.domain import (
-    repositories, 
-    enums, 
-    value_objects, 
-    exceptions, 
-    models
-)
 from order_management import models as django_snapshots
-from ddd.order_management.infrastructure import django_mappers
-from ddd.order_management.application import dtos
+from ddd.order_management.application import ports
 
-class DjangoVendorRepositoryImpl(repositories.VendorAbstract):
+class DjangoTenantWorkflowSnapshotRepo(ports.SnapshotRepoAbstract):
+
+    def sync(self, event: dtos.TenantWorkflowUpdateIntegrationEvent):
+        django_snapshots.TenantWorkflowSnapshot.objects.update_or_create(
+            tenant_id=event.data.tenant_id, 
+            vendor_id=event.data.vendor_id, 
+            offer_id=event.data.offer_id,
+            defaults=event.model_dump().get("data")
+        )
 
     def get_tenant_workflow(
         self,
@@ -30,4 +27,6 @@ class DjangoVendorRepositoryImpl(repositories.VendorAbstract):
                 print(f"DjangoVendorRepository.load_tenant_workflow exception > {str(e)}")
                 continue
         return final_opts
+
+
 

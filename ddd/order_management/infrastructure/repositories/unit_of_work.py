@@ -8,8 +8,6 @@ class DjangoOrderUnitOfWork(repositories.UnitOfWorkAbstract):
     #to trigger this
     def __init__(self):
         self.order = impl_repositories.DjangoOrderRepositoryImpl()
-        self.customer = impl_repositories.DjangoCustomerRepositoryImpl()
-        self.vendor = impl_repositories.DjangoVendorRepositoryImpl()
 
         self.event_publisher = event_bus
 

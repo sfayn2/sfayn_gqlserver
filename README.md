@@ -1,4 +1,4 @@
-# sfayn_gqlserver
+# LiteOMS
 
 [![Django CI](https://github.com/sfayn2/sfayn_gqlserver/actions/workflows/django.yml/badge.svg)](https://github.com/sfayn2/sfayn_gqlserver/actions/workflows/django.yml)
 
@@ -34,7 +34,7 @@ This Project is currently under active development. Major changes are ongoing.
 1. **Login** - User authenticates via IDP; optionally syncs to OMS.
 2. **Place Order** - External storefornt calls OMS create order api with confirmed checkout order.
 3. **Order Updates** - Vendor marks shipped, adds tracking, or completes order.
-6. **Cancel / View** - Order in PENDING or COFIRMED can be cancelled; order viewed via getOrder.
+6. **Cancel / View** - Order in PENDING or CONFIRMED can be cancelled; order viewed via getOrder.
 
 
 ## Integration
@@ -44,10 +44,10 @@ This Project is currently under active development. Major changes are ongoing.
 
 ## Snapshots
 * Local snapshots for read consistency and workflow decisions:
-- TenantWorkflowSnapshot
-- TenantRolemapSnapshot
-- FullfillmentSnapshot
-- UserAuthorizationSnapshot
+    * TenantWorkflowSnapshot
+    * TenantRolemapSnapshot
+    * FullfillmentSnapshot
+    * UserAuthorizationSnapshot
 
 
 ## Contributing

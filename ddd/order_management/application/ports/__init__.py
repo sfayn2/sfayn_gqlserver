@@ -1,19 +1,11 @@
-# vallidations
-from .stock_validation_abstract import StockValidationAbstract
-from .coupon_validation_abstract import CouponValidationAbstract
-from .customer_address_validation_abstract import CustomerAddressValidationAbstract
 
 from .email_sender_abstract import EmailSenderAbstract
 from .logging_abstract import LoggingAbstract
-from .payment_abstract import PaymentGatewayAbstract
 from .clock_abstract import ClockAbstract
+from .tenant_abstract import TenantAbstract
 
 #Snapshots
-#from .vendor_details_snapshot_abstract import VendorDetailsSnapshotAbstract
-from .vendor_offer_snapshot_abstract import VendorOfferSnapshotAbstract
-from .vendor_product_snapshot_abstract import VendorProductSnapshotAbstract
-from .vendor_shippingoption_snapshot_abstract import VendorShippingOptionSnapshotAbstract
-from .customer_snapshot_abstract import CustomerSnapshotAbstract
+from .tenant_workflow_snapshot_abstract import TenantWorkflowSnapshotAbstract
 from .snapshot_repo_abstract import SnapshotRepoAbstract
 
 from .access_control1_abstract import AccessControl1Abstract

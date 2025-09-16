@@ -15,7 +15,7 @@ class MoneyDTO(BaseModel):
     currency: str
 
 class ShippingOptionDTO(BaseModel):
-    method: enums.ShippingMethod
+    method: str
     delivery_time: str
     cost: MoneyDTO
 
@@ -46,7 +46,7 @@ class PackageDTO(BaseModel):
 
 class PaymentDetailsDTO(BaseModel):
     order_id: str
-    method: enums.PaymentMethod
+    method: str
     paid_amount: MoneyDTO
     transaction_id: str
     status: enums.PaymentStatus
@@ -56,7 +56,7 @@ class PaymentDetailsDTO(BaseModel):
 
 class PaymentOptionDTO(BaseModel):
     option_name: str
-    method: enums.PaymentMethod
+    method: str
     provider: str
 
 class LineItemDTO(BaseModel):
@@ -116,34 +116,6 @@ class OrderDTO(BaseModel):
     class Config:
         use_enum_values = True
 
-class OfferStrategyDTO(BaseModel):
-    offer_type: enums.OfferType
-    name: str
-    discount_value: int | Decimal
-    conditions: str
-    required_coupon: bool
-    coupons: Optional[List[CouponDTO]] = None
-    stackable: bool
-    priority: int
-    start_date: datetime
-    end_date: datetime
-    #is_active: bool
-
-    class Config:
-        use_enum_values = True
-
-class ShippingOptionStrategyDTO(BaseModel):
-    option_name: str
-    delivery_time: str
-    method: enums.ShippingMethod
-    conditions: dict
-    base_cost: MoneyDTO
-    flat_rate: MoneyDTO
-    currency: str
-    #is_active: bool
-
-    class Config:
-        use_enum_values = True
 
 class ProductSkusDTO(BaseModel):
     product_sku: str
