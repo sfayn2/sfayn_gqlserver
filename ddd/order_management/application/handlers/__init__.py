@@ -10,9 +10,9 @@ from .webhook_publish_handlers.publish_tenant_workflow_update import handle_publ
 from .webhook_publish_handlers.publish_tenant_rolemap_update import handle_publish_tenant_rolemap_update
 from .webhook_publish_handlers.publish_tenant_create_order import handle_publish_tenant_create_order
 
-# Other activities
-from .other_activities_handlers import other_activities_command_handlers
-from .other_activities_handlers.escalate_reviewer import handle_escalate_reviewer
+# Other activities / Workflow
+from .workflow_handlers import workflow_command_handlers
+from .workflow_handlers.escalate_reviewer import handle_escalate_reviewer
 
 # Queries
 from .get_order import handle_get_order

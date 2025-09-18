@@ -31,8 +31,15 @@ class OrderStage(Enum):
 class PaymentStatus(Enum):
     PAID = "PAID"
     PENDING = "PENDING"
-    CANCELLED = "CANCELLED"
-    UNKNOWN = "UNKNOWN"
+
+    @classmethod
+    def choices(cls):
+        return generate_choices(cls)
+
+class ShipmentStatus(Enum):
+    DELIVERED = "DELIVERED"
+    SHIPPED = "SHIPPED"
+    PENDING = "PENDING"
 
     @classmethod
     def choices(cls):

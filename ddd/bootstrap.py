@@ -156,7 +156,7 @@ message_bus.COMMAND_HANDLERS.update({
         **deps
     ),
     **handlers.webhook_publish_command_handlers.get_command_handlers(commands, handlers, event_bus),
-    **handlers.other_activities_command_handlers.get_command_handlers(commands, handlers, repositories.DjangoOrderUnitOfWork(), access_control)
+    **handlers.workflow_command_handlers.get_command_handlers(commands, handlers, repositories.DjangoOrderUnitOfWork(), access_control)
 })
 
 #Query Handlers (read operations)

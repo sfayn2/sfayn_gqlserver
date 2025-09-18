@@ -6,7 +6,7 @@ from .commands import (
     CompleteOrderCommand,
 )
 
-from .other_activities_commands import (
+from .workflow_commands import (
     ReviewOrderCommand,
     EscalateReviewerCommand,
     RequestReturnCommand,

@@ -5,7 +5,7 @@ from .cancel_order_mutation import CancelOrderMutation
 
 
 #Other activities
-from .other_activities.escalate_reviewer_mutation import EscalateReviewerMutation
-from .other_activities.review_order_mutation import ReviewOrderMutation
-from .other_activities.request_return_mutation import RequestReturnMutation
-from .other_activities.process_refund_mutation import ProcessRefundMutation
+from .workflow.escalate_reviewer_mutation import EscalateReviewerMutation
+from .workflow.review_order_mutation import ReviewOrderMutation
+from .workflow.request_return_mutation import RequestReturnMutation
+from .workflow.process_refund_mutation import ProcessRefundMutation

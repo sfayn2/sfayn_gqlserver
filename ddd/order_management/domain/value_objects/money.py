@@ -7,7 +7,7 @@ from ddd.order_management.domain import exceptions
 @dataclass(frozen=True)
 class Money:
     amount: Decimal
-    currency: str
+    currency: str = "USD"
 
     def __post_init__(self):
         if not isinstance(self.amount, Decimal):

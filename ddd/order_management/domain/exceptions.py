@@ -7,54 +7,6 @@ class MoneyException(InvalidOrderOperation):
 class AddressException(InvalidOrderOperation):
     pass
 
-class CouponException(InvalidOrderOperation):
-    pass
-
-class CustomerDetailsException(InvalidOrderOperation):
-    pass
-
-class OfferStrategyException(InvalidOrderOperation):
-    pass
-
-class PackageException(InvalidOrderOperation):
-    pass
-
-class PaymentDetailsException(InvalidOrderOperation):
-    pass
-
-class ShippingDetailsException(InvalidOrderOperation):
-    pass
-
-class VendorDetailsException(InvalidOrderOperation):
-    pass
-
-class ShippingOptionStrategyException(InvalidOrderOperation):
-    pass
-
-class SelectPaymentOptionException(InvalidOrderOperation):
-    pass
-
-class NoApplicableShippingOptionException(InvalidOrderOperation):
-    pass
-
-class NoApplicablePaymentOptionException(InvalidOrderOperation):
-    pass
-
-class NoApplicableTaxOptionException(InvalidOrderOperation):
-    pass
-
-class PaymentNotSettledException(InvalidOrderOperation):
-    pass
-
-class OutOfStockException(InvalidOrderOperation):
-    pass
-
-class VendorNotFoundException(InvalidOrderOperation):
-    pass
-
-class VendorProductNotFoundException(InvalidOrderOperation):
-    pass
-
 # below Exceptions will not be include error msg in response
 class Forbidden(Exception):
     pass
@@ -65,5 +17,5 @@ class AccessControlException(Exception):
 class IntegrationException(Exception):
     pass
 
-class OtherActivityException(InvalidOrderOperation):
+class WorkflowException(InvalidOrderOperation):
     pass

@@ -1,7 +1,7 @@
 from django.contrib import admin
 from order_management.models import (
     Order, 
-    OrderLine,
+    LineItem,
     UserAuthorizationSnapshot,
 )
 
@@ -11,7 +11,7 @@ from order_management.models import (
 class OrderAdmin(admin.ModelAdmin):
     pass
 
-class OrderLineAdmin(admin.ModelAdmin):
+class LineItemAdmin(admin.ModelAdmin):
     pass
 
 class UserAuthorizationSnapshotAdmin(admin.ModelAdmin):
@@ -19,7 +19,7 @@ class UserAuthorizationSnapshotAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Order, OrderAdmin)
-admin.site.register(OrderLine, OrderLineAdmin)
+admin.site.register(LineItem, LineItemAdmin)
 admin.site.register(UserAuthorizationSnapshot, UserAuthorizationSnapshotAdmin)
 
 #just a snapshots

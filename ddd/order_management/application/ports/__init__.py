@@ -5,7 +5,6 @@ from .clock_abstract import ClockAbstract
 from .tenant_abstract import TenantAbstract
 
 #Snapshots
-from .tenant_workflow_snapshot_abstract import TenantWorkflowSnapshotAbstract
 from .snapshot_repo_abstract import SnapshotRepoAbstract
 
 from .access_control1_abstract import AccessControl1Abstract
