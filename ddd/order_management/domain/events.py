@@ -10,7 +10,7 @@ from ddd.order_management.domain import value_objects, enums
 class DomainEvent(ABC):
     tenant_id: str
     order_id: str
-    order_stage: enums.OrderStage
+    order_status: enums.OrderStatus
     activity_status: str
 
     def event_type(self) -> str:

@@ -38,7 +38,7 @@ class Shipment:
         self.shipment_items.append(shipment_item)
 
     def add_shipping_tracking_reference(self, tracking_reference: str):
-        if self.order_stage != enums.OrderStage.SHIPPED:
+        if self.order_status != enums.OrderStatus.SHIPPED:
             raise exceptions.InvalidOrderOperation("Only shipped order can add tracking reference.")
         if not tracking_reference.startswith("http"):
             raise exceptions.InvalidOrderOperation("The Shipping tracking reference url is invalid.")

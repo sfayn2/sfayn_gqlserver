@@ -24,7 +24,7 @@ class WorkflowMapper:
 
         return models.Workflow(
             order_id=django_workflow.order_id,
-            order_stage=django_workflow.order_stage,
+            order_status=django_workflow.order_status,
             activity_status=django_workflow.activity_status,
             conditions=json.loads(django_workflow.step_name),
             step_name=django_workflow.step_name,

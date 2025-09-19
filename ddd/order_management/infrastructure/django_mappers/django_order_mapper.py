@@ -14,7 +14,7 @@ class OrderMapper:
                     'checkout_session': order.checkout_session,
                     'customer_name': order.customer_name, 
                     'customer_email': order.customer_email,
-                    'order_stage': order.order_stage.value, 
+                    'order_status': order.order_status.value, 
                     'activity_status': order.activity_status, 
                     'payment_status': order.payment_status, 
                     'currency': order.currency,
@@ -40,7 +40,7 @@ class OrderMapper:
             workflows=[
                 django_mappers.WorkflowMapper.to_domain(item) for item in django_order_object.workflows.all()
             ],
-            order_stage=django_order_object.order_stage,
+            order_status=django_order_object.order_status,
             payment_status=django_order_object.payment_status,
             activity_status=django_order_object.activity_status,
             currency=django_order_object.currency

@@ -12,12 +12,12 @@ class Order(models.Model):
     tenant_id = models.CharField(max_length=150)
     checkout_session = models.CharField(max_length=100, null=True, blank=True, help_text="{app}-{identifier} . eg. checkoutapp-1234")
 
-    order_stage = models.CharField(
+    order_status = models.CharField(
         max_length=25, 
         blank=True, 
         null=True, 
-        choices=enums.OrderStage.choices, 
-        default=enums.OrderStage.DRAFT
+        choices=enums.OrderStatus.choices, 
+        default=enums.OrderStatus.DRAFT
     ) 
 
     # sub status / workflow status
@@ -38,7 +38,7 @@ class Order(models.Model):
     date_modified = models.DateTimeField(auto_now=True) 
 
     def __str__(self):
-        return f"Order {self.order_id} | {self.customer_name} | Status {self.order_stage}"
+        return f"Order {self.order_id} | {self.customer_name} | Status {self.order_status}"
 
 class LineItem(models.Model):
     order = models.ForeignKey(
@@ -151,12 +151,12 @@ class Workflow(models.Model):
         null=True, 
         blank=True
     )
-    order_stage = models.CharField(
+    order_status = models.CharField(
         max_length=25, 
         blank=True, 
         null=True, 
-        choices=enums.OrderStage.choices, 
-        default=enums.OrderStage.DRAFT
+        choices=enums.OrderStatus.choices, 
+        default=enums.OrderStatus.DRAFT
     ) 
     workflow_status = models.CharField(
         max_length=25, 
@@ -205,12 +205,12 @@ class UserAuthorizationSnapshot(models.Model):
 # Local Tenant workflow
 class TenantWorkflowDefinition(models.Model):
     tenant_id = models.CharField(max_length=150)
-    order_stage = models.CharField(
+    order_status = models.CharField(
         max_length=25, 
         blank=True, 
         null=True, 
-        choices=enums.OrderStage.choices, 
-        default=enums.OrderStage.DRAFT
+        choices=enums.OrderStatus.choices, 
+        default=enums.OrderStatus.DRAFT
     ) 
     workflow_status = models.CharField(
         max_length=25, 

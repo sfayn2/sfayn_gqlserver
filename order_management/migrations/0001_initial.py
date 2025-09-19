@@ -19,7 +19,7 @@ class Migration(migrations.Migration):
                 ('order_id', models.CharField(help_text='ORD-1234', max_length=100, primary_key=True, serialize=False)),
                 ('tenant_id', models.CharField(max_length=150)),
                 ('checkout_session', models.CharField(blank=True, help_text='{app}-{identifier} . eg. checkoutapp-1234', max_length=100, null=True)),
-                ('order_stage', models.CharField(blank=True, choices=ddd.order_management.domain.enums.OrderStage.choices, default=ddd.order_management.domain.enums.OrderStage['DRAFT'], max_length=25, null=True)),
+                ('order_status', models.CharField(blank=True, choices=ddd.order_management.domain.enums.OrderStatus.choices, default=ddd.order_management.domain.enums.OrderStatus['DRAFT'], max_length=25, null=True)),
                 ('activity_status', models.CharField(blank=True, max_length=25, null=True)),
                 ('customer_id', models.CharField(blank=True, max_length=150, null=True)),
                 ('customer_name', models.CharField(blank=True, max_length=255, null=True)),
@@ -35,7 +35,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('tenant_id', models.CharField(max_length=150)),
-                ('order_stage', models.CharField(blank=True, choices=ddd.order_management.domain.enums.OrderStage.choices, default=ddd.order_management.domain.enums.OrderStage['DRAFT'], max_length=25, null=True)),
+                ('order_status', models.CharField(blank=True, choices=ddd.order_management.domain.enums.OrderStatus.choices, default=ddd.order_management.domain.enums.OrderStatus['DRAFT'], max_length=25, null=True)),
                 ('workflow_status', models.CharField(blank=True, max_length=25, null=True)),
                 ('conditions', models.CharField(blank=True, help_text='optional condition ex. {"non_refundable": false }', max_length=150, null=True)),
                 ('step_name', models.CharField(help_text='should match w command handler name, e.g. PendingApprovalCommand', max_length=50)),
@@ -115,7 +115,7 @@ class Migration(migrations.Migration):
             name='Workflow',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('order_stage', models.CharField(blank=True, choices=ddd.order_management.domain.enums.OrderStage.choices, default=ddd.order_management.domain.enums.OrderStage['DRAFT'], max_length=25, null=True)),
+                ('order_status', models.CharField(blank=True, choices=ddd.order_management.domain.enums.OrderStatus.choices, default=ddd.order_management.domain.enums.OrderStatus['DRAFT'], max_length=25, null=True)),
                 ('workflow_status', models.CharField(blank=True, max_length=25, null=True)),
                 ('conditions', models.CharField(blank=True, help_text='optional condition ex. {"non_refundable": false }', max_length=150, null=True)),
                 ('step_name', models.CharField(help_text='should match w command handler name, e.g. PendingApprovalCommand', max_length=50)),

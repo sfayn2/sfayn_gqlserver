@@ -25,7 +25,7 @@ class OrderMapper:
                 final_amount=asdict(order.final_amount),
                 shipping_reference=order.shipping_reference,
                 coupons=asdict(order.coupons) if order.coupons else None,
-                order_stage=order.order_stage,
+                order_status=order.order_status,
                 activity_status=order.activity_status,
                 currency=order.currency,
                 date_modified=order.date_modified)

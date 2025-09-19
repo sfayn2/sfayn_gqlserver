@@ -20,12 +20,12 @@ class Order:
     customer_email: str
 
     currency: str = "USD"
-    order_stage: enums.OrderStage = enums.OrderStage.DRAFT
+    order_status: enums.OrderStatus = enums.OrderStatus.DRAFT
 
     line_items: List[LineItem] = field(default_factory=list)
     shipments: List[Shipment] = field(default_factory=list)
 
-    workflows: List[Workflow] = field(default_factory=list)
+    workflows: List[WorkflowStep] = field(default_factory=list)
     workflow_status: str = "NoPendingActions"
 
     date_modified: Optional[datetime] = None
@@ -39,7 +39,7 @@ class Order:
             raise exceptions.InvalidOrderOperation("Please provide line item to add.")
         
         #OMS side only
-        if self.order_stage != enums.OrderStage.PENDING:
+        if self.order_status != enums.OrderStatus.PENDING:
             raise exceptions.InvalidOrderOperation("Only pending order can add line item.")
 
         if self.line_items:
@@ -54,7 +54,7 @@ class Order:
         self.date_modified = DomainClock.now()
 
     def add_shipment(self, shipment: Shipment) -> Shipment:
-        if self.order_stage != enums.OrderStage.CONFIRMED:
+        if self.order_status != enums.OrderStatus.CONFIRMED:
             raise exceptions.InvalidOrderOperation("Only confirm order can add shipment.")
 
         order_skus = {li.product_sku for li in self.line_items}
@@ -85,67 +85,66 @@ class Order:
         return sum(li.order_quantity for li in self.line_items)
 
     def mark_as_shipped(self):
-        if self.order_stage != enums.OrderStage.CONFIRMED:
+        if self.order_status != enums.OrderStatus.CONFIRMED:
             raise exceptions.InvalidOrderOperation("Only confirm order can mark as shipped.")
 
         #all shipment status are Shipped
         if self.shipments and any(d.status == enums.ShipmentStatus.PENDING for d in self.shipments):
             raise exceptions.InvalidOrderOperation("Order has a pending item for shipment")
 
-        if not self._all_required_workflows_for_stage_done(enums.OrderStage.CONFIRMED):
-            raise exceptions.InvalidOrderOperation(f"Order cannot mark as shipped, some workflows in {enums.OrderStage.CONFIRMED} stage are still pending.")
+        if not self._all_required_workflows_for_stage_done(enums.OrderStatus.CONFIRMED):
+            raise exceptions.InvalidOrderOperation(f"Order cannot mark as shipped, some workflows in {enums.OrderStatus.CONFIRMED} stage are still pending.")
 
-        self.order_stage = enums.OrderStage.SHIPPED
+        self.order_status = enums.OrderStatus.SHIPPED
         self._update_modified_date()
 
         event = events.ShippedOrderEvent(
             tenant_id=self.tenant_id,
             order_id=self.order_id,
-            order_stage=self.order_stage,
+            order_status=self.order_status,
             workflow_status=self.workflow_status
         )
 
         self.raise_event(event)
 
     def cancel_order(self, cancellation_reason: str):
-        if not self.order_stage in (enums.OrderStage.PENDING, enums.OrderStage.CONFIRMED):
+        if not self.order_status in (enums.OrderStatus.PENDING, enums.OrderStatus.CONFIRMED):
             raise exceptions.InvalidOrderOperation("Cannot cancel a completed or already cancelled order or shipped order or draft order")
 
         # Cancel anytime
-        #if not self._all_required_workflows_for_stage_done(enums.OrderStage.CONFIRMED):
-        #    raise exceptions.InvalidOrderOperation(f"Order cannot mark as shipped, some workflows in {enums.OrderStage.CONFIRMED} stage are still pending.")
+        #if not self._all_required_workflows_for_stage_done(enums.OrderStatus.CONFIRMED):
+        #    raise exceptions.InvalidOrderOperation(f"Order cannot mark as shipped, some workflows in {enums.OrderStatus.CONFIRMED} stage are still pending.")
 
         if not cancellation_reason:
             raise exceptions.InvalidOrderOperation("Cannot cancel without a cancellation reason.")
-        self.order_stage = enums.OrderStage.CANCELLED
-        self.cancellation_reason = cancellation_reason
+        self.order_status = enums.OrderStatus.CANCELLED
         self._update_modified_date()
 
         event = events.CanceledOrderEvent(
             tenant_id=self.tenant_id,
             order_id=self.order_id,
-            order_stage=self.order_stage,
+            order_status=self.order_status,
         )
 
         self.raise_event(event)
     
     def mark_as_completed(self):
-        if self.order_stage != enums.OrderStage.SHIPPED:
+        if self.order_status != enums.OrderStatus.SHIPPED:
             raise exceptions.InvalidOrderOperation("Only shipped order can mark as completed.")
 
-        if not self._all_required_workflows_for_stage_done(enums.OrderStage.SHIPPED):
-            raise exceptions.InvalidOrderOperation(f"Cannot mark as completed, some workflows in {enums.OrderStage.SHIPPED} stage are still pending.")
+        if not self._all_required_workflows_for_stage_done(enums.OrderStatus.SHIPPED):
+            raise exceptions.InvalidOrderOperation(f"Cannot mark as completed, some workflows in {enums.OrderStatus.SHIPPED} stage are still pending.")
 
         if self.payment_status != enums.PaymentStatus.PAID:
             raise exceptions.InvalidOrderOperation(f"Cannot mark as completed with outstanding payments.")
 
-        self.order_stage = enums.OrderStage.COMPLETED
+        self.order_status = enums.OrderStatus.COMPLETED
         self._update_modified_date()
 
         event = events.CompletedOrderEvent(
             tenant_id=self.tenant_id,
             order_id=self.order_id,
-            order_stage=self.order_stage,
+            order_status=self.order_status,
             workflow_status=self.workflow_status
         )
 
@@ -153,7 +152,7 @@ class Order:
 
 
     def load_tenant_workflow(self, workflows: List[Workflow]):
-        if self.order_stage != enums.OrderStage.DRAFT:
+        if self.order_status != enums.OrderStatus.DRAFT:
             raise exceptions.InvalidOrderOperation("Only draft order can load tenant workflows.")
 
         if workflows:
@@ -163,16 +162,16 @@ class Order:
 
             seen_stages = []
             for flw in workflows_sorted:
-                if flw.order_stage not in seen_stages:
-                    seen_stages.append(flw.order_stage)
+                if flw.order_status not in seen_stages:
+                    seen_stages.append(flw.order_status)
 
             # full expected stage order
             expected_stages = [
-                enums.OrderStage.DRAFT,
-                enums.OrderStage.PENDING,
-                enums.OrderStage.CONFIRMED,
-                enums.OrderStage.SHIPPED,
-                enums.OrderStage.COMPLETED,
+                enums.OrderStatus.DRAFT,
+                enums.OrderStatus.PENDING,
+                enums.OrderStatus.CONFIRMED,
+                enums.OrderStatus.SHIPPED,
+                enums.OrderStatus.COMPLETED,
             ]
 
             if seen_stages != expected_stages:
@@ -220,14 +219,14 @@ class Order:
         event = events.workflowEvent(
             tenant_id=self.tenant_id,
             order_id=self.order_id,
-            order_stage=self.order_stage,
+            order_status=self.order_status,
             workflow_status=self.workflow_status,
             step_name=self.next_step.step
         )
 
         self.raise_event(event)
 
-    def _all_required_workflows_for_stage_done(self, stage: enums.OrderStage) -> bool:
+    def _all_required_workflows_for_stage_done(self, stage: enums.OrderStatus) -> bool:
         # check if all workflows for a given stage are done/approved or skipped
         stage_workflows = [flw for flw in self.workflow if flw.stage == stage]
         if not stage_workflows:

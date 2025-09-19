@@ -16,7 +16,7 @@ class StepOutcome(Enum):
         return generate_choices(cls)
 
 
-class OrderStage(Enum):
+class OrderStatus(Enum):
     DRAFT = "DRAFT"
     PENDING = "PENDING"
     CONFIRMED = "CONFIRMED"
