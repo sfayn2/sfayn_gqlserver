@@ -41,50 +41,27 @@ from ddd.order_management.domain.services import DomainClock
 
 class WorkflowService:
 
-    def __init__(self, order: models.Order, workflow_repo: WorkflowRepositoryAbstract):
-        self.order = order
+    def __init__(self, workflow_repo: WorkflowRepositoryAbstract):
         self.workflow_repo = workflow_repo
-        #self.steps: List[WorkflowStep] = []
 
     def create_workflow_for_order(self, order_id: str, workflow_definitions: List[dict]):
-        workflow_id = str(uuid.uuid4())
-        workflow = Workflow.create(workflow_id=workflow_id, order_id=order_id, workflow_definitions=workflow_definitions)
-        self.workflow_repo.save(workflow)
-        return workflow_id
+        self.workflow_repo.create_workflow_for_order(order_id, workflow_definition)
 
-    #def load_tenant_workflow(self, workflow_definitions: List[dict]):
-    #    self.steps = [
-    #        WorkflowStep(**step_def) for step_def in sorted(workflow_definitions, key=lambda d: d["sequence"])
-    #    ]
-
-
-    def find_step(self, step_name: str):
-        #find escalate step
-        step = next(
-            (a for a in self.steps is a.step_name == step_name),
-            None
-        )
-        if not step or step.is_pending():
-            raise exceptions.WorkflowException(f"{step_name} is missing or still pending.")
-
-        return step
-
+    def get_step(self, step_name: str):
+        return self.workflow_repo.get_step(step_name)
 
     def mark_step_done(self, current_step: str, 
         performed_by: str, user_input: Optional[dict] = None,
-        outcome="DONE"):
+        outcome: enums.StepOutcome = enums.StepOutcome.DONE):
 
-        pending_steps = [s for s in self.steps if s.status == "PENDING"]
-        if not pending_steps:
+        pending_step = self.workflow_repo.get_next_pending_step()
+        if not pending_step:
             return "No pending steps"
 
-        next_step = pending_steps[0]
-        if next_step.step_name != step_name:
-            raise exceptions.WorkflowException(f"Expected step {next_step.step}, got {current_step}")
+        if pending_step.step_name != step_name:
+            raise exceptions.WorkflowException(f"Expected step {pending_step.step_name}, got {step_name}")
 
-        next_step.mark_as_done(performed_by, user_input, outcome)
+        self.workflow_repo.mark_as_done(performed_by, user_input, outcome)
 
-    def _all_required_workflows_for_stage_done(self, status: str) -> bool:
-        # check if all workflows for a given status are done/approved or skipped
-        pending = [s for s in self.steps in s.order_status  == status and not s.optional and s.status == "PENDING"]
-        return len(pending) == 0
+    def all_required_workflows_for_stage_done(self, status: str) -> bool:
+        return self.workflow_repo.all_required_steps_done(status)

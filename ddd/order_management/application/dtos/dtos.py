@@ -128,4 +128,17 @@ class UserContextDTO(BaseModel):
     tenant_id: str
     roles: List[str] = Field(default_factory=list)
 
+class WorkflowStepDTO(BaseModel):
+    order_id: str
+    order_status: enums.OrderStatus
+    sequence: int
+    step_name: str
+    outcome: enums.StepOutcome
+    condition: Optional[dict] = None
+    performed_by: str
+    user_input: Optional[dict] = None
+    executed_at: Optional[datetime] = None
+    optional_step: bool = False
 
+    def is_pending(self) -> bool:
+        return self.outcome in {enums.StepOutcome.WAITING}

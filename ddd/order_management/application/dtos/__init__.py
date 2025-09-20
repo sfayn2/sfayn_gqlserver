@@ -13,7 +13,8 @@ from .dtos import (
     CouponDTO,
     OrderDTO,
     ProductSkusDTO,
-    UserContextDTO
+    UserContextDTO,
+    WorkflowStepDTO
 )
 from .snapshot_dtos import (
     TenantWorkflowSnapshotDTO
