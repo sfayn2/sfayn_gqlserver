@@ -26,8 +26,8 @@ class DjangoOrderRepositoryImpl(repositories.OrderAbstract):
                 django_shipment_item = django_mappers.ShipmentItemMapper.to_django(shipment_item.line_item)
                 django_models.ShipmentItem.objects.update_or_create(**django_shipment_item)
 
-        for act in order.activities:
-            django_workflow = django_mappers.OtherActivityMapper.to_django(order.order_id, act)
-            django_models.Workflow.objects.update_or_create(**django_workflow)
+        #for act in order.activities:
+        #    django_workflow = django_mappers.OtherActivityMapper.to_django(order.order_id, act)
+        #    django_models.Workflow.objects.update_or_create(**django_workflow)
 
         self.seen.add(order) #Track Entitry for Uow

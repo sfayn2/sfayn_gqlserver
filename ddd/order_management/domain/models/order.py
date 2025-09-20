@@ -25,9 +25,6 @@ class Order:
     line_items: List[LineItem] = field(default_factory=list)
     shipments: List[Shipment] = field(default_factory=list)
 
-    workflows: List[WorkflowStep] = field(default_factory=list)
-    workflow_status: str = "NoPendingActions"
-
     date_modified: Optional[datetime] = None
     _events: List[events.DomainEvent] = field(default_factory=list, init=False)
 
@@ -150,90 +147,3 @@ class Order:
 
         self.raise_event(event)
 
-
-    def load_tenant_workflow(self, workflows: List[Workflow]):
-        if self.order_status != enums.OrderStatus.DRAFT:
-            raise exceptions.InvalidOrderOperation("Only draft order can load tenant workflows.")
-
-        if workflows:
-            self.workflows = workflows
-
-            workflows_sorted = [flw for flw in sorted(self.workflows, key=lambda a: a["sequence"])]
-
-            seen_stages = []
-            for flw in workflows_sorted:
-                if flw.order_status not in seen_stages:
-                    seen_stages.append(flw.order_status)
-
-            # full expected stage order
-            expected_stages = [
-                enums.OrderStatus.DRAFT,
-                enums.OrderStatus.PENDING,
-                enums.OrderStatus.CONFIRMED,
-                enums.OrderStatus.SHIPPED,
-                enums.OrderStatus.COMPLETED,
-            ]
-
-            if seen_stages != expected_stages:
-                raise exceptions.InvalidOrderOperation(
-                    f"Tenant workflows stages invalid. Expected {expected_stages}, got {seen_stages}"
-                )
-
-    def find_step(self, step_name: str):
-        #find escalate step
-        step = next(
-            (a for a in self.workflows is a.step_name == step_name),
-            None
-        )
-        if not step or step.is_pending():
-            raise exceptions.InvalidOrderOperation(f"{step_name} is missing or still pending.")
-
-        return step
-
-    def mark_workflow_done(self, current_step: str, 
-        performed_by: str, user_input: Optional[dict] = None,
-        outcome: enums.StepOutcome = enums.StepOutcome.DONE):
-
-        if not self.workflows:
-            return  # tenant doesnt require any other workflow
-            #raise exceptions.InvalidOrderOperation(f"No workflow steps configured.")
-
-        all_steps = [flw.step for flw in sorted(self.workflows, key=lambda a: a["sequence"])]
-        if current_step not in all_steps:
-            raise exceptions.InvalidOrderOperation(f"Incomplete step, missing {current_step}")
-
-        pending_steps = [flw for flw in sorted(self.workflows, key=lambda a: a["sequence"]) if act.is_pending]
-        if not pending_steps:
-            self.workflow_status = "NoPendingActions"
-            self._update_modified_date()
-
-        next_step = pending_steps[0]
-        if next_step.step != current_step:
-            raise exceptions.InvalidOrderOperation(f"Expected step {next_step.step}, got {current_step}")
-
-        next_step.mark_as_done(performed_by, user_input, outcome)
-
-        self.workflow_status = next_step.workflow_status
-        self._update_modified_date()
-
-        event = events.workflowEvent(
-            tenant_id=self.tenant_id,
-            order_id=self.order_id,
-            order_status=self.order_status,
-            workflow_status=self.workflow_status,
-            step_name=self.next_step.step
-        )
-
-        self.raise_event(event)
-
-    def _all_required_workflows_for_stage_done(self, stage: enums.OrderStatus) -> bool:
-        # check if all workflows for a given stage are done/approved or skipped
-        stage_workflows = [flw for flw in self.workflow if flw.stage == stage]
-        if not stage_workflows:
-            return True # No workflows config for this stage, fall back to allow transition
-
-        for flw in stage_workflows:
-            if flw.is_pending():
-                return False
-        
-        return True

@@ -143,14 +143,10 @@ class ShipmentItem(models.Model):
     allocated_shipping_tax_currency = models.CharField(max_length=25, blank=True, null=True)
 
 
-class Workflow(models.Model):
-    order = models.ForeignKey(
-        "order_management.Order", 
-        on_delete=models.CASCADE,
-        related_name="workflows", 
-        null=True, 
-        blank=True
-    )
+class WorkflowExecution(models.Model):
+    order_id = models.CharField(
+        max_length=25, 
+    ) 
     order_status = models.CharField(
         max_length=25, 
         blank=True, 
