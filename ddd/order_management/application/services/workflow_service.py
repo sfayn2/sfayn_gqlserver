@@ -4,6 +4,7 @@ from typing import Optional
 from dataclasses import dataclass
 from ddd.order_management.domain import enums
 from ddd.order_management.application import dtos
+from ddd.order_management.domain.services import DomainClock
 
 class WorkflowService:
 
@@ -38,7 +39,8 @@ class WorkflowService:
             step_name=current_step,
             performed_by=performed_by, 
             user_input=user_input, 
-            outcome=outcome
+            outcome=outcome,
+            executed_at=DomainClock.now()
         )
 
     def all_required_workflows_for_stage_done(self, status: enums.OrderStatus) -> bool:

@@ -57,7 +57,7 @@ class DjangoWorkflowRepository:
             order_id=self.order.order_id,
             step_name=step_name,
         ).update(
-            status=enums.StepOutcome.DONE,
+            outcome=enums.StepOutcome.DONE,
             performed_by=performed_by,
             user_input=json.dumps(user_input),
             executed_at=executed_at
