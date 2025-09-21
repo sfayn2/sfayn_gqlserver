@@ -15,7 +15,7 @@ class DjangoWorkflowRepository:
                     order_status=row.order_status,
                     workflow_status=row.workflow_status,
                     step_name=row.step_name,
-                    conditions=json.loads(row.condition),
+                    conditions=json.loads(row.condition or {}),
                     sequence=row.sequence,
                     optional_step=row.optional_step
                 )
@@ -23,7 +23,7 @@ class DjangoWorkflowRepository:
         return steps
 
     def create_workflow_for_order(self, order_id: str):
-        workflow_definition = self.get_workflow_definition()
+        workflow_definitions = self.get_workflow_definition()
         for i, step in enumerate(sorted(workflow_definitions, key=lambda d: d["sequence"])):
             django_models.WorkflowExecution.objects.create(
                 order_id=self.order.order_id,
@@ -39,7 +39,7 @@ class DjangoWorkflowRepository:
     def get_next_pending_step(self):
         step_obj = django_models.WorkflowExecution.objects.filter(
             order_id=self.order.order_id,
-            status=enums.StepOutcome.PENDING
+            status=enums.StepOutcome.WAITING
         ).order_by("sequence").first()
 
         if not step_obj:
