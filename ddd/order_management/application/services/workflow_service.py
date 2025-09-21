@@ -1,4 +1,5 @@
 from __future__ import annotations
+import json
 from typing import Optional
 from dataclasses import dataclass
 from ddd.order_management.domain import enums
@@ -15,7 +16,7 @@ class WorkflowService:
     def get_step(self, step_name: str):
         step = self.workflow_repo.find_step(step_name)
         if not step:
-            raise exceptions.WorkflowException(f"Step {step_name} not found for {self.order_id}")
+            raise exceptions.WorkflowException(f"Step {step_name} not found for {self.order.order_id}")
         return self._to_dto(step)
 
     def mark_step_done(
@@ -30,14 +31,14 @@ class WorkflowService:
         if not pending_step:
             raise exceptions.WorkflowException(f"No pending steps")
 
-        if pending_step.step_name != step_name:
-            raise exceptions.WorkflowException(f"Expected step {pending_step.step_name}, got {step_name}")
+        if pending_step.step_name != current_step:
+            raise exceptions.WorkflowException(f"Expected step {pending_step.step_name}, got {current_step}")
 
         self.workflow_repo.mark_as_done(
-            step_name=step_name,
+            step_name=current_step,
             performed_by=performed_by, 
             user_input=user_input, 
-            out_come=outcome
+            outcome=outcome
         )
 
     def all_required_workflows_for_stage_done(self, status: enums.OrderStatus) -> bool:

@@ -15,7 +15,7 @@ class DjangoWorkflowRepository:
                     order_status=row.order_status,
                     workflow_status=row.workflow_status,
                     step_name=row.step_name,
-                    conditions=json.loads(row.condition or {}),
+                    conditions=json.loads(row.conditions or "{}"),
                     sequence=row.sequence,
                     optional_step=row.optional_step
                 )
@@ -32,14 +32,14 @@ class DjangoWorkflowRepository:
                 step_name=step["step_name"],
                 outcome=enums.StepOutcome.WAITING,
                 optional_step=step["optional_step"],
-                condition=step["condition"]
+                conditions=step["conditions"]
             )
 
 
     def get_next_pending_step(self):
         step_obj = django_models.WorkflowExecution.objects.filter(
             order_id=self.order.order_id,
-            status=enums.StepOutcome.WAITING
+            outcome=enums.StepOutcome.WAITING
         ).order_by("sequence").first()
 
         if not step_obj:
@@ -67,7 +67,7 @@ class DjangoWorkflowRepository:
         return not django_models.WorkflowExecution.objects.filter(
             order_id=self.order.order_id,
             order_status=status.value,
-            status=enums.StepOutcome.WAITING
+            outcome=enums.StepOutcome.WAITING
         ).exists()
 
     def find_step(self, step_name: str):
