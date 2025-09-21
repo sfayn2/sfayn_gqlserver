@@ -4,19 +4,21 @@ from order_management import models as django_models
 
 
 class DjangoWorkflowRepository:
-    def __init(self, order: models.Order):
+    def __init__(self, order: models.Order):
         self.order = order
 
     def get_workflow_definition(self) -> List[dict]:
         steps = []
-        for row in WorkflowDefinition.objects.filter(tenant_id=self.order.tenant_id)
+        for row in django_models.WorkflowDefinition.objects.filter(tenant_id=self.order.tenant_id):
             steps.append(
-                order_status=row.order_status,
-                workflow_status=row.workflow_status,
-                step_name=row.step_name,
-                conditions=json.loads(row.condition),
-                sequence=row.sequence,
-                optional_step=row.optional_step
+                dict(
+                    order_status=row.order_status,
+                    workflow_status=row.workflow_status,
+                    step_name=row.step_name,
+                    conditions=json.loads(row.condition),
+                    sequence=row.sequence,
+                    optional_step=row.optional_step
+                )
             )
         return steps
 
@@ -46,7 +48,7 @@ class DjangoWorkflowRepository:
         return step_obj
 
 
-    def mark_step_done(self, 
+    def mark_as_done(self, 
             step_name: str, 
             performed_by: str, 
             user_input: dict, 
@@ -55,7 +57,7 @@ class DjangoWorkflowRepository:
             order_id=self.order.order_id,
             step_name=step_name,
         ).update(
-            status="DONE",
+            status=enums.StepOutcome.DONE,
             performed_by=performed_by,
             user_input=json.dumps(user_input),
             executed_at=executed_at
@@ -68,9 +70,10 @@ class DjangoWorkflowRepository:
             status=enums.StepOutcome.WAITING
         ).exists()
 
-    def find_step(self):
+    def find_step(self, step_name: str):
         step_obj = django_models.WorkflowExecution.objects.filter(
             order_id=self.order.order_id,
+            step_name=step_name,
             status=enums.StepOutcome.DONE
         ).order_by("sequence").first()
 
