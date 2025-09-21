@@ -142,3 +142,11 @@ class WorkflowStepDTO(BaseModel):
 
     def is_pending(self) -> bool:
         return self.outcome in {enums.StepOutcome.WAITING}
+
+#class WorkflowDefinitionDTO(BaseModel):
+#    order_status: enums.OrderStatus
+#    workflow_status: str
+#    step_name: str
+#    condition: Optional[dict] = None
+#    sequence: int
+#    optional_step: bool = False

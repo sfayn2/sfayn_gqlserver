@@ -199,7 +199,7 @@ class UserAuthorizationSnapshot(models.Model):
 
 # ==========
 # Local Tenant workflow
-class TenantWorkflowDefinition(models.Model):
+class WorkflowDefinition(models.Model):
     tenant_id = models.CharField(max_length=150)
     order_status = models.CharField(
         max_length=25, 

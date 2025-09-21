@@ -2,7 +2,7 @@
 from .email_sender_abstract import EmailSenderAbstract
 from .logging_abstract import LoggingAbstract
 from .clock_abstract import ClockAbstract
-from .tenant_abstract import TenantAbstract
+from .workflow_abstract import WorkflowAbstract
 
 #Snapshots
 from .snapshot_repo_abstract import SnapshotRepoAbstract
