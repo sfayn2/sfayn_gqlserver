@@ -1,1 +1,1 @@
-from .django_workflow_repository import DjangoWorkflowRepository
+from .django_workflow_gateway import DjangoWorkflowGateway

@@ -21,7 +21,7 @@ def handle_add_shipping_tracking_reference(
             access_control.ensure_user_is_authorized_for(
                 user_ctx,
                 required_permission="add_shipping_tracking_reference",
-                required_scope={"vendor_id": user_ctx.sub }
+                required_scope={"role": ["vendor"] }
             )
 
             order = uow.order.get(order_id=command.order_id, tenant_id=user_ctx.tenant_id)

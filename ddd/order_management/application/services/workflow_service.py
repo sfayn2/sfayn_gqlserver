@@ -7,6 +7,7 @@ from ddd.order_management.application import dtos
 from ddd.order_management.domain.services import DomainClock
 
 class WorkflowService:
+    """ orchestrates workflow supports for Order agg."""
 
     def __init__(self, workflow_repo: WorkflowRepositoryAbstract):
         self.workflow_repo = workflow_repo
@@ -17,7 +18,7 @@ class WorkflowService:
     def get_step(self, order_id: str, step_name: str):
         step = self.workflow_repo.find_step(order_id, step_name)
         if not step:
-            raise exceptions.WorkflowException(f"Step {step_name} not found for {self.order.order_id}")
+            raise exceptions.WorkflowException(f"Step {step_name} not found for {order_id}")
         return self._to_dto(step)
 
     def mark_step_done(
@@ -55,7 +56,7 @@ class WorkflowService:
             sequence=step_obj.sequence,
             step_name=step_obj.step_name,
             outcome=step_obj.outcome,
-            conditions=json.loads(step_obj.conditions),
+            conditions=json.loads(step_obj.conditions or "{}"),
             performed_by=step_obj.performed_by,
             user_input=json.loads(step_obj.user_input) if step_obj.user_input else None,
             executed_at=step_obj.executed_at,

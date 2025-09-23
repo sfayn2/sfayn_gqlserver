@@ -14,6 +14,7 @@ def handle_escalate_reviewer(
         command: commands.EscalateReviewerCommand, 
         uow: UnitOfWorkAbstract,
         access_control: AccessControl1Abstract,
+        workflow_service: WorkflowService,
         user_ctx: dtos.UserContextDTO
 ) -> dtos.ResponseDTO:
 
@@ -23,12 +24,13 @@ def handle_escalate_reviewer(
             access_control.ensure_user_is_authorized_for(
                 user_ctx,
                 required_permission="escalate_reviewer",
-                required_scope={"customer_id": user_ctx.sub }
+                required_scope={"role": ["vendor"] }
             )
 
             order = uow.order.get(order_id=command.order_id, tenant_id=user_ctx.tenant_id)
 
-            order.mark_activity_done(
+            workflow_service.mark_step_done(
+                order_id=order.order_id,
                 current_step=command.step_name,
                 performed_by=user_ctx.sub,
                 user_input={"reviewer": command.reviewer, "comments": command.comments }

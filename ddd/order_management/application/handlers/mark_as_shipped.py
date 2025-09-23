@@ -14,6 +14,7 @@ def handle_mark_as_shipped(
         command: commands.ShipOrderCommand, 
         access_control: AccessControl1Abstract,
         user_ctx: dtos.UserContextDTO,
+        workflow_service: WorkflowService,
         uow: UnitOfWorkAbstract) -> dtos.ResponseDTO:
     try:
         with uow:
@@ -25,9 +26,13 @@ def handle_mark_as_shipped(
             )
 
             order = uow.order.get(order_id=command.order_id, tenant_id=user_ctx.tenant_id)
-            order.mark_activity_done(
-                command.step_name,
-                user_ctx.sub
+            workflow_service.mark_step_done(
+                order_id=order.order_id,
+                current_step=command.step_name,
+                performed_by=user_ctx.sub)
+            workflow_service.all_required_workflows_for_stage_done(
+                order_id, 
+                enums.OrderStatus.CONFIRMED
             )
             order.mark_as_shipped()
 

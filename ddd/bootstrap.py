@@ -62,7 +62,7 @@ application_services.webhook_validation_service.SIGNATURE_VERIFIER = {
 }
 
 workflow_service = application_services.workflow_service.WorkflowService(
-    workflow.DjangoWorkflowRepository()
+    workflow.DjangoWorkflowGateway()
 )
 
 # Configure which events get published
@@ -146,6 +146,7 @@ message_bus.COMMAND_HANDLERS.update({
         command=command,
         access_control=access_control,
         uow=repositories.DjangoOrderUnitOfWork(),
+        workflow_service=workflow_service,
         **deps
     ),
     commands.AddShippingTrackingReferenceCommand: lambda command, **deps: handlers.handle_add_shipping_tracking_reference(
@@ -158,10 +159,11 @@ message_bus.COMMAND_HANDLERS.update({
         command=command,
         access_control=access_control,
         uow=repositories.DjangoOrderUnitOfWork(),
+        workflow_service=workflow_service,
         **deps
     ),
     **handlers.webhook_publish_command_handlers.get_command_handlers(commands, handlers, event_bus),
-    **handlers.workflow_command_handlers.get_command_handlers(commands, handlers, repositories.DjangoOrderUnitOfWork(), access_control)
+    **handlers.workflow_command_handlers.get_command_handlers(commands, handlers, repositories.DjangoOrderUnitOfWork(), access_control, workflow_service)
 })
 
 #Query Handlers (read operations)

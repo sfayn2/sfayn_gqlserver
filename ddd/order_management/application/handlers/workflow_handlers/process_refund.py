@@ -18,6 +18,7 @@ def handle_process_refund(
         command: commands.ProcessRefundCommand, 
         uow: UnitOfWorkAbstract,
         access_control: AccessControl1Abstract,
+        workflow_service: WorkflowService,
         user_ctx: dtos.UserContextDTO
 ) -> dtos.ResponseDTO:
 
@@ -27,15 +28,15 @@ def handle_process_refund(
             access_control.ensure_user_is_authorized_for(
                 user_ctx,
                 required_permission="process_refund",
-                required_scope={"vendor_id": user_ctx.sub }
+                required_scope={"role": ["vendor"] }
             )
 
             order = uow.order.get(order_id=command.order_id, tenant_id=user_ctx.tenant_id)
 
-            request_return_step = order.find_step("request_return")
+            request_return_step = workflow_service.get_step(order.order_id, "request_return")
             returned_skus = request_return_step.user_input.get("return_skus", [])
 
-            process_refund_step = order.find_step("process_refund")
+            process_refund_step = workflow_service.get_step(order.order_id, "process_refund")
             conditions = process_refund_step.conditions or {}
 
             returned_sku_set = {
@@ -63,7 +64,8 @@ def handle_process_refund(
                 currency=order.currency
             )
 
-            order.mark_activity_done(
+            workflow_service.mark_step_done(
+                order_id=order.order_id,
                 current_step=command.step_name,
                 performed_by=user_ctx.sub,
                 user_input={"comments": command.comments, "refunded_amount": refunded_amount.as_dict() }

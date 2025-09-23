@@ -2,8 +2,8 @@ from __future__ import annotations
 import json
 from order_management import models as django_models
 
-
-class DjangoWorkflowRepository:
+#Protocol: ports.WorkflowGatewayAbstract
+class DjangoWorkflowGateway:
     def get_workflow_definition(self) -> List[dict]:
         steps = []
         for row in django_models.WorkflowDefinition.objects.filter(tenant_id=self.order.tenant_id):

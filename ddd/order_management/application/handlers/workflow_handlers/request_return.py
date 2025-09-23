@@ -15,6 +15,7 @@ def handle_request_return(
         command: commands.RequestReturnCommand, 
         uow: UnitOfWorkAbstract,
         access_control: AccessControl1Abstract,
+        workflow_service: WorkflowService,
         user_ctx: dtos.UserContextDTO
 ) -> dtos.ResponseDTO:
 
@@ -24,12 +25,12 @@ def handle_request_return(
             access_control.ensure_user_is_authorized_for(
                 user_ctx,
                 required_permission="request_return",
-                required_scope={"customer_id": user_ctx.sub }
+                required_scope={"role": ["customer"] }
             )
 
             order = uow.order.get(order_id=command.order_id, tenant_id=user_ctx.tenant_id)
 
-            request_return_step = order.find_step("request_return")
+            request_return_step = workflow_service.get_step(order.order_id, "request_return")
             conditions = request_return_step.conditions or {}
 
             non_returnable_patterns =  conditions.get("non_returnable_sku_patterns", [])
@@ -60,7 +61,8 @@ def handle_request_return(
             if allowed_days and (DomainClock.now() - order.get_date_modified).days > allowed_days:
                 raise exceptions.InvalidOrderOperation("Return window expired")
 
-            order.mark_activity_done(
+            workflow_service.mark_step_done(
+                order_id=order.order_id,
                 current_step=command.step_name,
                 performed_by=user_ctx.sub,
                 user_input={"comments": command.comments, "return_skus": command.product_skus.model_dump() }
