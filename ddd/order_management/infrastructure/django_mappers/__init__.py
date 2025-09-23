@@ -2,4 +2,3 @@ from .django_line_item_mapper import LineItemMapper
 from .django_order_mapper import OrderMapper
 from .django_shipment_mapper import ShipmentMapper
 from .django_shipment_item_mapper import ShipmentItemMapper
-from .django_workflow_mapper import WorkflowMapper

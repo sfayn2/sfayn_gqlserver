@@ -14,21 +14,22 @@ class WorkflowService:
     def create_workflow_for_order(self, order_id: str):
         self.workflow_repo.create_workflow_for_order(order_id)
 
-    def get_step(self, step_name: str):
-        step = self.workflow_repo.find_step(step_name)
+    def get_step(self, order_id: str, step_name: str):
+        step = self.workflow_repo.find_step(order_id, step_name)
         if not step:
             raise exceptions.WorkflowException(f"Step {step_name} not found for {self.order.order_id}")
         return self._to_dto(step)
 
     def mark_step_done(
         self, 
+        order_id: str,
         current_step: str, 
         performed_by: str, 
         user_input: Optional[dict] = None,
         outcome: enums.StepOutcome = enums.StepOutcome.DONE
     ):
 
-        pending_step = self.workflow_repo.get_next_pending_step()
+        pending_step = self.workflow_repo.get_next_pending_step(order_id)
         if not pending_step:
             raise exceptions.WorkflowException(f"No pending steps")
 
@@ -36,6 +37,7 @@ class WorkflowService:
             raise exceptions.WorkflowException(f"Expected step {pending_step.step_name}, got {current_step}")
 
         self.workflow_repo.mark_as_done(
+            order_id=order_id,
             step_name=current_step,
             performed_by=performed_by, 
             user_input=user_input, 
@@ -43,8 +45,8 @@ class WorkflowService:
             executed_at=DomainClock.now()
         )
 
-    def all_required_workflows_for_stage_done(self, status: enums.OrderStatus) -> bool:
-        return self.workflow_repo.all_required_steps_done(status)
+    def all_required_workflows_for_stage_done(self, order_id: str, status: enums.OrderStatus) -> bool:
+        return self.workflow_repo.all_required_steps_done(order_id, status)
 
     def _to_dto(self, step_obj) -> dtos.WorkflowStepDTO:
         return dtos.WorkflowStepDTO(

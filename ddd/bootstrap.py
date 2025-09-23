@@ -16,6 +16,7 @@ from ddd.order_management.infrastructure import (
     event_publishers,
     webhook_signatures,
     clocks,
+    workflow
 )
 from ddd.order_management.application import (
     handlers,
@@ -59,6 +60,10 @@ domain_services.DomainClock.configure(clocks.UTCClock())
 application_services.webhook_validation_service.SIGNATURE_VERIFIER = {
     "wss": lambda tenant_id: webhook_signatures.WssSignatureVerifier(shared_secret=os.getenv(f"WH_SECRET_{tenant_id}"))
 }
+
+workflow_service = application_services.workflow_service.WorkflowService(
+    workflow.DjangoWorkflowRepository()
+)
 
 # Configure which events get published
 event_bus.EXTERNAL_EVENT_WHITELIST = []

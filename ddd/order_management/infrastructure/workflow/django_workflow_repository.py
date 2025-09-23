@@ -4,9 +4,6 @@ from order_management import models as django_models
 
 
 class DjangoWorkflowRepository:
-    def __init__(self, order: models.Order):
-        self.order = order
-
     def get_workflow_definition(self) -> List[dict]:
         steps = []
         for row in django_models.WorkflowDefinition.objects.filter(tenant_id=self.order.tenant_id):
@@ -26,7 +23,7 @@ class DjangoWorkflowRepository:
         workflow_definitions = self.get_workflow_definition()
         for i, step in enumerate(sorted(workflow_definitions, key=lambda d: d["sequence"])):
             django_models.WorkflowExecution.objects.create(
-                order_id=self.order.order_id,
+                order_id=order_id,
                 order_status=step["order_status"],
                 sequence=step["sequence"],
                 step_name=step["step_name"],
@@ -36,9 +33,9 @@ class DjangoWorkflowRepository:
             )
 
 
-    def get_next_pending_step(self):
+    def get_next_pending_step(self, order_id: str):
         step_obj = django_models.WorkflowExecution.objects.filter(
-            order_id=self.order.order_id,
+            order_id=order_id,
             outcome=enums.StepOutcome.WAITING
         ).order_by("sequence").first()
 
@@ -48,13 +45,16 @@ class DjangoWorkflowRepository:
         return step_obj
 
 
-    def mark_as_done(self, 
-            step_name: str, 
-            performed_by: str, 
-            user_input: dict, 
-            executed_at):
+    def mark_as_done(
+        self, 
+        order_id: str,
+        step_name: str, 
+        performed_by: str, 
+        user_input: dict, 
+        executed_at
+    ):
         django_models.WorkflowExecution.objects.filter(
-            order_id=self.order.order_id,
+            order_id=order_id,
             step_name=step_name,
         ).update(
             outcome=enums.StepOutcome.DONE,
@@ -63,16 +63,16 @@ class DjangoWorkflowRepository:
             executed_at=executed_at
         )
 
-    def all_required_steps_done(self, status: enums.OrderStatus) -> bool:
+    def all_required_steps_done(self, order_id: str, status: enums.OrderStatus) -> bool:
         return not django_models.WorkflowExecution.objects.filter(
-            order_id=self.order.order_id,
+            order_id=order_id,
             order_status=status.value,
             outcome=enums.StepOutcome.WAITING
         ).exists()
 
-    def find_step(self, step_name: str):
+    def find_step(self, order_id: str, step_name: str):
         step_obj = django_models.WorkflowExecution.objects.filter(
-            order_id=self.order.order_id,
+            order_id=order_id,
             step_name=step_name,
             status=enums.StepOutcome.DONE
         ).order_by("sequence").first()
