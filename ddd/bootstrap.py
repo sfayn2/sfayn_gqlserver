@@ -63,7 +63,7 @@ application_services.webhook_validation_service.SIGNATURE_VERIFIER = {
 
 workflow_service = application_services.workflow_service.WorkflowService(
     workflow.DjangoWorkflowGateway(
-        [
+        default_workflow=[
             dict(order_status=enums.OrderStatus.CONFIRMED, workflow_status="AddShipment", step_name="add_shipment", sequence=1, optional_step=False, conditions={}),
             dict(order_status=enums.OrderStatus.SHIPPED, workflow_status="Shipped", step_name="mark_as_shipped", sequence=2, optional_step=False, conditions={}),
             dict(order_status=enums.OrderStatus.SHIPPED, workflow_status="AddTrackingReference", step_name="add_shipping_tracking_reference", sequence=3, optional_step=False, conditions={}),

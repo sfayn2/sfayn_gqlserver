@@ -1,12 +1,13 @@
 from __future__ import annotations
 import json
+from typing import List, Dict, Any
 from order_management import models as django_models
 
 from ddd.order_management.domain import enums
 
 #Protocol: ports.WorkflowGatewayAbstract
 class DjangoWorkflowGateway:
-    def __init__(self, default_workflow):
+    def __init__(self, default_workflow: List[Dict[str, Any]]):
         self.default_workflow = default_workflow
 
     def get_workflow_definition(self) -> List[dict]:
