@@ -2,11 +2,20 @@ from __future__ import annotations
 import json
 from order_management import models as django_models
 
+from ddd.order_management.domain import enums
+
 #Protocol: ports.WorkflowGatewayAbstract
 class DjangoWorkflowGateway:
+    def __init__(self, default_workflow):
+        self.default_workflow = default_workflow
+
     def get_workflow_definition(self) -> List[dict]:
         steps = []
-        for row in django_models.WorkflowDefinition.objects.filter(tenant_id=self.order.tenant_id):
+        tenant_workflow_definition = django_models.WorkflowDefinition.objects.filter(tenant_id=self.order.tenant_id)
+        if not tenant_workflow_definition.exists():
+            return self.default_workflow
+
+        for row in tenant_workflow_definition:
             steps.append(
                 dict(
                     order_status=row.order_status,
@@ -21,7 +30,7 @@ class DjangoWorkflowGateway:
 
     def create_workflow_for_order(self, order_id: str):
         workflow_definitions = self.get_workflow_definition()
-        for i, step in enumerate(sorted(workflow_definitions, key=lambda d: d["sequence"])):
+        for step in sorted(workflow_definitions, key=lambda d: d["sequence"]):
             django_models.WorkflowExecution.objects.create(
                 order_id=order_id,
                 order_status=step["order_status"],
@@ -36,7 +45,8 @@ class DjangoWorkflowGateway:
     def get_next_pending_step(self, order_id: str):
         step_obj = django_models.WorkflowExecution.objects.filter(
             order_id=order_id,
-            outcome=enums.StepOutcome.WAITING
+            outcome=enums.StepOutcome.WAITING,
+            sequence__isnull=False
         ).order_by("sequence").first()
 
         if not step_obj:
@@ -64,21 +74,25 @@ class DjangoWorkflowGateway:
         )
 
     def all_required_steps_done(self, order_id: str, status: enums.OrderStatus) -> bool:
-        return not django_models.WorkflowExecution.objects.filter(
+        with_pending_steps = django_models.WorkflowExecution.objects.filter(
             order_id=order_id,
             order_status=status.value,
             outcome=enums.StepOutcome.WAITING
-        ).exists()
+        )
 
-    def find_step(self, order_id: str, step_name: str):
-        step_obj = django_models.WorkflowExecution.objects.filter(
-            order_id=order_id,
-            step_name=step_name,
-            status=enums.StepOutcome.DONE
-        ).order_by("sequence").first()
+        if with_pending_steps.exists():
+            raise exceptions.InvalidOrderOperation(f"Unable to proceed, some workflows in statuses are still pending.")
 
-        if not step_obj:
-            return None
+        return True
 
-        return step_obj
+    def find_step(self, order_id: str, step_name: str, outcome: enums.StepOutcome = enums.StepOutcome.DONE):
+        try:
+            return django_models.WorkflowExecution.objects.get(
+                order_id=order_id,
+                step_name=step_name,
+                outcome=enums.StepOutcome.DONE
+            )
+        except django_models.WorkflowExecution.DoesNotExists:
+            raise exceptions.WorkflowException(f"Step '{step_name}' not found for order '{order_id}' ")
+
 

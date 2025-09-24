@@ -6,6 +6,8 @@ from ddd.order_management.domain import enums
 from ddd.order_management.application import dtos
 from ddd.order_management.domain.services import DomainClock
 
+
+
 class WorkflowService:
     """ orchestrates workflow supports for Order agg."""
 
@@ -30,12 +32,15 @@ class WorkflowService:
         outcome: enums.StepOutcome = enums.StepOutcome.DONE
     ):
 
-        pending_step = self.workflow_repo.get_next_pending_step(order_id)
-        if not pending_step:
-            raise exceptions.WorkflowException(f"No pending steps")
+        step = self.workflow_repo.find_step(order_id, current_step, enums.StepOutcome.PENDING)
 
-        if pending_step.step_name != current_step:
-            raise exceptions.WorkflowException(f"Expected step {pending_step.step_name}, got {current_step}")
+        if step.sequence is not None:
+            pending_step = self.workflow_repo.get_next_pending_step(order_id)
+            if not pending_step:
+                raise exceptions.WorkflowException(f"No pending steps in order {order_id}")
+
+            if pending_step.step_name != current_step:
+                raise exceptions.WorkflowException(f"Expected step {current_step}, got {pending_step.step_name}")
 
         self.workflow_repo.mark_as_done(
             order_id=order_id,
@@ -45,6 +50,7 @@ class WorkflowService:
             outcome=outcome,
             executed_at=DomainClock.now()
         )
+
 
     def all_required_workflows_for_stage_done(self, order_id: str, status: enums.OrderStatus) -> bool:
         return self.workflow_repo.all_required_steps_done(order_id, status)

@@ -89,8 +89,8 @@ class Order:
         if self.shipments and any(d.status == enums.ShipmentStatus.PENDING for d in self.shipments):
             raise exceptions.InvalidOrderOperation("Order has a pending item for shipment")
 
-        if not self._all_required_workflows_for_stage_done(enums.OrderStatus.CONFIRMED):
-            raise exceptions.InvalidOrderOperation(f"Order cannot mark as shipped, some workflows in {enums.OrderStatus.CONFIRMED} stage are still pending.")
+        #if not self._all_required_workflows_for_stage_done(enums.OrderStatus.CONFIRMED):
+        #    raise exceptions.InvalidOrderOperation(f"Order cannot mark as shipped, some workflows in {enums.OrderStatus.CONFIRMED} stage are still pending.")
 
         self.order_status = enums.OrderStatus.SHIPPED
         self._update_modified_date()
@@ -104,16 +104,12 @@ class Order:
 
         self.raise_event(event)
 
-    def cancel_order(self, cancellation_reason: str):
+    def cancel_order(self):
         if not self.order_status in (enums.OrderStatus.PENDING, enums.OrderStatus.CONFIRMED):
             raise exceptions.InvalidOrderOperation("Cannot cancel a completed or already cancelled order or shipped order or draft order")
 
-        # Cancel anytime
-        #if not self._all_required_workflows_for_stage_done(enums.OrderStatus.CONFIRMED):
-        #    raise exceptions.InvalidOrderOperation(f"Order cannot mark as shipped, some workflows in {enums.OrderStatus.CONFIRMED} stage are still pending.")
-
-        if not cancellation_reason:
-            raise exceptions.InvalidOrderOperation("Cannot cancel without a cancellation reason.")
+        #if not cancellation_reason:
+        #    raise exceptions.InvalidOrderOperation("Cannot cancel without a cancellation reason.")
         self.order_status = enums.OrderStatus.CANCELLED
         self._update_modified_date()
 
@@ -129,8 +125,8 @@ class Order:
         if self.order_status != enums.OrderStatus.SHIPPED:
             raise exceptions.InvalidOrderOperation("Only shipped order can mark as completed.")
 
-        if not self._all_required_workflows_for_stage_done(enums.OrderStatus.SHIPPED):
-            raise exceptions.InvalidOrderOperation(f"Cannot mark as completed, some workflows in {enums.OrderStatus.SHIPPED} stage are still pending.")
+        #if not self._all_required_workflows_for_stage_done(enums.OrderStatus.SHIPPED):
+        #    raise exceptions.InvalidOrderOperation(f"Cannot mark as completed, some workflows in {enums.OrderStatus.SHIPPED} stage are still pending.")
 
         if self.payment_status != enums.PaymentStatus.PAID:
             raise exceptions.InvalidOrderOperation(f"Cannot mark as completed with outstanding payments.")

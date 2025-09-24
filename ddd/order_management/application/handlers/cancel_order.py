@@ -25,12 +25,14 @@ def handle_cancel_order(
             )
 
             order = uow.order.get(order_id=command.order_id, tenant_id=user_ctx.tenant_id)
+
             workflow_service.mark_step_done(
                 order_id=order.order_id,
                 current_step=command.step_name,
+                user_input={"cancellation_reason": command.cancellation_reason },
                 performed_by=user_ctx.sub)
 
-            order.cancel_order(command.cancellation_reason)
+            order.cancel_order()
 
             uow.order.save(order)
             uow.commit()
