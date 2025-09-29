@@ -80,50 +80,6 @@ class Order:
     def total_line_item_qty(self) -> int:
         return sum(li.order_quantity for li in self.line_items)
 
-    def _validate_shipment_items(self):
-        # Verify that every item in the new shipment exists in the order & quantity matches.
-        for li in self.line_items:
-            for shipment in self.shipments:
-                if shipment.shipment_items_sku_qty.get(li.product_sku):
-                    if not shipment.shipment_items_sku_qty.get(li.product_sku) == li.order_quantity:
-                        raise exceptions.DomainError(
-                            f"Shipment for Product SKU {li.product_sku} does not match the required orders quantity."
-                        )
-                else:
-                    raise exceptions.DomainError(
-                        f"Order Item for Product SKU {li.product_sku} does not exists on any of shipment item/s."
-                    )
-
-    def mark_as_shipped(self):
-        if self.order_status != enums.OrderStatus.CONFIRMED:
-            raise exceptions.DomainError("Only confirm order can mark as shipped.")
-
-        if not self.shipments:
-            raise exceptions.DomainError("No shipments present")
-
-        #all shipment status are Shipped
-        if self.shipments and any(d.shipment_status != enums.ShipmentStatus.SHIPPED for d in self.shipments):
-            raise exceptions.DomainError("Not all shipments are shipped")
-
-        # Verify that every item in the new shipment exists in the order & quantity matches.
-        self._validate_shipment_items()
-
-
-        #if not self._all_required_workflows_for_stage_done(enums.OrderStatus.CONFIRMED):
-        #    raise exceptions.DomainError(f"Order cannot mark as shipped, some workflows in {enums.OrderStatus.CONFIRMED} stage are still pending.")
-
-        self.order_status = enums.OrderStatus.SHIPPED
-        self._update_modified_date()
-
-        event = events.ShippedOrderEvent(
-            tenant_id=self.tenant_id,
-            order_id=self.order_id,
-            order_status=self.order_status,
-            workflow_status=self.workflow_status
-        )
-
-        self.raise_event(event)
-
     def cancel_order(self):
         if not self.order_status in (enums.OrderStatus.PENDING, enums.OrderStatus.CONFIRMED):
             raise exceptions.DomainError("Cannot cancel a completed or already cancelled order or shipped order or draft order")
@@ -144,39 +100,44 @@ class Order:
 
         self.raise_event(event)
 
-    def mark_as_delivered(self):
-        if self.order_status != enums.OrderStatus.SHIPPED:
-            raise exceptions.DomainError("Only shipped order can mark as delivered.")
-
+    #roll-up style
+    def update_shipping_progress(self):
         if not self.shipments:
-            raise exceptions.DomainError("Cannot mark as delivered w missing shipment item/s, Cancel instead.")
+            return #remain CONFIRMED
 
-        #all shipment status are Shipped
-        if self.shipments and any(d.shipment_status != enums.ShipmentStatus.DELIVERED for d in self.shipments):
-            raise exceptions.DomainError("Cannot mark as delivered w pending shipment delivery.")
+        expected = {li.product_sku : li.order_quantity for li in self.line_items}
+        shipped: dict[str, int] = {}
+        delivered: dict[str, int] = {}
 
-        # Verify that every item in the new shipment exists in the order & quantity matches.
-        self._validate_shipment_items()
+        for sm in self.shipments:
+            if sm.shipment_status == enums.ShipmentStatus.SHIPPED:
+                for sku, qty in sm.shipment_items_sku_qty.items():
+                    shipped[sku] = shipped.get(sku, 0) + qty
+            if sm.shipment_status == enums.ShipmentStatus.DELIVERED:
+                for sku, qty in sm.shipment_items_sku_qty.items():
+                    delivered[sku] = delivered.get(sku, 0) + qty
 
-        self.order_status = enums.OrderStatus.DELIVERED
+        all_shipped = all(shipped.get(sku, 0) >= qty for sku, qty in expected.items())
+        some_shipped = any(shipped.get(sku, 0) > 0 for sku in expected)
+
+        all_delivered = all(delivered.get(sku, 0) >= qty for sku, qty in expected.items())
+        some_delivered = any(delivered.get(sku, 0) > 0 for sku in expected)
+
+        if all_delivered:
+            self.order_status = enums.OrderStatus.DELIVERED
+        elif all_shipped:
+            self.order_status = enums.OrderStatus.SHIPPED
+        elif some_delivered:
+            self.order_status = enums.OrderStatus.PARTIAL_DELIVERED
+        elif some_shipped:
+            self.order_status = enums.OrderStatus.PARTIAL_SHIPPED
+
         self._update_modified_date()
-
-        event = events.DeliveredOrderEvent(
-            tenant_id=self.tenant_id,
-            order_id=self.order_id,
-            order_status=self.order_status,
-            workflow_status=self.workflow_status
-        )
-
-        self.raise_event(event)
 
     
     def mark_as_completed(self):
         if self.order_status != enums.OrderStatus.DELIVERED:
             raise exceptions.DomainError("Only delivered order can mark as completed.")
-
-        #if not self._all_required_workflows_for_stage_done(enums.OrderStatus.SHIPPED):
-        #    raise exceptions.DomainError(f"Cannot mark as completed, some workflows in {enums.OrderStatus.SHIPPED} stage are still pending.")
 
         if self.payment_status != enums.PaymentStatus.PAID:
             raise exceptions.DomainError(f"Cannot mark as completed with outstanding payments.")
@@ -188,7 +149,6 @@ class Order:
             tenant_id=self.tenant_id,
             order_id=self.order_id,
             order_status=self.order_status,
-            workflow_status=self.workflow_status
         )
 
         self.raise_event(event)

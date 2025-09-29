@@ -41,14 +41,14 @@ class Shipment:
     def shipment_items_sku_qty(self):
         return {item.product_sku: item.quantity for item in self.shipment_items}
 
-    def confirm(self):
-        if self.shipment_status != enums.ShipmentStatus.PENDING:
-            raise exceptions.DomainError("Only pending shipment can be mark as confirmed")
-        self.shipment_status = enums.ShipmentStatus.CONFIRMED
+    #def confirm(self):
+    #    if self.shipment_status != enums.ShipmentStatus.PENDING:
+    #        raise exceptions.DomainError("Only pending shipment can be mark as confirmed")
+    #    self.shipment_status = enums.ShipmentStatus.CONFIRMED
 
     def mark_as_shipped(self):
-        if self.shipment_status != enums.ShipmentStatus.CONFIRMED:
-            raise exceptions.DomainError("Only confirmed shipment can be mark as shipped")
+        if self.shipment_status != enums.ShipmentStatus.PENDING:
+            raise exceptions.DomainError("Only pending shipment can be mark as shipped")
         self.shipment_status = enums.ShipmentStatus.SHIPPED
 
         #TODO how to raise an event?
