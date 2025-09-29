@@ -11,7 +11,6 @@ class DomainEvent(ABC):
     tenant_id: str
     order_id: str
     order_status: enums.OrderStatus
-    activity_status: str
 
     def event_type(self) -> str:
         return f"order_management.events.{self.__class__.__name__}"
@@ -42,6 +41,7 @@ class ConfirmedOrderEvent(DomainEvent):
 @dataclass(frozen=True)    
 class ShippedOrderEvent(DomainEvent):
     pass
+
 
 @dataclass(frozen=True)    
 class DeliveredOrderEvent(DomainEvent):
@@ -90,3 +90,19 @@ class AppliedTaxesEvent(DomainEvent):
 @dataclass(frozen=True)    
 class ActivityEvent(DomainEvent):
     step_name: str
+
+@dataclass(frozen=True)    
+class ShippedShipmentEvent(DomainEvent):
+    shipment_id: str
+
+@dataclass(frozen=True)    
+class DeliveredShipmentEvent(DomainEvent):
+    shipment_id: str
+
+@dataclass(frozen=True)    
+class CanceledShipmentEvent(DomainEvent):
+    shipment_id: str
+
+@dataclass(frozen=True)    
+class TrackingReferenceAssignedEvent(DomainEvent):
+    shipment_id: str

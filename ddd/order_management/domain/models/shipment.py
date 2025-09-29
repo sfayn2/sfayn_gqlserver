@@ -41,54 +41,6 @@ class Shipment:
     def shipment_items_sku_qty(self):
         return {item.product_sku: item.quantity for item in self.shipment_items}
 
-    def mark_as_shipped(self, order: Order):
-        if self.shipment_status != enums.ShipmentStatus.PENDING:
-            raise exceptions.DomainError("Only pending shipment can be mark as shipped")
-        self.shipment_status = enums.ShipmentStatus.SHIPPED
-
-        order.update_shipping_progress()
-        event = events.ShippedOrderEvent(
-            tenant_id=self.tenant_id,
-            order_id=self.order_id,
-            order_status=self.order_status,
-        )
-        order.raise_event(event)
-
-
-    def mark_as_delivered(self, order: Order):
-        if self.shipment_status != enums.ShipmentStatus.SHIPPED:
-            raise exceptions.DomainError("Only shipped shipment can be delivered")
-        self.shipment_status = enums.ShipmentStatus.DELIVERED
-
-        order.update_shipping_progress()
-        event = events.ShippedOrderEvent(
-            tenant_id=self.tenant_id,
-            order_id=self.order_id,
-            order_status=self.order_status,
-        )
-        order.raise_event(event)
-
-
-    def cancel_shipment(self):
-        if self.shipment_status in (enums.ShipmentStatus.SHIPPED, enums.ShipmentStatus.DELIVERED):
-            raise exceptions.DomainError("Cannot cancel shipment after shipped/delivered")
-        self.shipment_status = enums.ShipmentStatus.CANCELLED
-
-        order.update_shipping_progress()
-        event = events.ShippedOrderEvent(
-            tenant_id=self.tenant_id,
-            order_id=self.order_id,
-            order_status=self.order_status,
-        )
-        order.raise_event(event)
-
-    def add_shipping_tracking_reference(self, tracking_reference: str):
-        if self.order_status != enums.OrderStatus.SHIPPED:
-            raise exceptions.DomainError("Only shipped order can add tracking reference.")
-        if not tracking_reference.startswith("http"):
-            raise exceptions.DomainError("The Shipping tracking reference url is invalid.")
-
-        self.tracking_reference = tracking_reference
 
     def allocate_shipping_tax(self):
         total_line_subtotal = sum(

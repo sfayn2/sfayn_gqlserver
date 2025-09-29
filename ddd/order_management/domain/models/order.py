@@ -47,6 +47,12 @@ class Order:
 
         self.line_items.append(line_item)
 
+    def _get_shipment(self, shipment_id: str) -> Shipment:
+        shipment = next((s for s in self.shipments if s.shipment_id == shipment_id), None)
+        if not shipment:
+            raise exceptions.DomainError(f"Shipment {shipment_id} not found in order {self.order_id}")
+        return shipment
+
     def _update_modified_date(self):
         self.date_modified = DomainClock.now()
 
@@ -84,6 +90,63 @@ class Order:
     @property
     def total_line_item_qty(self) -> int:
         return sum(li.order_quantity for li in self.line_items)
+
+    def ship_shipment(self, shipment_id: str):
+        shipment = self._get_shipment(shipment_id)
+        if shipment.shipment_status != enums.ShipmentStatus.PENDING:
+            raise exceptions.DomainError("Only pending shipment can be mark as shipped")
+        shipment.shipment_status = enums.ShipmentStatus.SHIPPED
+
+        self.update_shipping_progress()
+        event = events.ShippedShipmentEvent(
+            tenant_id=self.tenant_id,
+            order_id=self.order_id,
+            shipment_id=shipment_id,
+        )
+        self.raise_event(event)
+
+    def deliver_shipment(self, shipment_id: str):
+        shipment = self._get_shipment(shipment_id)
+        if shipment.shipment_status != enums.ShipmentStatus.SHIPPED:
+            raise exceptions.DomainError("Only shipped shipment can be delivered")
+        shipment.shipment_status = enums.ShipmentStatus.DELIVERED
+
+        self.update_shipping_progress()
+        event = events.DeliveredShipmentEvent(
+            tenant_id=self.tenant_id,
+            order_id=self.order_id,
+            shipment_id=shipment_id,
+        )
+        self.raise_event(event)
+
+    def cancel_shipment(self, shipment_id: str):
+        shipment = self._get_shipment(shipment_id)
+        if shipment.shipment_status in (enums.ShipmentStatus.SHIPPED, enums.ShipmentStatus.DELIVERED):
+            raise exceptions.DomainError("Cannot cancel shipment after shipped/delivered")
+        shipment.shipment_status = enums.ShipmentStatus.CANCELLED
+
+        self.update_shipping_progress()
+        event = events.CanceledShipmentEvent(
+            tenant_id=self.tenant_id,
+            order_id=self.order_id,
+            shipment_id=shipment_id,
+        )
+        order.raise_event(event)
+
+    def assign_tracking_reference(self, shipment_id: str, tracking_reference: str):
+        shipment = self._get_shipment(shipment_id)
+        if shipment.shipment_status != enums.ShipmentStatus.SHIPPED:
+            raise exceptions.DomainError("Tracking reference can only be assign before delivery.")
+
+        shipment.tracking_reference = tracking_reference
+        self._update_modified_date()
+        event = events.TrackingReferenceAssignedEvent(
+            tenant_id=self.tenant_id,
+            order_id=self.order_id,
+            shipment_id=shipment_id,
+        )
+        self.raise_event(event)
+
 
     def cancel_order(self):
         if not self.order_status in (enums.OrderStatus.PENDING, enums.OrderStatus.CONFIRMED):
