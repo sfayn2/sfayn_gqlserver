@@ -131,11 +131,11 @@ class Order:
             order_id=self.order_id,
             shipment_id=shipment_id,
         )
-        order.raise_event(event)
+        self.raise_event(event)
 
     def assign_tracking_reference(self, shipment_id: str, tracking_reference: str):
         shipment = self._get_shipment(shipment_id)
-        if shipment.shipment_status != enums.ShipmentStatus.SHIPPED:
+        if shipment.shipment_status not in (enums.ShipmentStatus.PENDING, enums.ShipmentStatus.SHIPPED):
             raise exceptions.DomainError("Tracking reference can only be assign before delivery.")
 
         shipment.tracking_reference = tracking_reference
