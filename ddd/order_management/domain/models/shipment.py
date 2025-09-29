@@ -41,31 +41,46 @@ class Shipment:
     def shipment_items_sku_qty(self):
         return {item.product_sku: item.quantity for item in self.shipment_items}
 
-    #def confirm(self):
-    #    if self.shipment_status != enums.ShipmentStatus.PENDING:
-    #        raise exceptions.DomainError("Only pending shipment can be mark as confirmed")
-    #    self.shipment_status = enums.ShipmentStatus.CONFIRMED
-
-    def mark_as_shipped(self):
+    def mark_as_shipped(self, order: Order):
         if self.shipment_status != enums.ShipmentStatus.PENDING:
             raise exceptions.DomainError("Only pending shipment can be mark as shipped")
         self.shipment_status = enums.ShipmentStatus.SHIPPED
 
-        #TODO how to raise an event?
+        order.update_shipping_progress()
+        event = events.ShippedOrderEvent(
+            tenant_id=self.tenant_id,
+            order_id=self.order_id,
+            order_status=self.order_status,
+        )
+        order.raise_event(event)
 
-    def deliver(self):
+
+    def mark_as_delivered(self, order: Order):
         if self.shipment_status != enums.ShipmentStatus.SHIPPED:
             raise exceptions.DomainError("Only shipped shipment can be delivered")
         self.shipment_status = enums.ShipmentStatus.DELIVERED
 
-        #TODO how to raise an event?
+        order.update_shipping_progress()
+        event = events.ShippedOrderEvent(
+            tenant_id=self.tenant_id,
+            order_id=self.order_id,
+            order_status=self.order_status,
+        )
+        order.raise_event(event)
 
-    def cancel(self):
+
+    def cancel_shipment(self):
         if self.shipment_status in (enums.ShipmentStatus.SHIPPED, enums.ShipmentStatus.DELIVERED):
             raise exceptions.DomainError("Cannot cancel shipment after shipped/delivered")
         self.shipment_status = enums.ShipmentStatus.CANCELLED
 
-        #TODO how to raise an event?
+        order.update_shipping_progress()
+        event = events.ShippedOrderEvent(
+            tenant_id=self.tenant_id,
+            order_id=self.order_id,
+            order_status=self.order_status,
+        )
+        order.raise_event(event)
 
     def add_shipping_tracking_reference(self, tracking_reference: str):
         if self.order_status != enums.OrderStatus.SHIPPED:

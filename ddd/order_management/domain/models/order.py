@@ -21,6 +21,7 @@ class Order:
 
     currency: str = "USD"
     order_status: enums.OrderStatus = enums.OrderStatus.DRAFT
+    payment_status: enums.PaymentStatus = enums.PaymentStatus.UNPAID
 
     line_items: List[LineItem] = field(default_factory=list)
     shipments: List[Shipment] = field(default_factory=list)
@@ -73,8 +74,12 @@ class Order:
             )
 
         self.shipments.append(shipment)
+        self._update_modified_date()
 
         return shipment
+
+        #self.update_shipping_progress()
+
 
     @property
     def total_line_item_qty(self) -> int:
@@ -82,7 +87,7 @@ class Order:
 
     def cancel_order(self):
         if not self.order_status in (enums.OrderStatus.PENDING, enums.OrderStatus.CONFIRMED):
-            raise exceptions.DomainError("Cannot cancel a completed or already cancelled order or shipped order or draft order")
+            raise exceptions.DomainError(f"Order in {self.order_status} cannot be cancelled.")
 
         if self.shipments and any(d.shipment_status in [enums.ShipmentStatus.SHIPPED, enums.ShipmentStatus.DELIVERED] for d in self.shipments):
             raise exceptions.DomainError("Cannot cancel, Shipments has already been shipped or delivered.")

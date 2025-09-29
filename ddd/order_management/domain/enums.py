@@ -33,7 +33,7 @@ class OrderStatus(Enum):
 
 class PaymentStatus(Enum):
     PAID = "PAID"
-    PENDING = "PENDING"
+    UNPAID = "UNPAID"
 
     @classmethod
     def choices(cls):
