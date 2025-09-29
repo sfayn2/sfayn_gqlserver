@@ -6,9 +6,8 @@ from ddd.order_management.application import (
 )
 from ddd.order_management.domain import events, exceptions
 
-def handle_tenant_create_order_async_event(
+def handle_create_order_async_event(
     event: dtos.TenantCreateOrderIntegrationEvent,
-    tenant_create_order_snapshot_repo: ports.SnapshotRepoAbstract
 ):
 
     # sync external produc snapshot sync

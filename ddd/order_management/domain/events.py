@@ -44,6 +44,10 @@ class ShippedOrderEvent(DomainEvent):
     pass
 
 @dataclass(frozen=True)    
+class DeliveredOrderEvent(DomainEvent):
+    pass
+
+@dataclass(frozen=True)    
 class CanceledOrderEvent(DomainEvent):
     pass
 

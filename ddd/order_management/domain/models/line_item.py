@@ -18,10 +18,10 @@ class LineItem:
     def __post_init__(self):
 
         if self.order_quantity <= 0:
-            raise exceptions.InvalidOrderOperation("Order quantity must be greater than zero.")
+            raise exceptions.DomainError("Order quantity must be greater than zero.")
 
         if self.product_price.amount < 0:
-            raise exceptions.InvalidOrderOperation("Product price cannot be negative.")
+            raise exceptions.DomainError("Product price cannot be negative.")
 
     def __eq__(self, other):
         if not isinstance(other, LineItem):

@@ -21,6 +21,7 @@ class OrderStatus(Enum):
     PENDING = "PENDING"
     CONFIRMED = "CONFIRMED"
     SHIPPED = "SHIPPED"
+    DELIVERED = "DELIVERED"
     CANCELLED = "CANCELLED"
     COMPLETED = "COMPLETED"
 
@@ -37,9 +38,11 @@ class PaymentStatus(Enum):
         return generate_choices(cls)
 
 class ShipmentStatus(Enum):
-    DELIVERED = "DELIVERED"
-    SHIPPED = "SHIPPED"
     PENDING = "PENDING"
+    CONFIRMED = "CONFIRMED"
+    SHIPPED = "SHIPPED"
+    DELIVERED = "DELIVERED"
+    CANCELLED = "CANCELLED"
 
     @classmethod
     def choices(cls):

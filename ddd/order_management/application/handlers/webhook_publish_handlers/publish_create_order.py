@@ -7,12 +7,12 @@ from ddd.order_management.application import (
 )
 from ddd.order_management.domain import events, exceptions
 
-def handle_publish_tenant_workflow_update(
-    command: commands.PublishTenantWorkflowUpdateCommand, 
+def handle_publish_create_order(
+    command: commands.PublishCreateOrderCommand, 
     event_publisher: ports.EventPublisherAbstract
 ):
     try:
-        event = dtos.TenantWorkflowUpdateIntegrationEvent(
+        event = dtos.CreateOrderIntegrationEvent(
             **command.model_dump()
         )
 
@@ -20,7 +20,7 @@ def handle_publish_tenant_workflow_update(
 
         return dtos.ResponseDTO(
             success=True,
-            message="Tenant Workflow update has been published."
+            message="Tenant Create order has been published."
         )
 
     except exceptions.InvalidOrderOperation as e:

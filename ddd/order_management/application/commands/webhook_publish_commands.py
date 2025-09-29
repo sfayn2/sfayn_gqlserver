@@ -12,14 +12,6 @@ class Command2(Command):
 # }
 
 #TODO data
-class PublishTenantWorkflowUpdateCommand(Command2):
-    pass
-    #data: dtos.VendorProductSnapshotDTO
-
-class PublishTenantRolemapUpdateCommand(Command2):
-    pass
-    #data: dtos.VendorProductSnapshotDTO
-
-class PublishTenantCreateOrderCommand(Command2):
+class PublishCreateOrderCommand(Command2):
     pass
     #data: dtos.VendorProductSnapshotDTO

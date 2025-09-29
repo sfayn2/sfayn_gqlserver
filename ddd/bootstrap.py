@@ -69,6 +69,7 @@ workflow_service = application_services.workflow_service.WorkflowService(
             dict(order_status=enums.OrderStatus.CONFIRMED, workflow_status="AddShipment", step_name="add_shipment", sequence=1, optional_step=False, conditions={}),
             dict(order_status=enums.OrderStatus.SHIPPED, workflow_status="Shipped", step_name="mark_as_shipped", sequence=2, optional_step=False, conditions={}),
             dict(order_status=enums.OrderStatus.SHIPPED, workflow_status="AddTrackingReference", step_name="add_shipping_tracking_reference", sequence=3, optional_step=False, conditions={}),
+            dict(order_status=enums.OrderStatus.DELIVERED, workflow_status="AddTrackingReference", step_name="add_shipping_tracking_reference", sequence=3, optional_step=False, conditions={}),
             dict(order_status=enums.OrderStatus.CANCELLED, workflow_status="Canceled", step_name="cancel_order", sequence=None, optional_step=False, conditions={}),
             dict(order_status=enums.OrderStatus.COMPLETED, workflow_status="Completed", step_name="mark_as_completed", sequence=4, optional_step=False, conditions={}),
         ]
@@ -110,22 +111,9 @@ event_bus.ASYNC_EXTERNAL_EVENT_HANDLERS.update({
 
 # ==================Internal async (redis/kafka/etc?) event handlers (within this service) ==================
 event_bus.ASYNC_INTERNAL_EVENT_HANDLERS.update({
-    "order_management.internal_events.TenantWorkflowUpdatedEvent": [
-        lambda event: handlers.handle_tenant_workflow_update_async_event(
+    "order_management.internal_events.CreateOrderEvent": [
+        lambda event: handlers.handle_create_order_async_event(
             event=event,
-            tenant_workflow_snapshot_repo=snapshots.DjangoVendorProductSnapshotRepo()
-        ),
-    ],
-    "order_management.internal_events.TenantRolemapUpdatedEvent": [
-        lambda event: handlers.handle_tenant_rolemap_update_async_event(
-            event=event,
-            tenant_rolemap_snapshot_repo=snapshots.DjangoVendorProductSnapshotRepo()
-        ),
-    ],
-    "order_management.internal_events.TenantCreateOrderEvent": [
-        lambda event: handlers.handle_tenant_create_order_async_event(
-            event=event,
-            tenant_create_order_snapshot_repo=snapshots.DjangoVendorProductSnapshotRepo()
         ),
     ],
 })

@@ -20,7 +20,7 @@ class ShipmentItem:
     
     def __post_init__(self):
         if self.quantity > line_item.quantity:
-            raise exceptions.InvalidOrderOperation("Cannot allocate more than ordered quantity")
+            raise exceptions.DomainError("Cannot allocate more than ordered quantity")
 
 @dataclass
 class Shipment:
@@ -32,16 +32,46 @@ class Shipment:
     shipment_amount: value_objects.Money = field(default_factory=lambda: value_objects.Money.default())
     shipment_tax_amount: value_objects.Money = field(default_factory=lambda: value_objects.Money.default())
     shipment_status: enums.ShipmentStatus = enums.ShipmentStatus.PENDING
-    shipment_items: [ShipmentItem] = field(default_factory=list)
+    shipment_items: List[ShipmentItem] = field(default_factory=list)
 
     def add_line_item(self, shipment_item: ShipmentItem):
         self.shipment_items.append(shipment_item)
 
+    @property
+    def shipment_items_sku_qty(self):
+        return {item.product_sku: item.quantity for item in self.shipment_items}
+
+    def confirm(self):
+        if self.shipment_status != enums.ShipmentStatus.PENDING:
+            raise exceptions.DomainError("Only pending shipment can be mark as confirmed")
+        self.shipment_status = enums.ShipmentStatus.CONFIRMED
+
+    def mark_as_shipped(self):
+        if self.shipment_status != enums.ShipmentStatus.CONFIRMED:
+            raise exceptions.DomainError("Only confirmed shipment can be mark as shipped")
+        self.shipment_status = enums.ShipmentStatus.SHIPPED
+
+        #TODO how to raise an event?
+
+    def deliver(self):
+        if self.shipment_status != enums.ShipmentStatus.SHIPPED:
+            raise exceptions.DomainError("Only shipped shipment can be delivered")
+        self.shipment_status = enums.ShipmentStatus.DELIVERED
+
+        #TODO how to raise an event?
+
+    def cancel(self):
+        if self.shipment_status in (enums.ShipmentStatus.SHIPPED, enums.ShipmentStatus.DELIVERED):
+            raise exceptions.DomainError("Cannot cancel shipment after shipped/delivered")
+        self.shipment_status = enums.ShipmentStatus.CANCELLED
+
+        #TODO how to raise an event?
+
     def add_shipping_tracking_reference(self, tracking_reference: str):
         if self.order_status != enums.OrderStatus.SHIPPED:
-            raise exceptions.InvalidOrderOperation("Only shipped order can add tracking reference.")
+            raise exceptions.DomainError("Only shipped order can add tracking reference.")
         if not tracking_reference.startswith("http"):
-            raise exceptions.InvalidOrderOperation("The Shipping tracking reference url is invalid.")
+            raise exceptions.DomainError("The Shipping tracking reference url is invalid.")
 
         self.tracking_reference = tracking_reference
 
