@@ -10,9 +10,9 @@ from .webhook_publish_handlers import webhook_publish_command_handlers
 #from .webhook_publish_handlers.publish_tenant_rolemap_update import handle_publish_tenant_rolemap_update
 from .webhook_publish_handlers.publish_create_order import handle_publish_create_order
 
-# Other activities / Workflow
-from .workflow_handlers import workflow_command_handlers
-from .workflow_handlers.escalate_reviewer import handle_escalate_reviewer
+# Other user action handlers
+from .user_action_handlers import user_action_command_handlers
+from .user_action_handlers.escalate_reviewer import handle_escalate_reviewer
 
 # Queries
 from .get_order import handle_get_order
@@ -22,7 +22,6 @@ from .event_handlers.log_order import handle_logged_order
 
 # Async Events via Redis stream
 from .event_handlers.user_logged_in_async_event import handle_user_logged_in_async_event
-from .event_handlers.tenant_workflow_update_async_event import handle_tenant_workflow_update_async_event
 
 
 

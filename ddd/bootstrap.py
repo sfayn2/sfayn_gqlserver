@@ -16,7 +16,6 @@ from ddd.order_management.infrastructure import (
     event_publishers,
     webhook_signatures,
     clocks,
-    workflow
 )
 from ddd.order_management.application import (
     handlers,
@@ -62,19 +61,6 @@ application_services.webhook_validation_service.SIGNATURE_VERIFIER = {
 }
 
 
-# =============== workflow ===========
-workflow_service = application_services.workflow_service.WorkflowService(
-    workflow.DjangoWorkflowGateway(
-        default_workflow=[
-            dict(order_status=enums.OrderStatus.CONFIRMED, workflow_status="AddShipment", step_name="add_shipment", sequence=1, optional_step=False, conditions={}),
-            dict(order_status=enums.OrderStatus.SHIPPED, workflow_status="Shipped", step_name="mark_as_shipped", sequence=2, optional_step=False, conditions={}),
-            dict(order_status=enums.OrderStatus.SHIPPED, workflow_status="AddTrackingReference", step_name="add_shipping_tracking_reference", sequence=3, optional_step=False, conditions={}),
-            dict(order_status=enums.OrderStatus.DELIVERED, workflow_status="AddTrackingReference", step_name="add_shipping_tracking_reference", sequence=3, optional_step=False, conditions={}),
-            dict(order_status=enums.OrderStatus.CANCELLED, workflow_status="Canceled", step_name="cancel_order", sequence=None, optional_step=False, conditions={}),
-            dict(order_status=enums.OrderStatus.COMPLETED, workflow_status="Completed", step_name="mark_as_completed", sequence=4, optional_step=False, conditions={}),
-        ]
-    )
-)
 
 # ============ Configure which events get published ===========
 event_bus.EXTERNAL_EVENT_WHITELIST = []
@@ -140,7 +126,6 @@ message_bus.COMMAND_HANDLERS.update({
         command=command,
         access_control=access_control,
         uow=repositories.DjangoOrderUnitOfWork(),
-        workflow_service=workflow_service,
         **deps
     ),
     commands.AddShippingTrackingReferenceCommand: lambda command, **deps: handlers.handle_add_shipping_tracking_reference(
@@ -153,11 +138,10 @@ message_bus.COMMAND_HANDLERS.update({
         command=command,
         access_control=access_control,
         uow=repositories.DjangoOrderUnitOfWork(),
-        workflow_service=workflow_service,
         **deps
     ),
     **handlers.webhook_publish_command_handlers.get_command_handlers(commands, handlers, event_bus),
-    **handlers.workflow_command_handlers.get_command_handlers(commands, handlers, repositories.DjangoOrderUnitOfWork(), access_control, workflow_service)
+    **handlers.user_action_command_handlers.get_command_handlers(commands, handlers, repositories.DjangoOrderUnitOfWork(), access_control)
 })
 
 # ================= Query Handlers (read operations) ===================

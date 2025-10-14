@@ -143,39 +143,13 @@ class ShipmentItem(models.Model):
     allocated_shipping_tax_currency = models.CharField(max_length=25, blank=True, null=True)
 
 
-class WorkflowExecution(models.Model):
+class UserActionLog(models.Model):
     order_id = models.CharField(
         max_length=25, 
     ) 
-    order_status = models.CharField(
-        max_length=25, 
-        blank=True, 
-        null=True, 
-        choices=enums.OrderStatus.choices, 
-        default=enums.OrderStatus.DRAFT
-    ) 
-    workflow_status = models.CharField(
-        max_length=25, 
-        blank=True, 
-        null=True
-    ) 
-    conditions = models.CharField(
-        max_length=150, 
-        blank=True, 
-        null=True,
-        help_text='optional condition ex. {"non_refundable": false }'
-    )
-    step_name = models.CharField(max_length=50, help_text="should match w command handler name, e.g. PendingApprovalCommand")
-    sequence = models.PositiveIntegerField(help_text="sequence of steps")
+    action = models.CharField(max_length=50, help_text="should match w permission ?")
     performed_by = models.CharField(max_length=50, help_text="system or user or reviewer or other")
     user_input = models.CharField(max_length=500, help_text='{"comment": "Looks good"}')
-    optional_step = models.BooleanField(default=False, help_text="can skip")
-    outcome = models.CharField(
-        max_length=25, 
-        blank=True, 
-        null=True, 
-        choices=enums.StepOutcome.choices
-    ) 
     executed_at = models.DateTimeField(auto_now=True) 
 
 
@@ -196,35 +170,3 @@ class UserAuthorizationSnapshot(models.Model):
 
     def __str__(self):
         return f"{self.tenant_id} | {self.permission_codename} | {self.scope}"
-
-# ==========
-# Local Tenant workflow
-class WorkflowDefinition(models.Model):
-    tenant_id = models.CharField(max_length=150)
-    order_status = models.CharField(
-        max_length=25, 
-        blank=True, 
-        null=True, 
-        choices=enums.OrderStatus.choices, 
-        default=enums.OrderStatus.DRAFT
-    ) 
-    workflow_status = models.CharField(
-        max_length=25, 
-        blank=True, 
-        null=True
-    ) 
-    conditions = models.CharField(
-        max_length=150, 
-        blank=True, 
-        null=True,
-        help_text='optional condition ex. {"non_refundable": false }'
-    )
-    step_name = models.CharField(max_length=50, help_text="should match w command handler name, e.g. PendingApprovalCommand")
-    sequence = models.PositiveIntegerField(help_text="sequence of steps")
-    optional_step = models.BooleanField(default=False, help_text="can skip")
-
-    is_active = models.BooleanField(default=True, help_text="To quickly control whether the is valid")
-    last_update_dt = models.DateTimeField(auto_now=True) 
-
-    def __str__(self):
-        return f"{self.tenant_id} | {self.step_name} | IsActive: {self.is_active} | {self.last_update_dt}"

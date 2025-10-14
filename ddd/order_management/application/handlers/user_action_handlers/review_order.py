@@ -28,21 +28,20 @@ def handle_review_order(
             )
 
             order = uow.order.get(order_id=command.order_id, tenant_id=user_ctx.tenant_id)
+            user_action = uow.user_action
 
-            escalate_step = workflow_service.get_step(order.order_id, "escalate_reviewer")
+            escalate_step = user_action.get(order.order_id, "escalate_reviewer")
 
             reviewer = escalate_step.user_input.get("reviewer")
             if user_ctx.sub != reviewer:
                 raise exceptions.InvalidOrderOperation("You are not the assigned reviewer.")
 
-            decision = enums.StepOutcome.APPROVED if command.is_approved else enums.StepOutcome.REJECTED
 
-            workflow_service.mark_step_done(
+            user_action.save_action(
                 order_id=order.order_id,
-                current_step=command.step_name,
+                action="review_order",
                 performed_by=user_ctx.sub,
                 user_input={"comments": command.comments},
-                outcome=decision
             )
 
 

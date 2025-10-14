@@ -29,9 +29,10 @@ def handle_escalate_reviewer(
 
             order = uow.order.get(order_id=command.order_id, tenant_id=user_ctx.tenant_id)
 
-            workflow_service.mark_step_done(
+            user_action = uow.user_action
+            user_action.save_action(
                 order_id=order.order_id,
-                current_step=command.step_name,
+                action="escalate_reviewer",
                 performed_by=user_ctx.sub,
                 user_input={"reviewer": command.reviewer, "comments": command.comments }
             )

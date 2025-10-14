@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from django.db import transaction
-from ddd.order_management.infrastructure import django_mappers, event_bus, repositories as impl_repositories
+from ddd.order_management.infrastructure import django_mappers, event_bus, repositories as impl_repositories, user_action
 from ddd.order_management.domain import repositories
 
 class DjangoOrderUnitOfWork(repositories.UnitOfWorkAbstract):
@@ -8,6 +8,7 @@ class DjangoOrderUnitOfWork(repositories.UnitOfWorkAbstract):
     #to trigger this
     def __init__(self):
         self.order = impl_repositories.DjangoOrderRepositoryImpl()
+        self.user_action = user_action.DjangoUserActionRepository()
 
         self.event_publisher = event_bus
 

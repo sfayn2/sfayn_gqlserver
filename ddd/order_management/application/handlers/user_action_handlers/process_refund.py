@@ -32,11 +32,14 @@ def handle_process_refund(
             )
 
             order = uow.order.get(order_id=command.order_id, tenant_id=user_ctx.tenant_id)
+            user_action = uow.user_action
 
-            request_return_step = workflow_service.get_step(order.order_id, "request_return")
+            request_return_step = user_action.get_last_action(order.order_id, "request_return")
             returned_skus = request_return_step.user_input.get("return_skus", [])
 
             process_refund_step = workflow_service.get_step(order.order_id, "process_refund")
+
+            #TODO where can we get conditions?
             conditions = process_refund_step.conditions or {}
 
             returned_sku_set = {
@@ -64,7 +67,7 @@ def handle_process_refund(
                 currency=order.currency
             )
 
-            workflow_service.mark_step_done(
+            user_action.save_input(
                 order_id=order.order_id,
                 current_step=command.step_name,
                 performed_by=user_ctx.sub,
