@@ -18,7 +18,7 @@ def handle_process_refund(
         command: commands.ProcessRefundCommand, 
         uow: UnitOfWorkAbstract,
         access_control: AccessControl1Abstract,
-        workflow_service: WorkflowService,
+        refund_service: RefundService,
         user_ctx: dtos.UserContextDTO
 ) -> dtos.ResponseDTO:
 
@@ -31,56 +31,17 @@ def handle_process_refund(
                 required_scope={"role": ["vendor"] }
             )
 
-            order = uow.order.get(order_id=command.order_id, tenant_id=user_ctx.tenant_id)
-            user_action = uow.user_action
-
-            request_return_step = user_action.get_last_action(order.order_id, "request_return")
-            returned_skus = request_return_step.user_input.get("return_skus", [])
-
-            process_refund_step = workflow_service.get_step(order.order_id, "process_refund")
-
-            #TODO where can we get conditions?
-            conditions = process_refund_step.conditions or {}
-
-            returned_sku_set = {
-                sku["product_sku"]:sku["order_quantity"] 
-                for sku in returned_skus
-            }
-
-            amount = sum(
-                li.product_price.amount * min(returned_sku_set[li.product_sku], li.order_quantity) 
-                for li in order.get_line_items() 
-                if li.product_sku in returned_sku_set.keys()
-            )
-
-            restocking_fee_percent = conditions.get("restocking_fee_percent", 0)
-            if restocking_fee_percent > 0:
-                amount -= amount * (restocking_fee_percent / 100)
-
-
-            max_amount = conditions.get("max_refund_amount")
-            if max_amount is not None:
-                amount = min(amount, max_amount)
-
-            refunded_amount = value_objects.Money(
-                amount=amount,
-                currency=order.currency
-            )
-
-            user_action.save_input(
-                order_id=order.order_id,
-                current_step=command.step_name,
+            refund_service.process_refund(
+                order_id=commands.order_id, 
+                tenant_id=user_ctx.tenant_id,
                 performed_by=user_ctx.sub,
-                user_input={"comments": command.comments, "refunded_amount": refunded_amount.as_dict() }
+                comments=commands.comments
             )
 
-
-            uow.order.save(order)
-            uow.commit()
 
             return dtos.ResponseDTO(
                 success=True,
-                message=f"Order {order.order_id} successfully processed refund."
+                message=f"Order {commands.order_id} successfully processed refund."
             )
 
 

@@ -20,13 +20,6 @@ class Order(models.Model):
         default=enums.OrderStatus.DRAFT
     ) 
 
-    # sub status / workflow status
-    activity_status = models.CharField(
-        max_length=25, 
-        blank=True, 
-        null=True
-    ) 
-
     customer_id = models.CharField(max_length=150, blank=True, null=True)
     customer_name = models.CharField(max_length=255, blank=True, null=True)
     customer_email = models.EmailField(max_length=255, blank=True, null=True)
@@ -170,3 +163,11 @@ class UserAuthorizationSnapshot(models.Model):
 
     def __str__(self):
         return f"{self.tenant_id} | {self.permission_codename} | {self.scope}"
+
+class TenantSnapshot(models.Model):
+    tenant_id = models.CharField(max_length=150, primary_key=True)
+    configs = models.CharField(max_length=50, help_text='ex. { "restocking_fee_percent": 20 }')
+    last_update_dt = models.DateTimeField(auto_now=True) 
+
+    def __str__(self):
+        return f"{self.tenant_id} | {self.configs}"
