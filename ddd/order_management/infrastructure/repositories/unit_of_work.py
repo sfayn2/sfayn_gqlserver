@@ -8,8 +8,6 @@ class DjangoOrderUnitOfWork(repositories.UnitOfWorkAbstract):
     #to trigger this
     def __init__(self):
         self.order = impl_repositories.DjangoOrderRepositoryImpl()
-        self.user_action = impl_repositories.DjangoUserActionRepository()
-        self.tenant = impl_repositories.DjangoTenantSnapshotRepository()
 
         self.event_publisher = event_bus
 

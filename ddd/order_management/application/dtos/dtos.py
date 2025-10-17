@@ -2,7 +2,7 @@ import uuid
 from pydantic import BaseModel, Field, AliasChoices, parse_obj_as
 from datetime import datetime
 from decimal import Decimal
-from typing import Optional, List, Tuple
+from typing import Optional, List, Tuple, Dict, Any
 from ddd.order_management.domain import enums, value_objects
 
 
@@ -128,25 +128,13 @@ class UserContextDTO(BaseModel):
     tenant_id: str
     roles: List[str] = Field(default_factory=list)
 
-class WorkflowStepDTO(BaseModel):
+class TenantDTO(BaseModel):
+    tenant_id: str
+    config: Dict[str, Any]
+
+class UserActionDTO(BaseModel):
     order_id: str
-    order_status: enums.OrderStatus
-    sequence: int
-    step_name: str
-    outcome: enums.StepOutcome
-    condition: Optional[dict] = None
+    action: str
     performed_by: str
-    user_input: Optional[dict] = None
-    executed_at: Optional[datetime] = None
-    optional_step: bool = False
+    user_input: Dict[str, Any]
 
-    def is_pending(self) -> bool:
-        return self.outcome in {enums.StepOutcome.WAITING}
-
-#class WorkflowDefinitionDTO(BaseModel):
-#    order_status: enums.OrderStatus
-#    workflow_status: str
-#    step_name: str
-#    condition: Optional[dict] = None
-#    sequence: int
-#    optional_step: bool = False

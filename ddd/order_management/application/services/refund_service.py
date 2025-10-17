@@ -2,15 +2,24 @@ from __future__ import annotations
 from ddd.order_management.domain import value_objects
 
 class RefundService:
-    def __init__(self, uow: UnitOfWorkAbstract):
+    def __init__(self, 
+        uow: UnitOfWorkAbstract, 
+        tenant_service: TenantServiceAbstract, 
+        user_action_service: UserActionServiceAbstract):
         self.uow = uow
+        self.tenant_service = tenant_service
+        self.user_action_service = user_action_service
 
-    def process_refund(self, order_id: str, tenant_id: str, comments: str, action: str = "process_refund"):
+    def process_refund(self, 
+        order_id: str, 
+        tenant_id: str, 
+        comments: str, 
+        action: str = "process_refund"
+    ):
         order = self.uow.order.get(order_id=order_id, tenant_id=tenant_id)
-        user_action = self.uow.user_action
-        tenant_config = self.uow.tenant.get_tenant_config(tenant_id)
+        tenant_config = tenant_service.get_tenant_config(tenant_id)
 
-        request_return_step = user_action.get_last_action(order_id, "request_return")
+        request_return_step = user_action_service.get_last_action(order_id, "request_return")
         returned_skus = request_return_step.user_input.get("return_skus", [])
 
         returned_sku_set = {
@@ -38,11 +47,15 @@ class RefundService:
             currency=order.currency
         )
 
-        self.uow.user_action.save_input(
-            order_id=order_id,
-            action=action,
-            performed_by=performed_by,
-            user_input={"comments": comments, "refunded_amount": refunded_amount.as_dict() }
+        user_action_data = dtos.UserActionDTO(
+                order_id=order_id,
+                action=action,
+                performed_by=performed_by,
+                user_input={"comment": comments, "refunded_amount": refunded_amount.as_dict() }
+            )
+
+        user_action_service.save_action(
+            user_action_data
         )
 
 

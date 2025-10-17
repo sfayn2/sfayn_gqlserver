@@ -2,10 +2,10 @@
 from .email_sender_abstract import EmailSenderAbstract
 from .logging_abstract import LoggingAbstract
 from .clock_abstract import ClockAbstract
-from .user_action_abstract import UserActionAbstract
+from .user_action_service_abstract import UserActionServiceAbstract
+from .tenant_service_abstract import TenantServiceAbstract
 
 #Snapshots
-from .tenant_snapshot_abstract import TenantSnapshotAbstract
 from .snapshot_repo_abstract import SnapshotRepoAbstract
 
 from .access_control1_abstract import AccessControl1Abstract

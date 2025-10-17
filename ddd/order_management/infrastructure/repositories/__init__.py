@@ -1,4 +1,2 @@
 from .django_order_repository import DjangoOrderRepositoryImpl
-from .django_user_action_repository import DjangoUserActionRepository
-from .django_tenant_repository import DjangoTenantSnapshotRepository
 from .unit_of_work import DjangoOrderUnitOfWork
