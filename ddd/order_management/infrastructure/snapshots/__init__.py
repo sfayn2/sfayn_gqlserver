@@ -1,3 +1,1 @@
 from .django_user_authorization_snapshot_repo import DjangoUserAuthorizationSnapshotRepo
-from .django_tenant_workflow_snapshot_repo import DjangoTenantWorkflowSnapshotRepo
-from .django_tenant_rolemap_snapshot_repo import DjangoTenantRolemapSnapshotRepo

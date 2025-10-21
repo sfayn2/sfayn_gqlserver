@@ -37,9 +37,6 @@ class OrderMapper:
             shipments=[
                 django_mappers.ShipmentMapper.to_domain(item) for item in django_order_object.shipments.all()
             ],
-            workflows=[
-                django_mappers.WorkflowMapper.to_domain(item) for item in django_order_object.workflows.all()
-            ],
             order_status=django_order_object.order_status,
             payment_status=django_order_object.payment_status,
             activity_status=django_order_object.activity_status,

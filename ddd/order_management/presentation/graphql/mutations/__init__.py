@@ -4,8 +4,8 @@ from .add_shipping_tracking_reference_mutation import AddShippingTrackingReferen
 from .cancel_order_mutation import CancelOrderMutation
 
 
-#Other activities
-from .workflow.escalate_reviewer_mutation import EscalateReviewerMutation
-from .workflow.review_order_mutation import ReviewOrderMutation
-from .workflow.request_return_mutation import RequestReturnMutation
-from .workflow.process_refund_mutation import ProcessRefundMutation
+#Tenant specific user action
+from .user_action.escalate_reviewer_mutation import EscalateReviewerMutation
+from .user_action.review_order_mutation import ReviewOrderMutation
+from .user_action.request_return_mutation import RequestReturnMutation
+from .user_action.process_refund_mutation import ProcessRefundMutation
