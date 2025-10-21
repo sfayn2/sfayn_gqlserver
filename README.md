@@ -1,54 +1,68 @@
-# LiteOMS
+# TenantOMSApi
 
 [![Django CI](https://github.com/sfayn2/sfayn_gqlserver/actions/workflows/django.yml/badge.svg)](https://github.com/sfayn2/sfayn_gqlserver/actions/workflows/django.yml)
 
-# Lightweight, Integration-Focused Order Management API (DDD + GraphQL + JWT-secured)
-
-A lightweight, multi-tenant **OMS** built with **Domain Driven Design (DDD)**. Focuses on workflow customization and integration rather than being a full-features all-in-one system
-
-## Key Features
-- Customizable Workflows - tenants can define sub-states and optional steps.
-- JWT-secured, tenant-scoped APIs.
-- Supports single-tenant or multi-tenant setups.
-- Supports strong decoupling between bounded contexts (Snapshot Architecture).
-- Integrates easily with external storefronts and fullfullment services.
+**TenantOMSAPi**  is a multi-tenant backend API for managing orders, shipments, etc built with Domain-Driven Design (DDD), GraphQL, and JWT-secured access.
+it is IDP-agnostic, supports plan-based onboarding, and allows tenant-specific business configurations.
 
 
-## Work in Progress
+# Architecture Roles
+* **SaaS Provider**: Owns SaasConfig, plans, permissions, integration, and core business rules.
+* **Tenant**: Subscribes to SaaS plans, manages its own operational configuration via TenantConfig.
+* **Vendor**: Operates under a tenant, uses authorized endpoints to manage orders, shipments, etc.
+
+# Core Features
+* **Multi-Tenant Isolation**: All operations scoped by tenant_id to ensure data separation
+* **JWT Authentication (IDP-Agnostic)**: Works with any OIDC-compatible provider (e.g Keycloak)
+* **Permission-Based API Access**: SaaS provider enables or restricts endpoints for each tenant via permissions.
+* **Tenant Configuration**: Defines fees, refund policies, and other tenant-level behaviors.
+* **Webhook Automation**: Tenants/B2B can automate order or shipment creation via shared-key secured webhook integration.
+* **Event-Driven Integration**: Supports message-queue based integration (e.g. Redis Streams) for real-time synchronization between SaaS and tenant systems.
+* **User Action Logging**: Trackes vendor actions (approveOrder, shipShipment, et) for audit and validations.
+
+
+# Work in Progress
 This Project is currently under active development. Major changes are ongoing.
 
-
-## Auth & Multi-Tenancy
-
-- APIs are protected by **JWT access tokens**
-- Use header: `Authorization: Bearer <your token>`
-- Tokens must be issued by a trusted **IDP (e.g., Keycloak, Auth0, Firebase)**
-- JWT **must include**:
-    - `sub`: User id
-    - `tenant_id`: Tenant Scope
-    - `roles`: Customer or Vendor or Both
-
-
-
-## Example flow
-1. **Login** - User authenticates via IDP; optionally syncs to OMS.
-2. **Place Order** - External storefornt calls OMS create order api with confirmed checkout order.
-3. **Order Updates** - Vendor marks shipped, adds tracking, or completes order.
-6. **Cancel / View** - Order in PENDING or CONFIRMED can be cancelled; order viewed via getOrder.
+## Typical Flow
+1. Tenant subscribes to a SaaS provider plan (e.g Standard, Custom)
+2. SaaS provider updates SaaSConfig -- Adds the subscribed tenant, its IDP issuer/public key, optional webhook shared key, etc.
+3. Tenant sets up TenantConfig -- Defines its own operational settings (fees, refund rules, webhook URL, etc.)
+4. Integration Setup
+    * Tenant may automate order creation using webhooks.
+    * For advanced real-time sync, they may connect via Redis Streams or another message queue
+5. Vendors operation via TenantsOMSApi
+* Use authenticated API endpoints to create orders, process shipments, refunds, and complete order flows.
+* Access is enforece by tenant permissions defined in the SaaS plan.
 
 
-## Integration
-* **External Storefronts**: Webhook reciever API; supports backend sync, CSV import or event-driven updates.
-* **3rd-Party Services**: Fulfillment / 3PL updates via webhook APIs.
+# Configuration Overview
+## SaaSConfig
 
+Defines global SaaS-level settings, authorized tenants, and integration credentials.
+```json
+    {
+        "idp": {
+            "public_key": "92alSyFzFiPHT3oYDwjXAGXFAAAQGt1Eoaag5dw",
+            "issuer": "http://idp.saasprovider.com/realms/tenant1",
+            "audience": "AUD1",
+            "algorith": "RS256",
+        },
+        "plan": ["standard"],
+        "webhook_secret": "abc123secret",
+    }
+```
 
-## Snapshots
-* Local snapshots for read consistency and workflow decisions:
-    * TenantWorkflowSnapshot
-    * TenantRolemapSnapshot
-    * FullfillmentSnapshot
-    * UserAuthorizationSnapshot
+## TenantConfig
 
+Defines tenant-specific business rules and integration endpoints
+```json
+    {
+        "restocking_fee_percent": 10,
+        "max_refund_amount": 500.0,
+        "webhook_url": "https://tenant-a.app/webhook"
+    }
+```
 
 ## Contributing
 Contributions welcome! Please open issues or submit pull requests
