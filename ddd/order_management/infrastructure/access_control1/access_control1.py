@@ -26,7 +26,6 @@ class AccessControl1(ports.AccessControl1Abstract):
 
         #TODO: this should not be here? lets inject 
         matching_authorizations = django_snapshots.UserAuthorizationSnapshot.objects.filter(
-            user_id=user_context.sub,
             tenant_id=user_context.tenant_id,
             permission_codename=required_permission
         )

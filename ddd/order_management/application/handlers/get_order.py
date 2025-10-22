@@ -11,9 +11,11 @@ from ddd.order_management.application import (
 
 def handle_get_order(
         query: queries.GetOrderQuery, 
-        access_control: AccessControl1Abstract,
+        access_control_factory: callable[[str], AccessControl1Abstract],
         user_ctx: dtos.UserContextDTO,
         uow: UnitOfWorkAbstract) -> dtos.OrderResponseDTO:
+
+    access_control = access_control_factory(user_ctx.tenant_id)
 
     access_control.ensure_user_is_authorized_for(
         user_ctx,

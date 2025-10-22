@@ -44,8 +44,9 @@ load_dotenv(find_dotenv(filename=".env.test"))
 
 
 # ============== resolve access control based on tenant_id ===============
+saas_service_instance = saas_service.SaaSService()
 access_control = lambda tenant_id: application_services.AccessControlService(
-    saas_service=saas_service.SaaSService(),
+    saas_service=saas_service_instance,
     access_control1=access_control1
 ).resolve(tenant_id)
 

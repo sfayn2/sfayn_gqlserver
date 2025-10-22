@@ -14,13 +14,15 @@ from ddd.order_management.domain.services import DomainClock
 def handle_request_return(
         command: commands.RequestReturnCommand, 
         uow: UnitOfWorkAbstract,
-        access_control: AccessControl1Abstract,
+        access_control_factory: callable[[str], AccessControl1Abstract],
         workflow_service: WorkflowService,
         user_ctx: dtos.UserContextDTO
 ) -> dtos.ResponseDTO:
 
     try:
         with uow:
+
+            access_control = access_control_factory(user_ctx.tenant_id)
 
             access_control.ensure_user_is_authorized_for(
                 user_ctx,
