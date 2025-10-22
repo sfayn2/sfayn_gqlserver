@@ -42,18 +42,12 @@ load_dotenv(find_dotenv(filename=".env.test"))
 #}
 # ====================
 
-# ============= access control =========
-JWT_HANDLER = access_control1.JwtTokenHandler(
-    public_key=os.getenv("KEYCLOAK_PUBLIC_KEY"),
-    issuer=os.getenv("KEYCLOAK_ISSUER"),
-    audience=os.getenv("KEYCLOAK_CLIENT_ID"),
-    algorithm=os.getenv("KEYCLOAK_ALGORITHM")
-)
 
-# Configure JWT Authentication
-access_control = access_control1.AccessControl1(
-    jwt_handler=JWT_HANDLER
-)
+# ============== resolve access control based on tenant_id ===============
+access_control = lambda tenant_id: application_services.AccessControlService(
+    saas_service=saas_service.SaaSService(),
+    access_control1=access_control1
+).resolve(tenant_id)
 
 # ============== domain clock =============
 domain_services.DomainClock.configure(clocks.UTCClock())

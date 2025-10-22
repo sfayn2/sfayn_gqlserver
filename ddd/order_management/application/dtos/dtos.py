@@ -130,7 +130,7 @@ class UserContextDTO(BaseModel):
 
 class TenantDTO(BaseModel):
     tenant_id: str
-    config: Dict[str, Any]
+    configs: Dict[str, Any]
 
 class UserActionDTO(BaseModel):
     order_id: str
