@@ -15,7 +15,6 @@ def handle_request_return(
         command: commands.RequestReturnCommand, 
         uow: UnitOfWorkAbstract,
         access_control_factory: callable[[str], AccessControl1Abstract],
-        workflow_service: WorkflowService,
         user_ctx: dtos.UserContextDTO
 ) -> dtos.ResponseDTO:
 

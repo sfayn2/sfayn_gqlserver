@@ -10,9 +10,6 @@ class MoneyException(InvalidOrderOperation):
 class AddressException(InvalidOrderOperation):
     pass
 
-class WorkflowException(InvalidOrderOperation):
-    pass
-
 # below Exceptions will not be include error msg in response
 class Forbidden(Exception):
     pass

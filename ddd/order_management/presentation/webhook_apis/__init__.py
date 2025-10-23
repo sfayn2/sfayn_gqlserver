@@ -1,3 +1,1 @@
-from .tenant_workflow_update_api import tenant_workflow_update_api
-from .tenant_rolemap_update_api import tenant_rolemap_update_api
 from .tenant_create_order_api import tenant_create_order_api

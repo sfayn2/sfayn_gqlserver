@@ -6,8 +6,6 @@ from .cancel_order import handle_cancel_order
 
 # Webhook publish
 from .webhook_publish_handlers import webhook_publish_command_handlers
-#from .webhook_publish_handlers.publish_tenant_workflow_update import handle_publish_tenant_workflow_update
-#from .webhook_publish_handlers.publish_tenant_rolemap_update import handle_publish_tenant_rolemap_update
 from .webhook_publish_handlers.publish_create_order import handle_publish_create_order
 
 # Other user action handlers
