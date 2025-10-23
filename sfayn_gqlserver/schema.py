@@ -22,7 +22,6 @@ class Mutation(graphene.ObjectType):
     place_order = mutations.place_order_mutation.PlaceOrderMutation.Field()
     confirm_order = mutations.confirm_order_mutation.ConfirmOrderMutation.Field()
     cancel_order = mutations.cancel_order_mutation.CancelOrderMutation.Field()
-    mark_as_shipped_order = mutations.mark_as_shipped_mutation.MarkAsShippedMutation.Field()
     add_shipping_tracking_reference = mutations.add_shipping_tracking_reference_mutation.AddShippingTrackingReferenceMutation.Field()
     mark_as_completed_order = mutations.mark_as_completed_mutation.MarkAsCompletedMutation.Field()
     request_return = mutations.request_return_mutation.RequestReturnMutation.Field()

@@ -7,13 +7,14 @@ from ddd.order_management.application import (
     dtos, 
     shared
 )
-from ddd.order_management.domain import exceptions
+from ddd.order_management.domain import exceptions, value_objects
 
 
-def handle_mark_as_shipped(
-        command: commands.ShipOrderCommand, 
+def handle_add_shipment(
+        command: commands.AddShipmentCommand, 
         access_control_factory: callable[[str], AccessControl1Abstract],
         user_ctx: dtos.UserContextDTO,
+        user_action_service: UserActionServiceAbstract,
         uow: UnitOfWorkAbstract) -> dtos.ResponseDTO:
     try:
         with uow:
@@ -21,19 +22,35 @@ def handle_mark_as_shipped(
 
             access_control.ensure_user_is_authorized_for(
                 user_ctx,
-                required_permission="mark_as_shipped",
-                required_scope={"vendor_id": user_ctx.sub }
+                required_permission="add_shipment",
+                required_scope={"role": ["vendor"] }
             )
 
             order = uow.order.get(order_id=command.order_id, tenant_id=user_ctx.tenant_id)
-            order.mark_as_shipped()
+
+            shipment = value_objects.Shipment(
+
+            )
+
+            order.add_shipment(shipment)
+
+            user_action_data = dtos.UserActionDTO(
+                    order_id=command.order_id,
+                    action="add_shipment",
+                    performed_by=user_ctx.sub,
+                    user_input={}
+                )
+
+            user_action_service.save_action(
+                user_action_data
+            )
 
             uow.order.save(order)
             uow.commit()
 
             return dtos.ResponseDTO(
                 success=True,
-                message=f"Order {order.order_id} successfully mark as shipped."
+                message=f"Order {order.order_id} successfully add shipment."
             )
 
 

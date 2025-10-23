@@ -1,6 +1,5 @@
 # Commands
 from .add_shipping_tracking_reference import handle_add_shipping_tracking_reference
-from .mark_as_shipped import handle_mark_as_shipped
 from .mark_as_completed import handle_mark_as_completed
 from .cancel_order import handle_cancel_order
 

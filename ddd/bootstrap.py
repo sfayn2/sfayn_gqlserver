@@ -140,7 +140,8 @@ message_bus.COMMAND_HANDLERS.update({
     ),
     commands.CompleteOrderCommand: lambda command, **deps: handlers.handle_mark_as_completed(
         command=command,
-        access_control=access_control,
+        access_control_factory=access_control,
+        user_action_service=user_action_service.UserActionService(),
         uow=repositories.DjangoOrderUnitOfWork(),
         **deps
     ),
