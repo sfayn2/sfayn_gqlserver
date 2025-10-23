@@ -4,6 +4,7 @@ from .commands import (
     ShipOrderCommand,
     CancelOrderCommand,
     CompleteOrderCommand,
+    AddShipmentCommand
 )
 
 from .user_action_commands import (

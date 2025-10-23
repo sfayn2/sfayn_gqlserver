@@ -8,7 +8,7 @@ from decimal import Decimal
 class LineItem:
     product_sku: str
     order_quantity: int
-    vendor_name: str
+    vendor_id: str
     pickup_address: value_objects.Address
     product_price: value_objects.Money = field(default_factory=lambda: value_objects.Money.default())
     product_tax_amount: value_objects.Money = field(default_factory=lambda: value_objects.Money.default())

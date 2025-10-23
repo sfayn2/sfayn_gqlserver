@@ -47,6 +47,13 @@ class Order:
 
         self.line_items.append(line_item)
 
+    def get_line_item(self, product_sku: str, vendor_id: str) -> LineItem:
+        for li in self.line_items:
+            if li.product_sku == product_sku and li.vendor_id == vendor_id:
+                return li
+        raise exceptions.DomainError(f"Vendor {vendor_id} Line item w SKU {product_sku} not found in order {self.order_id}")
+
+
     def _get_shipment(self, shipment_id: str) -> Shipment:
         shipment = next((s for s in self.shipments if s.shipment_id == shipment_id), None)
         if not shipment:

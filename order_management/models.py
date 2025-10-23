@@ -47,7 +47,7 @@ class LineItem(models.Model):
     product_price = models.DecimalField(max_digits=10, decimal_places=2)
     order_quantity = models.PositiveIntegerField(null=True)
 
-    vendor_name = models.CharField(max_length=200, help_text="can use to check if product belongs to same vendor")
+    vendor_id = models.CharField(max_length=200, help_text="can use to check if product belongs to same vendor")
 
     pickup_address_line1 = models.TextField(blank=True, null=True, help_text="Warehouse/Vendor address")
     pickup_address_line2 = models.TextField(blank=True, null=True, help_text="Warehouse/Vendor address2")

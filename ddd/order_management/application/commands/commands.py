@@ -7,10 +7,7 @@ from ddd.order_management.application import dtos
 from ddd.order_management.domain import enums
 
 class Command(BaseModel, frozen=True):
-
-    @property
-    def step_name(self) -> str:
-        return self.__class__.__name__.replace("Command", "").lower()
+    pass
 
 class AddShippingTrackingReferenceCommand(Command):
     order_id: str
@@ -25,3 +22,13 @@ class CancelOrderCommand(Command):
 
 class CompleteOrderCommand(Command):
     order_id: str
+
+
+class AddShipmentCommand(Command):
+    order_id: str
+    shipment_id: str
+    shipment_address: dtos.AddressDTO
+    shipment_amount: dtos.MoneyDTO
+    shipment_tax_amount: dtos.MoneyDTO
+    shipment_items: dtos.ProductSkusDTO
+
