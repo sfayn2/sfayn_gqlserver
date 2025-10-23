@@ -28,32 +28,11 @@ def handle_add_shipment(
             )
 
             order = uow.order.get(order_id=command.order_id, tenant_id=user_ctx.tenant_id)
-
-            shipment = model.Shipment(
+            order.create_shipment(
                 shipment_id=command.shipment_id,
-                shipment_address=value_objects.Address(**command.shipment_address),
-                shipment_amount=value_objects.Money(
-                    amount=command.shipment_amount,
-                    currency=command.shipment_amount_currency
-                ),
-                shipment_tax_amount=value_objects.Money(
-                    amount=command.shipment_amount,
-                    currency=command.shipment_amount_currency
-                ),
-                shipment_items=[]
+                shipment_address=AddressDTO.to_domain(command.shipment_address),
+                shipiment_items=command.shipment_items
             )
-
-            for item_data in command.shipment_items:
-                line_item = order.get_line_item(item_data.product_sku, item_data.vendor_id)
-                shipment_item = model.ShipmentItem(
-                    shipment_item_id=str(uuid.uuid4()),
-                    line_item=line_item,
-                    quantity=item_data.quantity
-                )
-                shipment.add_line_item(shipment_item)
-
-            shipment.allocation_shipping_tax()
-            order.add_shipment(shipment)
 
             user_action_data = dtos.UserActionDTO(
                     order_id=command.order_id,

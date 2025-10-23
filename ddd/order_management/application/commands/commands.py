@@ -27,8 +27,8 @@ class CompleteOrderCommand(Command):
 class AddShipmentCommand(Command):
     order_id: str
     shipment_id: str
-    shipment_address: dtos.AddressDTO
-    shipment_amount: dtos.MoneyDTO
-    shipment_tax_amount: dtos.MoneyDTO
-    shipment_items: dtos.ProductSkusDTO
+    shipment_address: dict
+    shipment_amount: Optional[dict] = None
+    shipment_tax_amount: Optional[dict] = None
+    shipment_items: list[dict]
 

@@ -63,6 +63,32 @@ class Order:
     def _update_modified_date(self):
         self.date_modified = DomainClock.now()
 
+    def create_shipment(
+        self,
+        shipment_address: value_objects.Address,
+        shipment_provider: Optional[str],
+        shipment_service_code: Optional[str],
+        shipment_items: list[dict]
+    ) -> Shipment:
+
+        shipment = model.Shipment(
+            shipment_id=str(uuid.uuid4()),
+            shipment_address=shipment_address,
+            shipment_items=[]
+        )
+
+        for item_data in command.shipment_items:
+            line_item = order.get_line_item(item_data.product_sku, item_data.vendor_id)
+            shipment_item = model.ShipmentItem(
+                shipment_item_id=str(uuid.uuid4()),
+                line_item=line_item,
+                quantity=item_data.quantity
+            )
+            shipment.add_line_item(shipment_item)
+
+        self.add_shipment(shipment)
+        return shipment
+
     def add_shipment(self, shipment: Shipment) -> Shipment:
         if self.order_status != enums.OrderStatus.CONFIRMED:
             raise exceptions.DomainError("Only confirm order can add shipment.")
