@@ -3,17 +3,16 @@ from django.http import HttpResponseBadRequest, JsonResponse
 from ddd.order_management.application import (
     message_bus, commands
   )
-from ddd.order_management.application.services import validate_webhook
+from ddd.order_management.application.services import WebhookValidationService
 
 @csrf_exempt
-def tenant_rolemap_update_api(request, provider: str, tenant_id: str):
+def tenant_rolemap_update_api(request, tenant_id: str):
 
     if request.method != "POST":
         return HttpResponseBadRequest("Only POST is allowed")
 
     try:
-        payload = validate_webhook(
-                provider, 
+        payload = WebhookValidationService.validate(
                 tenant_id, 
                 request
             )

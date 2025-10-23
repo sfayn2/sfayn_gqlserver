@@ -17,7 +17,8 @@ from ddd.order_management.infrastructure import (
     webhook_signatures,
     clocks,
     user_action_service,
-    tenant_service
+    tenant_service,
+    saas_service
 
 )
 from ddd.order_management.application import (
@@ -42,9 +43,9 @@ load_dotenv(find_dotenv(filename=".env.test"))
 #}
 # ====================
 
+saas_service_instance = saas_service.SaaSService()
 
 # ============== resolve access control based on tenant_id ===============
-saas_service_instance = saas_service.SaaSService()
 access_control = lambda tenant_id: application_services.AccessControlService(
     saas_service=saas_service_instance,
     access_control1=access_control1
@@ -54,9 +55,14 @@ access_control = lambda tenant_id: application_services.AccessControlService(
 domain_services.DomainClock.configure(clocks.UTCClock())
 
 # ========= webhook validation =============
-application_services.webhook_validation_service.SIGNATURE_VERIFIER = {
-    "wss": lambda tenant_id: webhook_signatures.WssSignatureVerifier(shared_secret=os.getenv(f"WH_SECRET_{tenant_id}"))
-}
+#application_services.webhook_validation_service.SIGNATURE_VERIFIER = {
+#    "wss": lambda tenant_id: webhook_signatures.WssSignatureVerifier(shared_secret=os.getenv(f"WH_SECRET_{tenant_id}"))
+#}
+
+application_services.WebhookValidationService.configure(
+    saas_service=saas_service_instance,
+    signature_verifier=webhook_signatures.WssSignatureVerifier
+)
 
 
 
