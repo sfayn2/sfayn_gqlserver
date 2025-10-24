@@ -20,7 +20,6 @@ def handle_add_shipment(
     try:
         with uow:
 
-            access_control.ensure_tenant_consistency(command.tenant_id, user_ctx.tenant_id)
             access_control.ensure_user_is_authorized_for(
                 user_ctx,
                 required_permission="add_shipment",

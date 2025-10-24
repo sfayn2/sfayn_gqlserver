@@ -15,11 +15,6 @@ class AccessControl1(ports.AccessControl1Abstract):
 
         return dtos.UserContextDTO.model_validate(identity_claims)
 
-    def ensure_tenant_consistency(self, token_tenant_id: str, user_ctx_tenant_id: str) -> None:
-        # verify tenant_id
-        if user_ctx.tenant_id != command.tenant_id:
-            raise exceptions.AccessControlException(f"Tenant mismatch token={user_ctx.tenant_id}, request={command.tenant_id}")
-
 
     def ensure_user_is_authorized_for(
         self, user_context: dtos.UserContextDTO, required_permission: str, required_scope: Optional[dict] = None

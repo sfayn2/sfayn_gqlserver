@@ -25,6 +25,10 @@ class AddShipmentMutation(relay.ClientIDMutation):
         access_control = access_control_service.AccessControlService.resolve(tenant_id)
         user_ctx = access_control.get_user_context(token)
 
+        # verify tenant_id
+        if user_ctx.tenant_id != tenant_id:
+            raise exceptions.AccessControlException(f"Tenant mismatch token={user_ctx.tenant_id}, request={command.tenant_id}")
+
         command = commands.AddShipmentCommand.model_validate(input)
 
         result = message_bus.handle(command, access_control=access_control, user_ctx=user_ctx)
