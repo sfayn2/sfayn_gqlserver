@@ -126,9 +126,10 @@ event_bus.EVENT_HANDLERS.update({
 
 # ========= Command Handlers (write operations) ==================
 message_bus.COMMAND_HANDLERS.update({
-    commands.ShipOrderCommand: lambda command, **deps: handlers.handle_mark_as_shipped(
+    commands.AddShipmentCommand: lambda command, **deps: handlers.handle_add_shipment(
         command=command,
-        access_control=access_control,
+        access_control_factory=access_control,
+        user_action_service=user_action_service.UserActionService(),
         uow=repositories.DjangoOrderUnitOfWork(),
         **deps
     ),

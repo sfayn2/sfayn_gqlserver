@@ -14,12 +14,18 @@ from ddd.order_management.domain import exceptions, value_objects, model
 def handle_add_shipment(
         command: commands.AddShipmentCommand, 
         access_control_factory: callable[[str], AccessControl1Abstract],
-        user_ctx: dtos.UserContextDTO,
+        token: str,
+        tenant_id: str,
         user_action_service: UserActionServiceAbstract,
         uow: UnitOfWorkAbstract) -> dtos.ResponseDTO:
     try:
         with uow:
-            access_control = access_control_factory(user_ctx.tenant_id)
+            access_control = access_control_factory(tenant_id)
+            user_ctx = access_control.get_user_context(token)
+
+            # verify tenant_id
+            if user_ctx.tenant_id != tenant_id:
+                raise Exception("Invalid tenant id")
 
             access_control.ensure_user_is_authorized_for(
                 user_ctx,
