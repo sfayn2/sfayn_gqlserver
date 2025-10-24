@@ -77,8 +77,8 @@ class Order:
             shipment_items=[]
         )
 
-        for item_data in command.shipment_items:
-            line_item = order.get_line_item(item_data.product_sku, item_data.vendor_id)
+        for item_data in shipment_items:
+            line_item = self.get_line_item(item_data["product_sku"], item_data["vendor_id"])
             shipment_item = model.ShipmentItem(
                 shipment_item_id=str(uuid.uuid4()),
                 line_item=line_item,
@@ -87,6 +87,7 @@ class Order:
             shipment.add_line_item(shipment_item)
 
         self.add_shipment(shipment)
+        self.update_shipping_progress()
         return shipment
 
     def add_shipment(self, shipment: Shipment) -> Shipment:

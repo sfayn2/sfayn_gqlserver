@@ -29,47 +29,23 @@ class CustomerDetailsDTO(BaseModel):
     email: str
 
 class AddressDTO(BaseModel):
-    street: str
+    line1: str
     city: str
-    postal: int
     country: str
-    state: str
+    line2: Optional[str] = None
+    state: Optional[str] = None
+    postal: Optional[int] = None
 
-class VendorDetailsDTO(BaseModel):
-    vendor_id: str
-    name: Optional[str] = None
-    country: Optional[str] = None
 
-class PackageDTO(BaseModel):
-    weight: Decimal
-    dimensions: Tuple[int, int, int]
-
-class PaymentDetailsDTO(BaseModel):
-    order_id: str
-    method: str
-    paid_amount: MoneyDTO
-    transaction_id: str
-    status: enums.PaymentStatus
-
-    class Config:
-        use_enum_values = True
-
-class PaymentOptionDTO(BaseModel):
-    option_name: str
-    method: str
-    provider: str
 
 class LineItemDTO(BaseModel):
     product_sku: str
-    product_name: str 
-    vendor: VendorDetailsDTO
-    product_category: str 
-    options: dict
-    product_price: MoneyDTO
     order_quantity: int
-    package: PackageDTO
-    is_free_gift: bool = False
-    is_taxable: bool = True
+    vendor_id: str
+    pickup_address: AddressDTO
+    product_price: MoneyDTO
+    product_tax_amount: MoneyDTO
+    product_total_amount: MoneyDTO
 
 
 class OrderResponseDTO(BaseModel):
@@ -84,12 +60,6 @@ class OrderResponseDTO(BaseModel):
     tax_amount: MoneyDTO
     total_discounts_fee: MoneyDTO
     final_amount: MoneyDTO
-
-class CouponDTO(BaseModel):
-    coupon_code: str
-    start_date: Optional[datetime] = None
-    end_date: Optional[datetime] = None
-    is_active: Optional[bool] = None
 
 class OrderDTO(BaseModel):
     order_id: str
@@ -138,3 +108,7 @@ class UserActionDTO(BaseModel):
     performed_by: str
     user_input: Dict[str, Any]
 
+class ShipmentItemDTO(BaseModel):
+    product_sku: str
+    vendor_id: str
+    quantity: int

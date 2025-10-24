@@ -29,8 +29,7 @@ def handle_add_shipment(
 
             order = uow.order.get(order_id=command.order_id, tenant_id=user_ctx.tenant_id)
             order.create_shipment(
-                shipment_id=command.shipment_id,
-                shipment_address=AddressDTO.to_domain(command.shipment_address),
+                shipment_address=mappers.AddressDTO.to_domain(command.shipment_address),
                 shipiment_items=command.shipment_items
             )
 

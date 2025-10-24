@@ -1,21 +1,16 @@
 from .dtos import (
     ResponseDTO,
     MoneyDTO,
-    ShippingOptionDTO,
-    PaymentOptionDTO,
     CustomerDetailsDTO,
     AddressDTO,
-    VendorDetailsDTO,
-    PackageDTO,
-    PaymentDetailsDTO,
     LineItemDTO,
     OrderResponseDTO,
-    CouponDTO,
     OrderDTO,
     ProductSkusDTO,
     UserContextDTO,
     TenantDTO,
-    UserActionDTO
+    UserActionDTO,
+    ShipmentItemDTO
 )
 
 # Integration events
