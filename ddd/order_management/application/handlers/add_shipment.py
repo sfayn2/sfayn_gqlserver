@@ -14,6 +14,7 @@ from ddd.order_management.domain import exceptions, value_objects, model
 def handle_add_shipment(
         command: commands.AddShipmentCommand, 
         access_control: AccessControl1Abstract,
+        user_ctx: dtos.UserContextDTO,
         user_action_service: UserActionServiceAbstract,
         uow: UnitOfWorkAbstract) -> dtos.ResponseDTO:
     try:
