@@ -14,13 +14,15 @@ from ddd.order_management.domain.services import DomainClock
 @dataclass
 class ShipmentItem:
     shipment_item_id: str
-    line_item: LineItem
+    product_sku: str
+    vendor_id: str
     quantity: int
     allocated_shipping_tax: value_objects.Money = field(default_factory=lambda: value_objects.Money.default())
-    
-    def __post_init__(self):
-        if self.quantity > line_item.quantity:
-            raise exceptions.DomainError("Cannot allocate more than ordered quantity")
+
+    #TODO how to deal w this? 
+    #def __post_init__(self):
+    #    if self.quantity > line_item.quantity:
+    #        raise exceptions.DomainError("Cannot allocate more than ordered quantity")
 
 @dataclass
 class Shipment:

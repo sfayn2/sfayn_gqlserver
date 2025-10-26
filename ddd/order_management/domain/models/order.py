@@ -68,8 +68,8 @@ class Order:
         shipment_address: value_objects.Address,
         shipment_provider: Optional[str],
         shipment_service_code: Optional[str],
-        shipment_items: list[dict]
-    ) -> Shipment:
+        shipment_items: list[models.ShipmentItem]
+    ) -> model.Shipment:
 
         shipment = model.Shipment(
             shipment_id=str(uuid.uuid4()),
@@ -78,10 +78,11 @@ class Order:
         )
 
         for item_data in shipment_items:
-            line_item = self.get_line_item(item_data["product_sku"], item_data["vendor_id"])
+            line_item = self.get_line_item(item_data.product_sku, item_data.vendor_id)
             shipment_item = model.ShipmentItem(
                 shipment_item_id=str(uuid.uuid4()),
-                line_item=line_item,
+                product_sku=item_data.product_sku,
+                vendor_id=item_data.vendor_id,
                 quantity=item_data.quantity
             )
             shipment.add_line_item(shipment_item)
