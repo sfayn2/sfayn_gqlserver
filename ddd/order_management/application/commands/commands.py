@@ -7,7 +7,7 @@ from ddd.order_management.application import dtos
 from ddd.order_management.domain import enums
 
 class Command(BaseModel, frozen=True):
-    tenant_id: str
+    pass
 
 class AddShippingTrackingReferenceCommand(Command):
     order_id: str

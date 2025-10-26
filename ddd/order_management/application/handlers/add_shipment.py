@@ -20,8 +20,8 @@ def handle_add_shipment(
         uow: UnitOfWorkAbstract) -> dtos.ResponseDTO:
     try:
         with uow:
-            access_control = access_control_service.AccessControlService.resolve(request_tenant_id)
-            user_ctx = access_control.get_user_context(token, request_tenant_id)
+            access_control = access_control_factory(request_tenant_id)
+            user_ctx = access_control.get_user_context(token)
 
             access_control.ensure_user_is_authorized_for(
                 user_ctx,
