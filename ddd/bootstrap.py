@@ -51,7 +51,7 @@ saas_service_instance = saas_service.SaaSService()
 #    access_control1=access_control1
 #).resolve(tenant_id)
 
-access_control = application_services.AccessControlService.configure(
+application_services.AccessControlService.configure(
     saas_service=saas_service_instance,
     access_control1=access_control1
 )
