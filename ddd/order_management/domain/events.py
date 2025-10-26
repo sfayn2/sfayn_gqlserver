@@ -1,8 +1,7 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from typing import List, TYPE_CHECKING
-from dataclasses import dataclass, asdict
-from pydantic import BaseModel
+from typing import List, TYPE_CHECKING, Dict, Any
+from dataclasses import dataclass, asdict, field
 from ddd.order_management.domain import value_objects, enums
 
 
@@ -31,65 +30,12 @@ class DomainEvent(ABC):
 
 
 @dataclass(frozen=True)    
-class PlacedOrderEvent(DomainEvent):
-    pass
-
-@dataclass(frozen=True)    
-class ConfirmedOrderEvent(DomainEvent):
-    pass
-
-@dataclass(frozen=True)    
-class ShippedOrderEvent(DomainEvent):
-    pass
-
-
-@dataclass(frozen=True)    
-class DeliveredOrderEvent(DomainEvent):
-    pass
-
-@dataclass(frozen=True)    
 class CanceledOrderEvent(DomainEvent):
     pass
 
 @dataclass(frozen=True)    
 class CompletedOrderEvent(DomainEvent):
     pass
-
-@dataclass(frozen=True)    
-class AppliedPaymentEvent(DomainEvent):
-    pass
-
-@dataclass(frozen=True)    
-class CheckedOutEvent(DomainEvent):
-    pass
-
-@dataclass(frozen=True)    
-class SelectedShippingOptionEvent(DomainEvent):
-    pass
-
-@dataclass(frozen=True)    
-class AppliedOffersEvent(DomainEvent):
-    pass
-
-@dataclass(frozen=True)    
-class AppliedCouponEvent(DomainEvent):
-    pass
-
-@dataclass(frozen=True)    
-class RemovedCouponEvent(DomainEvent):
-    pass
-
-@dataclass(frozen=True)    
-class ChangedDestinationEvent(DomainEvent):
-    pass
-
-@dataclass(frozen=True)    
-class AppliedTaxesEvent(DomainEvent):
-    pass
-
-@dataclass(frozen=True)    
-class ActivityEvent(DomainEvent):
-    step_name: str
 
 @dataclass(frozen=True)    
 class ShippedShipmentEvent(DomainEvent):
@@ -105,4 +51,8 @@ class CanceledShipmentEvent(DomainEvent):
 
 @dataclass(frozen=True)    
 class TrackingReferenceAssignedEvent(DomainEvent):
+    shipment_id: str
+
+@dataclass(frozen=True)    
+class ShipmentAddedEvent(DomainEvent):
     shipment_id: str

@@ -16,6 +16,18 @@ def handle(message: Union[commands.Command, queries.Query], **deps):
             raise ValueError(f"No handler registered for command: {type(message)}")
 
         results = handler(message, **deps)
+
+        #made this cross cutting
+        user_ctx = deps.get("user_ctx") 
+        user_action_service = deps.get("user_action_service") 
+        if results.success == True and user_ctx and user_action_service:
+            user_action_service.save_action(
+                order_id=getattr(message, "order_id", None),
+                action=type(message).__name__,
+                performed_by=user_ctx.sub,
+                user_input=message.model_dump(exclude_none=True)
+            )
+
         return results
     elif isinstance(message, queries.Query):
         handler = QUERY_HANDLERS.get(type(message))
