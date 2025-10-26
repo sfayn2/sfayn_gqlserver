@@ -9,11 +9,16 @@ class AccessControl1(ports.AccessControl1Abstract):
     def __init__(self, jwt_handler):
         self.jwt_handler = jwt_handler
 
-    def get_user_context(self, token: str) -> dtos.UserContextDTO:
+    def get_user_context(self, token: str, request_tenant_id: str) -> dtos.UserContextDTO:
         identity_claims = self.jwt_handler.decode(token)
         token_type = identity_claims.get("token_type", "Bearer")
+        user_ctx = dtos.UserContextDTO.model_validate(identity_claims)
 
-        return dtos.UserContextDTO.model_validate(identity_claims)
+        # verify tenant_id
+        if user_ctx.tenant_id != request_tenant_id:
+            raise exceptions.AccessControlException(f"Tenant mismatch token={user_ctx.tenant_id}, request={request_tenant_id}")
+
+        return user_ctx
 
 
     def ensure_user_is_authorized_for(

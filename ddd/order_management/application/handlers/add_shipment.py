@@ -13,12 +13,15 @@ from ddd.order_management.domain import exceptions, value_objects, model
 
 def handle_add_shipment(
         command: commands.AddShipmentCommand, 
-        access_control: AccessControl1Abstract,
-        user_ctx: dtos.UserContextDTO,
+        access_control_factory: callable([str], AccessControl1Abstract),
+        token: str,
+        request_tenant_id: str,
         user_action_service: UserActionServiceAbstract,
         uow: UnitOfWorkAbstract) -> dtos.ResponseDTO:
     try:
         with uow:
+            access_control = access_control_service.AccessControlService.resolve(request_tenant_id)
+            user_ctx = access_control.get_user_context(token, request_tenant_id)
 
             access_control.ensure_user_is_authorized_for(
                 user_ctx,
@@ -29,9 +32,11 @@ def handle_add_shipment(
             order = uow.order.get(order_id=command.order_id, tenant_id=user_ctx.tenant_id)
             order.create_shipment(
                 shipment_address=mappers.AddressDTO.to_domain(command.shipment_address),
-                shipiment_items=command.shipment_items
+                #TODO should make use of mapper to domain
+                shipment_items=command.shipment_items
             )
 
+            # TODO to move to event driven side effect
             user_action_data = dtos.UserActionDTO(
                     order_id=command.order_id,
                     action="add_shipment",

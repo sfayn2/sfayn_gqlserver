@@ -51,7 +51,7 @@ saas_service_instance = saas_service.SaaSService()
 #    access_control1=access_control1
 #).resolve(tenant_id)
 
-application_services.AccessControlService.configure(
+access_control = application_services.AccessControlService.configure(
     saas_service=saas_service_instance,
     access_control1=access_control1
 )
@@ -133,6 +133,7 @@ event_bus.EVENT_HANDLERS.update({
 message_bus.COMMAND_HANDLERS.update({
     commands.AddShipmentCommand: lambda command, **deps: handlers.handle_add_shipment(
         command=command,
+        access_control_factory=access_control,
         user_action_service=user_action_service.UserActionService(),
         uow=repositories.DjangoOrderUnitOfWork(),
         **deps
