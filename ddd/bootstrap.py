@@ -137,21 +137,44 @@ message_bus.COMMAND_HANDLERS.update({
         uow=repositories.DjangoOrderUnitOfWork(),
         **deps
     ),
+    commands.ShipShipmentCommand: lambda command, **deps: handlers.handle_ship_shipment(
+        command=command,
+        user_action_service=user_action_service.UserActionService(),
+        uow=repositories.DjangoOrderUnitOfWork(),
+        **deps
+    ),
     commands.AddShippingTrackingReferenceCommand: lambda command, **deps: handlers.handle_add_shipping_tracking_reference(
         command=command,
-        access_control=access_control,
+        user_action_service=user_action_service.UserActionService(),
+        uow=repositories.DjangoOrderUnitOfWork(),
+        **deps
+    ),
+    commands.DeliverShipmentCommand: lambda command, **deps: handlers.handle_deliver_shipment(
+        command=command,
+        user_action_service=user_action_service.UserActionService(),
+        uow=repositories.DjangoOrderUnitOfWork(),
+        **deps
+    ),
+    commands.CancelShipmentCommand: lambda command, **deps: handlers.handle_cancel_shipment(
+        command=command,
+        user_action_service=user_action_service.UserActionService(),
+        uow=repositories.DjangoOrderUnitOfWork(),
+        **deps
+    ),
+    commands.CancelOrderCommand: lambda command, **deps: handlers.handle_cancel_order(
+        command=command,
+        user_action_service=user_action_service.UserActionService(),
         uow=repositories.DjangoOrderUnitOfWork(),
         **deps
     ),
     commands.CompleteOrderCommand: lambda command, **deps: handlers.handle_mark_as_completed(
         command=command,
-        access_control_factory=access_control,
         user_action_service=user_action_service.UserActionService(),
         uow=repositories.DjangoOrderUnitOfWork(),
         **deps
     ),
     **handlers.webhook_publish_command_handlers.get_command_handlers(commands, handlers, event_bus),
-    **handlers.user_action_command_handlers.get_command_handlers(commands, handlers, repositories.DjangoOrderUnitOfWork(), access_control, application_services, user_action_service, tenant_service)
+    **handlers.user_action_command_handlers.get_command_handlers(commands, handlers, repositories.DjangoOrderUnitOfWork(), application_services, user_action_service, tenant_service)
 })
 
 # ================= Query Handlers (read operations) ===================

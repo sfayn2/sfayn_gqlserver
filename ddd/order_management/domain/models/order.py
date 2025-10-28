@@ -129,8 +129,10 @@ class Order:
     def ship_shipment(self, shipment_id: str):
         shipment = self._get_shipment(shipment_id)
         if shipment.shipment_status != enums.ShipmentStatus.PENDING:
-            raise exceptions.DomainError("Only pending shipment can be mark as shipped")
+            raise exceptions.DomainError("Only pending shipment can be shipped")
         shipment.shipment_status = enums.ShipmentStatus.SHIPPED
+
+        #TODO update tax here?
 
         self.update_shipping_progress()
         event = events.ShippedShipmentEvent(

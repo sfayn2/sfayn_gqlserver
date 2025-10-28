@@ -6,15 +6,13 @@ from ddd.order_management.application import (
 from ddd.order_management.presentation.graphql import object_types, common, input_types
 
 
-
-
 # ==========================
 # Mutations 
 # ===================
-class CancelOrderMutation(relay.ClientIDMutation):
+class DeliverShipmentMutation(relay.ClientIDMutation):
     class Input:
         order_id = graphene.String(required=True)
-        cancellation_reason = graphene.String(required=True)
+        shipment_id = graphene.String(required=True)
 
     result = graphene.Field(object_types.ResponseType)
 
@@ -27,10 +25,9 @@ class CancelOrderMutation(relay.ClientIDMutation):
         user_ctx = access_control.get_user_context(token, request_tenant_id)
 
 
-        command = commands.CancelOrderCommand.model_validate(input)
+        command = commands.DeliverShipmentCommand.model_validate(input)
 
         result = message_bus.handle(command, access_control=access_control, user_ctx=user_ctx)
 
         return cls(result=object_types.ResponseType(**result.model_dump()))
-
 

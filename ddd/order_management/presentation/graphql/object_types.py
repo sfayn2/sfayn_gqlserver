@@ -84,7 +84,7 @@ class OrderType(graphene.ObjectType):
     tax_amount = graphene.Field(MoneyType)
     total_amount = graphene.Field(MoneyType)
     final_amount = graphene.Field(MoneyType)
-    shipping_reference = graphene.String()
+    tracking_reference = graphene.String()
     coupons = graphene.List(CouponType)
     order_status = graphene.String()
     currency = graphene.String()

@@ -18,15 +18,15 @@ def handle(message: Union[commands.Command, queries.Query], **deps):
         results = handler(message, **deps)
 
         #made this cross cutting
-        user_ctx = deps.get("user_ctx") 
-        user_action_service = deps.get("user_action_service") 
-        if results.success == True and user_ctx and user_action_service:
-            user_action_service.save_action(
-                order_id=getattr(message, "order_id", None),
-                action=type(message).__name__,
-                performed_by=user_ctx.sub,
-                user_input=message.model_dump(exclude_none=True)
-            )
+        #user_ctx = deps.get("user_ctx") 
+        #user_action_service = deps.get("user_action_service") 
+        #if results.success == True and user_ctx and user_action_service:
+        #    user_action_service.save_action(
+        #        order_id=getattr(message, "order_id", None),
+        #        action=type(message).__name__,
+        #        performed_by=user_ctx.sub,
+        #        user_input=message.model_dump(exclude_none=True)
+        #    )
 
         return results
     elif isinstance(message, queries.Query):

@@ -23,7 +23,7 @@ class OrderMapper:
                 tax_amount=asdict(order.tax_amount),
                 total_amount=asdict(order.total_amount),
                 final_amount=asdict(order.final_amount),
-                shipping_reference=order.shipping_reference,
+                tracking_reference=order.tracking_reference,
                 coupons=asdict(order.coupons) if order.coupons else None,
                 order_status=order.order_status,
                 activity_status=order.activity_status,

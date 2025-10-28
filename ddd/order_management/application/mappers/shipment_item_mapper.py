@@ -7,7 +7,7 @@ class ShipmentItemMapper:
     @staticmethod
     def to_domain(shipment_item: dtos.ShipmentItemDTO) -> models.ShipmentItem:
         return models.ShipmentItem(
-            product_sku=shipment_item.product_sku
-            quantity=shipment_item.quantity
+            product_sku=shipment_item.product_sku,
+            quantity=shipment_item.quantity,
             vendor_id=shipment_item.vendor_id
         )

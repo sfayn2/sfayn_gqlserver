@@ -11,7 +11,7 @@ class Command(BaseModel, frozen=True):
 
 class AddShippingTrackingReferenceCommand(Command):
     order_id: str
-    shipping_reference: str
+    tracking_reference: str
 
 class ShipOrderCommand(Command):
     order_id: str
@@ -31,3 +31,15 @@ class AddShipmentCommand(Command):
     shipment_tax_amount: Optional[dtos.MoneyDTO] = None
     shipment_items: list[dtos.ShipmentItemDTO]
 
+
+class ShipShipmentCommand(Command):
+    order_id: str
+    shipment_id: str
+
+class DeliverShipmentCommand(Command):
+    order_id: str
+    shipment_id: str
+
+class CancelShipmentCommand(Command):
+    order_id: str
+    shipment_id: str

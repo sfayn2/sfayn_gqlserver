@@ -12,13 +12,12 @@ from ddd.order_management.domain import exceptions
 
 def handle_mark_as_completed(
         command: commands.CompleteOrderCommand, 
-        access_control_factory: callable[[str], AccessControl1Abstract],
+        access_control: AccessControl1Abstract,
         user_ctx: dtos.UserContextDTO,
         user_action_service: UserActionServiceAbstract,
         uow: UnitOfWorkAbstract) -> dtos.ResponseDTO:
     try:
         with uow:
-            access_control = access_control_factory(user_ctx.tenant_id)
 
             access_control.ensure_user_is_authorized_for(
                 user_ctx,
@@ -29,15 +28,13 @@ def handle_mark_as_completed(
             order = uow.order.get(order_id=command.order_id, tenant_id=user_ctx.tenant_id)
             order.mark_as_completed()
 
-            user_action_data = dtos.UserActionDTO(
+            user_action_service.save_action(
+                dtos.UserActionDTO(
                     order_id=command.order_id,
                     action="mark_as_completed",
                     performed_by=user_ctx.sub,
-                    user_input={}
+                    user_input=command.model_dump(exclude_none=True)
                 )
-
-            user_action_service.save_action(
-                user_action_data
             )
 
             uow.order.save(order)

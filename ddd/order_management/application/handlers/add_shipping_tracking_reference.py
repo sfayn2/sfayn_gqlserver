@@ -12,22 +12,30 @@ from ddd.order_management.domain import exceptions
 
 def handle_add_shipping_tracking_reference(
         command: commands.AddShippingTrackingReferenceCommand, 
-        access_control_factory: callable[[str], AccessControl1Abstract],
+        access_control: AccessControl1Abstract,
         user_ctx: dtos.UserContextDTO,
+        user_action_service: UserActionServiceAbstract,
         uow: UnitOfWorkAbstract) -> dtos.ResponseDTO:
     try:
         with uow:
-            access_control = access_control_factory(user_ctx.tenant_id)
 
             access_control.ensure_user_is_authorized_for(
-                user_ctx.tenant_id,
+                user_ctx,
                 required_permission="add_shipping_tracking_reference",
                 required_scope={"role": ["vendor"] }
             )
 
             order = uow.order.get(order_id=command.order_id, tenant_id=user_ctx.tenant_id)
+            order.add_shipping_tracking_reference(tracking_reference=command.tracking_reference)
 
-            order.add_shipping_tracking_reference(shipping_reference=command.shipping_reference)
+            user_action_service.save_action(
+                dtos.UserActionDTO(
+                    order_id=command.order_id,
+                    action="add_shipping_tracking_reference",
+                    performed_by=user_ctx.sub,
+                    user_input=command.model_dump(exclude_none=True)
+                )
+            )
 
             uow.order.save(order)
             uow.commit()

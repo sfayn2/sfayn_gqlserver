@@ -1,7 +1,12 @@
 # Commands
+from .add_shipment import handle_add_shipment
+from .ship_shipment import handle_ship_shipment
 from .add_shipping_tracking_reference import handle_add_shipping_tracking_reference
-from .mark_as_completed import handle_mark_as_completed
+from .deliver_shipment import handle_deliver_shipment
+from .cancel_shipment import handle_cancel_shipment
 from .cancel_order import handle_cancel_order
+from .mark_as_completed import handle_mark_as_completed
+
 
 # Webhook publish
 from .webhook_publish_handlers import webhook_publish_command_handlers

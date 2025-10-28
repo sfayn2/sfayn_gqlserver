@@ -9,7 +9,7 @@ class AddressMapper:
         return value_objects.Address(
             line1=address.line1,
             city=address.city,
-            country=address.country
+            country=address.country,
             line2=address.line2,
             state=address.state,
             postal=address.postal

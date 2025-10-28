@@ -1,4 +1,5 @@
 from __future__ import annotations
+import uuid
 from typing import Union
 from ddd.order_management.application import (
     mappers, 
@@ -10,8 +11,8 @@ from ddd.order_management.application import (
 from ddd.order_management.domain import exceptions
 
 
-def handle_cancel_order(
-        command: commands.CancelOrderCommand, 
+def handle_deliver_shipment(
+        command: commands.DeliverShipmentCommand, 
         access_control: AccessControl1Abstract,
         user_ctx: dtos.UserContextDTO,
         user_action_service: UserActionServiceAbstract,
@@ -21,17 +22,17 @@ def handle_cancel_order(
 
             access_control.ensure_user_is_authorized_for(
                 user_ctx,
-                required_permission="cancel_order",
+                required_permission="deliver_shipment",
                 required_scope={"role": ["vendor"] }
             )
 
             order = uow.order.get(order_id=command.order_id, tenant_id=user_ctx.tenant_id)
-            order.cancel_order()
+            order.deliver_shipment(shipment_id=command.shipment_id)
 
             user_action_service.save_action(
                 dtos.UserActionDTO(
                     order_id=command.order_id,
-                    action="cancel_order",
+                    action="deliver_shipment",
                     performed_by=user_ctx.sub,
                     user_input=command.model_dump(exclude_none=True)
                 )
@@ -42,7 +43,7 @@ def handle_cancel_order(
 
             return dtos.ResponseDTO(
                 success=True,
-                message=f"Order {order.order_id} successfully canceled."
+                message=f"Order {order.order_id} w Shipment Id {command.shipment_id} successfully shipped."
             )
 
 

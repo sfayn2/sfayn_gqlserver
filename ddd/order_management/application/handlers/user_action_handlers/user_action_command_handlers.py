@@ -1,29 +1,29 @@
 
 
-def get_command_handlers(commands, handlers, uow, access_control, application_services, user_action_service, tenant_service):
+def get_command_handlers(commands, handlers, uow, application_services, user_action_service, tenant_service):
     return {
         commands.EscalateReviewerCommand: lambda command, **deps: handlers.handle_escalate_reviewer(
             command=command,
             uow=repositories.DjangoOrderUnitOfWork(),
-            access_control=access_control,
+            user_action_service=user_action_service.UserActionService(),
             **deps
         ),
         commands.ReviewOrderCommand: lambda command, **deps: handlers.handle_review_order(
             command=command,
             uow=repositories.DjangoOrderUnitOfWork(),
-            access_control=access_control,
+            user_action_service=user_action_service.UserActionService(),
             **deps
         ),
         commands.RequestReturnCommand: lambda command, **deps: handlers.handle_request_return(
             command=command,
             uow=repositories.DjangoOrderUnitOfWork(),
-            access_control=access_control,
+            user_action_service=user_action_service.UserActionService(),
             **deps
         ),
         commands.ProcessRefundCommand: lambda command, **deps: handlers.handle_process_refund(
             command=command,
             uow=repositories.DjangoOrderUnitOfWork(),
-            access_control=access_control,
+            user_action_service=user_action_service.UserActionService(),
             refund_service=application_services.RefundService(
                 uow=repositories.DjangoOrderUnitOfWork(),
                 tenant_service=tenant_service,
