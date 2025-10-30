@@ -54,7 +54,7 @@ class Order:
         raise exceptions.DomainError(f"Vendor {vendor_id} Line item w SKU {product_sku} not found in order {self.order_id}")
 
 
-    def _get_shipment(self, shipment_id: str) -> Shipment:
+    def get_shipment(self, shipment_id: str) -> Shipment:
         shipment = next((s for s in self.shipments if s.shipment_id == shipment_id), None)
         if not shipment:
             raise exceptions.DomainError(f"Shipment {shipment_id} not found in order {self.order_id}")
@@ -133,7 +133,7 @@ class Order:
                 s.shipment_amount = shipment_amount
 
     def confirm_shipment(self, shipment_id: str):
-        shipment = self._get_shipment(shipment_id)
+        shipment = self.get_shipment(shipment_id)
         if shipment.shipment_status != enums.ShipmentStatus.PENDING:
             raise exceptions.DomainError("Only pending shipment can be confirm")
         shipment.shipment_status = enums.ShipmentStatus.CONFIRMED
@@ -150,7 +150,7 @@ class Order:
         return shipment
 
     def deliver_shipment(self, shipment_id: str):
-        shipment = self._get_shipment(shipment_id)
+        shipment = self.get_shipment(shipment_id)
         if shipment.shipment_status != enums.ShipmentStatus.SHIPPED:
             raise exceptions.DomainError("Only shipped shipment can be delivered")
         shipment.shipment_status = enums.ShipmentStatus.DELIVERED
@@ -164,7 +164,7 @@ class Order:
         self.raise_event(event)
 
     def cancel_shipment(self, shipment_id: str):
-        shipment = self._get_shipment(shipment_id)
+        shipment = self.get_shipment(shipment_id)
         if shipment.shipment_status in (enums.ShipmentStatus.SHIPPED, enums.ShipmentStatus.DELIVERED):
             raise exceptions.DomainError("Cannot cancel shipment after shipped/delivered")
         shipment.shipment_status = enums.ShipmentStatus.CANCELLED
@@ -178,7 +178,7 @@ class Order:
         self.raise_event(event)
 
     def assign_tracking_reference(self, shipment_id: str, tracking_reference: str):
-        shipment = self._get_shipment(shipment_id)
+        shipment = self.get_shipment(shipment_id)
         if shipment.shipment_status not in (enums.ShipmentStatus.PENDING, enums.ShipmentStatus.SHIPPED):
             raise exceptions.DomainError("Tracking reference can only be assign before delivery.")
 
