@@ -31,6 +31,8 @@ def handle_dispatch_shipment_async_event(
             )
         )
 
+        order.mask_shipment_as_shipped(event.shipment_id)
+
         uow.order.save(order)
         uow.commit()
 

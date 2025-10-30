@@ -125,13 +125,16 @@ class Order:
     @property
     def total_line_item_qty(self) -> int:
         return sum(li.order_quantity for li in self.line_items)
-    
-    def update_shipment_details(self, shipment_id: str, tracking_number: str, shipment_amount: value_objects.Money):
-        for s in self.shipments:
-            if s.shipment_id == shipment_id:
-                s.tracking_number = tracking_number
-                s.shipment_amount = shipment_amount
 
+    def mark_shipment_as_shipped(self, shipment_id: str):
+        shipment = self.get_shipment(shipment_id)
+        if shipment.shipment_status != enums.ShipmentStatus.CONFIRMED:
+            raise exceptions.DomainError("Only confirmed shipment can be ship")
+        shipment.shipment_status = enums.ShipmentStatus.SHIPPED
+
+        self.update_shipping_progress()
+
+    
     def confirm_shipment(self, shipment_id: str):
         shipment = self.get_shipment(shipment_id)
         if shipment.shipment_status != enums.ShipmentStatus.PENDING:
