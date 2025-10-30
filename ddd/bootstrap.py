@@ -18,7 +18,8 @@ from ddd.order_management.infrastructure import (
     clocks,
     user_action_service,
     tenant_service,
-    saas_service
+    saas_service,
+    shipping
 
 )
 from ddd.order_management.application import (
@@ -44,16 +45,18 @@ load_dotenv(find_dotenv(filename=".env.test"))
 # ====================
 
 saas_service_instance = saas_service.SaaSService()
+tenant_service_instance = tenant_service.TenantService()
 
 # ============== resolve access control based on tenant_id ===============
-#access_control = lambda tenant_id: application_services.AccessControlService(
-#    saas_service=saas_service_instance,
-#    access_control1=access_control1
-#).resolve(tenant_id)
-
 application_services.AccessControlService.configure(
     saas_service=saas_service_instance,
     access_control1=access_control1
+)
+
+# =============== resolve shipping provider based on tenant_id ========
+application_services.ShippingProviderService.configure(
+    tenant_service=tenant_service_instance,
+    shipping_provider_resolver=shipping.ShippingProviderResolver
 )
 
 # ============== domain clock =============
@@ -140,6 +143,7 @@ message_bus.COMMAND_HANDLERS.update({
     commands.ShipShipmentCommand: lambda command, **deps: handlers.handle_ship_shipment(
         command=command,
         user_action_service=user_action_service.UserActionService(),
+        shipping_provider_service=application_services.ShippingProviderService
         uow=repositories.DjangoOrderUnitOfWork(),
         **deps
     ),

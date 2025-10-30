@@ -16,6 +16,7 @@ def handle_ship_shipment(
         access_control: AccessControl1Abstract,
         user_ctx: dtos.UserContextDTO,
         user_action_service: UserActionServiceAbstract,
+        shipping_provider_service= ports.ShippingProviderAbstract,
         uow: UnitOfWorkAbstract) -> dtos.ResponseDTO:
     try:
         with uow:
@@ -27,7 +28,9 @@ def handle_ship_shipment(
             )
 
             order = uow.order.get(order_id=command.order_id, tenant_id=user_ctx.tenant_id)
-            order.ship_shipment(shipment_id=command.shipment_id)
+            shipment = order.ship_shipment(shipment_id=command.shipment_id)
+
+            shipping_provider_service.create_shipment(user_ctx.tenant_id, shipment)
 
             user_action_service.save_action(
                 dtos.UserActionDTO(

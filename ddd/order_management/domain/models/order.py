@@ -142,6 +142,8 @@ class Order:
         )
         self.raise_event(event)
 
+        return shipment
+
     def deliver_shipment(self, shipment_id: str):
         shipment = self._get_shipment(shipment_id)
         if shipment.shipment_status != enums.ShipmentStatus.SHIPPED:

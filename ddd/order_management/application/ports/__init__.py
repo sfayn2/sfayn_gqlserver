@@ -4,6 +4,7 @@ from .logging_abstract import LoggingAbstract
 from .clock_abstract import ClockAbstract
 from .user_action_service_abstract import UserActionServiceAbstract
 from .tenant_service_abstract import TenantServiceAbstract
+from .shipping_provider_abstract import ShippingProviderAbstract
 
 #Snapshots
 from .snapshot_repo_abstract import SnapshotRepoAbstract

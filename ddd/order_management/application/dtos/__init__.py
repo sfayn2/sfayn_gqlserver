@@ -10,7 +10,8 @@ from .dtos import (
     UserContextDTO,
     TenantDTO,
     UserActionDTO,
-    ShipmentItemDTO
+    ShipmentItemDTO,
+    CreateShipmentResult
 )
 
 # Integration events

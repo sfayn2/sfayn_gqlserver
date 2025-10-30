@@ -85,6 +85,18 @@ class UserContextDTO(BaseModel):
     tenant_id: str
     roles: List[str] = Field(default_factory=list)
 
+#class ShippingProvider(BaseModel):
+#    provider: str
+#    endpoint: str
+#    api_key: str
+#
+#class TenantConfig(BaseModel):
+#    restocking_fee_percent: Decimal
+#    max_refund_amount: Decimal
+#    webhook_url: str
+#    shipping: ShippingProvider
+
+
 class TenantDTO(BaseModel):
     tenant_id: str
     configs: Dict[str, Any]
@@ -99,3 +111,8 @@ class ShipmentItemDTO(BaseModel):
     product_sku: str
     vendor_id: str
     quantity: int
+
+# use for shipping provider
+class CreateShipmentResult:
+    tracking_number: str
+    total_amount: Money
