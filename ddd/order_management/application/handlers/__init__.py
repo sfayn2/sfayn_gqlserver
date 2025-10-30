@@ -1,6 +1,6 @@
 # Commands
 from .add_shipment import handle_add_shipment
-from .ship_shipment import handle_ship_shipment
+from .confirm_shipment import handle_confirm_shipment
 from .add_shipping_tracking_reference import handle_add_shipping_tracking_reference
 from .deliver_shipment import handle_deliver_shipment
 from .cancel_shipment import handle_cancel_shipment
@@ -24,6 +24,7 @@ from .event_handlers.log_order import handle_logged_order
 
 # Async Events via Redis stream
 from .event_handlers.user_logged_in_async_event import handle_user_logged_in_async_event
+from .event_handlers.dispatch_shipment_async_event import handle_dispatch_shipment_async_event
 
 
 

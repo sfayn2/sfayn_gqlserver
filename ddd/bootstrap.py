@@ -114,6 +114,14 @@ event_bus.ASYNC_INTERNAL_EVENT_HANDLERS.update({
             event=event,
         ),
     ],
+    "order_management.internal_events.ConfirmedShipmentEvent": [
+        lambda event: handlers.handle_dispatch_shipment_async_event(
+            event=event,
+            user_action_service=user_action_service.UserActionService(),
+            shipping_provider_service=application_services.ShippingProviderService,
+            uow=repositories.DjangoOrderUnitOfWork()
+        ),
+    ],
 })
 
 # ======================= Domain event handlers (immediate processing) ==============
@@ -140,10 +148,10 @@ message_bus.COMMAND_HANDLERS.update({
         uow=repositories.DjangoOrderUnitOfWork(),
         **deps
     ),
-    commands.ShipShipmentCommand: lambda command, **deps: handlers.handle_ship_shipment(
+    commands.ConfirmShipmentCommand: lambda command, **deps: handlers.handle_confirm_shipment(
         command=command,
         user_action_service=user_action_service.UserActionService(),
-        shipping_provider_service=application_services.ShippingProviderService
+        shipping_provider_service=application_services.ShippingProviderService,
         uow=repositories.DjangoOrderUnitOfWork(),
         **deps
     ),

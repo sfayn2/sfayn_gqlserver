@@ -115,4 +115,4 @@ class ShipmentItemDTO(BaseModel):
 # use for shipping provider
 class CreateShipmentResult:
     tracking_number: str
-    total_amount: Money
+    total_amount: MoneyDTO

@@ -16,4 +16,5 @@ from .dtos import (
 
 # Integration events
 from .integration_events.auth_integration_events import UserLoggedInIntegrationEvent
+from .integration_events.order_integration_events import ConfirmedShipmentIntegrationEvent
 from .integration_events.base import IntegrationEvent

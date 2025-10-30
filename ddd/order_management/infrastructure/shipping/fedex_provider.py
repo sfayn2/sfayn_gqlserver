@@ -31,8 +31,8 @@ class FedExShippingProvider:
         data = response.json()
 
         return dtos.CreateShipmentResult(
-            "tracking_number": data["tracking_number"],
-            "total_amount": dtos.Money(
+            tracking_number=data["tracking_number"],
+            total_amount=dtos.Money(
                 amount=Decimal(data["total_amount"]),
                 currency=data["currency"]
             )

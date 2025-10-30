@@ -5,7 +5,7 @@ from .commands import (
     CancelOrderCommand,
     CompleteOrderCommand,
     AddShipmentCommand,
-    ShipShipmentCommand,
+    ConfirmShipmentCommand,
     CancelShipmentCommand,
     DeliverShipmentCommand
 )

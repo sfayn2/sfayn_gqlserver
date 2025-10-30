@@ -43,18 +43,24 @@ class Shipment:
     def shipment_items_sku_qty(self):
         return {item.product_sku: item.quantity for item in self.shipment_items}
 
+    def update_tracking_reference(self, tracking_reference: str):
+        self.tracking_reference = tracking_reference
 
-    def allocate_shipping_tax(self):
-        total_line_subtotal = sum(
-            sli.line_item.total_amount.amount * sli.quantity for sli in self.shipment_items
-        )
+    def update_shipment_amount(self, amount: value_objects.Money):
+        self.shipment_amount = amount
 
-        if total_line_subtotal == 0:
-            return
 
-        for sli in self.shipment_items:
-            proportion = (sli.line_item.total_amount.amount * sli.quantity) / total_line_subtotal
-            sli.allocated_shipping_tax = value_objects.Money(
-                self.shipment_tax_amount.amount * proportion,
-                self.shipment_tax_amount.currency
-            )
+    #def allocate_shipping_tax(self):
+    #    total_line_subtotal = sum(
+    #        sli.line_item.total_amount.amount * sli.quantity for sli in self.shipment_items
+    #    )
+
+    #    if total_line_subtotal == 0:
+    #        return
+
+    #    for sli in self.shipment_items:
+    #        proportion = (sli.line_item.total_amount.amount * sli.quantity) / total_line_subtotal
+    #        sli.allocated_shipping_tax = value_objects.Money(
+    #            self.shipment_tax_amount.amount * proportion,
+    #            self.shipment_tax_amount.currency
+    #        )

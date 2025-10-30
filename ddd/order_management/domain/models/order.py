@@ -125,17 +125,22 @@ class Order:
     @property
     def total_line_item_qty(self) -> int:
         return sum(li.order_quantity for li in self.line_items)
+    
+    def update_shipment_details(self, shipment_id: str, tracking_number: str, shipment_amount: value_objects.Money):
+        for s in self.shipments:
+            if s.shipment_id == shipment_id:
+                s.tracking_number = tracking_number
+                s.shipment_amount = shipment_amount
 
-    def ship_shipment(self, shipment_id: str):
+    def confirm_shipment(self, shipment_id: str):
         shipment = self._get_shipment(shipment_id)
         if shipment.shipment_status != enums.ShipmentStatus.PENDING:
-            raise exceptions.DomainError("Only pending shipment can be shipped")
-        shipment.shipment_status = enums.ShipmentStatus.SHIPPED
+            raise exceptions.DomainError("Only pending shipment can be confirm")
+        shipment.shipment_status = enums.ShipmentStatus.CONFIRMED
 
-        #TODO update tax here?
 
         self.update_shipping_progress()
-        event = events.ShippedShipmentEvent(
+        event = events.ConfirmedShipmentEvent(
             tenant_id=self.tenant_id,
             order_id=self.order_id,
             shipment_id=shipment_id,
@@ -179,12 +184,12 @@ class Order:
 
         shipment.tracking_reference = tracking_reference
         self._update_modified_date()
-        event = events.TrackingReferenceAssignedEvent(
-            tenant_id=self.tenant_id,
-            order_id=self.order_id,
-            shipment_id=shipment_id,
-        )
-        self.raise_event(event)
+        #event = events.TrackingReferenceAssignedEvent(
+        #    tenant_id=self.tenant_id,
+        #    order_id=self.order_id,
+        #    shipment_id=shipment_id,
+        #)
+        #self.raise_event(event)
 
 
     def cancel_order(self):

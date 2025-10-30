@@ -9,7 +9,7 @@ from ddd.order_management.presentation.graphql import object_types, common, inpu
 # ==========================
 # Mutations 
 # ===================
-class ShipShipmentMutation(relay.ClientIDMutation):
+class ConfirmShipmentMutation(relay.ClientIDMutation):
     class Input:
         order_id = graphene.String(required=True)
         shipment_id = graphene.String(required=True)
@@ -25,7 +25,7 @@ class ShipShipmentMutation(relay.ClientIDMutation):
         user_ctx = access_control.get_user_context(token, request_tenant_id)
 
 
-        command = commands.ShipShipmentCommand.model_validate(input)
+        command = commands.ConfirmShipmentCommand.model_validate(input)
 
         result = message_bus.handle(command, access_control=access_control, user_ctx=user_ctx)
 

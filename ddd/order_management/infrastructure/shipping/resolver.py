@@ -1,8 +1,9 @@
 from __future__ import annotations
-from .fedex_provider import FedExShippingProvider, SelfDeliveryProvider
+from .fedex_provider import FedExShippingProvider
+from .self_delivery_provider import SelfDeliveryProvider
 
 class ShippingProviderResolver:
-    @staticMethod
+    @staticmethod
     def resolve(config: dict):
         provider_cfg = config.get("shipping_provider")
         provider_type = provider_cfg.get("type")

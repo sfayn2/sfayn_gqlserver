@@ -32,7 +32,7 @@ class AddShipmentCommand(Command):
     shipment_items: list[dtos.ShipmentItemDTO]
 
 
-class ShipShipmentCommand(Command):
+class ConfirmShipmentCommand(Command):
     order_id: str
     shipment_id: str
 

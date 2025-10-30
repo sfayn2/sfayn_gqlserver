@@ -38,7 +38,7 @@ class CompletedOrderEvent(DomainEvent):
     pass
 
 @dataclass(frozen=True)    
-class ShippedShipmentEvent(DomainEvent):
+class ConfirmedShipmentEvent(DomainEvent):
     shipment_id: str
 
 @dataclass(frozen=True)    

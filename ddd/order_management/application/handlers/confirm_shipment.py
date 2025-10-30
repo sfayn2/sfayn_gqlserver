@@ -11,31 +11,28 @@ from ddd.order_management.application import (
 from ddd.order_management.domain import exceptions
 
 
-def handle_ship_shipment(
-        command: commands.ShipShipmentCommand, 
+def handle_confirm_shipment(
+        command: commands.ConfirmShipmentCommand, 
         access_control: AccessControl1Abstract,
         user_ctx: dtos.UserContextDTO,
         user_action_service: UserActionServiceAbstract,
-        shipping_provider_service= ports.ShippingProviderAbstract,
         uow: UnitOfWorkAbstract) -> dtos.ResponseDTO:
     try:
         with uow:
 
             access_control.ensure_user_is_authorized_for(
                 user_ctx,
-                required_permission="ship_shipment",
+                required_permission="confirm_shipment",
                 required_scope={"role": ["vendor"] }
             )
 
             order = uow.order.get(order_id=command.order_id, tenant_id=user_ctx.tenant_id)
-            shipment = order.ship_shipment(shipment_id=command.shipment_id)
-
-            shipping_provider_service.create_shipment(user_ctx.tenant_id, shipment)
+            order.confirm_shipment(shipment_id=command.shipment_id)
 
             user_action_service.save_action(
                 dtos.UserActionDTO(
                     order_id=command.order_id,
-                    action="ship_shipment",
+                    action="confirm_shipment",
                     performed_by=user_ctx.sub,
                     user_input=command.model_dump(exclude_none=True)
                 )
