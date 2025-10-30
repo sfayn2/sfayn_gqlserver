@@ -43,11 +43,6 @@ class Shipment:
     def shipment_items_sku_qty(self):
         return {item.product_sku: item.quantity for item in self.shipment_items}
 
-    def update_tracking_reference(self, tracking_reference: str):
-        self.tracking_reference = tracking_reference
-
-    def update_shipment_amount(self, amount: value_objects.Money):
-        self.shipment_amount = amount
 
 
     #def allocate_shipping_tax(self):

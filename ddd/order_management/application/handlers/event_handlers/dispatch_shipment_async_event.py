@@ -17,10 +17,7 @@ def handle_dispatch_shipment_async_event(
         order = uow.order.get(order_id=event.order_id, tenant_id=event.tenant_id)
         shipment = order.get_shipment(shipment_id=event.shipment_id)
 
-        provider_result = shipping_provider_service.create_shipment(tenant_id, shipment) 
-
-        shipment.update_tracking_reference(provider_result.tracking_reference)
-        shipment.update_shipping_amount(provider_result.total_amount)
+        provider_result = shipping_provider_service.create_shipment(event.tenant_id, shipment) 
 
         user_action_service.save_action(
             dtos.UserActionDTO(
@@ -31,7 +28,12 @@ def handle_dispatch_shipment_async_event(
             )
         )
 
-        order.mask_shipment_as_shipped(event.shipment_id)
+        order.apply_shipment_dispatch(
+            event.shipment_id, 
+            provider_result.tracking_reference, 
+            provider_result.total_amount
+        )
+
 
         uow.order.save(order)
         uow.commit()
