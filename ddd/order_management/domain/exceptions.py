@@ -1,6 +1,9 @@
 class DomainError(Exception):
     pass
 
+class DomainIntegrationError(Exception):
+    pass
+
 class InvalidOrderOperation(DomainError):
     pass
 

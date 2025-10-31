@@ -31,7 +31,8 @@ def handle_dispatch_shipment_async_event(
         order.apply_shipment_dispatch(
             event.shipment_id, 
             provider_result.tracking_reference, 
-            provider_result.total_amount
+            provider_result.total_amount,
+            provider_result.label_url
         )
 
 

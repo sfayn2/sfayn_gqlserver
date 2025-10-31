@@ -81,8 +81,7 @@ class Order:
             line_item = self.get_line_item(item_data.product_sku, item_data.vendor_id)
             shipment_item = model.ShipmentItem(
                 shipment_item_id=str(uuid.uuid4()),
-                product_sku=item_data.product_sku,
-                vendor_id=item_data.vendor_id,
+                line_item=line_item,
                 quantity=item_data.quantity
             )
             shipment.add_line_item(shipment_item)
@@ -126,12 +125,13 @@ class Order:
     def total_line_item_qty(self) -> int:
         return sum(li.order_quantity for li in self.line_items)
 
-    def apply_shipment_dispatch(self, shipment_id: str, tracking_reference: str, shipment_amount: value_objects.Money):
+    def apply_shipment_dispatch(self, shipment_id: str, tracking_reference: str, shipment_amount: value_objects.Money, label_url: str):
         shipment = self.get_shipment(shipment_id)
         if shipment.shipment_status != enums.ShipmentStatus.CONFIRMED:
             raise exceptions.DomainError("Only confirmed shipment can be ship")
         shipment.shipment_amount = shipment_amount
         shipment.tracking_reference = tracking_reference
+        shipment.label_url = label_url
 
         shipment.shipment_status = enums.ShipmentStatus.SHIPPED
 

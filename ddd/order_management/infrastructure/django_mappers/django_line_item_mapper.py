@@ -22,9 +22,9 @@ class LineItemMapper:
                     'pickup_country' : line_item.pickup_address.country,
                     'pickup_state': line_item.pickup_address.state,
                     'package_weight': line_item.package.weight,
-                    'package_length': line_item.package.length,
-                    'package_width': line_item.package.width,
-                    'package_height': line_item.package.height
+                    'package_length': line_item.package.dimension[0],
+                    'package_width': line_item.package.dimension[1],
+                    'package_height': line_item.package.dimension[2]
                 }
             }
 

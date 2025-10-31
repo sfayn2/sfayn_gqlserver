@@ -120,3 +120,4 @@ class ShipmentItemDTO(BaseModel):
 class CreateShipmentResult:
     tracking_number: str
     total_amount: MoneyDTO
+    label_url: str

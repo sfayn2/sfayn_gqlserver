@@ -19,7 +19,7 @@ class ShippingProviderService:
             return {
                 "tracking_number": f"SELF-{shipment.shipment_id[:8]}",
                 "total_amount": "0.00",
-                "tax_amount": "0.00"
+                "label_url": None
             }
         else:
             result = provider.create_shipment(shipment)

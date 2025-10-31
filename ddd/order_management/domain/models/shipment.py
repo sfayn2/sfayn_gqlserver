@@ -14,6 +14,7 @@ from ddd.order_management.domain.services import DomainClock
 @dataclass
 class ShipmentItem:
     shipment_item_id: str
+    line_item: LineItem
     product_sku: str
     vendor_id: str
     quantity: int
@@ -31,6 +32,7 @@ class Shipment:
     shipment_provider: Optional[str] = None
     shipment_service_code: Optional[str] = None
     tracking_reference: Optional[str] = None
+    label_url: Optional[str] = None
     shipment_amount: value_objects.Money = field(default_factory=lambda: value_objects.Money.default())
     shipment_tax_amount: value_objects.Money = field(default_factory=lambda: value_objects.Money.default())
     shipment_status: enums.ShipmentStatus = enums.ShipmentStatus.PENDING
@@ -42,6 +44,20 @@ class Shipment:
     @property
     def shipment_items_sku_qty(self):
         return {item.product_sku: item.quantity for item in self.shipment_items}
+
+    def get_max_dimensions(self):
+        for item in self.shipment_items:
+            pkg = getattr(item, "package", None)
+            if pkg and hasattr(pkg, "dimensions"):
+                l, w, h = pkg.dimensions
+                lengths.append(l)
+                widths.append(w)
+                heights.append(h)
+
+        if lengths and widths and heights: 
+            return max(lengths), max(widths), max(heights)
+
+        raise exceptions.DomainError(f"Unable to determine package max dimension for shipment id {self.shipment_id}")
 
 
 
