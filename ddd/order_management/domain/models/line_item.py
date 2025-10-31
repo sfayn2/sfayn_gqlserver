@@ -10,9 +10,11 @@ class LineItem:
     order_quantity: int
     vendor_id: str
     pickup_address: value_objects.Address
+    package: value_objects.Package
     product_price: value_objects.Money = field(default_factory=lambda: value_objects.Money.default())
     product_tax_amount: value_objects.Money = field(default_factory=lambda: value_objects.Money.default())
     product_total_amount: value_objects.Money = field(default_factory=lambda: value_objects.Money.default())
+
 
     
     def __post_init__(self):

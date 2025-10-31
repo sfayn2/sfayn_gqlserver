@@ -37,6 +37,9 @@ class AddressDTO(BaseModel):
     postal: Optional[int] = None
 
 
+class PackageDTO(BaseModel):
+    weight: Decimal
+    dimensions: Tuple[int, int, int]
 
 class LineItemDTO(BaseModel):
     product_sku: str
@@ -46,6 +49,7 @@ class LineItemDTO(BaseModel):
     product_price: MoneyDTO
     product_tax_amount: MoneyDTO
     product_total_amount: MoneyDTO
+    package: PackageDTO
 
 
 class OrderResponseDTO(BaseModel):
