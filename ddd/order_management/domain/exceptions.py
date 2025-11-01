@@ -1,7 +1,7 @@
 class DomainError(Exception):
     pass
 
-class DomainIntegrationError(Exception):
+class ShippingProviderIntegrationError(Exception):
     pass
 
 class InvalidOrderOperation(DomainError):

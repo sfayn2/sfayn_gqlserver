@@ -2,14 +2,14 @@
 class ShippingProviderService:
 
     @classmethod
-    def configure(cls, tenant_service, shipping_provider_resolver):
-        cls.tenant_service = tenant_service
+    def configure(cls, saas_service, shipping_provider_resolver):
+        cls.saas_service = saas_service
         cls.shipping_provider_resolver = shipping_provider_resolver
 
     @classmethod
     def _get_provider(cls, tenant_id: str):
-        tenant_configs = cls.tenant_service.get_tenant_config(tenant_id).configs.get("shipping_provider", {})
-        return cls.shipping_provider_resolver.resolve(tenant_configs)
+        saas_configs = cls.saas_service.get_tenant_config(tenant_id).configs.get("shipping_provider", {})
+        return cls.shipping_provider_resolver.resolve(saas_configs)
 
     @classmethod
     def create_shipment(cls, tenant_id: str, shipment):

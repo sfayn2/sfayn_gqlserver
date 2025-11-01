@@ -37,3 +37,8 @@ class ShipmentStatus(Enum):
     @classmethod
     def choices(cls):
         return generate_choices(cls)
+
+class ShipmentMethod(Enum):
+    PICKUP = "PICKUP"
+    DROPOFF = "DROPOFF"
+    WAREHOUSE = "WAREHOUSE"

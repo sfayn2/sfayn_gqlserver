@@ -55,7 +55,7 @@ application_services.AccessControlService.configure(
 
 # =============== resolve shipping provider based on tenant_id ========
 application_services.ShippingProviderService.configure(
-    tenant_service=tenant_service_instance,
+    saas_service=saas_service_instance,
     shipping_provider_resolver=shipping.ShippingProviderResolver
 )
 

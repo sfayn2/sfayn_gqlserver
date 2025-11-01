@@ -5,9 +5,9 @@ from ddd.order_management.domain import models, value_objects
 class ShipmentItemMapper:
 
     @staticmethod
-    def to_domain(shipment_item: dtos.ShipmentItemDTO) -> models.ShipmentItem:
+    def to_domain(shipment_item: dtos.ShipmentItemDTO, line_item) -> models.ShipmentItem:
+
         return models.ShipmentItem(
-            product_sku=shipment_item.product_sku,
-            quantity=shipment_item.quantity,
-            vendor_id=shipment_item.vendor_id
+            line_item=line_item,
+            quantity=shipment_item.quantity
         )

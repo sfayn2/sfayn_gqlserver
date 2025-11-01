@@ -26,10 +26,25 @@ class CompleteOrderCommand(Command):
 
 class AddShipmentCommand(Command):
     order_id: str
+
+    shipment_mode: str # pickup, dropoff, warehouse
+    shipment_provider: str #easypost, fedex, etc
+
+    # package
+    package_weight: Optional[Decimal] = None
+    package_length: Optional[Decimal] = None
+    package_width: Optional[Decimal] = None
+    package_height: Optional[Decimal] = None
+
+    # pickup mode
+    pickup_address: Optional[dtos.AddressDTO] = None
+    pickup_window_start: Optional[DateTime] = None
+    pickup_window_end: Optional[DateTime] = None
+
     shipment_address: dtos.AddressDTO
-    shipment_amount: Optional[dtos.MoneyDTO] = None
-    shipment_tax_amount: Optional[dtos.MoneyDTO] = None
     shipment_items: list[dtos.ShipmentItemDTO]
+
+
 
 
 class ConfirmShipmentCommand(Command):

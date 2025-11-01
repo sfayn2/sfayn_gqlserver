@@ -12,6 +12,21 @@ from ddd.order_management.presentation.graphql import object_types, common, inpu
 class AddShipmentMutation(relay.ClientIDMutation):
     class Input:
         order_id = graphene.String(required=True)
+        shipment_mode = graphene.String(required=True) # pickup, dropoff, warehouse
+        shipment_provider = graphene.String(required=True)
+
+        # package
+        package_weight = graphene.Decimal(required=False)
+        package_length = graphene.Decimal(required=False)
+        package_width = graphene.Decimal(required=False)
+        package_height = graphene.Decimal(required=False)
+
+        # pickup mode
+        pickup_address = graphene.Field(input_types.AddressInput, required=False)
+        pickup_window_start = graphene.String(required=False)
+        pickup_window_end = graphene.String(required=False)
+
+        # destination
         shipment_address = graphene.Field(input_types.AddressInput, required=True)
         shipment_items = graphene.List(input_types.ShipmentItemInput, required=True)
 

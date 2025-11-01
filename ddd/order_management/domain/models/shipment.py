@@ -15,8 +15,6 @@ from ddd.order_management.domain.services import DomainClock
 class ShipmentItem:
     shipment_item_id: str
     line_item: LineItem
-    product_sku: str
-    vendor_id: str
     quantity: int
     allocated_shipping_tax: value_objects.Money = field(default_factory=lambda: value_objects.Money.default())
 
@@ -28,11 +26,26 @@ class ShipmentItem:
 @dataclass
 class Shipment:
     shipment_id: str
+
+    shipment_mode: str # pickup, dropoff, warehouse
+    shipment_provider: str #easypost, fedex, etc
+
+    # package
+    package_weight: Optional[Decimal] = None
+    package_length: Optional[Decimal] = None
+    package_width: Optional[Decimal] = None
+    package_height: Optional[Decimal] = None
+
+    # pickup mode
+    pickup_address: Optional[value_objects.Address] = None
+    pickup_window_start: Optional[DateTime] = None
+    pickup_window_end: Optional[DateTime] = None
+
     shipment_address: value_objects.Address
-    shipment_provider: Optional[str] = None
-    shipment_service_code: Optional[str] = None
+
     tracking_reference: Optional[str] = None
     label_url: Optional[str] = None
+
     shipment_amount: value_objects.Money = field(default_factory=lambda: value_objects.Money.default())
     shipment_tax_amount: value_objects.Money = field(default_factory=lambda: value_objects.Money.default())
     shipment_status: enums.ShipmentStatus = enums.ShipmentStatus.PENDING
