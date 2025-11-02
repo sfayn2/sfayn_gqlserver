@@ -169,8 +169,8 @@ class Order:
 
     def cancel_shipment(self, shipment_id: str):
         shipment = self.get_shipment(shipment_id)
-        if shipment.shipment_status in (enums.ShipmentStatus.SHIPPED, enums.ShipmentStatus.DELIVERED):
-            raise exceptions.DomainError("Cannot cancel shipment after shipped/delivered")
+        if shipment.shipment_status in (enums.ShipmentStatus.IN_TRANSIT, enums.ShipmentStatus.SHIPPED, enums.ShipmentStatus.DELIVERED):
+            raise exceptions.DomainError("Cannot cancel shipment after in_transit/shipped/delivered")
         shipment.shipment_status = enums.ShipmentStatus.CANCELLED
 
         self.update_shipping_progress()
