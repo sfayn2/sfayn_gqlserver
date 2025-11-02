@@ -29,7 +29,7 @@ def handle_add_order(
             
             confirmed_order = uow.order.create_order(
                 customer_details=mappers.CustomerDetailsMapper.to_domain(command.customer_details),
-                line_items=command.product_skus,
+                line_items=[mappers.LineItemMapper.to_domain(sku) for sku in command.product_skus],
                 tenant_id=tenant_id
             )
 
