@@ -128,16 +128,14 @@ class Order:
     def apply_shipment_dispatch(self, shipment_id: str, tracking_reference: str, shipment_amount: value_objects.Money, label_url: str):
         shipment = self.get_shipment(shipment_id)
         if shipment.shipment_status != enums.ShipmentStatus.CONFIRMED:
-            raise exceptions.DomainError("Only confirmed shipment can be ship")
+            raise exceptions.DomainError("Only confirmed shipment can be dispatch")
         shipment.shipment_amount = shipment_amount
         shipment.tracking_reference = tracking_reference
         shipment.label_url = label_url
 
-        shipment.shipment_status = enums.ShipmentStatus.SHIPPED
+        shipment.shipment_status = enums.ShipmentStatus.IN_TRANSIT
 
-        self.update_shipping_progress()
 
-    
     def confirm_shipment(self, shipment_id: str):
         shipment = self.get_shipment(shipment_id)
         if shipment.shipment_status != enums.ShipmentStatus.PENDING:
@@ -183,19 +181,19 @@ class Order:
         )
         self.raise_event(event)
 
-    def assign_tracking_reference(self, shipment_id: str, tracking_reference: str):
-        shipment = self.get_shipment(shipment_id)
-        if shipment.shipment_status not in (enums.ShipmentStatus.PENDING, enums.ShipmentStatus.SHIPPED):
-            raise exceptions.DomainError("Tracking reference can only be assign before delivery.")
+    #def assign_tracking_reference(self, shipment_id: str, tracking_reference: str):
+    #    shipment = self.get_shipment(shipment_id)
+    #    if shipment.shipment_status not in (enums.ShipmentStatus.PENDING, enums.ShipmentStatus.SHIPPED):
+    #        raise exceptions.DomainError("Tracking reference can only be assign before delivery.")
 
-        shipment.tracking_reference = tracking_reference
-        self._update_modified_date()
-        #event = events.TrackingReferenceAssignedEvent(
-        #    tenant_id=self.tenant_id,
-        #    order_id=self.order_id,
-        #    shipment_id=shipment_id,
-        #)
-        #self.raise_event(event)
+    #    shipment.tracking_reference = tracking_reference
+    #    self._update_modified_date()
+    #    #event = events.TrackingReferenceAssignedEvent(
+    #    #    tenant_id=self.tenant_id,
+    #    #    order_id=self.order_id,
+    #    #    shipment_id=shipment_id,
+    #    #)
+    #    #self.raise_event(event)
 
 
     def cancel_order(self):

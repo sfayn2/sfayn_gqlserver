@@ -30,6 +30,7 @@ class PaymentStatus(Enum):
 class ShipmentStatus(Enum):
     PENDING = "PENDING"
     CONFIRMED = "CONFIRMED"
+    IN_TRANSIT = "IN_TRANSIT"
     SHIPPED = "SHIPPED"
     DELIVERED = "DELIVERED"
     CANCELLED = "CANCELLED"

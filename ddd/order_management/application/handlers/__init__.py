@@ -1,7 +1,6 @@
 # Commands
 from .add_shipment import handle_add_shipment
 from .confirm_shipment import handle_confirm_shipment
-from .add_shipping_tracking_reference import handle_add_shipping_tracking_reference
 from .deliver_shipment import handle_deliver_shipment
 from .cancel_shipment import handle_cancel_shipment
 from .cancel_order import handle_cancel_order
