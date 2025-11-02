@@ -6,6 +6,7 @@ from dataclasses import asdict
 from ddd.order_management.application import dtos
 from ddd.order_management.domain import enums
 from .enums import ShippingProviderEnum
+from .utils import kg_to_lb, kg_to_oz, cm_to_in
 
 #Protocol: ports.ShippingProviderAbstract
 class EasyPostShippingProvider:
@@ -22,7 +23,7 @@ class EasyPostShippingProvider:
         easypost_shipment = self.client.shipment.create(
             from_address=shipment.pickup_address,
             to_address=as_dict(shipment.shipment_address),
-            parcel=self._build_parcel_payload(shipment)
+            parcel=self._build_parcel_payload(shipment),
             metadata={
                 "shipment_id": shipment.shipment_id
             }
@@ -59,30 +60,28 @@ class EasyPostShippingProvider:
     
     def _build_parcel_payload(self, shipment):
 
-        #TODO conver weight to oz, dimension from cm to in?
-        
-        if shipment.package_weight:
-            total_weight = shipment.package_weight
+        if shipment.package_weight_kg:
+            total_weight = shipment.package_weight_kg.weight_to_oz()
         else:
             total_weight = sum(
                 si.package
                 for si in shipment.shipment_items.line_item.package
             )
 
-        if shipment.package_length and shipment.package_width and shipment.package_height:
+        if shipment.package_length_cm and shipment.package_width_cm and shipment.package_height_cm:
             parcel = {
-                "weight": total_weight,
-                "length": shipment.package_length,
-                "width": shipment.package_width,
-                "height": shipment.package_height
+                "weight": kg_to_oz(total_weight),
+                "length": cm_to_in(shipment.package_length_cm),
+                "width": cm_to_in(shipment.package_width_cm),
+                "height": cm_to_in(shipment.package_height_cm)
             }
         else:
             length, width, height = shipment.get_max_dimension()
             parcel = {
-                "weight": total_weight,
-                "length": length,
-                "width": width,
-                "height": height
+                "weight": kg_to_oz(total_weight),
+                "length": cm_to_in(length),
+                "width": cm_to_in(width),
+                "height": cm_to_in(height)
             }
 
     def _schedule_pickup(self, easypost_shipment_id, shipment, carrier_account_id=None):

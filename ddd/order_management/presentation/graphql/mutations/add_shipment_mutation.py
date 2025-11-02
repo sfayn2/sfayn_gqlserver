@@ -16,10 +16,10 @@ class AddShipmentMutation(relay.ClientIDMutation):
         shipment_provider = graphene.String(required=True)
 
         # package
-        package_weight = graphene.Decimal(required=False)
-        package_length = graphene.Decimal(required=False)
-        package_width = graphene.Decimal(required=False)
-        package_height = graphene.Decimal(required=False)
+        package_weight_kg = graphene.Decimal(required=False)
+        package_length_cm = graphene.Decimal(required=False)
+        package_width_cm = graphene.Decimal(required=False)
+        package_height_cm = graphene.Decimal(required=False)
 
         # pickup mode
         pickup_address = graphene.Field(input_types.AddressInput, required=False)

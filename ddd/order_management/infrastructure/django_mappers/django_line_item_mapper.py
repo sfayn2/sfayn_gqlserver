@@ -21,10 +21,10 @@ class LineItemMapper:
                     'pickup_postal' : line_item.pickup_address.postal,
                     'pickup_country' : line_item.pickup_address.country,
                     'pickup_state': line_item.pickup_address.state,
-                    'package_weight': line_item.package.weight,
-                    'package_length': line_item.package.dimension[0],
-                    'package_width': line_item.package.dimension[1],
-                    'package_height': line_item.package.dimension[2]
+                    'package_weight_kg': line_item.package.weight,
+                    'package_length_cm': line_item.package.dimension[0],
+                    'package_width_cm': line_item.package.dimension[1],
+                    'package_height_cm': line_item.package.dimension[2]
                 }
             }
 
@@ -48,10 +48,10 @@ class LineItemMapper:
                 postal=django_line_item.pickup_address_postal
             ),
             package=value_objects.Package(
-                weight=django_line_item.package_weight,
-                length=django_line_item.package_length,
-                width=django_line_item.package_width,
-                height=django_line_item.package_height
+                weight=django_line_item.package_weight_kg,
+                length=django_line_item.package_length_cm,
+                width=django_line_item.package_width_cm,
+                height=django_line_item.package_height_cm
             )
             #options=json.loads(django_line_item.options),
         )

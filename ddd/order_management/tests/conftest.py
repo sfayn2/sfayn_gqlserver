@@ -46,7 +46,7 @@ ORDER_SEEDS = (
     ("ORD-CHANGEQTY-1", enums.OrderStatus.DRAFT.value, "NoPendingActivities", "", USER1, "first name1", "last name1", "email@gmail.com", json.dumps([]), "street1", "Singapore", 1234, "Singapore", "Singapore", None, None, None, None, json.dumps([]), Decimal("0"), Decimal("0"), Decimal("0"), json.dumps([]), Decimal("0"), None, None, Decimal("0"), None, "SGD", TENANT1),
 )
 
-# Columns order_id, vendor_id, vendor_name, vendor_country, product_sku, product_name, product_category, is_free_gift, is_taxable, options, product_price, product_currency, order_quantity, package_weight, package_length, package_width, package_height, total_price
+# Columns order_id, vendor_id, vendor_name, vendor_country, product_sku, product_name, product_category, is_free_gift, is_taxable, options, product_price, product_currency, order_quantity, package_weight_kg, package_length_cm, package_width_cm, package_height_cm, total_price
 ORDER_LINE_SEEDS = (
     ("ORD-1", VENDOR1, "VendorA", "Singapore", "sku_ok", "my product", "T-SHIRT", False, True, json.dumps({"Size": "M", "Color": "RED"}), Decimal("20"), "SGD", 10, 1, 1, 1, 1, 200),
     ("ORD-1", VENDOR1, "VendorA", "Singapore", "sku_already_exists", "my product", "T-SHIRT", False, True, json.dumps({"Size": "M", "Color": "RED"}), Decimal("20"), "SGD", 10, 1, 1, 1, 1, 200),
@@ -68,7 +68,7 @@ OTHER_ACTIVITIES = (
     ("ORD-WORKFLOW-TENANT1", "COMPLETED", "MarkCompleted", "mark_as_completed", 6, "vendor-1", "", False, "WAITING", "")
 )
 
-# Columns product_id, vendor_id, tenant_id, product_sku, product_name, product_category, options, product_price, stock, product_currency, package_weight, package_length, package_width, package_height, is_free_gift, is_taxable, is_active
+# Columns product_id, vendor_id, tenant_id, product_sku, product_name, product_category, options, product_price, stock, product_currency, package_weight_kg, package_length_cm, package_width_cm, package_height_cm, is_free_gift, is_taxable, is_active
 VENDOR_PRODUCT_SEEDS = (
     ("prod-0", VENDOR1, TENANT1, "sku_ok", "sample product", "T-SHIRT", json.dumps({"Color": "RED", "Size": "M" }), 20, 999, "SGD", "1", "1", "1", "1", False, True, True),
     ("prod-1", VENDOR1, TENANT1, "sku1_ok", "sample product", "T-SHIRT", json.dumps({"Color": "RED", "Size": "M" }), 20, 999, "SGD", "1", "1", "1", "1", False, True, True),
@@ -251,10 +251,10 @@ def seeded_all(django_db_setup, django_db_blocker):
                 product_price=vp[7],
                 stock=vp[8],
                 product_currency=vp[9],
-                package_weight=vp[10],
-                package_length=vp[11],
-                package_width=vp[12],
-                package_height=vp[13],
+                package_weight_kg=vp[10],
+                package_length_cm=vp[11],
+                package_width_cm=vp[12],
+                package_height_cm=vp[13],
                 is_free_gift=vp[14],
                 is_taxable=vp[15],
                 is_active=vp[16]
@@ -327,10 +327,10 @@ def seeded_all(django_db_setup, django_db_blocker):
                 product_price=ol[10],
                 product_currency=ol[11],
                 order_quantity=ol[12],
-                package_weight=ol[13], 
-                package_length=ol[14], 
-                package_width=ol[15],
-                package_height=ol[16], 
+                package_weight_kg=ol[13], 
+                package_length_cm=ol[14], 
+                package_width_cm=ol[15],
+                package_height_cm=ol[16], 
                 total_price=ol[17]
             )
 

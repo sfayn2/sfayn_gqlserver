@@ -29,22 +29,23 @@ class Shipment:
 
     shipment_mode: str # pickup, dropoff, warehouse
     shipment_provider: str #easypost, fedex, etc
+    shipment_address: value_objects.Address
 
     # package
-    package_weight: Optional[Decimal] = None
-    package_length: Optional[Decimal] = None
-    package_width: Optional[Decimal] = None
-    package_height: Optional[Decimal] = None
+    package_weight_kg: Optional[Decimal] = None
+    package_length_cm: Optional[Decimal] = None
+    package_width_cm: Optional[Decimal] = None
+    package_height_cm: Optional[Decimal] = None
 
     # pickup mode
     pickup_address: Optional[value_objects.Address] = None
     pickup_window_start: Optional[DateTime] = None
     pickup_window_end: Optional[DateTime] = None
 
-    shipment_address: value_objects.Address
 
     tracking_reference: Optional[str] = None
     label_url: Optional[str] = None
+
 
     shipment_amount: value_objects.Money = field(default_factory=lambda: value_objects.Money.default())
     shipment_tax_amount: value_objects.Money = field(default_factory=lambda: value_objects.Money.default())

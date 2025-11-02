@@ -31,10 +31,10 @@ class AddShipmentCommand(Command):
     shipment_provider: str #easypost, fedex, etc
 
     # package
-    package_weight: Optional[Decimal] = None
-    package_length: Optional[Decimal] = None
-    package_width: Optional[Decimal] = None
-    package_height: Optional[Decimal] = None
+    package_weight_kg: Optional[Decimal] = None
+    package_length_cm: Optional[Decimal] = None
+    package_width_cm: Optional[Decimal] = None
+    package_height_cm: Optional[Decimal] = None
 
     # pickup mode
     pickup_address: Optional[dtos.AddressDTO] = None
