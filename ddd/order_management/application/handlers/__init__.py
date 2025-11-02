@@ -5,6 +5,7 @@ from .deliver_shipment import handle_deliver_shipment
 from .cancel_shipment import handle_cancel_shipment
 from .cancel_order import handle_cancel_order
 from .mark_as_completed import handle_mark_as_completed
+from .add_order import handle_add_order
 
 
 # Webhook publish

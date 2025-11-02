@@ -24,8 +24,7 @@ class ShippingOptionDTO(BaseModel):
 
 class CustomerDetailsDTO(BaseModel):
     customer_id: Optional[str] = None
-    first_name: str
-    last_name: str
+    name: str
     email: str
 
 class AddressDTO(BaseModel):
@@ -82,6 +81,11 @@ class ProductSkusDTO(BaseModel):
     product_sku: str
     order_quantity: int
     vendor_id: str
+    product_sku: str
+    product_name: str
+    product_price: MoneyDTO
+    product_weight_kg: Decimal
+    order_quantity: int
 
 class UserContextDTO(BaseModel):
     sub: str

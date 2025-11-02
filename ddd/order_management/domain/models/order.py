@@ -13,19 +13,18 @@ from ddd.order_management.domain.services import DomainClock
 @dataclass
 class Order:
     tenant_id: str
-    order_id: str
+    order_id: str = str(uuid.uuid4())
 
-    customer_id: str
-    customer_name: str
-    customer_email: str
+    customer_details: value_objects.CustomerDetails
 
-    currency: str = "USD"
+    currency: Optional[str] = None
     order_status: enums.OrderStatus = enums.OrderStatus.DRAFT
     payment_status: enums.PaymentStatus = enums.PaymentStatus.UNPAID
 
     line_items: List[LineItem] = field(default_factory=list)
     shipments: List[Shipment] = field(default_factory=list)
 
+    date_created: Optional[datetime] = None
     date_modified: Optional[datetime] = None
     _events: List[events.DomainEvent] = field(default_factory=list, init=False)
 
@@ -89,6 +88,21 @@ class Order:
         self.add_shipment(shipment)
         self.update_shipping_progress()
         return shipment
+
+    @staticmethod
+    def create_order(tenant_id:str, customer_details: value_objects.CustomerDetails, line_items: List[LineItem]):
+        order = Order(
+                tenant_id=tenant_id,
+                customer_details=customer_details,
+                date_created=DomainClock.now(),
+            )
+
+        for line_item in line_items:
+            order.add_line_item(line_item)
+
+        order.order_status = enums.OrderStatus.CONFIRMED #its always confirm order?
+
+        return order
 
     def add_shipment(self, shipment: Shipment) -> Shipment:
         if self.order_status != enums.OrderStatus.CONFIRMED:

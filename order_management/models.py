@@ -45,21 +45,22 @@ class LineItem(models.Model):
     product_sku = models.CharField(max_length=50)
     product_name = models.CharField(max_length=255)
     product_price = models.DecimalField(max_digits=10, decimal_places=2)
+    product_currency = models.CharField(max_length=50, help_text="Currency for calculation requirements & validation. e.g. SGD")
     order_quantity = models.PositiveIntegerField(null=True)
 
     vendor_id = models.CharField(max_length=200, help_text="can use to check if product belongs to same vendor")
 
-    pickup_address_line1 = models.TextField(blank=True, null=True, help_text="Warehouse/Vendor address")
-    pickup_address_line2 = models.TextField(blank=True, null=True, help_text="Warehouse/Vendor address2")
-    pickup_address_city = models.CharField(max_length=50, blank=True, null=True, help_text="Optional for other countries (e.g. Singapore)")
-    pickup_address_postal = models.CharField(max_length=50, blank=True, null=True, help_text="some countries dont use this (e.g Ireland?)")
-    pickup_address_country = models.CharField(max_length=50)
-    pickup_address_state = models.CharField(max_length=10, blank=True, null=True, help_text="Mandatory in countries like US, Canada, India but irrelevant in small countries")
+    #pickup_address_line1 = models.TextField(blank=True, null=True, help_text="Warehouse/Vendor address")
+    #pickup_address_line2 = models.TextField(blank=True, null=True, help_text="Warehouse/Vendor address2")
+    #pickup_address_city = models.CharField(max_length=50, blank=True, null=True, help_text="Optional for other countries (e.g. Singapore)")
+    #pickup_address_postal = models.CharField(max_length=50, blank=True, null=True, help_text="some countries dont use this (e.g Ireland?)")
+    #pickup_address_country = models.CharField(max_length=50)
+    #pickup_address_state = models.CharField(max_length=10, blank=True, null=True, help_text="Mandatory in countries like US, Canada, India but irrelevant in small countries")
 
     package_weight_kg = models.CharField(max_length=100, null=True, blank=True, help_text="value should be coming from product itself or to fill in later once it goes to warehouse fulfillment?")
-    package_length_cm = models.CharField(max_length=100, null=True, blank=True, help_text="value should be coming from product itself or to fill in later once it goes to warehouse fulfillment? ")
-    package_width_cm = models.CharField(max_length=100, null=True, blank=True, help_text="value should be coming from product itself or to fill in later once it goes to warehouse fulfillment?")
-    package_height_cm = models.CharField(max_length=100, null=True, blank=True, help_text="value should be coming from product itself or to fill in later once it goes to warehouse fulfillment?")
+    #package_length_cm = models.CharField(max_length=100, null=True, blank=True, help_text="value should be coming from product itself or to fill in later once it goes to warehouse fulfillment? ")
+    #package_width_cm = models.CharField(max_length=100, null=True, blank=True, help_text="value should be coming from product itself or to fill in later once it goes to warehouse fulfillment?")
+    #package_height_cm = models.CharField(max_length=100, null=True, blank=True, help_text="value should be coming from product itself or to fill in later once it goes to warehouse fulfillment?")
 
     class Meta:
         unique_together = ("product_sku", "order")

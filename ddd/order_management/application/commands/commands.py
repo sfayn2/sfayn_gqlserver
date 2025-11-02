@@ -40,10 +40,10 @@ class AddShipmentCommand(Command):
     pickup_address: Optional[dtos.AddressDTO] = None
     pickup_window_start: Optional[DateTime] = None
     pickup_window_end: Optional[DateTime] = None
+    pickup_instructions: Optional[str] = None
 
     shipment_address: dtos.AddressDTO
     shipment_items: list[dtos.ShipmentItemDTO]
-
 
 
 
@@ -58,3 +58,8 @@ class DeliverShipmentCommand(Command):
 class CancelShipmentCommand(Command):
     order_id: str
     shipment_id: str
+
+class AddOrderCommand(Command):
+    external_ref: str
+    customer_details: dtos.CustomerDetailsDTO
+    product_skus: List[dtos.ProductSkusDTO]

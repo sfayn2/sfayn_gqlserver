@@ -11,8 +11,8 @@ class Query(
     pass
 
 class Mutation(graphene.ObjectType):
-    add_line_items = mutations.add_line_items_mutation.AddLineItemsMutation.Field()
 
+    add_order = mutations.add_shipment_mutation.AddOrderMutation.Field()
     add_shipment = mutations.add_shipment_mutation.AddShipmentMutation.Field()
     confirm_shipment = mutations.confirm_shipment_mutation.ConfirmShipmentMutation.Field()
     deliver_shipment = mutations.deliver_shipment_mutation.DeliverShipmentMutation.Field()

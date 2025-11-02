@@ -22,11 +22,14 @@ class ShipmentItemInput(graphene.InputObjectType):
     vendor_id = graphene.String(required=True)
 
 class CustomerDetailsInput(graphene.InputObjectType):
-    first_name = graphene.String(required=True)
-    last_name = graphene.String(required=True)
+    customer_id = graphene.String(required=False)
+    name = graphene.String(required=True)
     email = graphene.String(required=True)
 
 class ProductSkusInput(graphene.InputObjectType):
     product_sku = graphene.String(required=True)
+    product_name = graphene.String(required=True)
+    product_price = graphene.Field(MoneyInput, required=True)
+    product_weight_kg = graphene.Decimal(required=False)
     order_quantity = graphene.Int(required=True)
     vendor_id = graphene.String(required=True)

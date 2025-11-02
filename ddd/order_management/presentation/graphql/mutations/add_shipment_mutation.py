@@ -23,12 +23,15 @@ class AddShipmentMutation(relay.ClientIDMutation):
 
         # pickup mode
         pickup_address = graphene.Field(input_types.AddressInput, required=False)
-        pickup_window_start = graphene.String(required=False)
-        pickup_window_end = graphene.String(required=False)
+        pickup_window_start = graphene.DateTime(required=False)
+        pickup_window_end = graphene.DateTime(required=False)
+        pickup_instructions = graphene.String(required=False)
 
-        # destination
+        # destination / items
         shipment_address = graphene.Field(input_types.AddressInput, required=True)
         shipment_items = graphene.List(input_types.ShipmentItemInput, required=True)
+
+        instructions = graphene.String(required=True)
 
     result = graphene.Field(object_types.ResponseType)
 

@@ -41,6 +41,7 @@ class Shipment:
     pickup_address: Optional[value_objects.Address] = None
     pickup_window_start: Optional[DateTime] = None
     pickup_window_end: Optional[DateTime] = None
+    pickup_instructions: Optional[str] = None
 
 
     tracking_reference: Optional[str] = None
@@ -51,6 +52,8 @@ class Shipment:
     shipment_tax_amount: value_objects.Money = field(default_factory=lambda: value_objects.Money.default())
     shipment_status: enums.ShipmentStatus = enums.ShipmentStatus.PENDING
     shipment_items: List[ShipmentItem] = field(default_factory=list)
+
+
 
     def add_line_item(self, shipment_item: ShipmentItem):
         self.shipment_items.append(shipment_item)
