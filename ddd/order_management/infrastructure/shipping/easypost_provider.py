@@ -1,4 +1,5 @@
 from __future__ import annotations
+import easypost
 from typing import Any
 from decimal import Decimal
 from dataclasses import asdict
@@ -10,66 +11,45 @@ from .enums import ShippingProviderEnum
 class EasyPostShippingProvider:
     name = ShippingProviderEnums.EASYPOST
 
-    def __init__(self, api_key: str, endpoint: str = "https://api.easypost.com/v2"):
-        self.api_key = api_key
-        self.endpoint = endpoint.rstrip("/")
+    def __init__(self, api_key: str, endpoint: str ):
+        self.client = easypost.EasyPostClient(self.api_key)
 
     def is_self_delivery(self) -> bool:
         return False
 
-    def _headers(self) -> dict[str, str]:
-        return {
-            "Authorization": f"Bearer {self.api_key}",
-            "Content-Type": "application/json",
-            "Accept": "application/json"
-        }
-
-    def _format_pickup_window(self, shipment):
-        return {
-            "min_datetime": shipment.pickup_window_start.isoformat(),
-            "max_datetime": shipment.pickup_window_end.isoformat()
-        }
-
-
     def create_shipment(self, shipment) -> dtos.CreateShipmentResult:
-        pickup_details = self._format_pickup_window(shipment)
 
-        payload: dict[str, Any] = {
-            # optional: can be grabbed from line item pickup address
-            "to_address": as_dict(shipment.shipment_address),
-            "parcel": self._build_parcel_payload(shipment),
-            "pickup_details": pickup_details if shipment.shipment_method == enums.ShipmentMethod.PICKUP else None
-            "options": {}
-        }
+        easypost_shipment = self.client.shipment.create(
+            from_address=shipment.pickup_address,
+            to_address=as_dict(shipment.shipment_address),
+            parcel=self._build_parcel_payload(shipment)
+            metadata={
+                "shipment_id": shipment.shipment_id
+            }
+        )
 
-        # add metadata for webhook tracking, TODO tenant_id need to pass?
-        payload["metadata"] = {
-            "shipment_id": shipment.shipment_id
-        }
+        bought_shipment = self.client.shipment.buy(easypost_shipment.id, rate=easypost_shipment.lowest_rate())
 
-        headers = {"Authorization": f"Bearer {self.api_key}"}
-        try:
-            response = requests.post(
-                f"{self.endpoint}/shipments", 
-                json=payload, 
-                headers=self._headers(),
-                timeout=20
-            )
-            response.raise_for_status()
-        except Exception as e:
-            raise exceptions.ShippingProviderIntegrationError(f"{ShippingProviderEnum.EASYPOST} request failed: {e}")
+        tracker = bought_shipment.get("tracker", {})
+        tracking_code = tracker.get("tracking_code") or bought_shipment.get("tracking_code")
 
-        data = response.json()
+        label_url = bought_shipment.get("postage_label").get("label_url")
 
-        rate_info = self._select_rate(data)
+
+        rate_info = easypost_shipment.lowest_rate()
         total_amount = rate_info["amount"]
         currency = rate_info["currency"]
 
-        #Easy post request explicit buy step to dispatch
-        tracking_number, label_url = self._buy_shipment(data["id"], rate_info["id"])
+        #Option for pickup
+        if shipment.shipment_method == enums.ShipmentMethod.PICKUP:
+            self._schedule_pickup(
+                easypost_shipment_id,
+                shipment
+            )
+
 
         return dtos.CreateShipmentResult(
-            tracking_number=tracking_number,
+            tracking_number=tracking_code,
             total_amount=dtos.Money(
                 amount=total_amount,
                 currency=currency
@@ -78,6 +58,8 @@ class EasyPostShippingProvider:
         )
     
     def _build_parcel_payload(self, shipment):
+
+        #TODO conver weight to oz, dimension from cm to in?
         
         if shipment.package_weight:
             total_weight = shipment.package_weight
@@ -103,43 +85,29 @@ class EasyPostShippingProvider:
                 "height": height
             }
 
-    def _select_rate(self, data: dict[str, Any]) -> dict[str, Any]:
-        rates = data.get("rates", [])
-        if not rates:
-            raise exceptions.ShippingProviderIntegrationError("No shipping rates returned from EasyPost.")
+    def _schedule_pickup(self, easypost_shipment_id, shipment, carrier_account_id=None):
 
-        selected = next((r for r in rates if r.get("selected")), None)
-        candidate = selected or min(rates, key=lambda r: Decimal(r.get("rate") or "0"))
-
-        return {
-            "id": candidate.get("id"),
-            "amount": Decimal(candidate.get("rate") or "0"),
-            "currency": candidate.get("currency")
+        pickup_params = {
+            "address": shipment.pickup_address,
+            "shipment": {"id": easypost_shipment_id},
+            "min_datetime": shipment.pickup_window_start.strftime("%Y-%m-%d %H:%M:%S"),
+            "max_datetime": shipment.pickup_window_end.strftime("%Y-%m-%d %H:%M:%S"),
+            "is_account_address": False,
+            "instructions": shipment.pickup_instructions
         }
 
-    def _buy_shipment(self, shipment_id: str, rate_id: str) -> str:
-        try:
-            resp = request.post(
-                f"{self.endpoint}/shipments/{shipment_id}/buy",
-                json={"rate": {"id": rate_id}},
-                headers=self._headers(),
-                timeout=20
-            )
-            resp.raise_for_status()
-        except request.RequestException as e:
-            raise exceptions.ShippingProviderIntegrationError(f"{ShippingProviderEnum.EASYPOST} shipment buy failed: {e}")
+        #Optional specify carrier account for pickup
+        if carrier_account_id:
+            pickup_params["carrier_accounts"] = [{"id": carrier_account_id}]
 
-        buy_data = resp.json()
-        tracker = buy_data.get("tracker", {})
-        tracking_code = tracker.get("tracking_code") or buy_data.get("tracking_code")
+        # create pickup object
+        pickup = self.client.pickup.create(**pickup_params)
 
-        label_url = buy_data.get("postage_label").get("label_url")
+        bought_pickup = self.client.pickup.buy(
+            pickup.id,
+            rate=pickup.lowest_rate()
+        )
 
-        if not tracking_code:
-            raise exceptions.ShippingProviderIntegrationError(f"Missing tracking code after {ShippingProviderEnum.EASYPOST} buy step.")
-        
-        return tracking_code, label_url
+        return bought_pickup
 
-       
-       
-       
+

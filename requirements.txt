@@ -12,6 +12,7 @@ curtsies==0.4.2
 cwcwidth==0.1.9
 Django==5.2.6
 django-cors-headers==4.6.0
+easypost==10.1.0
 exceptiongroup==1.2.2
 graphene==3.4.3
 graphene-django==3.2.2
