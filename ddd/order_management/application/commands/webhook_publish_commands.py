@@ -1,6 +1,6 @@
 from pydantic import BaseModel, constr
 from ddd.order_management.application import dtos
-from .commands import Command
+from .commands import Command, AddOrderCommand
 
 class Command2(Command):
     event_type: str
@@ -11,7 +11,5 @@ class Command2(Command):
 #    "data": { ... }
 # }
 
-#TODO data
-class PublishCreateOrderCommand(Command2):
-    pass
-    #data: dtos.VendorProductSnapshotDTO
+class PublishAddOrderCommand(Command2):
+    data: dtos.AddOrderDTO

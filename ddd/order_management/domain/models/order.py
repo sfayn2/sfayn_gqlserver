@@ -1,4 +1,5 @@
 from __future__ import annotations
+import uuid
 from datetime import datetime
 from dataclasses import dataclass, field
 from typing import Optional, List, Tuple
@@ -13,10 +14,10 @@ from ddd.order_management.domain.services import DomainClock
 @dataclass
 class Order:
     tenant_id: str
-    order_id: str = str(uuid.uuid4())
 
     customer_details: value_objects.CustomerDetails
 
+    order_id: str = str(uuid.uuid4())
     currency: Optional[str] = None
     order_status: enums.OrderStatus = enums.OrderStatus.DRAFT
     payment_status: enums.PaymentStatus = enums.PaymentStatus.UNPAID

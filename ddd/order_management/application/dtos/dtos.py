@@ -121,7 +121,18 @@ class ShipmentItemDTO(BaseModel):
     quantity: int
 
 # use for shipping provider
-class CreateShipmentResult:
+class CreateShipmentResultDTO(BaseModel):
     tracking_number: str
     total_amount: MoneyDTO
     label_url: str
+
+class ConfirmShipmentDTO(BaseModel):
+    tenant_id: str
+    order_id: str
+    shipment_id: str
+    order_status: enums.OrderStatus
+
+class AddOrderDTO(BaseModel):
+    external_ref: str
+    customer_details: CustomerDetailsDTO
+    product_skus: List[ProductSkusDTO]

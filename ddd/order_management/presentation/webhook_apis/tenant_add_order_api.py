@@ -6,7 +6,7 @@ from ddd.order_management.application import (
 from ddd.order_management.application.services import WebhookValidationService
 
 @csrf_exempt
-def tenant_create_order_api(request, tenant_id: str):
+def tenant_add_order_api(request, tenant_id: str):
 
     if request.method != "POST":
         return HttpResponseBadRequest("Only POST is allowed")
@@ -17,7 +17,7 @@ def tenant_create_order_api(request, tenant_id: str):
                 request
             )
         
-        command = commands.PublishCreateOrderCommand.model_validate(payload)
+        command = commands.PublishAddOrderCommand.model_validate(payload)
         result = message_bus.handle(command)
         return JsonResponse(result.model_dump())
     except Exception as e:

@@ -1,5 +1,6 @@
 import uuid
 from abc import ABC
+from decimal import Decimal
 from pydantic import BaseModel, constr
 from typing import Union, List, Optional
 from datetime import datetime
@@ -38,8 +39,8 @@ class AddShipmentCommand(Command):
 
     # pickup mode
     pickup_address: Optional[dtos.AddressDTO] = None
-    pickup_window_start: Optional[DateTime] = None
-    pickup_window_end: Optional[DateTime] = None
+    pickup_window_start: Optional[datetime] = None
+    pickup_window_end: Optional[datetime] = None
     pickup_instructions: Optional[str] = None
 
     shipment_address: dtos.AddressDTO
@@ -59,7 +60,5 @@ class CancelShipmentCommand(Command):
     order_id: str
     shipment_id: str
 
-class AddOrderCommand(Command):
-    external_ref: str
-    customer_details: dtos.CustomerDetailsDTO
-    product_skus: List[dtos.ProductSkusDTO]
+class AddOrderCommand(Command, dtos.AddOrderDTO):
+    pass

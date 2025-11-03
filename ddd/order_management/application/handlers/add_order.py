@@ -27,16 +27,16 @@ def handle_add_order(
             )
 
             
-            confirmed_order = uow.order.create_order(
+            order = uow.order.create_order(
                 customer_details=mappers.CustomerDetailsMapper.to_domain(command.customer_details),
                 line_items=[mappers.LineItemMapper.to_domain(sku) for sku in command.product_skus],
-                tenant_id=tenant_id
+                tenant_id=user_ctx.tenant_id
             )
 
 
             user_action_service.save_action(
                 dtos.UserActionDTO(
-                    order_id=command.order_id,
+                    order_id=order.order_id,
                     action="add_order",
                     performed_by=user_ctx.sub,
                     user_input=command.model_dump(exclude_none=True)
@@ -48,7 +48,7 @@ def handle_add_order(
 
             return dtos.ResponseDTO(
                 success=True,
-                message=f"OMS successfully add new order."
+                message=f"Order successfully created."
             )
 
 

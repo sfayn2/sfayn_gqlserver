@@ -20,6 +20,6 @@ from .user_action_commands import (
 
 
 from .webhook_publish_commands import (
-    PublishCreateOrderCommand
+    PublishAddOrderCommand
 )
 

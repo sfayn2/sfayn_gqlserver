@@ -7,12 +7,12 @@ from ddd.order_management.application import (
 )
 from ddd.order_management.domain import events, exceptions
 
-def handle_publish_create_order(
-    command: commands.PublishCreateOrderCommand, 
+def handle_publish_add_order(
+    command: commands.PublishAddOrderCommand, 
     event_publisher: ports.EventPublisherAbstract
 ):
     try:
-        event = dtos.CreateOrderIntegrationEvent(
+        event = dtos.AddOrderIntegrationEvent(
             **command.model_dump()
         )
 
@@ -20,7 +20,7 @@ def handle_publish_create_order(
 
         return dtos.ResponseDTO(
             success=True,
-            message="Tenant Create order has been published."
+            message="New order has been publish to queue."
         )
 
     except exceptions.InvalidOrderOperation as e:

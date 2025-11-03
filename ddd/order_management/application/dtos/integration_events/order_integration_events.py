@@ -7,8 +7,8 @@ from ddd.order_management.application import dtos
 
 
 class ConfirmedShipmentIntegrationEvent(IntegrationEvent):
-    tenant_id: str
-    order_id: str
-    shipment_id: str
-    order_status: enums.OrderStatus
+    data: dtos.ConfirmShipmentDTO
+    
 
+class AddOrderIntegrationEvent(IntegrationEvent):
+    data: dtos.AddOrderDTO

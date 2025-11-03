@@ -10,7 +10,7 @@ from .utils import kg_to_lb, kg_to_oz, cm_to_in
 
 #Protocol: ports.ShippingProviderAbstract
 class EasyPostShippingProvider:
-    name = ShippingProviderEnums.EASYPOST
+    name = ShippingProviderEnum.EASYPOST
 
     def __init__(self, api_key: str, endpoint: str ):
         self.client = easypost.EasyPostClient(self.api_key)
@@ -49,7 +49,7 @@ class EasyPostShippingProvider:
             )
 
 
-        return dtos.CreateShipmentResult(
+        return dtos.CreateShipmentResultDTO(
             tracking_number=tracking_code,
             total_amount=dtos.Money(
                 amount=total_amount,

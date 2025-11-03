@@ -8,7 +8,7 @@ from .enums import ShippingProviderEnum
 
 #Protocol: ports.ShippingProviderAbstract
 class NinjaVanShippingProvider:
-    name = ShippingProviderEnums.NINJAVAN
+    name = ShippingProviderEnum.NINJAVAN
 
     def __init__(self, api_key: str, endpoint: str):
         self.api_key = api_key
@@ -71,10 +71,10 @@ class NinjaVanShippingProvider:
 
         data = response.json()
 
-        return dtos.CreateShipmentResult(
+        return dtos.CreateShipmentResultDTO(
             tracking_number=data.get("tracking_number") or data.get("id"),
             total_amount=dtos.Money(
-                amount=Decimal("0")
+                amount=Decimal("0"),
                 currency="SGD"
             ),
             label_url=data.get("label_url")

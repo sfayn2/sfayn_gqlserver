@@ -8,7 +8,7 @@ from .enums import ShippingProviderEnum
 
 #Protocol: ports.ShippingProviderAbstract
 class ShipBobShippingProvider:
-    name = ShippingProviderEnums.SHIPBOB
+    name = ShippingProviderEnum.SHIPBOB
 
     def __init__(self, api_key: str, endpoint: str):
         self.api_key = api_key
@@ -63,10 +63,10 @@ class ShipBobShippingProvider:
 
         data = response.json()
 
-        return dtos.CreateShipmentResult(
+        return dtos.CreateShipmentResultDTO(
             tracking_number=data.get("tracking_number") or data.get("id"),
             total_amount=dtos.Money(
-                amount=data.get("shipping_cost", 0)
+                amount=data.get("shipping_cost", 0),
                 currency=data.get("currency")
             ),
             label_url=data.get("label_url")

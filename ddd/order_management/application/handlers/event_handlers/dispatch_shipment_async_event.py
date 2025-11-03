@@ -14,22 +14,23 @@ def handle_dispatch_shipment_async_event(
 
     with uow:
 
-        order = uow.order.get(order_id=event.order_id, tenant_id=event.tenant_id)
-        shipment = order.get_shipment(shipment_id=event.shipment_id)
+        data = event.data
+        order = uow.order.get(order_id=data.order_id, tenant_id=data.tenant_id)
+        shipment = order.get_shipment(shipment_id=data.shipment_id)
 
-        provider_result = shipping_provider_service.create_shipment(event.tenant_id, shipment) 
+        provider_result = shipping_provider_service.create_shipment(data.tenant_id, shipment) 
 
         user_action_service.save_action(
             dtos.UserActionDTO(
-                order_id=event.order_id,
+                order_id=data.order_id,
                 action="dispatch_shipment",
                 performed_by="system",
-                user_input=event.dict()
+                user_input=data.dict()
             )
         )
 
         order.apply_shipment_dispatch(
-            event.shipment_id, 
+            data.shipment_id, 
             provider_result.tracking_reference, 
             provider_result.total_amount,
             provider_result.label_url
@@ -39,4 +40,7 @@ def handle_dispatch_shipment_async_event(
         uow.order.save(order)
         uow.commit()
 
-        print(f"Dispatched Shipment id {event.shipment_id}")
+        return dtos.ResponseDTO(
+            success=True,
+            message=f"Dispatched Shipment id {order.order_id} successfully created."
+        )
