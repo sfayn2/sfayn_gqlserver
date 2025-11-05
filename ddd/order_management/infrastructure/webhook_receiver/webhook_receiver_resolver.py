@@ -8,18 +8,18 @@ from .wss_webhook_receiver import WssWebhookReceiver
 
 class WebhookReceiverResolver:
     @staticmethod
-    def resolve(config: dict):
-        webhook_cfg = config.get("webhook")
-        if webhook_cfg.get("provider") == "EASYPOST":
+    def resolve(cfg: dict):
+        provider_name = cfg.get("provider_name")
+        if provider_name == "EASYPOST":
             return EasyPostWebhookReceiver(
-                shared_secret=webhook_cfg.get("shared_secret"),
-                max_age=webhook_cfg.get("max_age", None),
+                shared_secret=cfg.get("shared_secret"),
+                max_age=cfg.get("max_age", None),
             )
-        elif webhook_cfg.get("provider") == "GITHUB":
+        elif provider_name == "GITHUB":
             return GithubWebhookReceiver(
-                shared_secret=webhook_cfg.get("shared_secret")
+                shared_secret=cfg.get("shared_secret")
             )
-        elif webhook_cfg.get("provider") == "WSS":
+        elif provider_name == "WSS":
             return WssWebhookReceiver(
-                shared_secret=webhook_cfg.get("shared_secret")
+                shared_secret=cfg.get("shared_secret")
             )

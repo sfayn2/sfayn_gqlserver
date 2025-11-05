@@ -9,23 +9,22 @@ from .shipbob_provider import ShipBobShippingProvider
 
 class ShippingProviderResolver:
     @staticmethod
-    def resolve(config: dict):
-        shipping_cfg = config.get("shipping")
-        provider_type = shipping_cfg.get("provider")
-        if provider_type == "EASYPOST":
+    def resolve(cfg: dict):
+        provider_name = cfg.get("provider_name")
+        if provider_name == "EASYPOST":
             return EasyPostShippingProvider(
-                api_key=shipping_cfg.get("api_key"),
-                endpoint=shipping_cfg.get("endpoint"),
+                api_key=cfg.get("api_key"),
+                endpoint=cfg.get("endpoint"),
             )
-        elif provider_type == "NINJAVAN":
+        elif provider_name == "NINJAVAN":
             return NinjaVanShippingProvider(
-                api_key=shipping_cfg.get("api_key"),
-                endpoint=shipping_cfg.get("endpoint"),
+                api_key=cfg.get("api_key"),
+                endpoint=cfg.get("endpoint"),
             )
-        elif provider_type == "SHIPBOB":
+        elif provider_name == "SHIPBOB":
             return ShipBobShippingProvider(
-                api_key=shipping_cfg.get("api_key"),
-                endpoint=shipping_cfg.get("endpoint"),
+                api_key=cfg.get("api_key"),
+                endpoint=cfg.get("endpoint"),
             )
-        elif provider_type == "SELFDELIVERY":
+        elif provider_name == "SELFDELIVERY":
             return SelfDeliveryProvider()

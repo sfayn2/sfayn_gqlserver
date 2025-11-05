@@ -40,7 +40,7 @@ class WebhookValidationService:
 
     @classmethod
     def _get_provider(cls, tenant_id: str):
-        saas_configs = cls.saas_service.get_tenant_config(tenant_id).configs.get("shipping_provider", {})
+        saas_configs = cls.saas_service.get_tenant_config(tenant_id).configs.get("webhook_provider", {})
         return cls.webhook_receiver_resolver.resolve(saas_configs)
 
 
