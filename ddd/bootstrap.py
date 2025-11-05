@@ -62,6 +62,13 @@ application_services.ShippingProviderService.configure(
 # ============== domain clock =============
 domain_services.DomainClock.configure(clocks.UTCClock())
 
+#================ logging ============
+loggings.LoggingFactory.configure(
+    loggings.StdLogProvider("tenant_oms_api")
+)
+logger = loggings.LoggingFactory.get_logger()
+logger.log("System initiated")
+
 # ========= webhook validation =============
 #application_services.webhook_validation_service.SIGNATURE_VERIFIER = {
 #    "wss": lambda tenant_id: webhook_signatures.WssSignatureVerifier(shared_secret=os.getenv(f"WH_SECRET_{tenant_id}"))
@@ -130,7 +137,7 @@ event_bus.EVENT_HANDLERS.update({
             lambda event, uow: handlers.handle_logged_order(
                 event=event,
                 uow=uow,
-                logging=loggings.SampleLogging()
+                logger=logger
             ),
             lambda event, uow: handlers.handle_email_canceled_order(
                 event=event, 

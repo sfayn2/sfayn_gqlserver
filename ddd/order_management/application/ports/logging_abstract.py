@@ -1,7 +1,8 @@
 from __future__ import annotations
-from abc import ABC, abstractmethod
+from typing import Protocol, Any
 
-class LoggingAbstract(ABC):
-    @abstractmethod
-    def log(self, message: str):
-        raise NotImplementedError("Subclasses must implement this method")
+class LoggingAbstract(Protocol):
+    def log(self, message: str, **kwargs: Any) -> None: ...
+    #def warning(self, message: str, **kwargs: Any) -> None: ...
+    #def error(self, message: str, **kwargs: Any) -> None: ...
+    #def debug(self, message: str, **kwargs: Any) -> None: ...
