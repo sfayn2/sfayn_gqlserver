@@ -63,11 +63,11 @@ application_services.ShippingProviderService.configure(
 domain_services.DomainClock.configure(clocks.UTCClock())
 
 #================ logging ============
-loggings.LoggingFactory.configure(
+logger = loggings.LoggingFactory.configure(
     loggings.StdLogProvider("tenant_oms_api")
 )
-logger = loggings.LoggingFactory.get_logger()
-logger.log("System initiated")
+#logger = loggings.LoggingFactory.get_logger()
+#logger.log("System initiated")
 
 # ========= webhook validation =============
 #application_services.webhook_validation_service.SIGNATURE_VERIFIER = {

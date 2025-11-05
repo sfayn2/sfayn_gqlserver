@@ -7,8 +7,9 @@ class LoggingFactory:
         cls._provider = provider
 
     @classmethod
-    def get_logger(cls) -> ports.LoggingAbstract:
+    def log(cls, message: str, **kwargs: Any) -> None:
+    #def get_logger(cls) -> ports.LoggingAbstract:
         # Prep for multi logger based on Tenant?
         if cls._provider is None:
             raise RuntimeError("Logging provider not configured")
-        return cls._provider
+        return cls._provider.log(message, **kwargs or None)
