@@ -4,11 +4,9 @@ from decimal import Decimal
 from dataclasses import asdict
 from ddd.order_management.application import dtos
 from ddd.order_management.domain import enums
-from .enums import ShippingProviderEnum
 
 #Protocol: ports.ShippingProviderAbstract
 class ShipBobShippingProvider:
-    name = ShippingProviderEnum.SHIPBOB
 
     def __init__(self, api_key: str, endpoint: str):
         self.api_key = api_key

@@ -4,7 +4,8 @@ from typing import Dict, Any, Type
 from ddd.order_management.application import ports, dtos
 from ddd.order_management.domain import exceptions
 
-class RedisEventPayloadDecoder(ports.EventPayloadDecoderAbstract):
+# EventPayloadDecoderAbstract
+class RedisEventPayloadDecoder:
 
     def __init__(self, event_models: Dict[str, Type[dtos.IntegrationEvent]]):
         self.event_models = event_models

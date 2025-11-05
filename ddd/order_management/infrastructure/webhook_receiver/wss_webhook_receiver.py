@@ -4,7 +4,13 @@ import hmac, hashlib
 from ddd.order_management.application import ports
 from ddd.order_management.domain.services import DomainClock
 
-class WssSignatureVerifier(ports.WebhookSignatureVerifier):
+
+
+# Webhook sender service usually have their own headers requirement
+
+# WebhookReceiverAbstract
+class WssWebhookReceiver:
+
     def __init__(self, shared_secret: str, max_age: int = 3000):
         self.secret = shared_secret
         self.max_age = max_age

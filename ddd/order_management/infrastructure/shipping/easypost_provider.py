@@ -5,12 +5,10 @@ from decimal import Decimal
 from dataclasses import asdict
 from ddd.order_management.application import dtos
 from ddd.order_management.domain import enums
-from .enums import ShippingProviderEnum
 from .utils import kg_to_lb, kg_to_oz, cm_to_in
 
 #Protocol: ports.ShippingProviderAbstract
 class EasyPostShippingProvider:
-    name = ShippingProviderEnum.EASYPOST
 
     def __init__(self, api_key: str, endpoint: str ):
         self.client = easypost.EasyPostClient(self.api_key)

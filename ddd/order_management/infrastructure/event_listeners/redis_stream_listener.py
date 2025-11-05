@@ -1,3 +1,4 @@
+from __future__ import annotations
 import redis
 import json
 from typing import List, Dict, Optional
@@ -17,7 +18,8 @@ from ddd.order_management.domain import exceptions
 # ===========
 # To consumer any stream service 
 
-class RedisStreamListener(ports.EventListenerAbstract):
+# EventListenerAbstract
+class RedisStreamListener:
     def __init__(self, event_payload_decoder: Optional[ports.EventPayloadDecoderAbstract], redis_client: redis.Redis, stream_name: str, consumer_name: str, group_name: str = "order_management_service", event_handlers: Dict[str, List] = {}):
         #self.redis_client = redis.Redis.from_url('redis://localhost:6379', decode_responses=True)
         self.redis_client = redis_client

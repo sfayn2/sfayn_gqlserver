@@ -1,7 +1,9 @@
+from __future__ import annotations
 import hmac, hashlib
-from ddd.order_management.application import ports
 
-class GithubSignatureVerifier(ports.WebhookSignatureVerifier):
+# WebhookReceiverAbstract
+class GithubWebhookReceiver:
+
     def __init__(self, shared_secret: str):
         self.secret = shared_secret.encode()
 

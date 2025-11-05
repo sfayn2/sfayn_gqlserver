@@ -4,7 +4,6 @@ from ddd.order_management.application import dtos
 
 #Protocol: ports.ShippingProviderAbstract
 class SelfDeliveryProvider:
-    name = "SelfDelivery"
 
     def is_self_delivery(self) -> bool:
         return True

@@ -12,9 +12,8 @@ from ddd.order_management.infrastructure import (
     loggings,
     repositories,
     access_control1,
-    snapshots,
     event_publishers,
-    webhook_signatures,
+    webhook_receiver,
     clocks,
     user_action_service,
     tenant_service,
@@ -63,20 +62,14 @@ application_services.ShippingProviderService.configure(
 domain_services.DomainClock.configure(clocks.UTCClock())
 
 #================ logging ============
-logger = loggings.LoggingFactory.configure(
+loggings.LoggingFactory.configure(
     loggings.StdLogProvider("tenant_oms_api")
 )
-#logger = loggings.LoggingFactory.get_logger()
-#logger.log("System initiated")
 
 # ========= webhook validation =============
-#application_services.webhook_validation_service.SIGNATURE_VERIFIER = {
-#    "wss": lambda tenant_id: webhook_signatures.WssSignatureVerifier(shared_secret=os.getenv(f"WH_SECRET_{tenant_id}"))
-#}
-
 application_services.WebhookValidationService.configure(
     saas_service=saas_service_instance,
-    signature_verifier=webhook_signatures.WssSignatureVerifier
+    webhook_receiver_resolver=webhook_receiver.WebhookReceiverResolver
 )
 
 
@@ -137,7 +130,7 @@ event_bus.EVENT_HANDLERS.update({
             lambda event, uow: handlers.handle_logged_order(
                 event=event,
                 uow=uow,
-                logger=logger
+                logger=logging.LoggingFactory
             ),
             lambda event, uow: handlers.handle_email_canceled_order(
                 event=event, 

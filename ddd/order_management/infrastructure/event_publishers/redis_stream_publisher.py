@@ -1,3 +1,4 @@
+from __future__ import annotations
 import json
 import redis
 from typing import List
@@ -5,7 +6,8 @@ from decimal import Decimal
 
 from ddd.order_management.application import ports
 
-class RedisStreamPublisher(ports.EventPublisherAbstract):
+#EventPublisherAbstract
+class RedisStreamPublisher:
     def __init__(self, redis_client: redis.Redis, stream_name: str, event_whitelist: List[str]):
         #self.redis_client = redis.Redis.from_url('redis://localhost:6379')
         self.redis_client = redis_client

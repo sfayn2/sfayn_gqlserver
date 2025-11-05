@@ -33,23 +33,21 @@ from typing import Dict
 class WebhookValidationService:
 
     @classmethod
-    def configure(cls, saas_service, signature_verifier):
+    def configure(cls, saas_service, webhook_receiver_resolver):
         cls.saas_service = saas_service
-        cls.signature_verifier = signature_verifier
+        cls.webhook_receiver_resolver = webhook_receiver_resolver
+
 
     @classmethod
-    def _get_verifier_for_tenant(cls, tenant_id: str):
-        saas_config = cls.saas_service.get_tenant_config(tenant_id)
-        shared_secret = saas_config.configs.get("webhook_secret", {})
-        if not shared_secret:
-            raise Exception(f"No webhook secret configured for tenant {tenant_id}")
-
-        return cls.signature_verifier(shared_secret)
+    def _get_provider(cls, tenant_id: str):
+        saas_configs = cls.saas_service.get_tenant_config(tenant_id).configs.get("shipping_provider", {})
+        return cls.webhook_receiver_resolver.resolve(saas_configs)
 
 
     @classmethod
     def validate(cls, tenant_id: str, request):
-        verifier = cls._get_verifier_for_tenant(tenant_id)
+        #verifier = cls._get_verifier_for_tenant(tenant_id)
+        verifier = self._get_provider(tenant_id)
 
         if not verifier.verify(request.headers, request.body):
             raise Exception("Invalid signature")

@@ -13,6 +13,7 @@ from ddd.order_management.domain import exceptions
 def handle_cancel_order(
         command: commands.CancelOrderCommand, 
         access_control: AccessControl1Abstract,
+        logger: LogProviderAbstract,
         user_ctx: dtos.UserContextDTO,
         user_action_service: UserActionServiceAbstract,
         uow: UnitOfWorkAbstract) -> dtos.ResponseDTO:

@@ -5,28 +5,27 @@ from .self_delivery_provider import SelfDeliveryProvider
 from .easypost_provider import EasyPostShippingProvider
 from .ninjavan_provider import NinjaVanShippingProvider
 from .shipbob_provider import ShipBobShippingProvider
-from .enums import ShippingProviderEnum
 
 
 class ShippingProviderResolver:
     @staticmethod
     def resolve(config: dict):
-        provider_cfg = config.get("shipping_provider")
-        provider_type = provider_cfg.get("type")
-        if provider_type == ShippingProviderEnum.EASYPOST.value:
+        shipping_cfg = config.get("shipping")
+        provider_type = shipping_cfg.get("provider")
+        if provider_type == "EASYPOST":
             return EasyPostShippingProvider(
-                api_key=provider_cfg.get("api_key"),
-                endpoint=provider_cfg.get("endpoint"),
+                api_key=shipping_cfg.get("api_key"),
+                endpoint=shipping_cfg.get("endpoint"),
             )
-        elif provider_type == ShippingProviderEnum.NINJAVAN.value:
+        elif provider_type == "NINJAVAN":
             return NinjaVanShippingProvider(
-                api_key=provider_cfg.get("api_key"),
-                endpoint=provider_cfg.get("endpoint"),
+                api_key=shipping_cfg.get("api_key"),
+                endpoint=shipping_cfg.get("endpoint"),
             )
-        elif provider_type == ShippingProviderEnum.SHIPBOB.value:
+        elif provider_type == "SHIPBOB":
             return ShipBobShippingProvider(
-                api_key=provider_cfg.get("api_key"),
-                endpoint=provider_cfg.get("endpoint"),
+                api_key=shipping_cfg.get("api_key"),
+                endpoint=shipping_cfg.get("endpoint"),
             )
-        elif provider_type == ShippingProviderEnum.SELFDELIVERY.value:
+        elif provider_type == "SELFDELIVERY":
             return SelfDeliveryProvider()
