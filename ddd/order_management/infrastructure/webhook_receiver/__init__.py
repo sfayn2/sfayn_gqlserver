@@ -1,1 +1,2 @@
-from .webhook_receiver_resolver import WebhookReceiverResolver
+from .webhook_receiver_factory import WebhookReceiverFactory
+from .webhook_receiver_service import WebhookReceiverService

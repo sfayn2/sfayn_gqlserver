@@ -55,21 +55,21 @@ application_services.AccessControlService.configure(
 # =============== resolve shipping provider based on tenant_id ========
 application_services.ShippingProviderService.configure(
     saas_service=saas_service_instance,
-    shipping_provider_resolver=shipping.ShippingProviderResolver
+    shipping_provider_factory=shipping.ShippingProviderFactory
 )
 
 # ============== domain clock =============
 domain_services.DomainClock.configure(clocks.UTCClock())
 
 #================ logging ============
-loggings.LoggingFactory.configure(
+loggings.LoggingService.configure(
     loggings.StdLogProvider("tenant_oms_api")
 )
 
-# ========= webhook validation =============
-application_services.WebhookValidationService.configure(
+# ========= webhook receiver  =============
+webhook_receiver.WebhookReceiverService.configure(
     saas_service=saas_service_instance,
-    webhook_receiver_resolver=webhook_receiver.WebhookReceiverResolver
+    webhook_receiver_factory=webhook_receiver.WebhookReceiverFactory
 )
 
 

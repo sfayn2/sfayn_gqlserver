@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Any
+from typing import Any, Optional
 from datetime import datetime
 from .self_delivery_provider import SelfDeliveryProvider
 from .easypost_provider import EasyPostShippingProvider
@@ -7,10 +7,22 @@ from .ninjavan_provider import NinjaVanShippingProvider
 from .shipbob_provider import ShipBobShippingProvider
 
 
-class ShippingProviderResolver:
+# Define a custom exception for better error clarity
+class UnknownShippingProviderError(Exception):
+    """Raised when the requested shipping provider name is unknown."""
+    pass
+
+
+class ShippingProviderFactory:
+    
     @staticmethod
-    def resolve(cfg: dict):
-        provider_name = cfg.get("provider_name")
+    def get_shipping_provider(cfg: dict) -> ports.ShippingProviderAbstract:
+        """
+        Factory method to create the appropriate ShippingProvider instance 
+        based on configuration.
+        """
+        provider_name = cfg.get("provider_name", "").upper()
+        
         if provider_name == "EASYPOST":
             return EasyPostShippingProvider(
                 api_key=cfg.get("api_key"),
@@ -28,3 +40,9 @@ class ShippingProviderResolver:
             )
         elif provider_name == "SELFDELIVERY":
             return SelfDeliveryProvider()
+        else:
+            # Raise a specific, informative exception
+            raise UnknownShippingProviderError(
+                f"Configuration error: Unknown shipping provider name '{provider_name}'."
+            )
+

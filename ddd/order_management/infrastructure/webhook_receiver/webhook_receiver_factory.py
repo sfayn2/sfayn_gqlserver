@@ -1,0 +1,48 @@
+from __future__ import annotations
+from typing import Any, Dict, Type
+from datetime import datetime
+from .easypost_webhook_receiver import EasyPostWebhookReceiver
+from .github_webhook_receiver import GithubWebhookReceiver
+from .wss_webhook_receiver import WssWebhookReceiver
+
+
+# Define a custom exception for better error clarity
+class UnknownProviderError(Exception):
+    """Raised when the requested webhook provider is unknown."""
+    pass
+
+class WebhookReceiverFactory:
+    
+    # A dictionary mapping provider names (lowercase) to their class constructors
+    _RECEIVER_MAP: Dict[str, Any] = {
+        "easypost": EasyPostWebhookReceiver,
+        "github": GithubWebhookReceiver,
+        "wss": WssWebhookReceiver,
+    }
+
+    @staticmethod
+    def get_webhook_receiver(cfg: dict) -> WebhookReceiverInterface:
+        provider_name = cfg.get("provider_name", "").lower()
+        
+        # Use dictionary lookup to find the correct class
+        receiver_class = WebhookReceiverFactory._RECEIVER_MAP.get(provider_name)
+
+        if receiver_class:
+            # Pass configuration parameters to the constructor dynamically as needed
+            # This logic depends on which parameters each class expects
+            if provider_name == "easypost":
+                 return receiver_class(
+                    shared_secret=cfg.get("shared_secret"),
+                    max_age=cfg.get("max_age", None),
+                )
+            # for others that just need shared_secret
+            else:
+                return receiver_class(
+                    shared_secret=cfg.get("shared_secret")
+                )
+        else:
+            # Raise a clear exception if the provider name isn't found
+            raise UnknownProviderError(
+                f"No webhook receiver found for provider: '{provider_name}'"
+            )
+

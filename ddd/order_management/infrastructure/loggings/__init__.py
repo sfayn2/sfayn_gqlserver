@@ -1,2 +1,2 @@
 from .std_log_provider import StdLogProvider
-from .loggings_factory import LoggingFactory
+from .logging_service import LoggingService

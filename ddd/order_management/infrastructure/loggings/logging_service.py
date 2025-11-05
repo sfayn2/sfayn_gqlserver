@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-class LoggingFactory:
+class LoggingService:
 
     @classmethod
     def configure(cls, provider: LogProviderAbstract) -> None:

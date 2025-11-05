@@ -1,1 +1,1 @@
-from .resolver import ShippingProviderResolver
+from .factory import ShippingProviderFactory
