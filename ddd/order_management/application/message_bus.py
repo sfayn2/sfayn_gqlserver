@@ -8,8 +8,9 @@ COMMAND_HANDLERS: Dict[commands.Command, Callable[..., Any]] = {}
 
 QUERY_HANDLERS: Dict[queries.Query, Callable[..., Any]] = {}
 
-ACCESS_CONTROL_SERVICE_IMPL: Optional[ports.AccessControl1Abstract] = None
-LOGGING_SERVICE_IMPL: Optional[Any] = None
+ACCESS_CONTROL_SERVICE_IMPL: Optional[AccessControl1Abstract] = None
+#LOGGING_SERVICE_IMPL: Optional[Any] = None
+EXCEPTION_HANDLER_FACTORY = Optional[ExceptionHandlerAbstract] = None
 
 
 def handle(message: Union[commands.Command, queries.Query], **deps):
@@ -24,15 +25,16 @@ def handle(message: Union[commands.Command, queries.Query], **deps):
             if not ACCESS_CONTROL_SERVICE_IMPL:
                 raise PermissionError("Access control service definition is required to authorize user.")
 
-            if not LOGGING_SERVICE_IMPL:
-                raise Exception("Logging service definition is required")
+            #if not LOGGING_SERVICE_IMPL:
+            #    raise Exception("Logging service definition is required")
 
             access_control = ACCESS_CONTROL_SERVICE_IMPL.create_access_control(context_data.tenant_id)
             user_ctx = access_control.get_user_context(context_data.token, context_data.tenant_id)
 
             deps["access_control"] = access_control
             deps["user_ctx"] = user_ctx
-            deps["logger"] = LOGGING_SERVICE_IMPL
+            #deps["logger"] = LOGGING_SERVICE_IMPL
+            deps["exception_handler"] = EXCEPTION_HANDLER_FACTORY
 
         results = handler(message, **deps)
 

@@ -9,7 +9,7 @@ from ddd.order_management.domain import (
 from ddd.order_management.infrastructure import (
     event_bus, 
     email_senders,
-    loggings,
+    #loggings,
     repositories,
     access_control1,
     event_publishers,
@@ -18,8 +18,8 @@ from ddd.order_management.infrastructure import (
     user_action_service,
     tenant_service,
     saas_service,
-    shipping
-
+    shipping,
+    exception_handler
 )
 from ddd.order_management.application import (
     handlers,
@@ -63,10 +63,10 @@ shipping.ShippingProviderService.configure(
 # ============== domain clock =============
 domain_services.DomainClock.configure(clocks.UTCClock())
 
-#================ logging ============
-loggings.LoggingService.configure(
-    loggings.StdLogProvider("tenant_oms_api")
-)
+##================ logging ============
+#loggings.LoggingService.configure(
+#    loggings.StdLogProvider("tenant_oms_api")
+#)
 
 # ========= webhook receiver  =============
 webhook_receiver.WebhookReceiverService.configure(
@@ -141,9 +141,10 @@ event_bus.EVENT_HANDLERS.update({
         ],
 })
 
-# =========== inject onetime cross cutting =======================
+# =========== inject concrete impl / cross cutting =======================
 message_bus.ACCESS_CONTROL_SERVICE_IMPL = access_control1.AccessControlService
-message_bus.LOGGING_SERVICE_IMPL = loggings.LoggingService
+#message_bus.LOGGING_SERVICE_IMPL = loggings.LoggingService
+message_bus.EXCEPTION_HANDLER_FACTORY = exception_handler.InfrastructureExceptionHandler
 
 # ========= Command Handlers (write operations) ==================
 message_bus.COMMAND_HANDLERS.update({
