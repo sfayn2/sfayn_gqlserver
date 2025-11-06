@@ -145,61 +145,48 @@ event_bus.EVENT_HANDLERS.update({
 message_bus.ACCESS_CONTROL_SERVICE_IMPL = access_control1.AccessControlService
 #message_bus.LOGGING_SERVICE_IMPL = loggings.LoggingService
 message_bus.EXCEPTION_HANDLER_FACTORY = exception_handler.InfrastructureExceptionHandler
+message_bus.UOW = repositories.DjangoOrderUnitOfWork()
+message_bus.USER_ACTION_SERVICE_IMPL = user_action_service.UserActionService()
 
 # ========= Command Handlers (write operations) ==================
 message_bus.COMMAND_HANDLERS.update({
     commands.AddShipmentCommand: lambda command, **deps: handlers.handle_add_shipment(
         command=command,
-        user_action_service=user_action_service.UserActionService(),
-        uow=repositories.DjangoOrderUnitOfWork(),
         **deps
     ),
     commands.ConfirmShipmentCommand: lambda command, **deps: handlers.handle_confirm_shipment(
         command=command,
-        user_action_service=user_action_service.UserActionService(),
         shipping_provider_service=shipping.ShippingProviderService,
-        uow=repositories.DjangoOrderUnitOfWork(),
         **deps
     ),
     commands.AddShippingTrackingReferenceCommand: lambda command, **deps: handlers.handle_add_shipping_tracking_reference(
         command=command,
-        user_action_service=user_action_service.UserActionService(),
-        uow=repositories.DjangoOrderUnitOfWork(),
         **deps
     ),
     commands.DeliverShipmentCommand: lambda command, **deps: handlers.handle_deliver_shipment(
         command=command,
-        user_action_service=user_action_service.UserActionService(),
-        uow=repositories.DjangoOrderUnitOfWork(),
         **deps
     ),
     commands.CancelShipmentCommand: lambda command, **deps: handlers.handle_cancel_shipment(
         command=command,
-        user_action_service=user_action_service.UserActionService(),
-        uow=repositories.DjangoOrderUnitOfWork(),
         **deps
     ),
     commands.CancelOrderCommand: lambda command, **deps: handlers.handle_cancel_order(
         command=command,
-        user_action_service=user_action_service.UserActionService(),
-        uow=repositories.DjangoOrderUnitOfWork(),
         **deps
     ),
     commands.CompleteOrderCommand: lambda command, **deps: handlers.handle_mark_as_completed(
         command=command,
-        user_action_service=user_action_service.UserActionService(),
-        uow=repositories.DjangoOrderUnitOfWork(),
         **deps
     ),
     **handlers.webhook_publish_command_handlers.get_command_handlers(commands, handlers, event_bus),
-    **handlers.user_action_command_handlers.get_command_handlers(commands, handlers, repositories.DjangoOrderUnitOfWork(), application_services, user_action_service, tenant_service)
+    **handlers.user_action_command_handlers.get_command_handlers(commands, handlers, application_services, tenant_service)
 })
 
 # ================= Query Handlers (read operations) ===================
 message_bus.QUERY_HANDLERS.update({
     queries.GetOrderQuery: lambda query, **deps: handlers.handle_get_order(
         query=query, 
-        uow=repositories.DjangoOrderUnitOfWork(),
         **deps
     ),
 })

@@ -10,7 +10,9 @@ QUERY_HANDLERS: Dict[queries.Query, Callable[..., Any]] = {}
 
 ACCESS_CONTROL_SERVICE_IMPL: Optional[AccessControl1Abstract] = None
 #LOGGING_SERVICE_IMPL: Optional[Any] = None
-EXCEPTION_HANDLER_FACTORY = Optional[ExceptionHandlerAbstract] = None
+EXCEPTION_HANDLER_FACTORY: Optional[ExceptionHandlerAbstract] = None
+UOW: Optional[UnitOfWorkAbstract] = None
+USER_ACTION_SERVICE_IMPL: Optional[UserActionServiceAbstract] = None
 
 
 def handle(message: Union[commands.Command, queries.Query], **deps):
@@ -31,10 +33,12 @@ def handle(message: Union[commands.Command, queries.Query], **deps):
             access_control = ACCESS_CONTROL_SERVICE_IMPL.create_access_control(context_data.tenant_id)
             user_ctx = access_control.get_user_context(context_data.token, context_data.tenant_id)
 
+            deps["uow"] = UOW
             deps["access_control"] = access_control
             deps["user_ctx"] = user_ctx
             #deps["logger"] = LOGGING_SERVICE_IMPL
             deps["exception_handler"] = EXCEPTION_HANDLER_FACTORY
+            deps["user_action_service"] = USER_ACTION_SERVICE_IMPL
 
         results = handler(message, **deps)
 

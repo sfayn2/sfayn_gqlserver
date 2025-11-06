@@ -5,7 +5,6 @@ from ddd.order_management.application import (
     commands, 
     ports, 
     dtos, 
-    shared
 )
 from ddd.order_management.domain import exceptions
 
@@ -14,6 +13,7 @@ def handle_mark_as_completed(
         command: commands.CompleteOrderCommand, 
         access_control: AccessControl1Abstract,
         user_ctx: dtos.UserContextDTO,
+        exception_handler: ExceptionHandlerAbstract,
         user_action_service: UserActionServiceAbstract,
         uow: UnitOfWorkAbstract) -> dtos.ResponseDTO:
     try:
@@ -47,7 +47,12 @@ def handle_mark_as_completed(
 
 
     except exceptions.InvalidOrderOperation as e:
-        return shared.handle_invalid_order_operation(e)
+        # Delegate handling of EXPECTED exceptions to the infrastructure service
+        return exception_handler.handle_expected(e)
     except Exception as e:
-        return shared.handle_unexpected_error(e)
+        # Delegate handling of UNEXPECTED exceptions to the infrastructure service
+        return exception_handler.handle_unexpected(e)
+
+
+
 

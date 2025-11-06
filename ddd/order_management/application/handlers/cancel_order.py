@@ -5,7 +5,6 @@ from ddd.order_management.application import (
     commands, 
     ports, 
     dtos, 
-    shared
 )
 from ddd.order_management.domain import exceptions
 
@@ -15,6 +14,7 @@ def handle_cancel_order(
         access_control: AccessControl1Abstract,
         logger: LogProviderAbstract,
         user_ctx: dtos.UserContextDTO,
+        exception_handler: ExceptionHandlerAbstract,
         user_action_service: UserActionServiceAbstract,
         uow: UnitOfWorkAbstract) -> dtos.ResponseDTO:
     try:
@@ -48,7 +48,9 @@ def handle_cancel_order(
 
 
     except exceptions.InvalidOrderOperation as e:
-        return shared.handle_invalid_order_operation(e)
+        # Delegate handling of EXPECTED exceptions to the infrastructure service
+        return exception_handler.handle_expected(e)
     except Exception as e:
-        return shared.handle_unexpected_error(e)
+        # Delegate handling of UNEXPECTED exceptions to the infrastructure service
+        return exception_handler.handle_unexpected(e)
 
