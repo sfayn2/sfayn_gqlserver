@@ -53,7 +53,17 @@ def handle_add_order(
 
 
     except exceptions.InvalidOrderOperation as e:
+        # Use a WARNING level for handled business exceptions
+        logger.warning(
+            f"Expected error creating order for user {user_ctx.sub}. Error: {e}",
+            exc_info=False # No traceback needed for expected errors
+        )
         return shared.handle_invalid_order_operation(e)
     except Exception as e:
+        # Use an ERROR level for unexpected system crashes, include traceback (exc_info=True)
+        logger.error(
+            f"UNEXPECTED SYSTEM ERROR during order creation for user {user_ctx.sub}. Error: {e}", 
+            exc_info=True 
+        )
         return shared.handle_unexpected_error(e)
 

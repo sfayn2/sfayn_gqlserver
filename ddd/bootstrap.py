@@ -53,8 +53,6 @@ access_control1.AccessControlService.configure(
     jwt_handler=access_control1.JwtTokenHandler
 )
 
-# inject onetime
-message_bus.ACCESS_CONTROL_SERVICE_IMPL = access_control1.AccessControlService
 
 # =============== resolve shipping provider based on tenant_id ========
 shipping.ShippingProviderService.configure(
@@ -134,7 +132,6 @@ event_bus.EVENT_HANDLERS.update({
             lambda event, uow: handlers.handle_logged_order(
                 event=event,
                 uow=uow,
-                logger=logging.LoggingFactory
             ),
             lambda event, uow: handlers.handle_email_canceled_order(
                 event=event, 
@@ -143,6 +140,10 @@ event_bus.EVENT_HANDLERS.update({
             )
         ],
 })
+
+# =========== inject onetime cross cutting =======================
+message_bus.ACCESS_CONTROL_SERVICE_IMPL = access_control1.AccessControlService
+message_bus.LOGGING_SERVICE_IMPL = loggings.LoggingService
 
 # ========= Command Handlers (write operations) ==================
 message_bus.COMMAND_HANDLERS.update({
