@@ -1,1 +1,2 @@
 from .factory import ShippingProviderFactory
+from .shipping_provider_service import ShippingProviderService

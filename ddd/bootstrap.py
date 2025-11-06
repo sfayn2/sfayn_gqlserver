@@ -53,7 +53,7 @@ application_services.AccessControlService.configure(
 )
 
 # =============== resolve shipping provider based on tenant_id ========
-application_services.ShippingProviderService.configure(
+shipping.ShippingProviderService.configure(
     saas_service=saas_service_instance,
     shipping_provider_factory=shipping.ShippingProviderFactory
 )
@@ -118,7 +118,7 @@ event_bus.ASYNC_INTERNAL_EVENT_HANDLERS.update({
         lambda event: handlers.handle_dispatch_shipment_async_event(
             event=event,
             user_action_service=user_action_service.UserActionService(),
-            shipping_provider_service=application_services.ShippingProviderService,
+            shipping_provider_service=shipping.ShippingProviderService,
             uow=repositories.DjangoOrderUnitOfWork()
         ),
     ],
@@ -151,7 +151,7 @@ message_bus.COMMAND_HANDLERS.update({
     commands.ConfirmShipmentCommand: lambda command, **deps: handlers.handle_confirm_shipment(
         command=command,
         user_action_service=user_action_service.UserActionService(),
-        shipping_provider_service=application_services.ShippingProviderService,
+        shipping_provider_service=shipping.ShippingProviderService,
         uow=repositories.DjangoOrderUnitOfWork(),
         **deps
     ),
