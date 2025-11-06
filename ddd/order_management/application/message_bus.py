@@ -1,11 +1,14 @@
 
-from typing import Union, Dict, Callable, Any
+from __future__ import annotations
+from typing import Union, Dict, Callable, Any, Optional
 from ddd.order_management.application import commands, queries
 from ddd.order_management.domain import repositories
 
 COMMAND_HANDLERS: Dict[commands.Command, Callable[..., Any]] = {}
 
 QUERY_HANDLERS: Dict[queries.Query, Callable[..., Any]] = {}
+
+ACCESS_CONTROL_SERVICE_IMPL: Optional[ports.AccessControl1Abstract] = None
 
 
 def handle(message: Union[commands.Command, queries.Query], **deps):
@@ -15,18 +18,18 @@ def handle(message: Union[commands.Command, queries.Query], **deps):
         if not handler:
             raise ValueError(f"No handler registered for command: {type(message)}")
 
-        results = handler(message, **deps)
+        context_data: dtos.RequestContextDTO = deps.pop("context_data", None) 
+        if context_data:
+            if not ACCESS_CONTROL_SERVICE_IMPL:
+                raise PermissionError("Access control service definition is required to authorize user.")
 
-        #made this cross cutting
-        #user_ctx = deps.get("user_ctx") 
-        #user_action_service = deps.get("user_action_service") 
-        #if results.success == True and user_ctx and user_action_service:
-        #    user_action_service.save_action(
-        #        order_id=getattr(message, "order_id", None),
-        #        action=type(message).__name__,
-        #        performed_by=user_ctx.sub,
-        #        user_input=message.model_dump(exclude_none=True)
-        #    )
+            access_control = ACCESS_CONTROL_SERVICE_IMPL.create_access_control(context_data.tenant_id)
+            user_ctx = access_control.get_user_context(context_data.token, context_data.tenant_id)
+
+            deps["access_control"] = access_control
+            deps["user_ctx"] = user_ctx
+
+        results = handler(message, **deps)
 
         return results
     elif isinstance(message, queries.Query):

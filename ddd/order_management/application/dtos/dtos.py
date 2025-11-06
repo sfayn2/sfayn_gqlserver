@@ -136,3 +136,8 @@ class AddOrderDTO(BaseModel):
     external_ref: str
     customer_details: CustomerDetailsDTO
     product_skus: List[ProductSkusDTO]
+
+# define security context
+class RequestContextDTO(BaseModel):
+    token: str
+    tenant_id: str

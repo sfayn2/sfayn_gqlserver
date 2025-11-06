@@ -49,9 +49,12 @@ tenant_service_instance = tenant_service.TenantService()
 # ============== resolve access control based on tenant_id ===============
 access_control1.AccessControlService.configure(
     saas_service=saas_service_instance,
-    access_control1=access_control1.AccessControl1,
+    access_control_library=access_control1.AccessControl1,
     jwt_handler=access_control1.JwtTokenHandler
 )
+
+# inject onetime
+message_bus.ACCESS_CONTROL_SERVICE_IMPL = access_control1.AccessControlService
 
 # =============== resolve shipping provider based on tenant_id ========
 shipping.ShippingProviderService.configure(

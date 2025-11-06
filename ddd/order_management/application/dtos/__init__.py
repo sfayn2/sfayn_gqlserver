@@ -13,7 +13,8 @@ from .dtos import (
     ShipmentItemDTO,
     CreateShipmentResultDTO,
     ConfirmShipmentDTO,
-    AddOrderDTO
+    AddOrderDTO,
+    RequestContextDTO
 )
 
 # Integration events

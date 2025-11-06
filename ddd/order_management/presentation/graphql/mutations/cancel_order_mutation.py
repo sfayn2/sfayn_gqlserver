@@ -26,13 +26,17 @@ class CancelOrderMutation(relay.ClientIDMutation):
         token = common.get_token_from_context(info)
         request_tenant_id = common.get_tenant_id(token)
 
-        access_control = access_control_service.AccessControlService.create_access_control(request_tenant_id)
-        user_ctx = access_control.get_user_context(token, request_tenant_id)
-
+        # 1. Create a DTO with the raw necessary context data
+        context_data = dtos.RequestContextDTO( # A new DTO we define
+            token=token,
+            tenant_id=request_tenant_id
+        )
 
         command = commands.CancelOrderCommand.model_validate(input)
 
-        result = message_bus.handle(command, access_control=access_control, user_ctx=user_ctx)
+        # 2. Pass this raw context data DTO to the message bus handler
+        # The message bus (Application Layer) should handle resolving authentication/authorization logic.
+        result = message_bus.handle(command, context_data=context_data)
 
         return cls(result=object_types.ResponseType(**result.model_dump()))
 
