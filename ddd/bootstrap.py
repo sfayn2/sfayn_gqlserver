@@ -144,7 +144,7 @@ event_bus.EVENT_HANDLERS.update({
 # =========== inject concrete impl / cross cutting =======================
 message_bus.ACCESS_CONTROL_SERVICE_IMPL = access_control1.AccessControlService
 #message_bus.LOGGING_SERVICE_IMPL = loggings.LoggingService
-message_bus.EXCEPTION_HANDLER_FACTORY = exception_handler.InfrastructureExceptionHandler
+message_bus.EXCEPTION_HANDLER_FACTORY = exception_handler.OrderExceptionHandler
 message_bus.UOW = repositories.DjangoOrderUnitOfWork()
 message_bus.USER_ACTION_SERVICE_IMPL = user_action_service.UserActionService()
 

@@ -1,9 +1,10 @@
-from abc import ABC, abstractmethod
+from __future__ import annotations
 from django.db import transaction
 from ddd.order_management.infrastructure import django_mappers, event_bus, repositories as impl_repositories
 from ddd.order_management.domain import repositories
 
-class DjangoOrderUnitOfWork(repositories.UnitOfWorkAbstract):
+#ports.UnitOfWorkAbstract
+class DjangoOrderUnitOfWork:
     #make sure to call uow within block statement
     #to trigger this
     def __init__(self):

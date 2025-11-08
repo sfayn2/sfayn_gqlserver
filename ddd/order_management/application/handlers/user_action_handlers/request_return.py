@@ -5,23 +5,20 @@ from ddd.order_management.application import (
     commands, 
     ports, 
     dtos, 
-    shared
 )
 from ddd.order_management.domain import exceptions
-from ddd.order_management.domain.services import DomainClock
 
 
 def handle_request_return(
         command: commands.RequestReturnCommand, 
-        uow: UnitOfWorkAbstract,
-        access_control_factory: callable[[str], AccessControl1Abstract],
-        user_ctx: dtos.UserContextDTO
-) -> dtos.ResponseDTO:
+        uow: ports.UnitOfWorkAbstract,
+        exception_handler: ports.ExceptionHandlerAbstract,
+        access_control: ports.AccessControl1Abstract,
+        user_ctx: dtos.UserContextDTO,
+        uow: ports.UnitOfWorkAbstract) -> dtos.ResponseDTO:
 
     try:
         with uow:
-
-            access_control = access_control_factory(user_ctx.tenant_id)
 
             access_control.ensure_user_is_authorized_for(
                 user_ctx,
@@ -36,8 +33,9 @@ def handle_request_return(
 
 
     except exceptions.InvalidOrderOperation as e:
-        return shared.handle_invalid_order_operation(e)
+        # Delegate handling of EXPECTED exceptions to the infrastructure service
+        return exception_handler.handle_expected(e)
     except Exception as e:
-        return shared.handle_unexpected_error(e)
-
+        # Delegate handling of UNEXPECTED exceptions to the infrastructure service
+        return exception_handler.handle_unexpected(e)
 

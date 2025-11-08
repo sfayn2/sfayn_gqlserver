@@ -3,12 +3,12 @@ import json
 from ddd.order_management.application import (
     ports, 
     dtos,
-    shared
 )
 from ddd.order_management.domain import events, exceptions
 
 def handle_publish_add_order(
     command: commands.PublishAddOrderCommand, 
+    exception_handler: ports.ExceptionHandlerAbstract,
     event_publisher: ports.EventPublisherAbstract
 ):
     try:
@@ -24,8 +24,11 @@ def handle_publish_add_order(
         )
 
     except exceptions.InvalidOrderOperation as e:
-        return shared.handle_invalid_order_operation(e)
+        # Delegate handling of EXPECTED exceptions to the infrastructure service
+        return exception_handler.handle_expected(e)
     except Exception as e:
-        return shared.handle_unexpected_error(e)
+        # Delegate handling of UNEXPECTED exceptions to the infrastructure service
+        return exception_handler.handle_unexpected(e)
+
 
 

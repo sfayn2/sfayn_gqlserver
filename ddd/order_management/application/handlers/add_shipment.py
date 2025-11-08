@@ -1,6 +1,4 @@
 from __future__ import annotations
-import uuid
-from typing import Union
 from ddd.order_management.application import (
     mappers, 
     commands, 
@@ -12,11 +10,11 @@ from ddd.order_management.domain import exceptions
 
 def handle_add_shipment(
         command: commands.AddShipmentCommand, 
-        access_control: AccessControl1Abstract,
+        access_control: ports.AccessControl1Abstract,
         user_ctx: dtos.UserContextDTO,
-        exception_handler: ExceptionHandlerAbstract,
-        user_action_service: UserActionServiceAbstract,
-        uow: UnitOfWorkAbstract) -> dtos.ResponseDTO:
+        exception_handler: ports.ExceptionHandlerAbstract,
+        user_action_service: ports.UserActionServiceAbstract,
+        uow: ports.UnitOfWorkAbstract) -> dtos.ResponseDTO:
     try:
         with uow:
 

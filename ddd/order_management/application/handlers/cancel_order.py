@@ -1,5 +1,4 @@
 from __future__ import annotations
-from typing import Union
 from ddd.order_management.application import (
     mappers, 
     commands, 
@@ -11,12 +10,11 @@ from ddd.order_management.domain import exceptions
 
 def handle_cancel_order(
         command: commands.CancelOrderCommand, 
-        access_control: AccessControl1Abstract,
-        logger: LogProviderAbstract,
+        access_control: ports.AccessControl1Abstract,
         user_ctx: dtos.UserContextDTO,
-        exception_handler: ExceptionHandlerAbstract,
-        user_action_service: UserActionServiceAbstract,
-        uow: UnitOfWorkAbstract) -> dtos.ResponseDTO:
+        exception_handler: ports.ExceptionHandlerAbstract,
+        user_action_service: ports.UserActionServiceAbstract,
+        uow: ports.UnitOfWorkAbstract) -> dtos.ResponseDTO:
     try:
         with uow:
 

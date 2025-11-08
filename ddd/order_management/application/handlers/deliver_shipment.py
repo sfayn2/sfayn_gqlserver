@@ -12,11 +12,11 @@ from ddd.order_management.domain import exceptions
 
 def handle_deliver_shipment(
         command: commands.DeliverShipmentCommand, 
-        access_control: AccessControl1Abstract,
+        access_control: ports.AccessControl1Abstract,
         user_ctx: dtos.UserContextDTO,
-        exception_handler: ExceptionHandlerAbstract,
-        user_action_service: UserActionServiceAbstract,
-        uow: UnitOfWorkAbstract) -> dtos.ResponseDTO:
+        exception_handler: ports.ExceptionHandlerAbstract,
+        user_action_service: ports.UserActionServiceAbstract,
+        uow: ports.UnitOfWorkAbstract) -> dtos.ResponseDTO:
     try:
         with uow:
 

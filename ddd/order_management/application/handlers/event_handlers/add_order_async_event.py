@@ -8,8 +8,8 @@ from ddd.order_management.domain import events, exceptions
 
 def handle_add_order_async_event(
     event: dtos.AddOrderIntegrationEvent,
-    user_action_service: UserActionServiceAbstract,
-    uow: UnitOfWorkAbstract) -> dtos.ResponseDTO:
+    user_action_service: ports.UserActionServiceAbstract,
+    uow: ports.UnitOfWorkAbstract) -> dtos.ResponseDTO:
 ):
     with uow:
 

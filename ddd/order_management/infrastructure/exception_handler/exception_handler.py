@@ -1,11 +1,13 @@
 from __future__ import annotations
 import logging
 from ddd.order_management.application import ports, dtos
+from ddd.order_management.domain import exceptions
 
 logger = logging.getLogger(__name__)
 
-#ExceptionHandlerAbstract
-class InfrastructureExceptionHandler:
+
+#ports.ExceptionHandlerAbstract
+class OrderExceptionHandler:
 
     def handle_expected(self, exception: Exception) -> dtos.ResponseDTO:
         # Log this at a WARNING level, no traceback needed

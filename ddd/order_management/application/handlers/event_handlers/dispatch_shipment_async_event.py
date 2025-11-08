@@ -8,9 +8,9 @@ from ddd.order_management.domain import events, exceptions
 
 def handle_dispatch_shipment_async_event(
     event: dtos.ConfirmedShipmentIntegrationEvent,
-    user_action_service: UserActionServiceAbstract,
+    user_action_service: ports.UserActionServiceAbstract,
     shipping_provider_service: ports.ShippingProviderAbstract,
-    uow: UnitOfWorkAbstract) -> dtos.ResponseDTO:
+    uow: ports.UnitOfWorkAbstract) -> dtos.ResponseDTO:
 
     with uow:
 
