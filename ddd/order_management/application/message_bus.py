@@ -1,18 +1,23 @@
 
 from __future__ import annotations
-from typing import Union, Dict, Callable, Any, Optional
-from ddd.order_management.application import commands, queries
+from typing import Union, Dict, Callable, Any, Optional, Type
+from ddd.order_management.application import (
+    commands, 
+    queries, 
+    ports,
+    dtos
+)
 from ddd.order_management.domain import repositories
 
-COMMAND_HANDLERS: Dict[commands.Command, Callable[..., Any]] = {}
+COMMAND_HANDLERS: Dict[Type[commands.Command], Callable[..., Any]] = {}
 
-QUERY_HANDLERS: Dict[queries.Query, Callable[..., Any]] = {}
+QUERY_HANDLERS: Dict[Type[queries.Query], Callable[..., Any]] = {}
 
-ACCESS_CONTROL_SERVICE_IMPL: Optional[AccessControl1Abstract] = None
+ACCESS_CONTROL_SERVICE_IMPL: Optional[ports.AccessControlServiceAbstract] = None
 #LOGGING_SERVICE_IMPL: Optional[Any] = None
-EXCEPTION_HANDLER_FACTORY: Optional[ExceptionHandlerAbstract] = None
-UOW: Optional[UnitOfWorkAbstract] = None
-USER_ACTION_SERVICE_IMPL: Optional[UserActionServiceAbstract] = None
+EXCEPTION_HANDLER_FACTORY: Optional[ports.ExceptionHandlerAbstract] = None
+UOW: Optional[ports.UnitOfWorkAbstract] = None
+USER_ACTION_SERVICE_IMPL: Optional[ports.UserActionServiceAbstract] = None
 
 
 def handle(message: Union[commands.Command, queries.Query], **deps):

@@ -6,9 +6,6 @@ from typing import Optional, List, Tuple, Dict, Any
 from ddd.order_management.domain import enums, value_objects
 
 
-class ResponseDTO(BaseModel):
-    success: bool
-    message: str
 
 class MoneyDTO(BaseModel):
     amount: Decimal
@@ -51,26 +48,17 @@ class LineItemDTO(BaseModel):
     package: PackageDTO
 
 
-class OrderResponseDTO(BaseModel):
-    order_id: str
-    order_status: str
-    activity_status: str
-    success: bool
-    message: str
-    shipping_details: Optional[ShippingOptionDTO] = None
-    tax_details: List[str]
-    offer_details: List[str]
-    tax_amount: MoneyDTO
-    total_discounts_fee: MoneyDTO
-    final_amount: MoneyDTO
 
 class OrderDTO(BaseModel):
+    tenant_id: str
+    customer_details: CustomerDetailsDTO
     order_id: str
-    date_created: datetime 
-    line_items: List[LineItemDTO]
-    tracking_reference: Optional[str] = Field(json_schema_extra=AliasChoices('shipping_tracking_reference', 'tracking_reference'))
-    order_status: enums.OrderStatus
     currency: str
+    order_status: enums.OrderStatus
+    payment_status: enums.PaymentStatus
+    line_items: List[LineItemDTO]
+    shipments: List[ShipmentItemDTO]
+    date_created: Optional[datetime] = None
     date_modified: Optional[datetime] = None
 
     class Config:
@@ -81,11 +69,9 @@ class ProductSkusDTO(BaseModel):
     product_sku: str
     order_quantity: int
     vendor_id: str
-    product_sku: str
     product_name: str
     product_price: MoneyDTO
     product_weight_kg: Decimal
-    order_quantity: int
 
 class UserContextDTO(BaseModel):
     sub: str
@@ -120,11 +106,6 @@ class ShipmentItemDTO(BaseModel):
     vendor_id: str
     quantity: int
 
-# use for shipping provider
-class CreateShipmentResultDTO(BaseModel):
-    tracking_number: str
-    total_amount: MoneyDTO
-    label_url: str
 
 class ConfirmShipmentDTO(BaseModel):
     tenant_id: str
@@ -134,10 +115,6 @@ class ConfirmShipmentDTO(BaseModel):
 
 class AddOrderDTO(BaseModel):
     external_ref: str
+    tenant_id: str
     customer_details: CustomerDetailsDTO
     product_skus: List[ProductSkusDTO]
-
-# define security context
-class RequestContextDTO(BaseModel):
-    token: str
-    tenant_id: str

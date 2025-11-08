@@ -1,20 +1,21 @@
 from __future__ import annotations
 import json
 from ddd.order_management.application import (
+    mappers,
     ports, 
     dtos
 )
-from ddd.order_management.domain import events, exceptions
+from ddd.order_management.domain import events, exceptions, models
 
 def handle_add_order_async_event(
     event: dtos.AddOrderIntegrationEvent,
     user_action_service: ports.UserActionServiceAbstract,
     uow: ports.UnitOfWorkAbstract) -> dtos.ResponseDTO:
-):
+
     with uow:
 
         data = event.data
-        order = uow.order.create_order(
+        order = models.Order.create_order(
             customer_details=mappers.CustomerDetailsMapper.to_domain(data.customer_details),
             line_items=[mappers.LineItemMapper.to_domain(sku) for sku in data.product_skus],
             tenant_id=data.tenant_id

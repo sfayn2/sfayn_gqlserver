@@ -26,8 +26,8 @@ def handle_add_shipment(
 
             order = uow.order.get(order_id=command.order_id, tenant_id=user_ctx.tenant_id)
             order.create_shipment(
-                shipment_address=mappers.AddressDTO.to_domain(command.shipment_address),
-                shipment_items=[mappers.ShipmentItemDTO.to_domain(si, order.get_line_item(si.product_sku, si.vendor_id)) for si in command.shipment_items]
+                shipment_address=mappers.AddressMapper.to_domain(command.shipment_address),
+                shipment_items=[mappers.ShipmentItemMapper.to_domain(si, order.get_line_item(si.product_sku, si.vendor_id)) for si in command.shipment_items]
             )
 
             user_action_service.save_action(

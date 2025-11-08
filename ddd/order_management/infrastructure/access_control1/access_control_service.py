@@ -1,5 +1,6 @@
 from __future__ import annotations
 from typing import Any, Optional
+from ddd.order_management.application import ports
 
 class AccessControlService:
     """
@@ -46,7 +47,7 @@ class AccessControlService:
         )
 
     @classmethod
-    def create_access_control(cls, tenant_id: str):
+    def create_access_control(cls, tenant_id: str) -> ports.AccessControl1Abstract:
         """
         Factory method: Creates and returns a fully configured AccessControl 
         instance tailored for the given tenant ID.

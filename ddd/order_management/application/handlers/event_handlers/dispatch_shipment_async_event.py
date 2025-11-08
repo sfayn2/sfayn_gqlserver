@@ -1,6 +1,7 @@
 from __future__ import annotations
 import json
 from ddd.order_management.application import (
+    mappers,
     ports, 
     dtos
 )
@@ -9,7 +10,7 @@ from ddd.order_management.domain import events, exceptions
 def handle_dispatch_shipment_async_event(
     event: dtos.ConfirmedShipmentIntegrationEvent,
     user_action_service: ports.UserActionServiceAbstract,
-    shipping_provider_service: ports.ShippingProviderAbstract,
+    shipping_provider_service: ports.ShippingProviderServiceAbstract,
     uow: ports.UnitOfWorkAbstract) -> dtos.ResponseDTO:
 
     with uow:
@@ -32,7 +33,7 @@ def handle_dispatch_shipment_async_event(
         order.apply_shipment_dispatch(
             data.shipment_id, 
             provider_result.tracking_reference, 
-            provider_result.total_amount,
+            mappers.MoneyMapper.to_domain(provider_result.total_amount),
             provider_result.label_url
         )
 

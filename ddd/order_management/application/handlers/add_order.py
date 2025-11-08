@@ -26,12 +26,12 @@ def handle_add_order(
                 required_scope={"role": ["vendor"] }
             )
 
-            
-            order = uow.order.create_order(
+            #TODO: should make it as as order service? 
+            order = uow.order.create_order( # type: ignore
                 customer_details=mappers.CustomerDetailsMapper.to_domain(command.customer_details),
                 line_items=[mappers.LineItemMapper.to_domain(sku) for sku in command.product_skus],
                 tenant_id=user_ctx.tenant_id
-            )
+            )  
 
 
             user_action_service.save_action(

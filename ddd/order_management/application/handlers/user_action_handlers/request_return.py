@@ -11,7 +11,6 @@ from ddd.order_management.domain import exceptions
 
 def handle_request_return(
         command: commands.RequestReturnCommand, 
-        uow: ports.UnitOfWorkAbstract,
         exception_handler: ports.ExceptionHandlerAbstract,
         access_control: ports.AccessControl1Abstract,
         user_ctx: dtos.UserContextDTO,
@@ -28,7 +27,7 @@ def handle_request_return(
 
             return dtos.ResponseDTO(
                 success=True,
-                message=f"Order {order.order_id} successfully request product return, may be subject to approval."
+                message=f"Order successfully request product return, may be subject to approval."
             )
 
 

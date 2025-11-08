@@ -11,8 +11,7 @@ from ddd.order_management.domain import exceptions
 
 def handle_process_refund(
         command: commands.ProcessRefundCommand, 
-        refund_service: RefundService,
-        uow: ports.UnitOfWorkAbstract,
+        refund_service: ports.RefundService,
         exception_handler: ports.ExceptionHandlerAbstract,
         access_control: ports.AccessControl1Abstract,
         user_ctx: dtos.UserContextDTO,
@@ -28,16 +27,16 @@ def handle_process_refund(
             )
 
             refund_service.process_refund(
-                order_id=commands.order_id, 
+                order_id=command.order_id, 
                 tenant_id=user_ctx.tenant_id,
                 performed_by=user_ctx.sub,
-                comments=commands.comments
+                comments=command.comments
             )
 
 
             return dtos.ResponseDTO(
                 success=True,
-                message=f"Order {commands.order_id} successfully processed refund."
+                message=f"Order {command.order_id} successfully processed refund."
             )
 
 

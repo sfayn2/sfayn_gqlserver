@@ -1,5 +1,6 @@
 from __future__ import annotations
-from typing import Protocol
+from typing import Protocol, Optional
+from ddd.order_management.application import dtos
 
 class UserActionServiceAbstract(Protocol):
     def save_action(
@@ -12,5 +13,5 @@ class UserActionServiceAbstract(Protocol):
         self,
         order_id: str,
         action: str
-    ) -> List[dtos.UserActionDTO]:
+    ) -> Optional[dtos.UserActionDTO]: # Change return type to Optional
         ...

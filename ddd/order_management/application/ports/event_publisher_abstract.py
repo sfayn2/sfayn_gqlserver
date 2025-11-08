@@ -2,5 +2,4 @@ from __future__ import annotations
 from typing import Protocol
 
 class EventPublisherAbstract(Protocol):
-    @abstractmethod
-    def publish(event): ...
+    def publish(self, event): ...

@@ -48,28 +48,30 @@ class Money:
     def default(cls) -> Money:
         return Money(amount=Decimal("0"), currency="SGD") #need to get from settigns?
     
-    def _validate_currency(self):
+    def _validate_currency(self, other):
         if self.currency != other.currency:
             raise exceptions.MoneyException("Cannot compare money with different currencies")
 
     def __lt__(self, other: Money) -> bool:
-        self._validate_currency()
+        self._validate_currency(other)
         return self.amount < other.amount
 
     def __le__(self, other: Money) -> bool:
-        self._validate_currency()
+        self._validate_currency(other)
         return self.amount <= other.amount
 
     def __gt__(self, other: Money) -> bool:
-        self._validate_currency()
+        self._validate_currency(other)
         return self.amount > other.amount
 
     def __ge__(self, other: Money) -> bool:
-        self._validate_currency()
+        self._validate_currency(other)
         return self.amount >= other.amount
 
-    def __eq__(self, other: Money) -> bool:
-        self._validate_currency()
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, Money):
+            return NotImplemented
+        self._validate_currency(other)
         return self.amount == other.amount
 
     def as_dict(self):

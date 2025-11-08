@@ -1,5 +1,6 @@
 from __future__ import annotations
 from typing import Protocol
+from ddd.order_management.application import dtos
 
 class TenantServiceAbstract(Protocol):
     def get_tenant_config(

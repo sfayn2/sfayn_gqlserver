@@ -7,7 +7,7 @@ from datetime import datetime
 from ddd.order_management.application import dtos
 from ddd.order_management.domain import enums
 
-class Command(BaseModel, frozen=True):
+class Command(BaseModel):
     pass
 
 class AddShippingTrackingReferenceCommand(Command):

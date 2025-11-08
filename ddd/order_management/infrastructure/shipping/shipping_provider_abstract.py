@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import Protocol
 
 class ShippingProviderAbstract(Protocol):
-    def create_shipment(self, shipment) -> dtos.CreateShipmentResult:
+    def create_shipment(self, shipment) -> dtos.CreateShipmentResponseDTO:
         ...
 
     def is_self_delivery(self) -> bool:

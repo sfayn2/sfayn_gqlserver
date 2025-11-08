@@ -7,7 +7,8 @@ from ddd.order_management.domain import (
     enums, 
     exceptions, 
     events, 
-    value_objects
+    value_objects,
+    models
 )
 from ddd.order_management.domain.services import DomainClock
 
@@ -17,13 +18,13 @@ class Order:
 
     customer_details: value_objects.CustomerDetails
 
-    order_id: str = str(uuid.uuid4())
-    currency: Optional[str] = None
+    order_id: str
+    currency: str
     order_status: enums.OrderStatus = enums.OrderStatus.DRAFT
     payment_status: enums.PaymentStatus = enums.PaymentStatus.UNPAID
 
-    line_items: List[LineItem] = field(default_factory=list)
-    shipments: List[Shipment] = field(default_factory=list)
+    line_items: List[models.LineItem] = field(default_factory=list)
+    shipments: List[models.Shipment] = field(default_factory=list)
 
     date_created: Optional[datetime] = None
     date_modified: Optional[datetime] = None
@@ -32,7 +33,7 @@ class Order:
     def raise_event(self, event: events.DomainEvent):
         self._events.append(event)
 
-    def add_line_item(self, line_item: LineItem) -> None:
+    def add_line_item(self, line_item: models.LineItem) -> None:
         if not line_item:
             raise exceptions.DomainError("Please provide line item to add.")
         
@@ -47,14 +48,14 @@ class Order:
 
         self.line_items.append(line_item)
 
-    def get_line_item(self, product_sku: str, vendor_id: str) -> LineItem:
+    def get_line_item(self, product_sku: str, vendor_id: str) -> models.LineItem:
         for li in self.line_items:
             if li.product_sku == product_sku and li.vendor_id == vendor_id:
                 return li
         raise exceptions.DomainError(f"Vendor {vendor_id} Line item w SKU {product_sku} not found in order {self.order_id}")
 
 
-    def get_shipment(self, shipment_id: str) -> Shipment:
+    def get_shipment(self, shipment_id: str) -> models.Shipment:
         shipment = next((s for s in self.shipments if s.shipment_id == shipment_id), None)
         if not shipment:
             raise exceptions.DomainError(f"Shipment {shipment_id} not found in order {self.order_id}")
@@ -66,20 +67,18 @@ class Order:
     def create_shipment(
         self,
         shipment_address: value_objects.Address,
-        shipment_provider: Optional[str],
-        shipment_service_code: Optional[str],
-        shipment_items: list[models.ShipmentItem]
-    ) -> model.Shipment:
+        shipment_items: list[models.ShipmentItem],
+    ) -> models.Shipment:
 
-        shipment = model.Shipment(
+        shipment = models.Shipment(
             shipment_id=str(uuid.uuid4()),
             shipment_address=shipment_address,
             shipment_items=[]
         )
 
         for item_data in shipment_items:
-            line_item = self.get_line_item(item_data.product_sku, item_data.vendor_id)
-            shipment_item = model.ShipmentItem(
+            line_item = self.get_line_item(item_data.line_item.product_sku, item_data.line_item.vendor_id)
+            shipment_item = models.ShipmentItem(
                 shipment_item_id=str(uuid.uuid4()),
                 line_item=line_item,
                 quantity=item_data.quantity
@@ -91,8 +90,16 @@ class Order:
         return shipment
 
     @staticmethod
-    def create_order(tenant_id:str, customer_details: value_objects.CustomerDetails, line_items: List[LineItem]):
+    def create_order(tenant_id:str, customer_details: value_objects.CustomerDetails, line_items: List[models.LineItem]):
+
+        if not line_items:
+            raise exceptions.DomainError("Cannot create an order with no line items.")
+
+        new_order_id: str = f"ORD-{uuid.uuid4()}"
+
         order = Order(
+                order_id=new_order_id,
+                currency="SGD", #TODO
                 tenant_id=tenant_id,
                 customer_details=customer_details,
                 date_created=DomainClock.now(),
@@ -105,7 +112,7 @@ class Order:
 
         return order
 
-    def add_shipment(self, shipment: Shipment) -> Shipment:
+    def add_shipment(self, shipment: models.Shipment) -> models.Shipment:
         if self.order_status != enums.OrderStatus.CONFIRMED:
             raise exceptions.DomainError("Only confirm order can add shipment.")
 
@@ -113,14 +120,14 @@ class Order:
 
         # Verify that every item in the new shipment exists in the order.
         for new_item in shipment.shipment_items:
-            if new_item.product_sku not in order_skus:
+            if new_item.line_item.product_sku not in order_skus:
                 raise exceptions.DomainError(
-                    f"Product SKU {new_item.product_sku} in the new shipment does not exist in the order."
+                    f"Product SKU {new_item.line_item.product_sku} in the new shipment does not exist in the order."
                 )
 
         # Calculate current and new quantities more concisely with generator expressions.
-        allocated_qty = sum(item.order_quantity for s in self.shipments for item in s.shipment_items)
-        new_allocate_qty = sum(item.order_quantity for item in shipment.shipment_items)
+        allocated_qty = sum(item.quantity for s in self.shipments for item in s.shipment_items)
+        new_allocate_qty = sum(item.quantity for item in shipment.shipment_items)
 
         if allocated_qty + new_allocate_qty > self.total_line_item_qty:
             raise exceptions.DomainError(
@@ -162,6 +169,7 @@ class Order:
         event = events.ConfirmedShipmentEvent(
             tenant_id=self.tenant_id,
             order_id=self.order_id,
+            order_status=self.order_status,
             shipment_id=shipment_id,
         )
         self.raise_event(event)
@@ -178,6 +186,7 @@ class Order:
         event = events.DeliveredShipmentEvent(
             tenant_id=self.tenant_id,
             order_id=self.order_id,
+            order_status=self.order_status,
             shipment_id=shipment_id,
         )
         self.raise_event(event)
@@ -192,6 +201,7 @@ class Order:
         event = events.CanceledShipmentEvent(
             tenant_id=self.tenant_id,
             order_id=self.order_id,
+            order_status=self.order_status,
             shipment_id=shipment_id,
         )
         self.raise_event(event)
@@ -232,7 +242,7 @@ class Order:
         self.raise_event(event)
 
     #roll-up style
-    def update_shipping_progress(self):
+    def update_shipping_progress(self) -> None:
         if not self.shipments:
             return #remain CONFIRMED
 

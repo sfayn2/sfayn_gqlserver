@@ -13,6 +13,7 @@ def handle_escalate_reviewer(
         command: commands.EscalateReviewerCommand, 
         exception_handler: ports.ExceptionHandlerAbstract,
         access_control: ports.AccessControl1Abstract,
+        user_action_service: ports.UserActionServiceAbstract,
         user_ctx: dtos.UserContextDTO,
         uow: ports.UnitOfWorkAbstract) -> dtos.ResponseDTO:
 
@@ -27,12 +28,13 @@ def handle_escalate_reviewer(
 
             order = uow.order.get(order_id=command.order_id, tenant_id=user_ctx.tenant_id)
 
-            user_action = uow.user_action
-            user_action.save_action(
-                order_id=order.order_id,
-                action="escalate_reviewer",
-                performed_by=user_ctx.sub,
-                user_input={"reviewer": command.reviewer, "comments": command.comments }
+            user_action_service.save_action(
+                dtos.UserActionDTO(
+                    order_id=order.order_id,
+                    action="escalate_reviewer",
+                    performed_by=user_ctx.sub,
+                    user_input={"reviewer": command.reviewer, "comments": command.comments }
+                )
             )
 
 

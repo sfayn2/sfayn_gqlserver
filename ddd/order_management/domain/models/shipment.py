@@ -1,21 +1,23 @@
 from __future__ import annotations
-from dataclasses import dataclass
+from decimal import Decimal
+from datetime import datetime
 from dataclasses import dataclass, field
 from typing import Optional, List, Tuple
 from ddd.order_management.domain import (
     enums, 
     exceptions, 
     events, 
-    value_objects
+    value_objects,
+    models
 )
 from ddd.order_management.domain.services import DomainClock
 
 
 @dataclass
 class ShipmentItem:
-    shipment_item_id: str
-    line_item: LineItem
+    line_item: models.LineItem
     quantity: int
+    shipment_item_id: Optional[str] = None
     allocated_shipping_tax: value_objects.Money = field(default_factory=lambda: value_objects.Money.default())
 
     #TODO how to deal w this? 
@@ -27,9 +29,9 @@ class ShipmentItem:
 class Shipment:
     shipment_id: str
 
-    shipment_mode: str # pickup, dropoff, warehouse
-    shipment_provider: str #easypost, fedex, etc
     shipment_address: value_objects.Address
+    shipment_mode: Optional[enums.ShipmentMethod] = None # pickup, dropoff, warehouse
+    shipment_provider: Optional[str] = None #easypost, fedex, etc
 
     # package
     package_weight_kg: Optional[Decimal] = None
@@ -39,8 +41,8 @@ class Shipment:
 
     # pickup mode
     pickup_address: Optional[value_objects.Address] = None
-    pickup_window_start: Optional[DateTime] = None
-    pickup_window_end: Optional[DateTime] = None
+    pickup_window_start: Optional[datetime] = None
+    pickup_window_end: Optional[datetime] = None
     pickup_instructions: Optional[str] = None
 
 

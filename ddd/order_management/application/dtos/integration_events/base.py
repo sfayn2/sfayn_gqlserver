@@ -4,4 +4,4 @@ from typing import Dict, Optional, List, Any
 
 class IntegrationEvent(BaseModel):
     event_type: str
-    data: Dict[str, Any]
+    data: Any

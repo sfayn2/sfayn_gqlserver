@@ -29,7 +29,7 @@ class ShipBobShippingProvider:
         }
 
 
-    def create_shipment(self, shipment) -> dtos.CreateShipmentResult:
+    def create_shipment(self, shipment) -> dtos.CreateShipmentResponseDTO:
 
         if shipment.shipment_method == enums.ShippingMethod.PICKUP:
             pickup_details = self._format_pickup_window(shipment)
@@ -61,7 +61,7 @@ class ShipBobShippingProvider:
 
         data = response.json()
 
-        return dtos.CreateShipmentResultDTO(
+        return dtos.CreateShipmentResponseDTO(
             tracking_number=data.get("tracking_number") or data.get("id"),
             total_amount=dtos.Money(
                 amount=data.get("shipping_cost", 0),

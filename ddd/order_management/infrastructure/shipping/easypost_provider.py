@@ -16,7 +16,7 @@ class EasyPostShippingProvider:
     def is_self_delivery(self) -> bool:
         return False
 
-    def create_shipment(self, shipment) -> dtos.CreateShipmentResult:
+    def create_shipment(self, shipment) -> dtos.CreateShipmentResponseDTO:
 
         easypost_shipment = self.client.shipment.create(
             from_address=shipment.pickup_address,
@@ -47,7 +47,7 @@ class EasyPostShippingProvider:
             )
 
 
-        return dtos.CreateShipmentResultDTO(
+        return dtos.CreateShipmentResponseDTO(
             tracking_number=tracking_code,
             total_amount=dtos.Money(
                 amount=total_amount,

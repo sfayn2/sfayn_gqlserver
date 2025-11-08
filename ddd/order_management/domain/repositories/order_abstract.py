@@ -15,5 +15,5 @@ class OrderAbstract(ABC):
         raise NotImplementedError("Subclasses must implement this method")
 
     @abstractmethod
-    def get(self, order_id: str) -> models.Order:
+    def get(self, order_id: str, tenant_id: str) -> models.Order:
         raise NotImplementedError("Subclasses must implement this method")

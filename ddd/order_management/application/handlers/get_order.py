@@ -21,7 +21,10 @@ def handle_get_order(
 
     order = uow.order.get(order_id=query.order_id, tenant_id=user_ctx.tenant_id)
 
-    return mappers.OrderMapper.to_dto(
+    return dtos.OrderResponseDTO(
+        **mappers.OrderMapper.to_dto(
             order=order
-        )
+        ).model_dump()
+    )
+
 

@@ -1,8 +1,11 @@
 from __future__ import annotations
 from typing import Protocol
+from ddd.order_management.domain import repositories
 #from abc import ABC, abstractmethod
 
 class UnitOfWorkAbstract(Protocol):
+
+    order: repositories.OrderAbstract 
 
     def __enter__(self):
         return self

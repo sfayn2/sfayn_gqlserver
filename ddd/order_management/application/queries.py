@@ -5,7 +5,7 @@ from typing import Union, List, Optional
 from datetime import datetime
 from ddd.order_management.domain import enums
 
-class Query(BaseModel, frozen=True):
+class Query(BaseModel):
     token: str
 
 class ListShippingOptionsQuery(Query):

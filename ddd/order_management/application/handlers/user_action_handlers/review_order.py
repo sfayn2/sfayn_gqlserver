@@ -1,21 +1,20 @@
 from __future__ import annotations
-from typing import Union
+from typing import Union, Optional
 from ddd.order_management.application import (
     mappers, 
     commands, 
     ports, 
     dtos, 
-    shared
 )
 from ddd.order_management.domain import exceptions
 
 
 def handle_review_order(
         command: commands.ReviewOrderCommand, 
-        uow: ports.UnitOfWorkAbstract,
         exception_handler: ports.ExceptionHandlerAbstract,
         access_control: ports.AccessControl1Abstract,
         user_ctx: dtos.UserContextDTO,
+        user_action_service: ports.UserActionServiceAbstract,
         uow: ports.UnitOfWorkAbstract) -> dtos.ResponseDTO:
 
     try:
@@ -28,21 +27,25 @@ def handle_review_order(
             )
 
             order = uow.order.get(order_id=command.order_id, tenant_id=user_ctx.tenant_id)
-            user_action = uow.user_action
-            #TODO
 
-            escalate_step = user_action.get(order.order_id, "escalate_reviewer")
+            escalate_step: Optional[dtos.UserActionDTO] = user_action_service.get_last_action(order.order_id, "escalate_reviewer")
+            
+            if escalate_step is None:
+                # Raise a specific domain exception if the required context is missing
+                raise exceptions.InvalidOrderOperation("Missing required action 'escalate_reviewer' for reviewing order.")
 
             reviewer = escalate_step.user_input.get("reviewer")
             if user_ctx.sub != reviewer:
                 raise exceptions.InvalidOrderOperation("You are not the assigned reviewer.")
 
 
-            user_action.save_action(
-                order_id=order.order_id,
-                action="review_order",
-                performed_by=user_ctx.sub,
-                user_input={"comments": command.comments},
+            user_action_service.save_action(
+                dtos.UserActionDTO(
+                    order_id=order.order_id,
+                    action="review_order",
+                    performed_by=user_ctx.sub,
+                    user_input={"comments": command.comments},
+                )
             )
 
 

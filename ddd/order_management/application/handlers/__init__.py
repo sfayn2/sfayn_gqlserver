@@ -20,7 +20,6 @@ from .user_action_handlers.escalate_reviewer import handle_escalate_reviewer
 from .get_order import handle_get_order
 
 # Events
-from .event_handlers.log_order import handle_logged_order
 
 # Async Events via Redis stream
 from .event_handlers.user_logged_in_async_event import handle_user_logged_in_async_event

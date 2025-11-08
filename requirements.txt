@@ -24,7 +24,10 @@ httpcore==1.0.9
 httpx==0.28.1
 idna==3.10
 iniconfig==2.0.0
+mypy==1.18.2
+mypy_extensions==1.1.0
 packaging==24.2
+pathspec==0.12.1
 pillow==11.0.0
 pluggy==1.5.0
 promise==2.3

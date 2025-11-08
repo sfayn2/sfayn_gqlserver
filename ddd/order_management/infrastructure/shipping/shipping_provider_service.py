@@ -1,7 +1,7 @@
 from __future__ import annotations
 from typing import Dict, Any
 
-
+# ports.ShippingProviderServiceAbstract
 class ShippingProviderService:
     """
     Service responsible for coordinating shipment creation across various providers.
@@ -24,7 +24,7 @@ class ShippingProviderService:
             raise RuntimeError(f"Failed to resolve shipping provider for tenant {tenant_id}") from e
 
     @classmethod
-    def create_shipment(cls, tenant_id: str, shipment: Shipment) -> Dict[str, Any]:
+    def create_shipment(cls, tenant_id: str, shipment: Shipment) -> dtos.CreateShipmentResponseDTO:
         """
         Orchestrates the creation of a shipment using the tenant's configured provider.
         """
