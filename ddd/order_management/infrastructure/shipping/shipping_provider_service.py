@@ -1,30 +1,48 @@
 from __future__ import annotations
-from typing import Dict, Any
+from typing import Dict, Any, Optional
+from .shipping_provider_abstract import ShippingProviderAbstract
+from .factory import ShippingProviderFactory
+from ddd.order_management.application import (
+    ports,
+    dtos
+)
+from ddd.order_management.domain import models
 
 # ports.ShippingProviderServiceAbstract
 class ShippingProviderService:
     """
     Service responsible for coordinating shipment creation across various providers.
     """
+    saas_service: Optional[ports.TenantServiceAbstract] = None
+    shipping_provider_factory: Optional[ShippingProviderFactory] = None
 
     @classmethod
     def configure(cls, saas_service: ports.TenantServiceAbstract, 
-                 shipping_provider_factory: ports.ShippingProviderAbstract):
+                 shipping_provider_factory: ShippingProviderFactory):
         cls.saas_service = saas_service
         cls.shipping_provider_factory = shipping_provider_factory
 
     @classmethod
-    def _get_provider(cls, tenant_id: str) -> ports.ShippingProviderAbstract:
+    def _get_provider(cls, tenant_id: str) -> ShippingProviderAbstract:
         """Internal helper to retrieve the correct provider instance via the factory."""
+        
+        if cls.saas_service is None:
+            raise RuntimeError("ShippingProviderService has not been configured yet (missing saas_service).")
+
+        if cls.shipping_provider_factory is None:
+            raise RuntimeError("ShippingProviderService has not been configured yet (missing shipping_provider_factory).")
+
+            
         try:
             saas_configs = cls.saas_service.get_tenant_config(tenant_id).configs.get("shipping_provider", {})
             return cls.shipping_provider_factory.get_shipping_provider(saas_configs)
         except Exception as e:
-            # Wrap infrastructure errors in a service-specific exception if necessary
-            raise RuntimeError(f"Failed to resolve shipping provider for tenant {tenant_id}") from e
+            # Handle potential exceptions during config retrieval
+            raise RuntimeError(f"Failed to retrieve shipping config for tenant {tenant_id}: {e}")
+
 
     @classmethod
-    def create_shipment(cls, tenant_id: str, shipment: Shipment) -> dtos.CreateShipmentResponseDTO:
+    def create_shipment(cls, tenant_id: str, shipment: models.Shipment) -> dtos.CreateShipmentResponseDTO:
         """
         Orchestrates the creation of a shipment using the tenant's configured provider.
         """

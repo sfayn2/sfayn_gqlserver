@@ -8,8 +8,6 @@ from ddd.order_management.domain import (
 )
 from ddd.order_management.infrastructure import (
     event_bus, 
-    email_senders,
-    #loggings,
     repositories,
     access_control1,
     event_publishers,

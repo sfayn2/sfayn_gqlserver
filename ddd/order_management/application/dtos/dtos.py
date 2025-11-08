@@ -11,13 +11,10 @@ class MoneyDTO(BaseModel):
     amount: Decimal
     currency: str
 
-class ShippingOptionDTO(BaseModel):
-    method: str
-    delivery_time: str
-    cost: MoneyDTO
-
-    class Config:
-        use_enum_values = True
+class ShipmentItemDTO(BaseModel):
+    product_sku: str
+    vendor_id: str
+    quantity: int
 
 class CustomerDetailsDTO(BaseModel):
     customer_id: Optional[str] = None
@@ -101,10 +98,6 @@ class UserActionDTO(BaseModel):
     performed_by: str
     user_input: Dict[str, Any]
 
-class ShipmentItemDTO(BaseModel):
-    product_sku: str
-    vendor_id: str
-    quantity: int
 
 
 class ConfirmShipmentDTO(BaseModel):

@@ -10,7 +10,6 @@ from ddd.order_management.domain import (
 from ddd.order_management.infrastructure import (
     repositories as infra_repo,
     access_control1,
-    validations
 )
 
 @pytest.mark.django_db

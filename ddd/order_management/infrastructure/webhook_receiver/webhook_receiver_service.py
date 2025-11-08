@@ -1,6 +1,8 @@
 from __future__ import annotations
 import json
-from typing import Dict, Any
+from typing import Dict, Any, Optional
+from ddd.order_management.application import ports
+from .webhook_receiver_factory import WebhookReceiverFactory
 
 
 # Define custom exceptions for specific error scenarios
@@ -20,6 +22,8 @@ class WebhookReceiverService:
     """
     A service responsible for validating and decoding incoming webhook requests.
     """
+    saas_service: Optional[ports.TenantServiceAbstract] = None
+    webhook_receiver_factory: Optional[WebhookReceiverFactory] = None
 
     @classmethod 
     def configure(cls, saas_service, webhook_receiver_factory):
@@ -29,7 +33,15 @@ class WebhookReceiverService:
     @classmethod 
     def _get_provider(cls, tenant_id: str):
         """Internal helper to resolve the correct provider instance."""
+
         # Note: Assuming saas_service methods are robust
+        if cls.saas_service is None:
+            raise RuntimeError("Cannot get provider: saas_service is not configured.")
+            
+        # Check the second dependency
+        if cls.webhook_receiver_factory is None:
+            raise RuntimeError("Cannot get provider: webhook_receiver_factory is not configured.")
+
         saas_configs = cls.saas_service.get_tenant_config(tenant_id).configs.get("webhook_provider", {})
         return cls.webhook_receiver_factory.get_webhook_receiver(saas_configs)
 

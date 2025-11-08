@@ -1,6 +1,7 @@
 from __future__ import annotations
-from typing import Any, Optional, Dict
+from typing import Any, Optional, Dict, Type
 from datetime import datetime
+from .shipping_provider_abstract import ShippingProviderAbstract
 from .self_delivery_provider import SelfDeliveryProvider
 from .easypost_provider import EasyPostShippingProvider
 from .ninjavan_provider import NinjaVanShippingProvider
@@ -16,7 +17,7 @@ class UnknownShippingProviderError(Exception):
 class ShippingProviderFactory:
 
     # A dictionary mapping provider names (lowercase for consistency) to their classes
-    _PROVIDER_MAP: Dict[str, Type[ports.ShippingProviderAbstract]] = {
+    _PROVIDER_MAP: Dict[str, Type[ShippingProviderAbstract]] = {
         "easypost": EasyPostShippingProvider,
         "ninjavan": NinjaVanShippingProvider,
         "shipbob": ShipBobShippingProvider,
@@ -24,7 +25,7 @@ class ShippingProviderFactory:
     }
     
     @staticmethod
-    def get_shipping_provider(cfg: dict) -> ports.ShippingProviderAbstract:
+    def get_shipping_provider(cfg: dict) -> ShippingProviderAbstract:
         """
         Factory method to create the appropriate ShippingProvider instance 
         based on configuration.
@@ -43,8 +44,8 @@ class ShippingProviderFactory:
             else:
                 # Other providers (Easypost, Ninjavan, Shipbob) share common arguments
                 return provider_class(
-                    api_key=cfg.get("api_key"),
-                    endpoint=cfg.get("endpoint"),
+                    api_key=cfg.get("api_key"), # type: ignore 
+                    endpoint=cfg.get("endpoint"), # type: ignore 
                 )
         else:
             # Raise a specific, informative exception

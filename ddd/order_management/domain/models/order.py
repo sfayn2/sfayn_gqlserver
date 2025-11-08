@@ -15,6 +15,7 @@ from ddd.order_management.domain.services import DomainClock
 @dataclass
 class Order:
     tenant_id: str
+    external_ref: str
 
     customer_details: value_objects.CustomerDetails
 
@@ -90,7 +91,7 @@ class Order:
         return shipment
 
     @staticmethod
-    def create_order(tenant_id:str, customer_details: value_objects.CustomerDetails, line_items: List[models.LineItem]):
+    def create_order(external_ref: str, tenant_id:str, customer_details: value_objects.CustomerDetails, line_items: List[models.LineItem]):
 
         if not line_items:
             raise exceptions.DomainError("Cannot create an order with no line items.")
@@ -99,6 +100,7 @@ class Order:
 
         order = Order(
                 order_id=new_order_id,
+                external_ref=external_ref,
                 currency="SGD", #TODO
                 tenant_id=tenant_id,
                 customer_details=customer_details,

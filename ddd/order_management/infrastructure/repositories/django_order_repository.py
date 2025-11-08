@@ -16,14 +16,14 @@ class DjangoOrderRepositoryImpl(repositories.OrderAbstract):
 
         for line_item in order.line_items:
             django_line_item = django_mappers.LineItemMapper.to_django(order.order_id, line_item)
-            django_models.OrderLine.objects.update_or_create(**django_line_item)
+            django_models.LineItem.objects.update_or_create(**django_line_item)
 
         for shipment in order.shipments:
             django_shipment = django_mappers.ShipmentMapper.to_django(order.order_id, shipment)
-            django_models.Shipment.objects.update_or_create(**django_shipment)
+            shipment_obj, created = django_models.Shipment.objects.update_or_create(**django_shipment)
 
             for shipment_item in shipment.shipment_items:
-                django_shipment_item = django_mappers.ShipmentItemMapper.to_django(shipment_item.line_item)
+                django_shipment_item = django_mappers.ShipmentItemMapper.to_django(shipment_id=shipment_obj.shipment_id, shipment_item=shipment_item)
                 django_models.ShipmentItem.objects.update_or_create(**django_shipment_item)
 
         #for act in order.activities:

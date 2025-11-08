@@ -18,7 +18,8 @@ def handle_add_order_async_event(
         order = models.Order.create_order(
             customer_details=mappers.CustomerDetailsMapper.to_domain(data.customer_details),
             line_items=[mappers.LineItemMapper.to_domain(sku) for sku in data.product_skus],
-            tenant_id=data.tenant_id
+            tenant_id=data.tenant_id,
+            external_ref=data.external_ref
         )
 
 

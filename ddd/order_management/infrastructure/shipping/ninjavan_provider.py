@@ -1,9 +1,10 @@
 from __future__ import annotations
+import requests
 from typing import Any
 from decimal import Decimal
 from dataclasses import asdict
 from ddd.order_management.application import dtos
-from ddd.order_management.domain import enums
+from ddd.order_management.domain import enums, exceptions
 
 #Protocol: ports.ShippingProviderAbstract
 class NinjaVanShippingProvider:
@@ -32,7 +33,7 @@ class NinjaVanShippingProvider:
 
     def create_shipment(self, shipment) -> dtos.CreateShipmentResponseDTO:
 
-        if shipment.shipment_method == enums.ShippingMethod.PICKUP:
+        if shipment.shipment_method == enums.ShipmentMethod.PICKUP:
             pickup_details = self._format_pickup_window(shipment)
             other_parcel_job = {
                 **pickup_details,
@@ -45,7 +46,7 @@ class NinjaVanShippingProvider:
             "service_type": "Parcel",
             "pickup_type": shipment.shipment_method,
             "parcel_job": {
-                "delivery_address": as_dict(shipment.shipment_address),
+                "delivery_address": asdict(shipment.shipment_address),
                 "items": [
                     { "sku": i.product_sku, "quantity": i.quantity}
                     for i in shipment.shipment_items
@@ -65,13 +66,13 @@ class NinjaVanShippingProvider:
             )
             response.raise_for_status()
         except Exception as e:
-            raise exceptions.ShippingProviderIntegrationError(f"{ShippingProviderEnum.NINJAVAN} request failed: {e}")
+            raise exceptions.ShippingProviderIntegrationError(f"NINJAVAN request failed: {e}")
 
         data = response.json()
 
         return dtos.CreateShipmentResponseDTO(
-            tracking_number=data.get("tracking_number") or data.get("id"),
-            total_amount=dtos.Money(
+            tracking_reference=data.get("tracking_number") or data.get("id"),
+            total_amount=dtos.MoneyDTO(
                 amount=Decimal("0"),
                 currency="SGD"
             ),

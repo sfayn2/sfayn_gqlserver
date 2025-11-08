@@ -1,4 +1,5 @@
 import ast, json
+from typing import Any
 from decimal import Decimal
 from ddd.order_management.domain import value_objects, models
 from .django_line_item_mapper import LineItemMapper
@@ -6,18 +7,20 @@ from .django_line_item_mapper import LineItemMapper
 class ShipmentItemMapper:
 
     @staticmethod
-    def to_django(line_item_id, shipment_item: models.ShipmentItem) -> dict:
+    def to_django(shipment_id: str, shipment_item: models.ShipmentItem) -> dict:
         return {
                 "shipment_item_id": shipment_item.shipment_item_id,
+                'shipment_id': shipment_id,
                 "defaults":  {
-                    'shipment_id': shipment_item.shipment_id,
+                    "line_item_id": shipment_item.line_item.product_sku,
                     'quantity': shipment_item.quantity,
                     'allocated_shipping_tax': shipment_item.allocated_shipping_tax.amount,
                     'allocated_shipping_tax_currency': shipment_item.allocated_shipping_tax.currency
                 }
             }
 
-    def to_domain(django_shipment_item) -> models.ShipmentItem:
+    @staticmethod
+    def to_domain(django_shipment_item: Any) -> models.ShipmentItem:
 
         return models.ShipmentItem(
             shipment_item_id=django_shipment_item.shipment_item_id,

@@ -1,0 +1,14 @@
+# pyproject.toml
+
+[tool.mypy]
+# Set your global mypy options here (e.g., strict = true)
+ignore_missing_imports = true # This global flag helps with many untyped libraries
+
+# Add this section to specifically ignore type errors within the Django modules:
+[[tool.mypy.overrides]]
+module = "django.*"
+ignore_errors = true 
+# Alternatively, you can use follow_imports = "skip" to completely ignore imports
+# from django when analyzing your code, which can speed up checks slightly.
+# follow_imports = "skip" 
+

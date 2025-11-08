@@ -10,7 +10,7 @@ from ddd.order_management.domain import enums, models as domain_models, value_ob
 class Order(models.Model):
     order_id = models.CharField(max_length=100, primary_key=True, help_text="ORD-1234")
     tenant_id = models.CharField(max_length=150)
-    checkout_session = models.CharField(max_length=100, null=True, blank=True, help_text="{app}-{identifier} . eg. checkoutapp-1234")
+    external_ref = models.CharField(max_length=100, null=True, blank=True, help_text="{app}-{identifier} . eg. checkoutapp-1234")
 
     order_status = models.CharField(
         max_length=25, 
@@ -89,7 +89,7 @@ class Shipment(models.Model):
     shipment_address_state = models.CharField(max_length=10, blank=True, null=True, help_text="Mandatory in countries like US, Canada, India but irrelevant in small countries")
 
     shipment_provider = models.CharField(max_length=25, blank=True, null=True)
-    shipment_service_code = models.CharField(max_length=25, blank=True, null=True)
+    #shipment_service_code = models.CharField(max_length=25, blank=True, null=True)
     tracking_reference = models.CharField(max_length=100, blank=True, null=True)
 
     shipment_amount = models.DecimalField(

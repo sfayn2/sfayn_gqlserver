@@ -4,7 +4,7 @@ from graphene.types.generic import GenericScalar
 from ddd.order_management.application import (
     message_bus, commands
   )
-from ddd.order_management.presentation.graphql import object_types, common
+from ddd.order_management.presentation.graphql import object_types, common, input_types
 from ddd.order_management.infrastructure import (
     access_control1,
 )

@@ -8,6 +8,7 @@ from .shipping_provider_service_abstract import ShippingProviderServiceAbstract
 from .access_control_service_abstract import AccessControlServiceAbstract
 
 from .event_publisher_abstract import EventPublisherAbstract
+from .event_payload_decoder_abstract import EventPayloadDecoderAbstract
 
 
 from ddd.order_management.application.services import RefundService

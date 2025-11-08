@@ -11,7 +11,7 @@ from .utils import kg_to_lb, kg_to_oz, cm_to_in
 class EasyPostShippingProvider:
 
     def __init__(self, api_key: str, endpoint: str ):
-        self.client = easypost.EasyPostClient(self.api_key)
+        self.client = easypost.EasyPostClient(api_key)
 
     def is_self_delivery(self) -> bool:
         return False
@@ -20,7 +20,7 @@ class EasyPostShippingProvider:
 
         easypost_shipment = self.client.shipment.create(
             from_address=shipment.pickup_address,
-            to_address=as_dict(shipment.shipment_address),
+            to_address=asdict(shipment.shipment_address),
             parcel=self._build_parcel_payload(shipment),
             metadata={
                 "shipment_id": shipment.shipment_id
@@ -42,14 +42,14 @@ class EasyPostShippingProvider:
         #Option for pickup
         if shipment.shipment_method == enums.ShipmentMethod.PICKUP:
             self._schedule_pickup(
-                easypost_shipment_id,
+                easypost_shipment.id,
                 shipment
             )
 
 
         return dtos.CreateShipmentResponseDTO(
-            tracking_number=tracking_code,
-            total_amount=dtos.Money(
+            tracking_reference=tracking_code,
+            total_amount=dtos.MoneyDTO(
                 amount=total_amount,
                 currency=currency
             ),

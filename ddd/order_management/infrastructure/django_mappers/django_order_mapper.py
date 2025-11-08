@@ -11,11 +11,11 @@ class OrderMapper:
             'order_id': order.order_id,
             'defaults': {
                     'tenant_id': order.tenant_id,
-                    'checkout_session': order.checkout_session,
-                    'customer_name': order.customer_name, 
-                    'customer_email': order.customer_email,
+                    'external_ref': order.external_ref,
+                    'customer_id': order.customer_details.customer_id, 
+                    'customer_name': order.customer_details.customer_name, 
+                    'customer_email': order.customer_details.customer_email,
                     'order_status': order.order_status.value, 
-                    'activity_status': order.activity_status, 
                     'payment_status': order.payment_status, 
                     'currency': order.currency,
                     'date_created': order.date_created,
@@ -28,9 +28,16 @@ class OrderMapper:
 
         return models.Order(
             order_id=django_order_object.order_id,
+            external_ref=django_order_object.external_ref,
             tenant_id=django_order_object.tenant_id,
             date_created=django_order_object.date_created,
             date_modified=django_order_object.date_modified, 
+            customer_details=value_objects.CustomerDetails(
+                customer_id=django_order_object.customer_id, 
+                customer_name=django_order_object.customer_name, 
+                customer_email=django_order_object.customer_email
+
+            ),
             line_items=[
                 django_mappers.LineItemMapper.to_domain(item) for item in django_order_object.line_items.all()
             ],
@@ -39,7 +46,6 @@ class OrderMapper:
             ],
             order_status=django_order_object.order_status,
             payment_status=django_order_object.payment_status,
-            activity_status=django_order_object.activity_status,
             currency=django_order_object.currency
         )
 

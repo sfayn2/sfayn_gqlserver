@@ -1,5 +1,7 @@
 from __future__ import annotations
-from typing import Protocol
+from abc import abstractmethod
+from typing import Protocol, Dict, Any
+from ddd.order_management.application import dtos
 
 class EventPayloadDecoderAbstract(Protocol):
 

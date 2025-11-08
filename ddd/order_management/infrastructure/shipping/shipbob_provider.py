@@ -1,9 +1,10 @@
 from __future__ import annotations
+import requests
 from typing import Any
 from decimal import Decimal
 from dataclasses import asdict
 from ddd.order_management.application import dtos
-from ddd.order_management.domain import enums
+from ddd.order_management.domain import enums, exceptions
 
 #Protocol: ports.ShippingProviderAbstract
 class ShipBobShippingProvider:
@@ -31,15 +32,15 @@ class ShipBobShippingProvider:
 
     def create_shipment(self, shipment) -> dtos.CreateShipmentResponseDTO:
 
-        if shipment.shipment_method == enums.ShippingMethod.PICKUP:
+        if shipment.shipment_method == enums.ShipmentMethod.PICKUP:
             pickup_details = self._format_pickup_window(shipment)
         else:
             pickup_details = {}
 
         payload: dict[str, Any] = {
             "order_number": shipment.shipment_id,
-            "to_address": as_dict(shipment.shipment_address),
-            "pickup": pickup_details if shipment.shipment_method == enums.ShippingMethod.PICKUP else None,
+            "to_address": asdict(shipment.shipment_address),
+            "pickup": pickup_details if shipment.shipment_method == enums.ShipmentMethod.PICKUP else None,
             "items": [
                 { "sku": i.product_sku, "quantity": i.quantity}
                 for i in shipment.shipment_items
@@ -57,13 +58,13 @@ class ShipBobShippingProvider:
             )
             response.raise_for_status()
         except Exception as e:
-            raise exceptions.ShippingProviderIntegrationError(f"{ShippingProviderEnum.SHIPBOB} request failed: {e}")
+            raise exceptions.ShippingProviderIntegrationError(f"SHIPBOB request failed: {e}")
 
         data = response.json()
 
         return dtos.CreateShipmentResponseDTO(
-            tracking_number=data.get("tracking_number") or data.get("id"),
-            total_amount=dtos.Money(
+            tracking_reference=data.get("tracking_number") or data.get("id"),
+            total_amount=dtos.MoneyDTO(
                 amount=data.get("shipping_cost", 0),
                 currency=data.get("currency")
             ),

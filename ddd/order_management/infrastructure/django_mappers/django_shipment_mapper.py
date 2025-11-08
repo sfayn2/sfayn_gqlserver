@@ -1,11 +1,13 @@
+from typing import Any
 import ast, json
 from decimal import Decimal
 from ddd.order_management.domain import value_objects, models
+from ddd.order_management.infrastructure import django_mappers
 
 class ShipmentMapper:
 
     @staticmethod
-    def to_django(order_id, shipment: models.Shipment) -> dict:
+    def to_django(order_id: str, shipment: models.Shipment) -> dict:
         return {
                 "shipment_id": shipment.shipment_id,
                 "order_id": order_id,
@@ -17,7 +19,6 @@ class ShipmentMapper:
                     'shipment_address_country' : shipment.shipment_address.country,
                     'shipment_address_state' : shipment.shipment_address.state,
                     'shipment_provider': shipment.shipment_provider,
-                    'shipment_service_code': shipment.shipment_service_code,
                     'tracking_reference': shipment.tracking_reference,
                     'shipment_amount': shipment.shipment_amount,
                     'shipment_tax_amount': shipment.shipment_tax_amount,
@@ -25,7 +26,8 @@ class ShipmentMapper:
                 }
         }
 
-    def to_domain(django_shipment) -> models.LineItem:
+    @staticmethod
+    def to_domain(django_shipment: Any) -> models.Shipment:
 
         return models.Shipment(
             shipment_id=django_shipment.shipment_id,
@@ -38,7 +40,6 @@ class ShipmentMapper:
                 state=django_shipment.shipment_address_state,
             ),
             shipment_provider=django_shipment.shipment_provider,
-            shipment_service_code=django_shipment.shipment_service_code,
             tracking_reference=django_shipment.tracking_reference,
             shipment_amount=value_objects.Money(
                 amount=django_shipment.shipment_amount,
@@ -50,6 +51,6 @@ class ShipmentMapper:
             ),
             shipment_status=django_shipment.shipment_status,
             shipment_items=[
-                django_mappers.ShipmentLineItemMapper.to_domain(item) for item in django_shipment.shipment_items.all()
+                django_mappers.ShipmentItemMapper.to_domain(item) for item in django_shipment.shipment_items.all()
             ]
         )

@@ -1,6 +1,7 @@
 from __future__ import annotations
 from typing import Any, Dict, Type
 from datetime import datetime
+from .webhook_receiver_abstract import WebhookReceiverAbstract
 from .easypost_webhook_receiver import EasyPostWebhookReceiver
 from .github_webhook_receiver import GithubWebhookReceiver
 from .wss_webhook_receiver import WssWebhookReceiver
@@ -21,7 +22,7 @@ class WebhookReceiverFactory:
     }
 
     @staticmethod
-    def get_webhook_receiver(cfg: dict) -> WebhookReceiverInterface:
+    def get_webhook_receiver(cfg: dict) -> WebhookReceiverAbstract:
         provider_name = cfg.get("provider_name", "").lower()
         
         # Use dictionary lookup to find the correct class

@@ -5,6 +5,6 @@ from ddd.order_management.domain import exceptions
 
 @dataclass(frozen=True)
 class CustomerDetails:
-    name: str
-    email: str
+    customer_name: str
+    customer_email: str
     customer_id: Optional[str] = None

@@ -1,5 +1,6 @@
 from __future__ import annotations
-from typing import Any, Optional
+from typing import Any, Optional, Type
+from .jwt_token_handler import JwtTokenHandler
 from ddd.order_management.application import ports
 
 class AccessControlService:
@@ -8,17 +9,16 @@ class AccessControlService:
     dependencies and create tenant-specific AccessControl objects.
     """
     
-    #_saas_service: Optional[SaasServiceLike] = None
-    #_access_control_library_class: Optional[Type[AccessControl1Like]] = None
-    ## Injected factory function that creates the JwtTokenHandler
-    #_jwt_handler: Optional[JwtHandlerFactory] = None
+    _saas_service: Optional[ports.TenantServiceAbstract] = None
+    _access_control_library: Optional[Type[ports.AccessControl1Abstract]] = None
+    _jwt_handler: Optional[Type[JwtTokenHandler]] = None
 
     @classmethod
     def configure(
         cls, 
-        saas_service, 
-        access_control_library,
-        jwt_handler
+        saas_service: ports.TenantServiceAbstract, 
+        access_control_library: Type[ports.AccessControl1Abstract],
+        jwt_handler: Type[JwtTokenHandler]
     ):
         """
         Configures the global dependencies for the service, including the JWT handler factory.

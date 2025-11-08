@@ -24,7 +24,7 @@ class AccessControl1:
 
     def ensure_user_is_authorized_for(
         self, user_context: dtos.UserContextDTO, required_permission: str, required_scope: Optional[dict] = None
-    ) -> dtos.UserContextDTO:
+    ) -> bool:
 
         #identity_claims = self.jwt_handler.decode(token)
         #token_type = identity_claims.get("token_type", "Bearer")
