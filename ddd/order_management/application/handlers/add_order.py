@@ -7,7 +7,7 @@ from ddd.order_management.application import (
     ports, 
     dtos, 
 )
-from ddd.order_management.domain import exceptions
+from ddd.order_management.domain import exceptions, models
 
 
 def handle_add_order(
@@ -26,11 +26,11 @@ def handle_add_order(
                 required_scope={"role": ["vendor"] }
             )
 
-            #TODO: should make it as as order service? 
-            order = uow.order.create_order( # type: ignore
+            order = models.Order.create_order( 
                 customer_details=mappers.CustomerDetailsMapper.to_domain(command.customer_details),
                 line_items=[mappers.LineItemMapper.to_domain(sku) for sku in command.product_skus],
-                tenant_id=user_ctx.tenant_id
+                tenant_id=user_ctx.tenant_id,
+                external_ref=command.external_ref
             )  
 
 

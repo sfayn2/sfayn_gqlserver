@@ -14,6 +14,7 @@ def handle_confirm_shipment(
         user_ctx: dtos.UserContextDTO,
         exception_handler: ports.ExceptionHandlerAbstract,
         user_action_service: ports.UserActionServiceAbstract,
+        shipping_provider_service: ports.ShippingProviderServiceAbstract,
         uow: ports.UnitOfWorkAbstract) -> dtos.ResponseDTO:
     try:
         with uow:

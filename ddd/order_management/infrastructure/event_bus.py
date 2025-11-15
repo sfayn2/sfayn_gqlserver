@@ -1,6 +1,6 @@
 from __future__ import annotations
 import redis, os
-from typing import Dict, List, Type, Any
+from typing import Dict, List, Type, Any, Optional
 from ddd.order_management.domain import events, repositories
 from ddd.order_management.application import dtos, ports
 
@@ -10,12 +10,13 @@ ASYNC_INTERNAL_EVENT_HANDLERS: Dict[str, List[Any]] = {}
 ASYNC_EXTERNAL_EVENT_HANDLERS: Dict[str, List[Any]] = {}
 
 # central mapping of event stream payloads to dtos.IntegrationEvent
-EVENT_MODELS = Dict[str, Type[dtos.IntegrationEvent]]
+EVENT_MODELS: Dict[str, Type[dtos.IntegrationEvent]] = {}
 
 EXTERNAL_EVENT_WHITELIST: List[str] = []
 INTERNAL_EVENT_WHITELIST: List[str] = []
-internal_publisher = None
-external_publisher = None
+
+internal_publisher: Optional[ports.EventPublisherAbstract] = None 
+external_publisher: Optional[ports.EventPublisherAbstract] = None
 
 
 def publish_async_internal(event: events.DomainEvent):

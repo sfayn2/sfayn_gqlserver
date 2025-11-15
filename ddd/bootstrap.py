@@ -55,7 +55,7 @@ access_control1.AccessControlService.configure(
 # =============== resolve shipping provider based on tenant_id ========
 shipping.ShippingProviderService.configure(
     saas_service=saas_service_instance,
-    shipping_provider_factory=shipping.ShippingProviderFactory
+    shipping_provider_factory=shipping.ShippingProviderFactory()
 )
 
 # ============== domain clock =============
@@ -81,12 +81,12 @@ event_bus.INTERNAL_EVENT_WHITELIST = []
 # ===========Setup Redis event publishers ==========
 event_bus.internal_publisher = event_publishers.RedisStreamPublisher(
             redis_client=redis.Redis.from_url(os.getenv("REDIS_INTERNAL_URL"), decode_responses=True),
-            stream_name=os.getenv("REDIS_INTERNAL_STREAM"),
+            stream_name=os.getenv("REDIS_INTERNAL_STREAM", "default-internal-stream-oms"),
             event_whitelist=event_bus.INTERNAL_EVENT_WHITELIST
         )
 event_bus.external_publisher = event_publishers.RedisStreamPublisher(
             redis_client=redis.Redis.from_url(os.getenv("REDIS_EXTERNAL_URL"), decode_responses=True),
-            stream_name=os.getenv("REDIS_EXTERNAL_STREAM"),
+            stream_name=os.getenv("REDIS_EXTERNAL_STREAM", "default-external-stream-oms"),
             event_whitelist=event_bus.EXTERNAL_EVENT_WHITELIST
         )
 
@@ -100,8 +100,6 @@ event_bus.ASYNC_EXTERNAL_EVENT_HANDLERS.update({
     "identity_gateway_service.external_events.UserLoggedInEvent": [
             lambda event: handlers.handle_user_logged_in_async_event(
                 event=event,
-                auth_snapshot_repo=snapshots.DjangoUserAuthorizationSnapshotRepo(),
-                customer_snapshot_repo=snapshots.DjangoCustomerSnapshotRepo()
             ),
         ],
 })
@@ -109,9 +107,11 @@ event_bus.ASYNC_EXTERNAL_EVENT_HANDLERS.update({
 
 # ==================Internal async (redis/kafka/etc?) event handlers (within this service) ==================
 event_bus.ASYNC_INTERNAL_EVENT_HANDLERS.update({
-    "order_management.internal_events.CreateOrderEvent": [
-        lambda event: handlers.handle_create_order_async_event(
+    "order_management.internal_events.AddOrderIntegrationEvent": [
+        lambda event: handlers.handle_add_order_async_event(
             event=event,
+            user_action_service=user_action_service.UserActionService(),
+            uow=repositories.DjangoOrderUnitOfWork()
         ),
     ],
     "order_management.internal_events.ConfirmedShipmentEvent": [
@@ -127,22 +127,13 @@ event_bus.ASYNC_INTERNAL_EVENT_HANDLERS.update({
 # ======================= Domain event handlers (immediate processing) ==============
 event_bus.EVENT_HANDLERS.update({
     events.CanceledOrderEvent: [
-            lambda event, uow: handlers.handle_logged_order(
-                event=event,
-                uow=uow,
-            ),
-            lambda event, uow: handlers.handle_email_canceled_order(
-                event=event, 
-                uow=uow,
-                email=email_sender.MyEmailSender()
-            )
         ],
 })
 
 # =========== inject concrete impl / cross cutting =======================
 message_bus.ACCESS_CONTROL_SERVICE_IMPL = access_control1.AccessControlService
 #message_bus.LOGGING_SERVICE_IMPL = loggings.LoggingService
-message_bus.EXCEPTION_HANDLER_FACTORY = exception_handler.OrderExceptionHandler
+message_bus.EXCEPTION_HANDLER_FACTORY = exception_handler.OrderExceptionHandler()
 message_bus.UOW = repositories.DjangoOrderUnitOfWork()
 message_bus.USER_ACTION_SERVICE_IMPL = user_action_service.UserActionService()
 
@@ -155,10 +146,6 @@ message_bus.COMMAND_HANDLERS.update({
     commands.ConfirmShipmentCommand: lambda command, **deps: handlers.handle_confirm_shipment(
         command=command,
         shipping_provider_service=shipping.ShippingProviderService,
-        **deps
-    ),
-    commands.AddShippingTrackingReferenceCommand: lambda command, **deps: handlers.handle_add_shipping_tracking_reference(
-        command=command,
         **deps
     ),
     commands.DeliverShipmentCommand: lambda command, **deps: handlers.handle_deliver_shipment(

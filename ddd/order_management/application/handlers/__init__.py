@@ -24,6 +24,7 @@ from .get_order import handle_get_order
 # Async Events via Redis stream
 from .event_handlers.user_logged_in_async_event import handle_user_logged_in_async_event
 from .event_handlers.dispatch_shipment_async_event import handle_dispatch_shipment_async_event
+from .event_handlers.add_order_async_event import handle_add_order_async_event
 
 
 
