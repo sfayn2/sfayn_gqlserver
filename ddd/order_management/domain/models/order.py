@@ -296,3 +296,15 @@ class Order:
 
         self.raise_event(event)
 
+
+    def __hash__(self):
+        # Recommended: Include both identifiers used to retrieve the order
+        return hash((self.order_id, self.tenant_id))
+
+    def __eq__(self, other):
+        # Recommended: Check both attributes for equality
+        if not isinstance(other, Order):
+            return NotImplemented
+        return (self.order_id == other.order_id and 
+                self.tenant_id == other.tenant_id)
+

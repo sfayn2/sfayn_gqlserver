@@ -1,5 +1,5 @@
 from __future__ import annotations
-import requests
+import requests, json
 from typing import Tuple, Optional
 from order_management import models as django_snapshots
 from ddd.order_management.domain import exceptions
@@ -39,7 +39,8 @@ class AccessControl1:
 
         if required_scope:
             for authorization in matching_authorizations:
-                if all(authorization.scope.get(k) == v for k, v in required_scope.items()):
+                auth_scope = json.loads(authorization.scope)
+                if all(auth_scope.get(k) == v for k, v in required_scope.items()):
                     return True
 
             raise exceptions.AccessControlException("Access denied: required scoped permission not found")

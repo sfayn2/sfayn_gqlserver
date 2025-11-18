@@ -81,12 +81,12 @@ event_bus.INTERNAL_EVENT_WHITELIST = []
 # ===========Setup Redis event publishers ==========
 event_bus.internal_publisher = event_publishers.RedisStreamPublisher(
             redis_client=redis.Redis.from_url(os.getenv("REDIS_INTERNAL_URL"), decode_responses=True),
-            stream_name=os.getenv("REDIS_INTERNAL_STREAM", "default-internal-stream-oms"),
+            stream_name=os.getenv("REDIS_INTERNAL_STREAM", "stream.internal.oms"),
             event_whitelist=event_bus.INTERNAL_EVENT_WHITELIST
         )
 event_bus.external_publisher = event_publishers.RedisStreamPublisher(
             redis_client=redis.Redis.from_url(os.getenv("REDIS_EXTERNAL_URL"), decode_responses=True),
-            stream_name=os.getenv("REDIS_EXTERNAL_STREAM", "default-external-stream-oms"),
+            stream_name=os.getenv("REDIS_EXTERNAL_STREAM", "stream.external.oms"),
             event_whitelist=event_bus.EXTERNAL_EVENT_WHITELIST
         )
 

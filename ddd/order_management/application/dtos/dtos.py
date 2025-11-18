@@ -31,8 +31,8 @@ class AddressDTO(BaseModel):
 
 
 class PackageDTO(BaseModel):
-    weight: Decimal
-    dimensions: Tuple[int, int, int]
+    weight_kg: Decimal
+    #dimensions: Tuple[int, int, int]
 
 class LineItemDTO(BaseModel):
     product_sku: str

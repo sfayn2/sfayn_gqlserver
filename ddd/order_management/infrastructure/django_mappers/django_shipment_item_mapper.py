@@ -14,8 +14,8 @@ class ShipmentItemMapper:
                 "defaults":  {
                     "line_item_id": shipment_item.line_item.product_sku,
                     'quantity': shipment_item.quantity,
-                    'allocated_shipping_tax': shipment_item.allocated_shipping_tax.amount,
-                    'allocated_shipping_tax_currency': shipment_item.allocated_shipping_tax.currency
+                    'allocated_shipping_tax': shipment_item.allocated_shipping_tax.amount if shipment_item.allocated_shipping_tax else None,
+                    'allocated_shipping_tax_currency': shipment_item.allocated_shipping_tax.currency if shipment_item.allocated_shipping_tax else None
                 }
             }
 

@@ -1,10 +1,11 @@
-class DomainError(Exception):
-    pass
 
 class ShippingProviderIntegrationError(Exception):
     pass
 
-class InvalidOrderOperation(DomainError):
+class InvalidOrderOperation(Exception):
+    pass
+
+class DomainError(InvalidOrderOperation):
     pass
 
 class MoneyException(InvalidOrderOperation):
@@ -13,11 +14,12 @@ class MoneyException(InvalidOrderOperation):
 class AddressException(InvalidOrderOperation):
     pass
 
-# below Exceptions will not be include error msg in response
-class Forbidden(Exception):
+class AccessControlException(InvalidOrderOperation):
     pass
 
-class AccessControlException(Exception):
+
+# below Exceptions will not be include error msg in response
+class Forbidden(Exception):
     pass
 
 class IntegrationException(Exception):

@@ -20,8 +20,9 @@ class ShipmentMapper:
                     'shipment_address_state' : shipment.shipment_address.state,
                     'shipment_provider': shipment.shipment_provider,
                     'tracking_reference': shipment.tracking_reference,
-                    'shipment_amount': shipment.shipment_amount,
-                    'shipment_tax_amount': shipment.shipment_tax_amount,
+                    'shipment_amount': shipment.shipment_amount.amount,
+                    'shipment_currency': shipment.shipment_amount.currency,
+                    'shipment_tax_amount': shipment.shipment_tax_amount.amount,
                     'shipment_status': shipment.shipment_status,
                 }
         }

@@ -15,8 +15,17 @@ from ddd.order_management.application import (
     dtos, 
 )
 from ddd.order_management.infrastructure import (
+    event_bus, 
+    repositories,
+    access_control1,
+    event_publishers,
+    webhook_receiver,
     clocks,
-    access_control1
+    user_action_service,
+    tenant_service,
+    saas_service,
+    shipping,
+    exception_handler
 )
 
 # =================
@@ -33,71 +42,69 @@ TENANT2 = "tenant_456"
 VENDOR1 = "vendor-1"
 VENDOR2 = "vendor-2"
 
-# Columns user_id, permission_codename, tenant_id, scope, is_active
+# Columns tenant_id, permission_codename, scope, is_active
 USER_SEEDS = (
-    (USER1, "checkout_items", TENANT1, json.dumps({ "customer_id": USER1 }), True),
+    (TENANT1, "add_shipment", json.dumps({ "role": ["vendor"] }), True),
+    (TENANT2, "add_shipment", json.dumps({ "role": ["vendor"] }), True),
 )
 
-# Columns order_id, order_status, activity_status, cancellation_reason, customer_id, customer_first_name, customer_last_name, customer_email, coupons, delivery_street, delivery_city, delivery_postal, delivery_country, delivery_state, shipping_method, shipping_delivery_time, shipping_cost, shipping_tracking_reference, tax_details, tax_amount, total_discounts_fee, total_amount, offer_details, final_amount, payment_method, payment_reference, payment_amount, payment_status, currency, tenant_id
+# Columns order_id, tenant_id, external_ref, order_status, customer_id, customer_name, customer_email, payment_status, currency, date_created, date_modified
 ORDER_SEEDS = (
-    ("ORD-1", enums.OrderStatus.DRAFT.value, "NoPendingActivities", "", USER1, "first name1", "last name1", "email@gmail.com", json.dumps(["VALID-COUPON25"]), "street1", "Singapore", 1234, "Singapore", "Singapore", None, None, None, None, json.dumps([]), Decimal("0"), Decimal("0"), Decimal("0"), json.dumps([]), Decimal("0"), None, None, Decimal("0"), None, "SGD", TENANT1),
-    ("ORD-NONDRAFT-1", enums.OrderStatus.PENDING.value, "NoPendingActivities", "", USER1, "first name1", "last name1", "email@gmail.com", json.dumps([]), "street1", "Singapore", 1234, "Singapore", "Singapore", None, None, None, None, json.dumps([]), Decimal("0"), Decimal("0"), Decimal("0"), json.dumps([]), Decimal("0"), None, None, Decimal("0"), None, "SGD", TENANT1),
-    ("ORD-REMOVEITEMS-1", enums.OrderStatus.DRAFT.value, "NoPendingActivities", "", USER1, "first name1", "last name1", "email@gmail.com", json.dumps([]), "street1", "Singapore", 1234, "Singapore", "Singapore", None, None, None, None, json.dumps([]), Decimal("0"), Decimal("0"), Decimal("0"), json.dumps([]), Decimal("0"), None, None, Decimal("0"), None, "SGD", TENANT1),
-    ("ORD-CHANGEQTY-1", enums.OrderStatus.DRAFT.value, "NoPendingActivities", "", USER1, "first name1", "last name1", "email@gmail.com", json.dumps([]), "street1", "Singapore", 1234, "Singapore", "Singapore", None, None, None, None, json.dumps([]), Decimal("0"), Decimal("0"), Decimal("0"), json.dumps([]), Decimal("0"), None, None, Decimal("0"), None, "SGD", TENANT1),
+    ("ORD-CONFIRMED-1", TENANT1, "external ref here", enums.OrderStatus.CONFIRMED.value, "customer id here", " customer name", " customer email", enums.PaymentStatus.UNPAID.value, "SGD", datetime.now(timezone.utc), datetime.now(timezone.utc)),
+    ("ORD-NOTCONFIRMED-1", TENANT1, "external ref here", enums.OrderStatus.PENDING.value, "customer id here", " customer name", " customer email", enums.PaymentStatus.UNPAID.value, "SGD", datetime.now(timezone.utc), datetime.now(timezone.utc)),
 )
 
-# Columns order_id, vendor_id, vendor_name, vendor_country, product_sku, product_name, product_category, is_free_gift, is_taxable, options, product_price, product_currency, order_quantity, package_weight_kg, package_length_cm, package_width_cm, package_height_cm, total_price
+# Columns order_id, product_sku, product_name, product_price, product_currency, order_quantity, vendor_id, package_weight_kg
 ORDER_LINE_SEEDS = (
-    ("ORD-1", VENDOR1, "VendorA", "Singapore", "sku_ok", "my product", "T-SHIRT", False, True, json.dumps({"Size": "M", "Color": "RED"}), Decimal("20"), "SGD", 10, 1, 1, 1, 1, 200),
-    ("ORD-1", VENDOR1, "VendorA", "Singapore", "sku_already_exists", "my product", "T-SHIRT", False, True, json.dumps({"Size": "M", "Color": "RED"}), Decimal("20"), "SGD", 10, 1, 1, 1, 1, 200),
-    ("ORD-NONDRAFT-1", VENDOR1, "VendorA", "Singapore", "sku_already_exists", "my product", "T-SHIRT", False, True, json.dumps({"Size": "M", "Color": "RED"}), Decimal("20"), "SGD", 10, 1, 1, 1, 1, 200),
-    ("ORD-REMOVEITEMS-1", VENDOR1, "VendorA", "Singapore", "sku_remove1", "my product", "T-SHIRT", False, True, json.dumps({"Size": "M", "Color": "RED"}), Decimal("20"), "SGD", 10, 1, 1, 1, 1, 200),
-    ("ORD-REMOVEITEMS-1", VENDOR1, "VendorA", "Singapore", "sku_remove2", "my product", "T-SHIRT", False, True, json.dumps({"Size": "M", "Color": "RED"}), Decimal("20"), "SGD", 10, 1, 1, 1, 1, 200),
-    ("ORD-CHANGEQTY-1", VENDOR1, "VendorA", "Singapore", "sku_change1", "my product", "T-SHIRT", False, True, json.dumps({"Size": "M", "Color": "RED"}), Decimal("20"), "SGD", 10, 1, 1, 1, 1, 200),
-    ("ORD-CHANGEQTY-1", VENDOR1, "VendorA", "Singapore", "sku_change2", "my product", "T-SHIRT", False, True, json.dumps({"Size": "M", "Color": "RED"}), Decimal("20"), "SGD", 10, 1, 1, 1, 1, 200),
-    ("ORD-1", VENDOR1, "VendorA", "Singapore", "sku_add_coupon", "my product", "T-SHIRT", False, True, json.dumps({"Size": "M", "Color": "RED"}), Decimal("20"), "SGD", 10, 1, 1, 1, 1, 200),
+    ("ORD-CONFIRMED-1", "SKU-A", "my product", Decimal("1.12"), "SGD", 2, VENDOR1, Decimal("20")),
+    ("ORD-CONFIRMED-1", "SKU-B", "my product", Decimal("1.12"), "SGD", 2, VENDOR1, Decimal("20")),
+    ("ORD-NOTCONFIRMED-1", "SKU-NOTCONFIRMED", "my product", Decimal("1.12"), "SGD", 2, VENDOR1, Decimal("20")),
 )
 
-# order_id, order_status, activity_status, step, sequence, performed_by, user_input, optional_step, outcome, conditions
-OTHER_ACTIVITIES = (
-    ("ORD-WORKFLOW-TENANT1", "PENDING", "PlaceOrder", "place_order", 1, "user-1", "", False, "WAITING", ""),
-    ("ORD-WORKFLOW-TENANT1", "CONFIRMED", "ConfirmOrder", "confirm_order", 2, "user-1", "", False, "WAITING", ""),
-    ("ORD-WORKFLOW-TENANT1", "SHIPPED", "MarkShipped", "mark_as_shipped", 3, "vendor-1", "", False, "WAITING", ""),
-    ("ORD-WORKFLOW-TENANT1", "SHIPPED", "ReturnOrder", "return_item", 4, "vendor-1", "", False, "WAITING", ""),
-    ("ORD-WORKFLOW-TENANT1", "SHIPPED", "ProcessRefund", "process_refund", 5, "vendor-1", "", False, "WAITING", ""),
-    ("ORD-WORKFLOW-TENANT1", "COMPLETED", "MarkCompleted", "mark_as_completed", 6, "vendor-1", "", False, "WAITING", "")
+# Shipment
+# Columns shipment_id, order_id, shipment_address_line1, shipment_address_line2, shipment_address_city, shipment_address_postal, shipment_address_country, shipment_address_state, shipment_provider, tracking_reference, shipment_amount, shipment_tax_amount, shipment_currency, shipment_status
+SHIPMENT_SEEDS = (
+    ("SH-1", "ORD-CONFIRMED-1", "line 1", "line 2", "city ", "postal here", "country here", "state here", "provider here", " tracking reference here", Decimal("2.2"), Decimal("1.2"), "SGD", enums.ShipmentStatus.PENDING.value),
 )
 
-# Columns product_id, vendor_id, tenant_id, product_sku, product_name, product_category, options, product_price, stock, product_currency, package_weight_kg, package_length_cm, package_width_cm, package_height_cm, is_free_gift, is_taxable, is_active
-VENDOR_PRODUCT_SEEDS = (
-    ("prod-0", VENDOR1, TENANT1, "sku_ok", "sample product", "T-SHIRT", json.dumps({"Color": "RED", "Size": "M" }), 20, 999, "SGD", "1", "1", "1", "1", False, True, True),
-    ("prod-1", VENDOR1, TENANT1, "sku1_ok", "sample product", "T-SHIRT", json.dumps({"Color": "RED", "Size": "M" }), 20, 999, "SGD", "1", "1", "1", "1", False, True, True),
-    ("prod-2", VENDOR1, TENANT1, "sku1_out_of_stock", "sample product", "T-SHIRT", json.dumps({"Color": "RED", "Size": "M" }), 20, 999, "SGD", "1", "1", "1", "1", False, True, True),
-    ("prod-3", VENDOR1, TENANT1, "sku_w_free_gift", "sample product", "T-SHIRT", json.dumps({"Color": "RED", "Size": "M" }), 20, 999, "SGD", "1", "1", "1", "1", True, True, True),
-    ("prod-4", VENDOR1, TENANT1, "sku_currency_mismatch", "sample product", "T-SHIRT", json.dumps({"Color": "RED", "Size": "M" }), 20, 999, "USD", "1", "1", "1", "1", False, True, True),
-    ("prod-5", VENDOR1, TENANT1, "sku_free_gift_zero_price", "sample product", "T-SHIRT", json.dumps({"Color": "RED", "Size": "M" }), 20, 999, "USD", "1", "1", "1", "1", True, False, True),
-    ("prod-6", VENDOR2, TENANT1, "sku_vendor_mismatch", "sample product", "T-SHIRT", json.dumps({"Color": "RED", "Size": "M" }), 20, 999, "SGD", "1", "1", "1", "1", False, True, True),
-    ("prod-7", VENDOR1, TENANT1, "sku_already_exists", "sample product", "T-SHIRT", json.dumps({"Color": "RED", "Size": "M" }), 20, 999, "SGD", "1", "1", "1", "1", False, True, True),
-    ("prod-8", VENDOR1, TENANT1, "sku_remove1", "sample product", "T-SHIRT", json.dumps({"Color": "RED", "Size": "M" }), 20, 999, "SGD", "1", "1", "1", "1", False, True, True),
-    ("prod-9", VENDOR1, TENANT1, "sku_remove2", "sample product", "T-SHIRT", json.dumps({"Color": "RED", "Size": "M" }), 20, 999, "SGD", "1", "1", "1", "1", False, True, True),
-    ("prod-changeqty-1", VENDOR1, TENANT1, "sku_change1", "sample product", "T-SHIRT", json.dumps({"Color": "RED", "Size": "M" }), 20, 999, "SGD", "1", "1", "1", "1", False, True, True),
-    ("prod-changeqty-2", VENDOR1, TENANT1, "sku_change2", "sample product", "T-SHIRT", json.dumps({"Color": "RED", "Size": "M" }), 20, 999, "SGD", "1", "1", "1", "1", False, True, True),
+
+# Shipment Item
+# Columns shipment_item_id, shipment_id, line_item_id, quantity, allocated_shipping_tax, allocated_shipping_tax_currency
+SHIPMENT_ITEM_SEEDS = (
+    ("SHI-1", "SH-1", "SKU-A", 1, None, None),
 )
 
-# Columns vendor_id, tenant_id, offer_id, coupon_code, start_date, end_date, is_active
-VENDOR_COUPON_SEEDS = (
-    (VENDOR1, TENANT1, "OFFER-1", "VALID-COUPON25", datetime.now(timezone.utc), datetime.now(timezone.utc) + timedelta(minutes=5), True),
-    (VENDOR1, TENANT1, "OFFER-1", "VALID2-COUPON25", datetime.now(timezone.utc), datetime.now(timezone.utc) + timedelta(minutes=5), True),
-    (VENDOR1, TENANT1, "OFFER-1", "EXPIRED-COUPON25", datetime(2024, 8, 13, 14, 30, 29, tzinfo=timezone.utc), datetime(2024, 11, 11, 23, 59, 59, tzinfo=timezone.utc), True),
-    (VENDOR1, TENANT1, "OFFER-1", "NOT-ACTIVE-COUPON25", datetime.now(timezone.utc), datetime.now(timezone.utc) + timedelta(minutes=5), False),
-
+# UserActionLog
+# Columns order_id, action, performed_by, user_input, executed_at
+USER_ACTION_SEEDS = (
+    ("ORD-CONFIRMED-1", "add_order", USER1, json.dumps({}), datetime.now(timezone.utc)),
 )
 
-# Columns vendor_id, tenant_id, name, country, is_active
-VENDOR_SEEDS = (
-    (VENDOR1, TENANT1, "VendorA", "Singapore", True),
-    (VENDOR2, TENANT1, "VendorB", "Singapore", True),
+# TenantConfig
+# Columns tenant_id, configs, last_update_dt
+TENANT_CONFIG_SEEDS  = (
+    (TENANT1, json.dumps({
+        "restocking_fee_percent": 10,
+        "max_refund_amount": 500.0,
+        "webhook_url": "https://tenant-a.app/webhook"
+    }), datetime.now(timezone.utc)),
 )
+
+# SaaSConfig
+# Columns tenant_id, configs, last_update_dt
+SAAS_CONFIG_SEEDS  = (
+    (TENANT1, json.dumps({
+        "idp": {
+            "public_key": "92alSyFzFiPHT3oYDwjXAGXFAAAQGt1Eoaag5dw",
+            "issuer": "http://idp.saasprovider.com/realms/tenant1",
+            "audience": "AUD1",
+            "algorith": "RS256",
+        },
+        "plan": ["standard"],
+        "webhook_secret": "abc123secret",
+    }), datetime.now(timezone.utc)),
+)
+
 # === Test Data ========
 
 @pytest.fixture(scope="session", autouse=True)
@@ -123,43 +130,59 @@ def fake_rsa_keys():
 # =================
 # RSA key
 # =========
-
 @pytest.fixture
 def fake_customer_details():
     return dtos.CustomerDetailsDTO(
-            last_name="last name1",
-            first_name="first name1",
+            customer_id="customer id",
+            name="name here",
             email="email1@gmail.com"
         )
 
 @pytest.fixture
 def fake_address():
     return dtos.AddressDTO(
-            street="street1",
-            city="Singapore",
-            postal=1234,
-            country="Singapore",
-            state="Singapore"
+            line1="line 1",
+            city="city 1",
+            country="country 1",
+            line2="line 2 here",
+            state="state here",
+            postal="postal here"
         )
+
+@pytest.fixture
+def fake_jwt_token_handler():
+    class JwtTokenHandler:
+        def __init__(self, public_key: str, issuer: str, audience: str, algorithm: str):
+            self.public_key = public_key
+            self.issuer = issuer
+            self.audience = audience
+            self.algorithm = algorithm
+
+        def decode(self, token: str, secret: Optional[str] = None) -> dict:
+            return {
+                "sub": USER1,
+                "token_type": "Bearer",
+                "tenant_id": TENANT1,
+                "roles": ["vendor"]
+            }
+    return JwtTokenHandler
+
+
 
 
 
 @pytest.fixture
-def fake_access_control():
-    class FakeAccessControl:
-        def get_user_context(self, token: str) -> dtos.UserContextDTO:
-            return dtos.UserContextDTO(
-                sub=USER1,
-                token_type="Bearer",
-                tenant_id=TENANT1,
-                roles=["customer"]
-            )
+def fake_access_control(fake_jwt_token_handler):
 
-        def ensure_user_is_authorized_for(
-            self, user_context: dtos.UserContextDTO, required_permission: str, required_scope: Optional[dict] = None
-        ) -> dtos.UserContextDTO:
-            return user_context
-    return FakeAccessControl
+    saas_service_instance = saas_service.SaaSService()
+
+    # ============== resolve access control based on tenant_id ===============
+    access_control1.AccessControlService.configure(
+        saas_service=saas_service_instance,
+        access_control_library=access_control1.AccessControl1,
+        jwt_handler=fake_jwt_token_handler
+    )
+    return access_control1.AccessControlService
 
 @pytest.fixture(scope="session", autouse=True)
 def domain_clock():
@@ -172,6 +195,18 @@ def domain_clock():
 # ==========
 
 @pytest.fixture()
+def fake_exception_handler():
+    return exception_handler.OrderExceptionHandler()
+
+@pytest.fixture()
+def fake_user_action_service():
+    return user_action_service.UserActionService()
+
+@pytest.fixture()
+def fake_uow():
+    return repositories.DjangoOrderUnitOfWork()
+
+@pytest.fixture()
 def fake_jwt_valid_token(fake_rsa_keys):
     private_key, _ = fake_rsa_keys
 
@@ -181,7 +216,7 @@ def fake_jwt_valid_token(fake_rsa_keys):
         "iss":"https://issuer.test",
         "tenant_id": TENANT1,
         "token_type": "Bearer",
-        "roles": ["customer"],
+        "roles": ["vendor"],
         "exp": datetime.now() + timedelta(minutes=5)
     }
     token = jwt.encode(payload, private_key, algorithm="RS256")
@@ -204,17 +239,6 @@ def fake_jwt_expired_token(fake_rsa_keys):
     return token
 
 
-@pytest.fixture
-def fake_jwt_handler():
-    class FakeJWTHandler:
-        def decode(self, token: str) -> dict:
-            return {
-                "sub": USER1,
-                "tenant_id": TENANT1,
-                "token_type": "Bearer",
-                "roles": ["customer"]
-            }
-    return FakeJWTHandler
 
 # =======================
 # JWT fixtures
@@ -228,113 +252,93 @@ def seeded_all(django_db_setup, django_db_blocker):
     with django_db_blocker.unblock():
 # Columns vendor_id, tenant_id, offer_id, coupon_code, start_date, end_date, is_active
 
-        for vc in VENDOR_COUPON_SEEDS:
-            django_snapshots.VendorCouponSnapshot.objects.create(
-                vendor_id=vc[0],
-                tenant_id=vc[1],
-                offer_id=vc[2],
-                coupon_code=vc[3], 
-                start_date=vc[4],
-                end_date=vc[5],
-                is_active=vc[6]
+        for tc in TENANT_CONFIG_SEEDS:
+            django_snapshots.TenantConfig.objects.create(
+                tenant_id=tc[0],
+                configs=tc[1],
+                last_update_dt=tc[2]
             )
 
-        for vp in VENDOR_PRODUCT_SEEDS:
-            django_snapshots.VendorProductSnapshot.objects.create(
-                product_id=vp[0],
-                vendor_id=vp[1],
-                tenant_id=vp[2],
-                product_sku=vp[3],
-                product_name=vp[4],
-                product_category=vp[5],
-                options=vp[6],
-                product_price=vp[7],
-                stock=vp[8],
-                product_currency=vp[9],
-                package_weight_kg=vp[10],
-                package_length_cm=vp[11],
-                package_width_cm=vp[12],
-                package_height_cm=vp[13],
-                is_free_gift=vp[14],
-                is_taxable=vp[15],
-                is_active=vp[16]
+        for sas in SAAS_CONFIG_SEEDS:
+            django_snapshots.SaaSConfig.objects.create(
+                tenant_id=sas[0],
+                configs=sas[1],
+                last_update_dt=sas[2]
             )
 
-        for vs in VENDOR_SEEDS:
-            django_snapshots.VendorDetailsSnapshot.objects.create(
-                vendor_id=vs[0], 
-                tenant_id=vs[1], 
-                name=vs[2], 
-                country=vs[3], 
-                is_active=vs[4]
-            )
 
         for us in USER_SEEDS:
             django_snapshots.UserAuthorizationSnapshot.objects.create(
-                user_id=us[0], 
+                tenant_id=us[0], 
                 permission_codename=us[1],
-                tenant_id=us[2], 
-                scope=us[3],
-                is_active=us[4]
+                scope=us[2],
+                is_active=us[3]
             )
 
         for os in ORDER_SEEDS:
             django_snapshots.Order.objects.create(
                 order_id=os[0], 
-                order_status=os[1],
-                activity_status=os[2],
-                cancellation_reason=os[3], 
+                tenant_id=os[1], 
+                external_ref=os[2], 
+                order_status=os[3], 
                 customer_id=os[4], 
-                customer_first_name=os[5],
-                customer_last_name=os[6], 
-                customer_email=os[7], 
-                coupons=os[8],
-                delivery_street=os[9], 
-                delivery_city=os[10], 
-                delivery_postal=os[11],
-                delivery_country=os[12], 
-                delivery_state=os[13], 
-                shipping_method=os[14],
-                shipping_delivery_time=os[15], 
-                shipping_cost=os[16], 
-                shipping_tracking_reference=os[17],
-                tax_details=os[18], 
-                tax_amount=os[19], 
-                total_discounts_fee=os[20],
-                total_amount=os[21], 
-                offer_details=os[22], 
-                final_amount=os[23],
-                payment_method=os[24], 
-                payment_reference=os[25], 
-                payment_amount=os[26],
-                payment_status=os[27], 
-                currency=os[28], 
-                tenant_id=os[29]
+                customer_name=os[5], 
+                customer_email=os[6],
+                payment_status=os[7], 
+                currency=os[8], 
+                date_created=os[9],
+                date_modified=os[10]
             )
 
         for ol in ORDER_LINE_SEEDS:
-            django_snapshots.OrderLine.objects.create(
-                order_id=ol[0],
-                vendor_id=ol[1],
-                vendor_name=ol[2],
-                vendor_country=ol[3],
-                product_sku=ol[4],
-                product_name=ol[5],
-                product_category=ol[6],
-                is_free_gift=ol[7],
-                is_taxable=ol[8],
-                options=ol[9],
-                product_price=ol[10],
-                product_currency=ol[11],
-                order_quantity=ol[12],
-                package_weight_kg=ol[13], 
-                package_length_cm=ol[14], 
-                package_width_cm=ol[15],
-                package_height_cm=ol[16], 
-                total_price=ol[17]
+            django_snapshots.LineItem.objects.create(
+                order_id=ol[0], 
+                product_sku=ol[1], 
+                product_name=ol[2], 
+                product_price=ol[3], 
+                product_currency=ol[4], 
+                order_quantity=ol[5], 
+                vendor_id=ol[6], 
+                package_weight_kg=ol[7]
             )
 
 
+        for sh in SHIPMENT_SEEDS:
+            django_snapshots.Shipment.objects.create(
+                shipment_id=sh[0], 
+                order_id=sh[1], 
+                shipment_address_line1=sh[2], 
+                shipment_address_line2=sh[3], 
+                shipment_address_city=sh[4], 
+                shipment_address_postal=sh[5], 
+                shipment_address_country=sh[6], 
+                shipment_address_state=sh[7], 
+                shipment_provider=sh[8], 
+                tracking_reference=sh[9], 
+                shipment_amount=sh[10], 
+                shipment_tax_amount=sh[11], 
+                shipment_currency=sh[12], 
+                shipment_status=sh[13]
+            )
+
+        for shi in SHIPMENT_ITEM_SEEDS:
+            django_snapshots.ShipmentItem.objects.create(
+                shipment_item_id=shi[0], 
+                shipment_id=shi[1], 
+                line_item_id=shi[2], 
+                quantity=shi[3], 
+                allocated_shipping_tax=shi[4], 
+                allocated_shipping_tax_currency=shi[5]
+            )
+
+        for ual in USER_ACTION_SEEDS:
+            django_snapshots.UserActionLog.objects.create(
+                order_id=ual[0], 
+                action=ual[1], 
+                performed_by=ual[2], 
+                user_input=ual[3], 
+                executed_at=ual[4]
+            )
 
 
 
