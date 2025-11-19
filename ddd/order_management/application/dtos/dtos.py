@@ -68,7 +68,7 @@ class ProductSkusDTO(BaseModel):
     vendor_id: str
     product_name: str
     product_price: MoneyDTO
-    product_weight_kg: Decimal
+    package: PackageDTO
 
 class UserContextDTO(BaseModel):
     sub: str
@@ -108,6 +108,5 @@ class ConfirmShipmentDTO(BaseModel):
 
 class AddOrderDTO(BaseModel):
     external_ref: str
-    tenant_id: str
     customer_details: CustomerDetailsDTO
     product_skus: List[ProductSkusDTO]

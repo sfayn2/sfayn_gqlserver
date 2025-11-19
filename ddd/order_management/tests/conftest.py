@@ -45,7 +45,7 @@ VENDOR2 = "vendor-2"
 # Columns tenant_id, permission_codename, scope, is_active
 USER_SEEDS = (
     (TENANT1, "add_shipment", json.dumps({ "role": ["vendor"] }), True),
-    (TENANT2, "add_shipment", json.dumps({ "role": ["vendor"] }), True),
+    (TENANT1, "add_order", json.dumps({ "role": ["vendor"] }), True),
 )
 
 # Columns order_id, tenant_id, external_ref, order_status, customer_id, customer_name, customer_email, payment_status, currency, date_created, date_modified
@@ -86,7 +86,7 @@ TENANT_CONFIG_SEEDS  = (
     (TENANT1, json.dumps({
         "restocking_fee_percent": 10,
         "max_refund_amount": 500.0,
-        "webhook_url": "https://tenant-a.app/webhook"
+        "webhook_url": "https://tenant_123.app/webhook"
     }), datetime.now(timezone.utc)),
 )
 
@@ -96,7 +96,7 @@ SAAS_CONFIG_SEEDS  = (
     (TENANT1, json.dumps({
         "idp": {
             "public_key": "92alSyFzFiPHT3oYDwjXAGXFAAAQGt1Eoaag5dw",
-            "issuer": "http://idp.saasprovider.com/realms/tenant1",
+            "issuer": "http://idp.saasprovider.com/realms/tenant_123",
             "audience": "AUD1",
             "algorith": "RS256",
         },

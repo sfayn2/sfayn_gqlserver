@@ -24,8 +24,8 @@ class OrderMapper:
                     'tenant_id': order.tenant_id, 
                     'external_ref': order.external_ref,
                     'customer_id': order.customer_details.customer_id, 
-                    'customer_name': order.customer_details.customer_name, 
-                    'customer_email': order.customer_details.customer_email,
+                    'customer_name': order.customer_details.name, 
+                    'customer_email': order.customer_details.email,
                     'order_status': order.order_status.value, 
                     'payment_status': order.payment_status.value,
                     'currency': order.currency,
@@ -52,8 +52,8 @@ class OrderMapper:
             date_modified=django_order_object.date_modified, 
             customer_details=value_objects.CustomerDetails(
                 customer_id=customer_id, 
-                customer_name=customer_name, 
-                customer_email=customer_email
+                name=customer_name, 
+                email=customer_email
             ),
             line_items=[
                 django_mappers.LineItemMapper.to_domain(item) 
@@ -65,5 +65,4 @@ class OrderMapper:
             ],
             order_status=enums.OrderStatus(django_order_object.order_status),
             payment_status=enums.PaymentStatus(django_order_object.payment_status),
-            currency=django_order_object.currency
         )

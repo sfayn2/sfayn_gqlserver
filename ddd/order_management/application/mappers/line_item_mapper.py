@@ -6,4 +6,11 @@ class LineItemMapper:
 
     @staticmethod
     def to_domain(dto: dtos.ProductSkusDTO) -> models.LineItem:
-        return models.LineItem(**dto.model_dump())
+        return models.LineItem(
+            product_sku=dto.product_sku,
+            product_name=dto.product_name,
+            order_quantity=dto.order_quantity,
+            vendor_id=dto.vendor_id,
+            package=value_objects.Package(dto.package.weight_kg),
+            product_price=value_objects.Money(amount=dto.product_price.amount, currency=dto.product_price.currency),
+        )

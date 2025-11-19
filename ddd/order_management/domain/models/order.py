@@ -1,5 +1,6 @@
 from __future__ import annotations
 import uuid
+from decimal import Decimal
 from datetime import datetime
 from dataclasses import dataclass, field
 from typing import Optional, List, Tuple
@@ -20,7 +21,6 @@ class Order:
     customer_details: value_objects.CustomerDetails
 
     order_id: str
-    currency: str
     order_status: enums.OrderStatus = enums.OrderStatus.DRAFT
     payment_status: enums.PaymentStatus = enums.PaymentStatus.UNPAID
 
@@ -37,13 +37,20 @@ class Order:
     def add_line_item(self, line_item: models.LineItem) -> None:
         if not line_item:
             raise exceptions.DomainError("Please provide line item to add.")
+
+        if line_item.order_quantity <= Decimal("0.0"):
+            raise exceptions.InvalidOrderOperation("Order quantity must be greater than zero.")
         
         #OMS side only
         if self.order_status != enums.OrderStatus.CONFIRMED:
             raise exceptions.DomainError("Only confirmed order can add line item.")
 
+
         if self.line_items:
             # this validation is only applicable for those w existing line items
+            if any(item.product_price.currency != line_item.product_price.currency for item in self.line_items):
+                raise exceptions.InvalidOrderOperation("All line items must have the same currency.")
+
             if line_item.product_sku in [item.product_sku for item in self.line_items]:
                 raise exceptions.DomainError(f"Order {self.order_id} Line item with SKU {line_item.product_sku} already exists.")
 
@@ -101,16 +108,15 @@ class Order:
         order = Order(
                 order_id=new_order_id,
                 external_ref=external_ref,
-                currency="SGD", #TODO
                 tenant_id=tenant_id,
                 customer_details=customer_details,
                 date_created=DomainClock.now(),
             )
 
+        order.order_status = enums.OrderStatus.CONFIRMED #its always confirm order?
+
         for line_item in line_items:
             order.add_line_item(line_item)
-
-        order.order_status = enums.OrderStatus.CONFIRMED #its always confirm order?
 
         return order
 
@@ -296,6 +302,13 @@ class Order:
 
         self.raise_event(event)
 
+    @property
+    def currency(self) -> str:
+        #assuming invariants
+        if not self.line_items:
+            raise exceptions.InvalidOrderOperation("Currency is unknown because the order has no line items.")
+        return self.line_items[0].product_price.currency
+
 
     def __hash__(self):
         # Recommended: Include both identifiers used to retrieve the order
@@ -307,4 +320,5 @@ class Order:
             return NotImplemented
         return (self.order_id == other.order_id and 
                 self.tenant_id == other.tenant_id)
+
 
