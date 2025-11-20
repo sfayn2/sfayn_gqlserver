@@ -231,13 +231,14 @@ class Order:
 
     def cancel_order(self):
         if not self.order_status in (enums.OrderStatus.PENDING, enums.OrderStatus.CONFIRMED):
-            raise exceptions.DomainError(f"Order in {self.order_status} cannot be cancelled.")
+            raise exceptions.DomainError(f"Order in {self.order_id} cannot be canceled.")
 
         if self.shipments and any(d.shipment_status in [enums.ShipmentStatus.SHIPPED, enums.ShipmentStatus.DELIVERED] for d in self.shipments):
             raise exceptions.DomainError("Cannot cancel, Shipments has already been shipped or delivered.")
 
         #if not cancellation_reason:
         #    raise exceptions.DomainError("Cannot cancel without a cancellation reason.")
+
         self.order_status = enums.OrderStatus.CANCELLED
         self._update_modified_date()
 

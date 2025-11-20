@@ -19,7 +19,7 @@ class ShipOrderCommand(Command):
 
 class CancelOrderCommand(Command):
     order_id: str
-    cancellation_reason: str
+    #cancellation_reason: str
 
 class CompleteOrderCommand(Command):
     order_id: str

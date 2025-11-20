@@ -1,7 +1,7 @@
 from typing import Any
 import ast, json
 from decimal import Decimal
-from ddd.order_management.domain import value_objects, models
+from ddd.order_management.domain import value_objects, models, enums
 from ddd.order_management.infrastructure import django_mappers
 
 class ShipmentMapper:
@@ -50,7 +50,7 @@ class ShipmentMapper:
                 amount=django_shipment.shipment_tax_amount,
                 currency=django_shipment.shipment_currency
             ),
-            shipment_status=django_shipment.shipment_status,
+            shipment_status=enums.ShipmentStatus(django_shipment.shipment_status),
             shipment_items=[
                 django_mappers.ShipmentItemMapper.to_domain(item) for item in django_shipment.shipment_items.all()
             ]

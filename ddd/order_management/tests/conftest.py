@@ -46,12 +46,14 @@ VENDOR2 = "vendor-2"
 USER_SEEDS = (
     (TENANT1, "add_shipment", json.dumps({ "role": ["vendor"] }), True),
     (TENANT1, "add_order", json.dumps({ "role": ["vendor"] }), True),
+    (TENANT1, "cancel_order", json.dumps({ "role": ["vendor"] }), True),
 )
 
 # Columns order_id, tenant_id, external_ref, order_status, customer_id, customer_name, customer_email, payment_status, currency, date_created, date_modified
 ORDER_SEEDS = (
-    ("ORD-CONFIRMED-1", TENANT1, "external ref here", enums.OrderStatus.CONFIRMED.value, "customer id here", " customer name", " customer email", enums.PaymentStatus.UNPAID.value, "SGD", datetime.now(timezone.utc), datetime.now(timezone.utc)),
-    ("ORD-NOTCONFIRMED-1", TENANT1, "external ref here", enums.OrderStatus.PENDING.value, "customer id here", " customer name", " customer email", enums.PaymentStatus.UNPAID.value, "SGD", datetime.now(timezone.utc), datetime.now(timezone.utc)),
+    ("ORD-CONFIRMED-1", TENANT1, "external ref here", enums.OrderStatus.CONFIRMED.value, "customer id here", " customer name", " customer email", enums.PaymentStatus.UNPAID.value, "SGD", datetime.now(timezone.utc), datetime.now(timezone.utc)), ("ORD-NOTCONFIRMED-1", TENANT1, "external ref here", enums.OrderStatus.PENDING.value, "customer id here", " customer name", " customer email", enums.PaymentStatus.UNPAID.value, "SGD", datetime.now(timezone.utc), datetime.now(timezone.utc)),
+    ("ORD-DRAFT-1", TENANT1, "external ref here", enums.OrderStatus.DRAFT.value, "customer id here", " customer name", " customer email", enums.PaymentStatus.UNPAID.value, "SGD", datetime.now(timezone.utc), datetime.now(timezone.utc)),
+    ("ORD-CONFIRMED_W_SHIPPED-1", TENANT1, "external ref here", enums.OrderStatus.CONFIRMED.value, "customer id here", " customer name", " customer email", enums.PaymentStatus.UNPAID.value, "SGD", datetime.now(timezone.utc), datetime.now(timezone.utc)),
 )
 
 # Columns order_id, product_sku, product_name, product_price, product_currency, order_quantity, vendor_id, package_weight_kg
@@ -59,25 +61,28 @@ ORDER_LINE_SEEDS = (
     ("ORD-CONFIRMED-1", "SKU-A", "my product", Decimal("1.12"), "SGD", 2, VENDOR1, Decimal("20")),
     ("ORD-CONFIRMED-1", "SKU-B", "my product", Decimal("1.12"), "SGD", 2, VENDOR1, Decimal("20")),
     ("ORD-NOTCONFIRMED-1", "SKU-NOTCONFIRMED", "my product", Decimal("1.12"), "SGD", 2, VENDOR1, Decimal("20")),
+    ("ORD-CONFIRMED_W_SHIPPED-1", "SKU-C", "my product", Decimal("1.12"), "SGD", 2, VENDOR1, Decimal("20")),
 )
 
 # Shipment
 # Columns shipment_id, order_id, shipment_address_line1, shipment_address_line2, shipment_address_city, shipment_address_postal, shipment_address_country, shipment_address_state, shipment_provider, tracking_reference, shipment_amount, shipment_tax_amount, shipment_currency, shipment_status
 SHIPMENT_SEEDS = (
     ("SH-1", "ORD-CONFIRMED-1", "line 1", "line 2", "city ", "postal here", "country here", "state here", "provider here", " tracking reference here", Decimal("2.2"), Decimal("1.2"), "SGD", enums.ShipmentStatus.PENDING.value),
-)
+    ("SH-SHIPPED-2", "ORD-CONFIRMED_W_SHIPPED-1", "line 1", "line 2", "city ", "postal here", "country here", "state here", "provider here", " tracking reference here", Decimal("2.2"), Decimal("1.2"), "SGD", enums.ShipmentStatus.SHIPPED.value),)
 
 
 # Shipment Item
 # Columns shipment_item_id, shipment_id, line_item_id, quantity, allocated_shipping_tax, allocated_shipping_tax_currency
 SHIPMENT_ITEM_SEEDS = (
     ("SHI-1", "SH-1", "SKU-A", 1, None, None),
+    ("SHI-SHIPPED-1", "SH-SHIPPED-2", "SKU-C", 1, None, None),
 )
 
 # UserActionLog
 # Columns order_id, action, performed_by, user_input, executed_at
 USER_ACTION_SEEDS = (
     ("ORD-CONFIRMED-1", "add_order", USER1, json.dumps({}), datetime.now(timezone.utc)),
+    ("ORD-CONFIRMED_W_SHIPPED-1", "cancel_order", USER1, json.dumps({}), datetime.now(timezone.utc)),
 )
 
 # TenantConfig

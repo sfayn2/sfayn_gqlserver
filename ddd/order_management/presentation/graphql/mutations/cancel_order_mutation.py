@@ -17,7 +17,7 @@ from ddd.order_management.presentation.graphql import object_types, common, inpu
 class CancelOrderMutation(relay.ClientIDMutation):
     class Input:
         order_id = graphene.String(required=True)
-        cancellation_reason = graphene.String(required=True)
+        #cancellation_reason = graphene.String(required=True)
 
     result = graphene.Field(object_types.ResponseType)
 
