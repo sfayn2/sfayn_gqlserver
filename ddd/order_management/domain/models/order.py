@@ -103,7 +103,7 @@ class Order:
         if not line_items:
             raise exceptions.DomainError("Cannot create an order with no line items.")
 
-        new_order_id: str = f"ORD-{uuid.uuid4()}"
+        new_order_id: str = f"ORD-{uuid.uuid4()}".upper()[:12]
 
         order = Order(
                 order_id=new_order_id,
@@ -187,7 +187,7 @@ class Order:
     def deliver_shipment(self, shipment_id: str):
         shipment = self.get_shipment(shipment_id)
         if shipment.shipment_status != enums.ShipmentStatus.SHIPPED:
-            raise exceptions.DomainError("Only shipped shipment can be delivered")
+            raise exceptions.DomainError("Shipment must be in SHIPPED status to be delivered")
         shipment.shipment_status = enums.ShipmentStatus.DELIVERED
 
         self.update_shipping_progress()

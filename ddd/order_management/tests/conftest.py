@@ -42,18 +42,37 @@ TENANT2 = "tenant_456"
 VENDOR1 = "vendor-1"
 VENDOR2 = "vendor-2"
 
+VENDOR_PERMISSIONS = [
+    "add_order",
+    "cancel_order",
+    "add_shipment",
+    "cancel_shipment",
+    "confirm_shipment",
+    "deliver_shipment",
+    # Add more permissions here easily
+]
+
+# Generate the USER_SEEDS tuple using a generator expression
 # Columns tenant_id, permission_codename, scope, is_active
-USER_SEEDS = (
-    (TENANT1, "add_shipment", json.dumps({ "role": ["vendor"] }), True),
-    (TENANT1, "add_order", json.dumps({ "role": ["vendor"] }), True),
-    (TENANT1, "cancel_order", json.dumps({ "role": ["vendor"] }), True),
+USER_SEEDS = tuple(
+    (TENANT1, permission, json.dumps({ "role": ["vendor"] }), True)
+    for permission in VENDOR_PERMISSIONS
 )
+#USER_SEEDS = (
+#    (TENANT1, "add_shipment", json.dumps({ "role": ["vendor"] }), True),
+#    (TENANT1, "add_order", json.dumps({ "role": ["vendor"] }), True),
+#    (TENANT1, "cancel_order", json.dumps({ "role": ["vendor"] }), True),
+#    (TENANT1, "cancel_shipment", json.dumps({ "role": ["vendor"] }), True),
+#)
 
 # Columns order_id, tenant_id, external_ref, order_status, customer_id, customer_name, customer_email, payment_status, currency, date_created, date_modified
 ORDER_SEEDS = (
     ("ORD-CONFIRMED-1", TENANT1, "external ref here", enums.OrderStatus.CONFIRMED.value, "customer id here", " customer name", " customer email", enums.PaymentStatus.UNPAID.value, "SGD", datetime.now(timezone.utc), datetime.now(timezone.utc)), ("ORD-NOTCONFIRMED-1", TENANT1, "external ref here", enums.OrderStatus.PENDING.value, "customer id here", " customer name", " customer email", enums.PaymentStatus.UNPAID.value, "SGD", datetime.now(timezone.utc), datetime.now(timezone.utc)),
     ("ORD-DRAFT-1", TENANT1, "external ref here", enums.OrderStatus.DRAFT.value, "customer id here", " customer name", " customer email", enums.PaymentStatus.UNPAID.value, "SGD", datetime.now(timezone.utc), datetime.now(timezone.utc)),
     ("ORD-CONFIRMED_W_SHIPPED-1", TENANT1, "external ref here", enums.OrderStatus.CONFIRMED.value, "customer id here", " customer name", " customer email", enums.PaymentStatus.UNPAID.value, "SGD", datetime.now(timezone.utc), datetime.now(timezone.utc)),
+    ("ORD-CONFIRMED_W_PENDING-1", TENANT1, "external ref here", enums.OrderStatus.PENDING.value, "customer id here", " customer name", " customer email", enums.PaymentStatus.UNPAID.value, "SGD", datetime.now(timezone.utc), datetime.now(timezone.utc)),
+    ("ORD-CONFIRMED_W_CONFIRMED-1", TENANT1, "external ref here", enums.OrderStatus.CONFIRMED.value, "customer id here", " customer name", " customer email", enums.PaymentStatus.UNPAID.value, "SGD", datetime.now(timezone.utc), datetime.now(timezone.utc)),
+    ("ORD-CONFIRMED_W_DELIVERED-1", TENANT1, "external ref here", enums.OrderStatus.DELIVERED.value, "customer id here", " customer name", " customer email", enums.PaymentStatus.UNPAID.value, "SGD", datetime.now(timezone.utc), datetime.now(timezone.utc)),
 )
 
 # Columns order_id, product_sku, product_name, product_price, product_currency, order_quantity, vendor_id, package_weight_kg
@@ -62,13 +81,20 @@ ORDER_LINE_SEEDS = (
     ("ORD-CONFIRMED-1", "SKU-B", "my product", Decimal("1.12"), "SGD", 2, VENDOR1, Decimal("20")),
     ("ORD-NOTCONFIRMED-1", "SKU-NOTCONFIRMED", "my product", Decimal("1.12"), "SGD", 2, VENDOR1, Decimal("20")),
     ("ORD-CONFIRMED_W_SHIPPED-1", "SKU-C", "my product", Decimal("1.12"), "SGD", 2, VENDOR1, Decimal("20")),
+    ("ORD-CONFIRMED_W_PENDING-1", "SKU-D", "my product", Decimal("1.12"), "SGD", 2, VENDOR1, Decimal("20")),
+    ("ORD-CONFIRMED_W_CONFIRMED-1", "SKU-E", "my product", Decimal("1.12"), "SGD", 2, VENDOR1, Decimal("20")),
+    ("ORD-CONFIRMED_W_DELIVERED-1", "SKU-F", "my product", Decimal("1.12"), "SGD", 2, VENDOR1, Decimal("20")),
 )
 
 # Shipment
 # Columns shipment_id, order_id, shipment_address_line1, shipment_address_line2, shipment_address_city, shipment_address_postal, shipment_address_country, shipment_address_state, shipment_provider, tracking_reference, shipment_amount, shipment_tax_amount, shipment_currency, shipment_status
 SHIPMENT_SEEDS = (
     ("SH-1", "ORD-CONFIRMED-1", "line 1", "line 2", "city ", "postal here", "country here", "state here", "provider here", " tracking reference here", Decimal("2.2"), Decimal("1.2"), "SGD", enums.ShipmentStatus.PENDING.value),
-    ("SH-SHIPPED-2", "ORD-CONFIRMED_W_SHIPPED-1", "line 1", "line 2", "city ", "postal here", "country here", "state here", "provider here", " tracking reference here", Decimal("2.2"), Decimal("1.2"), "SGD", enums.ShipmentStatus.SHIPPED.value),)
+    ("SH-SHIPPED-2", "ORD-CONFIRMED_W_SHIPPED-1", "line 1", "line 2", "city ", "postal here", "country here", "state here", "provider here", " tracking reference here", Decimal("2.2"), Decimal("1.2"), "SGD", enums.ShipmentStatus.SHIPPED.value),
+    ("SH-PENDING-2", "ORD-CONFIRMED_W_PENDING-1", "line 1", "line 2", "city ", "postal here", "country here", "state here", "provider here", " tracking reference here", Decimal("2.2"), Decimal("1.2"), "SGD", enums.ShipmentStatus.PENDING.value),
+    ("SH-CONFIRMED-2", "ORD-CONFIRMED_W_CONFIRMED-1", "line 1", "line 2", "city ", "postal here", "country here", "state here", "provider here", " tracking reference here", Decimal("2.2"), Decimal("1.2"), "SGD", enums.ShipmentStatus.CONFIRMED.value),
+    ("SH-DELIVERED-2", "ORD-CONFIRMED_W_DELIVERED-1", "line 1", "line 2", "city ", "postal here", "country here", "state here", "provider here", " tracking reference here", Decimal("2.2"), Decimal("1.2"), "SGD", enums.ShipmentStatus.DELIVERED.value),
+)
 
 
 # Shipment Item
@@ -76,6 +102,9 @@ SHIPMENT_SEEDS = (
 SHIPMENT_ITEM_SEEDS = (
     ("SHI-1", "SH-1", "SKU-A", 1, None, None),
     ("SHI-SHIPPED-1", "SH-SHIPPED-2", "SKU-C", 1, None, None),
+    ("SHI-PENDING-1", "SH-PENDING-2", "SKU-D", 1, None, None),
+    ("SHI-CONFIRMED-1", "SH-CONFIRMED-2", "SKU-E", 1, None, None),
+    ("SHI-DELIVERED-1", "SH-DELIVERED-2", "SKU-F", 1, None, None),
 )
 
 # UserActionLog
@@ -115,6 +144,8 @@ SAAS_CONFIG_SEEDS  = (
 @pytest.fixture(scope="session", autouse=True)
 def test_constants():
     return {
+        "tenant1": TENANT1,
+        "tenant2": TENANT2,
         "vendor1": VENDOR1,
         "vendor2": VENDOR2,
         "user1": USER1,

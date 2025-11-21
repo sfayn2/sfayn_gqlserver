@@ -145,7 +145,7 @@ message_bus.COMMAND_HANDLERS.update({
     ),
     commands.ConfirmShipmentCommand: lambda command, **deps: handlers.handle_confirm_shipment(
         command=command,
-        shipping_provider_service=shipping.ShippingProviderService,
+        #shipping_provider_service=shipping.ShippingProviderService,
         **deps
     ),
     commands.DeliverShipmentCommand: lambda command, **deps: handlers.handle_deliver_shipment(

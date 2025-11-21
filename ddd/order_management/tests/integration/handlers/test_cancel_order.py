@@ -34,7 +34,7 @@ from order_management import models as django_snapshots
         ),
     ]
 )
-def test_handle_cancel_order_dto_pattern(
+def test_handle_cancel_order(
     fake_access_control,
     fake_exception_handler,
     fake_user_action_service,

@@ -48,7 +48,7 @@ def handle_add_order(
 
             return dtos.ResponseDTO(
                 success=True,
-                message=f"Order successfully created."
+                message=f"Order {order.order_id} successfully created."
             )
 
 

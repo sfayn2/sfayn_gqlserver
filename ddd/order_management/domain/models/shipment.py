@@ -62,7 +62,7 @@ class Shipment:
 
     @property
     def shipment_items_sku_qty(self):
-        return {item.product_sku: item.quantity for item in self.shipment_items}
+        return {item.line_item.product_sku: item.line_item.order_quantity for item in self.shipment_items}
 
     def get_max_dimensions(self):
         for item in self.shipment_items:

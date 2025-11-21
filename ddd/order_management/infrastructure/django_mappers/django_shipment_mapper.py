@@ -23,7 +23,7 @@ class ShipmentMapper:
                     'shipment_amount': shipment.shipment_amount.amount,
                     'shipment_currency': shipment.shipment_amount.currency,
                     'shipment_tax_amount': shipment.shipment_tax_amount.amount,
-                    'shipment_status': shipment.shipment_status,
+                    'shipment_status': shipment.shipment_status.value,
                 }
         }
 
