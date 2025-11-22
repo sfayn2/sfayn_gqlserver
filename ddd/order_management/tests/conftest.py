@@ -49,6 +49,7 @@ VENDOR_PERMISSIONS = [
     "cancel_shipment",
     "confirm_shipment",
     "deliver_shipment",
+    "mark_as_completed",
     # Add more permissions here easily
 ]
 
@@ -73,6 +74,9 @@ ORDER_SEEDS = (
     ("ORD-CONFIRMED_W_PENDING-1", TENANT1, "external ref here", enums.OrderStatus.PENDING.value, "customer id here", " customer name", " customer email", enums.PaymentStatus.UNPAID.value, "SGD", datetime.now(timezone.utc), datetime.now(timezone.utc)),
     ("ORD-CONFIRMED_W_CONFIRMED-1", TENANT1, "external ref here", enums.OrderStatus.CONFIRMED.value, "customer id here", " customer name", " customer email", enums.PaymentStatus.UNPAID.value, "SGD", datetime.now(timezone.utc), datetime.now(timezone.utc)),
     ("ORD-CONFIRMED_W_DELIVERED-1", TENANT1, "external ref here", enums.OrderStatus.DELIVERED.value, "customer id here", " customer name", " customer email", enums.PaymentStatus.UNPAID.value, "SGD", datetime.now(timezone.utc), datetime.now(timezone.utc)),
+    ("ORD-READY-TO-COMPLETE-1", TENANT1, "external ref here", enums.OrderStatus.DELIVERED.value, "customer id here", " customer name", " customer email", enums.PaymentStatus.PAID.value, "SGD", datetime.now(timezone.utc), datetime.now(timezone.utc)),
+    ("ORD-ALREADY-COMPLETED-1", TENANT1, "external ref here", enums.OrderStatus.COMPLETED.value, "customer id here", " customer name", " customer email", enums.PaymentStatus.PAID.value, "SGD", datetime.now(timezone.utc), datetime.now(timezone.utc)),
+    ("ORD-READY-TO-COMPLETE-UNPAID-1", TENANT1, "external ref here", enums.OrderStatus.DELIVERED.value, "customer id here", " customer name", " customer email", enums.PaymentStatus.UNPAID.value, "SGD", datetime.now(timezone.utc), datetime.now(timezone.utc)),
 )
 
 # Columns order_id, product_sku, product_name, product_price, product_currency, order_quantity, vendor_id, package_weight_kg
@@ -84,6 +88,9 @@ ORDER_LINE_SEEDS = (
     ("ORD-CONFIRMED_W_PENDING-1", "SKU-D", "my product", Decimal("1.12"), "SGD", 2, VENDOR1, Decimal("20")),
     ("ORD-CONFIRMED_W_CONFIRMED-1", "SKU-E", "my product", Decimal("1.12"), "SGD", 2, VENDOR1, Decimal("20")),
     ("ORD-CONFIRMED_W_DELIVERED-1", "SKU-F", "my product", Decimal("1.12"), "SGD", 2, VENDOR1, Decimal("20")),
+    ("ORD-READY-TO-COMPLETE-1", "SKU-G", "my product", Decimal("1.12"), "SGD", 2, VENDOR1, Decimal("20")),
+    ("ORD-ALREADY-COMPLETED-1", "SKU-H", "my product", Decimal("1.12"), "SGD", 2, VENDOR1, Decimal("20")),
+    ("ORD-READY-TO-COMPLETE-UNPAID-1", "SKU-I", "my product", Decimal("1.12"), "SGD", 2, VENDOR1, Decimal("20")),
 )
 
 # Shipment
@@ -94,6 +101,9 @@ SHIPMENT_SEEDS = (
     ("SH-PENDING-2", "ORD-CONFIRMED_W_PENDING-1", "line 1", "line 2", "city ", "postal here", "country here", "state here", "provider here", " tracking reference here", Decimal("2.2"), Decimal("1.2"), "SGD", enums.ShipmentStatus.PENDING.value),
     ("SH-CONFIRMED-2", "ORD-CONFIRMED_W_CONFIRMED-1", "line 1", "line 2", "city ", "postal here", "country here", "state here", "provider here", " tracking reference here", Decimal("2.2"), Decimal("1.2"), "SGD", enums.ShipmentStatus.CONFIRMED.value),
     ("SH-DELIVERED-2", "ORD-CONFIRMED_W_DELIVERED-1", "line 1", "line 2", "city ", "postal here", "country here", "state here", "provider here", " tracking reference here", Decimal("2.2"), Decimal("1.2"), "SGD", enums.ShipmentStatus.DELIVERED.value),
+    ("SH-READY-TO-COMPLETE-1", "ORD-READY-TO-COMPLETE-1", "line 1", "line 2", "city ", "postal here", "country here", "state here", "provider here", " tracking reference here", Decimal("2.2"), Decimal("1.2"), "SGD", enums.ShipmentStatus.DELIVERED.value),
+    ("SH-ALREADY-COMPLETED-1", "ORD-ALREADY-COMPLETED-1", "line 1", "line 2", "city ", "postal here", "country here", "state here", "provider here", " tracking reference here", Decimal("2.2"), Decimal("1.2"), "SGD", enums.ShipmentStatus.DELIVERED.value),
+    ("SH-READY-TO-COMPLETE-UNPAID-1", "ORD-READY-TO-COMPLETE-UNPAID-1", "line 1", "line 2", "city ", "postal here", "country here", "state here", "provider here", " tracking reference here", Decimal("2.2"), Decimal("1.2"), "SGD", enums.ShipmentStatus.DELIVERED.value),
 )
 
 
@@ -105,6 +115,9 @@ SHIPMENT_ITEM_SEEDS = (
     ("SHI-PENDING-1", "SH-PENDING-2", "SKU-D", 1, None, None),
     ("SHI-CONFIRMED-1", "SH-CONFIRMED-2", "SKU-E", 1, None, None),
     ("SHI-DELIVERED-1", "SH-DELIVERED-2", "SKU-F", 1, None, None),
+    ("SHI-READY-TO-COMPLETE-1", "SH-READY-TO-COMPLETE-1", "SKU-G", 1, None, None),
+    ("SHI-ALREADY-COMPLETED-1", "SH-ALREADY-COMPLETED-1", "SKU-H", 1, None, None),
+    ("SHI-READY-TO-COMPLETE-UNPAID-1", "SH-READY-TO-COMPLETE-UNPAID-1", "SKU-I", 1, None, None),
 )
 
 # UserActionLog
