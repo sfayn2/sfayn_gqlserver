@@ -54,7 +54,7 @@ class WebhookReceiverService:
         verifier = cls._get_provider(tenant_id)
 
         # 2. Verify the signature
-        if not verifier.verify(request.headers, request.body):
+        if not verifier.verify(headers=request.headers, raw_body=request.body, request_path=request.path):
             # Raise specific error for the API handler to catch and return 401
             raise InvalidSignatureError("Invalid webhook signature")
 

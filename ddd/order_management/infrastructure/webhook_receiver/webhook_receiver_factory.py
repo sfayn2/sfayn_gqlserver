@@ -31,10 +31,10 @@ class WebhookReceiverFactory:
         if receiver_class:
             # Pass configuration parameters to the constructor dynamically as needed
             # This logic depends on which parameters each class expects
-            if provider_name == "easypost":
+            if provider_name in ("easypost", "wss"):
                  return receiver_class(
                     shared_secret=cfg.get("shared_secret"),
-                    max_age=cfg.get("max_age", None),
+                    max_age_seconds=cfg.get("max_age_seconds", None),
                 )
             # for others that just need shared_secret
             else:

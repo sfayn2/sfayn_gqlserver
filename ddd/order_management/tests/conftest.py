@@ -148,7 +148,11 @@ SAAS_CONFIG_SEEDS  = (
             "algorith": "RS256",
         },
         "plan": ["standard"],
-        "webhook_secret": "abc123secret",
+        "webhook_provider": {
+            "provider_name": "wss",
+            "shared_secret": "2323434235235",
+            "max_age_seconds": 3000
+        }
     }), datetime.now(timezone.utc)),
 )
 

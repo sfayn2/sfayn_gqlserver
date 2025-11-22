@@ -11,11 +11,12 @@ from ddd.order_management.domain.services import DomainClock
 # WebhookReceiverAbstract
 class WssWebhookReceiver:
 
-    def __init__(self, shared_secret: str, max_age: int = 3000):
+    def __init__(self, shared_secret: str, max_age_seconds: int = 3000):
         self.secret = shared_secret
-        self.max_age = max_age
+        self.max_age = max_age_seconds
 
-    def verify(self, headers, body) -> bool:
+    #def verify(self, headers, body) -> bool:
+    def verify(self, headers: Mapping[str, str], raw_body: bytes, request_path: str) -> bool:
         signature = headers.get("X-Wss-Signature", "")
         timestamp = headers.get("X-Wss-Timestamp", "") #to protect from replay
         if not signature or not timestamp:
@@ -30,8 +31,7 @@ class WssWebhookReceiver:
             return False
 
         # recompute signature
-        expected = self.generate_signature(self.secret, body)
-        #import pdb;pdb.set_trace()
+        expected = self.generate_signature(self.secret, raw_body)
 
         return hmac.compare_digest(expected, signature)
 

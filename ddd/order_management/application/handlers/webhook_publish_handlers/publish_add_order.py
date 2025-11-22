@@ -9,7 +9,9 @@ from ddd.order_management.domain import events, exceptions
 
 def handle_publish_add_order(
     command: commands.PublishAddOrderCommand, 
+    uow: ports.UnitOfWorkAbstract,
     exception_handler: ports.ExceptionHandlerAbstract,
+    user_action_service: ports.UserActionServiceAbstract,
     event_publisher: ports.EventPublisherAbstract
 ):
     try:

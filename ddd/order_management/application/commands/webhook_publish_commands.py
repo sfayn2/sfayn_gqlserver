@@ -4,6 +4,7 @@ from .commands import Command, AddOrderCommand
 
 class Command2(Command):
     event_type: str
+    tenant_id: str
 
 # {
 #    "event_type": "events.ProductUpdateEvent",
