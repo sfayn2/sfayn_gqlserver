@@ -35,19 +35,19 @@ class ShippingWebhookResolver:
             
         try:
             saas_configs = cls.saas_service.get_tenant_config(tenant_id).configs.get("shipping_webhook", {})
-            return cls.shipping_parser_factory.get_shipping_parser(saas_configs)
+            return cls.shipping_parser_factory.get_payload_parser(saas_configs)
         except Exception as e:
             # Handle potential exceptions during config retrieval
             raise RuntimeError(f"Failed to retrieve shipping config for tenant {tenant_id}: {e}")
 
     @classmethod
-    def resolve(cls, tenant_id: str, payload, headers) -> dtos.ShippingWebhookIntegrationEvent:
+    def resolve(cls, tenant_id: str, payload: Any) -> dtos.ShippingWebhookDTO:
         """
         Orchestrates the creation of a shipment using the tenant's configured parser.
         """
         parser = cls._get_parser(tenant_id)
 
-        result = parser.parse(payload, headers)
+        result = parser.parse(payload)
         
         # Ensure result adheres to a consistent interface/schema
         return result

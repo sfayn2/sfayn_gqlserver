@@ -15,4 +15,4 @@ class AddOrderIntegrationEvent(IntegrationEvent):
 
 
 class ShippingWebhookIntegrationEvent(IntegrationEvent):
-    data: dtos.ShippingWebhookPayloadDTO
+    data: dtos.ShippingWebhookDTO

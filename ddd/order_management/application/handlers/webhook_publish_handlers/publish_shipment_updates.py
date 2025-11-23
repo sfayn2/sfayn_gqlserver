@@ -11,63 +11,54 @@ from ddd.order_management.domain import exceptions
 
 def handle_publish_shipment_updates(
     command: commands.PublishShipmentUpdatesCommand, 
-    uow: ports.UnitOfWorkAbstract, # uow is unused, consider removing or using it
+    uow: ports.UnitOfWorkAbstract,
+    user_action_service: ports.UserActionServiceAbstract,
     exception_handler: ports.ExceptionHandlerAbstract,
-    user_action_service: ports.UserActionServiceAbstract, # unused, consider removing
     webhook_receiver_service: ports.WebhookReceiverServiceAbstract,
-    shipment_repo: ports.ShipmentRepositoryAbstract, # Use abstract type hint
+    shipment_lookup_service: ports.ShipmentLookupServiceAbstract,
     shipping_webhook_resolver: ports.ShippingWebhookResolverAbstract,
     event_publisher: ports.EventPublisherAbstract
 ) -> dtos.ResponseDTO:
     """
-    Processes an incoming EasyPost webhook request within a DDD context.
+    Processes an incoming Shipping provider webhook request within a DDD context.
     """
     try:
-        # Use command.raw_body directly, which should already be bytes/str
-        # Decode robustly; request is assumed to be an infrastructure detail passed in via command
-        try:
-            payload_data = json.loads(command.raw_body)
-        except json.JSONDecodeError:
-            # Re-raise with context or return a specific handler error
-            raise exceptions.InvalidOrderOperation("Invalid JSON payload received.")
+        # 1. Extract the tracking reference from the raw request body
+        tracking_reference = webhook_receiver_service.extract_tracking_reference(command.raw_body)
         
-        # EasyPost webhooks use "tracker.created" or similar event structures
-        # We need to adapt the key lookup based on actual webhook structure.
-        # Assuming the tracking code is nested, adjust lookup paths as necessary:
-        tracking_reference = payload_data.get("result", {}).get("tracking_code") or \
-                             payload_data.get("tracking_code") 
+        # 2. Identify the tenant associated with the shipment tracking reference
+        tenant_id = shipment_lookup_service.get_tenant_id_by_tracking_ref(tracking_reference)
 
-        if not tracking_reference:
-            raise exceptions.InvalidOrderOperation("Tracking reference missing from payload.")
-
-        # --- Core Logic Streamlined ---
-
-        # Assuming shipment_repo can find a tenant ID associated with the tracking ref
-        # This part requires specific implementation details based on your data model
-        tenant_id = shipment_repo.get_tenant_id_by_tracking_ref(tracking_reference)
+        if not tenant_id:
+            # Raise an explicit domain exception if we cannot route the webhook
+            raise exceptions.InvalidOrderOperation(
+                f"No tenant found for tracking reference {tracking_reference}. Cannot process webhook."
+            )
         
-        # Validation uses the raw body provided in the command DTO
+        # 3. Validate the raw payload signature/origin using tenant-specific credentials
         validated_payload = webhook_receiver_service.validate(
-            tenant_id, 
-            command.headers,
-            command.raw_body,
-            command.request_path
+            tenant_id=tenant_id, 
+            headers=command.headers,
+            raw_body=command.raw_body,
+            request_path=command.request_path
         )
 
-        normalized_event_data = shipping_webhook_resolver.resolve(
+        # 4. Normalize the third-party schema into a generic internal DTO
+        normalized_event_data: dtos.ShippingWebhookDTO = shipping_webhook_resolver.resolve(
             tenant_id=tenant_id,
-            payload=validated_payload # Use the validated payload
+            payload=validated_payload
         )
 
-        event = dtos.ShippingWebhookIntegrationEvent(
-            **normalized_event_data
+        # 5. Create an integration event DTO for the message bus
+        integration_event = dtos.ShippingWebhookIntegrationEvent(
+            event_type="shipping_webhook.received",
+            data=normalized_event_data # Use the correct DTO variable name
         )
 
-        event_publisher.publish(event)
+        # 6. Publish the event asynchronously for downstream consumers
+        event_publisher.publish(integration_event)
         
-        # The UOW is the standard place to commit work in DDD apps
-        # If operations change state, commit here
-        # uow.commit() 
+        # In a command handler that doesn't modify local domain state, a UOW commit isn't needed.
 
         return dtos.ResponseDTO(
             success=True,
@@ -75,9 +66,9 @@ def handle_publish_shipment_updates(
         )
 
     except exceptions.InvalidOrderOperation as e:
-        # Delegate handling of EXPECTED exceptions to the infrastructure service
+        # Delegate handling of EXPECTED exceptions (e.g., business logic validation errors)
         return exception_handler.handle_expected(e)
     except Exception as e:
-        # Delegate handling of UNEXPECTED exceptions to the infrastructure service
+        # Delegate handling of UNEXPECTED/SYSTEM exceptions
         return exception_handler.handle_unexpected(e)
 

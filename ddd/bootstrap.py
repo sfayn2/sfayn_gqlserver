@@ -18,6 +18,7 @@ from ddd.order_management.infrastructure import (
     saas_service,
     shipping,
     shipping_webhook_parser,
+    shipment_lookup_service,
     exception_handler
 )
 from ddd.order_management.application import (
@@ -176,7 +177,8 @@ message_bus.COMMAND_HANDLERS.update({
         handlers, 
         event_bus
         shipping_webhook_parser.ShippingWebhookResolver,
-        webhook_receiver.WebhookReceiverService
+        webhook_receiver.WebhookReceiverService,
+        shipment_lookup_service.ShipmentLookupService(),
     ),
     **handlers.user_action_command_handlers.get_command_handlers(commands, handlers, application_services, tenant_service)
 })

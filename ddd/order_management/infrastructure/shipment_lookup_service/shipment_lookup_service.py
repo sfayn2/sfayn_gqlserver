@@ -2,7 +2,7 @@ from order_management import models as django_models
 
 
 # Improved error handling using .first() or try/except
-class DjangoShipmentRepository:
+class ShipmentLookupService:
     def get_tenant_id_by_tracking_ref(self, tracking_reference: str) -> str | None:
         try:
             # The select_related() method is added here to optimize performance (see #3)

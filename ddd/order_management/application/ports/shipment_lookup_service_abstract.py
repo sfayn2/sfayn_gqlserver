@@ -1,6 +1,6 @@
 from typing import Protocol
 
-class ShipmentRepositoryAbstract(Protocol):
+class ShipmentLookupServiceAbstract(Protocol):
     """
     Defines the interface for interacting with shipment data to retrieve
     core information needed by the application layer, abstracting the

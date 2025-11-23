@@ -8,12 +8,15 @@ from datetime import datetime
 # Inheriting from an abstract base class (ABC) is good practice for handlers
 # class ShippingWebhookPayloadHandlerAbstract: ...
 
+class ShippingWebhookParserError(Exception):
+    pass
+
 class EasyPostShippingWebhookParser:
     """
     Handles parsing EasyPost webhook payloads into a standardized DTO.
     """
 
-    def parse(self, payload: dict[str, Any], headers: dict[str, Any]) -> dtos.ShippingWebhookIntegrationEvent:
+    def parse(self, payload: dict[str, Any]) -> dtos.ShippingWebhookDTO:
         """
         Parses the raw webhook payload dictionary into a structured integration event DTO.
 
@@ -41,9 +44,12 @@ class EasyPostShippingWebhookParser:
             # 3. Data Transformation: Convert the string timestamp into a proper datetime object
             # if your DTO expects one (highly recommended).
             # Example format: '2023-10-27T12:00:00Z'
-            occurred_at = datetime.fromisoformat(
-                occurred_at_str,replace("Z", "+00:00")
-            )
+            if occurred_at_str:
+                occurred_at = datetime.fromisoformat(
+                    occurred_at_str.replace("Z", "+00:00")
+                )
+            else:
+                raise ShippingWebhookParserError("The 'occurred_at/updated_at' fields is missing or empty in the payload.")
 
             # 4. Use intermediate variables for clarity before instantiation.
             payload_dto = dtos.ShippingWebhookDTO(
@@ -55,10 +61,12 @@ class EasyPostShippingWebhookParser:
                 raw_payload=payload
             )
 
-            return dtos.ShippingWebhookIntegrationEvent(
-                event_type="webhook_events.ShippingTracker",
-                data=payload_dto,
-            )
+            return payload_dto
+
+            #return dtos.ShippingWebhookIntegrationEvent(
+            #    event_type="webhook_events.ShippingTracker",
+            #    data=payload_dto,
+            #)
 
         except KeyError as e:
             # Handle missing mandatory fields gracefully

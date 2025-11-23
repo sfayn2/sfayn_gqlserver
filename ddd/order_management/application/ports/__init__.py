@@ -6,7 +6,8 @@ from .exception_handler_abstract import ExceptionHandlerAbstract
 from .unit_of_work_abstract import UnitOfWorkAbstract
 from .shipping_provider_service_abstract import ShippingProviderServiceAbstract
 from .shipping_webhook_resolver_abstract import ShippingWebhookResolverAbstract
-from .shipment_repo_abstract import ShipmentRepositoryAbstract
+from .shipment_lookup_service_abstract import ShipmentLookupServiceAbstract
+from .webhook_receiver_service_abstract import WebhookReceiverServiceAbstract
 
 from .access_control_service_abstract import AccessControlServiceAbstract
 

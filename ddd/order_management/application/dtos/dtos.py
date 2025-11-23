@@ -118,4 +118,4 @@ class ShippingWebhookDTO(BaseModel):
     tenant_id: str
     status: str
     occured_at: datetime
-    raw_payload: str
+    raw_payload: dict
