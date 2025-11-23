@@ -16,4 +16,7 @@ class PublishAddOrderCommand(Command2):
     data: dtos.AddOrderDTO
 
 class PublishShipmentUpdatesCommand(Command2):
-    data: dict
+    headers: dict
+    raw_body: bytes
+    request_path: str
+

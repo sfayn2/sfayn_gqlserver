@@ -171,7 +171,13 @@ message_bus.COMMAND_HANDLERS.update({
         command=command,
         **deps
     ),
-    **handlers.webhook_publish_command_handlers.get_command_handlers(commands, handlers, event_bus),
+    **handlers.webhook_publish_command_handlers.get_command_handlers(
+        commands, 
+        handlers, 
+        event_bus
+        shipping_webhook_parser.ShippingWebhookResolver,
+        webhook_receiver.WebhookReceiverService
+    ),
     **handlers.user_action_command_handlers.get_command_handlers(commands, handlers, application_services, tenant_service)
 })
 

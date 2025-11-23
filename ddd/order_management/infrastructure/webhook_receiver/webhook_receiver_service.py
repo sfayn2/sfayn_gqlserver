@@ -46,7 +46,7 @@ class WebhookReceiverService:
         return cls.webhook_receiver_factory.get_webhook_receiver(saas_configs)
 
     @classmethod 
-    def validate(cls, tenant_id: str, request) -> Dict[str, Any]:
+    def validate(cls, tenant_id: str, headers, raw_body, request_path) -> Dict[str, Any]:
         """
         Validates the request signature and decodes the payload.
         """
@@ -54,7 +54,8 @@ class WebhookReceiverService:
         verifier = cls._get_provider(tenant_id)
 
         # 2. Verify the signature
-        if not verifier.verify(headers=request.headers, raw_body=request.body, request_path=request.path):
+        #if not verifier.verify(headers=request.headers, raw_body=request.body, request_path=request.path):
+        if not verifier.verify(headers=headers, raw_body=raw_body, request_path=request_path):
             # Raise specific error for the API handler to catch and return 401
             raise InvalidSignatureError("Invalid webhook signature")
 
