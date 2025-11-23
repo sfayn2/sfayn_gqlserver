@@ -1,5 +1,5 @@
 from typing import Protocol
 
 
-class ShippingWebhookPayloadHandlerAbstract(Protocol):
+class ShippingWebhookParserAbstract(Protocol):
     def parse(self, payload: dict, headers: dict) -> dict: ... 

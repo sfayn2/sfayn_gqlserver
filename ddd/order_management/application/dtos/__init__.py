@@ -11,7 +11,7 @@ from .dtos import (
     ShipmentItemDTO,
     ConfirmShipmentDTO,
     AddOrderDTO,
-    ShippingWebhookPayloadDTO
+    ShippingWebhookDTO
 )
 
 # Integration events

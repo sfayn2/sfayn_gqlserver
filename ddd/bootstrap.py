@@ -17,6 +17,7 @@ from ddd.order_management.infrastructure import (
     tenant_service,
     saas_service,
     shipping,
+    shipping_webhook_parser,
     exception_handler
 )
 from ddd.order_management.application import (
@@ -56,6 +57,12 @@ access_control1.AccessControlService.configure(
 shipping.ShippingProviderService.configure(
     saas_service=saas_service_instance,
     shipping_provider_factory=shipping.ShippingProviderFactory()
+)
+
+# =============== resolve shipping webhook parser based on tenant_id ========
+shipping_webhook_parser.ShippingWebhookResolver.configure(
+    saas_service=saas_service_instance,
+    shipping_parser_factory=shipping_webhook_parser.ShippingWebhookParserFactory()
 )
 
 # ============== domain clock =============

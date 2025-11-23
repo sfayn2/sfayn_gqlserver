@@ -11,6 +11,7 @@ from .add_order import handle_add_order
 # Webhook publish
 from .webhook_publish_handlers import webhook_publish_command_handlers
 from .webhook_publish_handlers.publish_add_order import handle_publish_add_order
+from .webhook_publish_handlers.publish_shipment_updates import handle_publish_shipment_updates
 
 # Other user action handlers
 from .user_action_handlers import user_action_command_handlers

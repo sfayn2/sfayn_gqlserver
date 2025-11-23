@@ -8,7 +8,7 @@ from datetime import datetime
 # Inheriting from an abstract base class (ABC) is good practice for handlers
 # class ShippingWebhookPayloadHandlerAbstract: ...
 
-class EasyPostShippingWebhookPayloadHandler:
+class EasyPostShippingWebhookParser:
     """
     Handles parsing EasyPost webhook payloads into a standardized DTO.
     """
@@ -32,18 +32,21 @@ class EasyPostShippingWebhookPayloadHandler:
             # 1. Type Hinting: Use explicit dict[str, Any] for clarity.
             # 2. Defensive Access: Use .get() where possible or wrap in try/except for mandatory keys.
 
-            tracking_reference = payload["result"]["tracking_code"]
-            tenant_id = payload["metadata"]["tenant_id"]
-            status = payload["description"]
-            occurred_at_str = payload["created_at"]
+            result = payload["result"]
+            tracking_reference = result["tracking_code"]
+            tenant_id = result["metadata"]["tenant_id"]
+            status = result["status"]
+            occurred_at_str = payload.get("created_at") or payload.get("updated_at")
 
             # 3. Data Transformation: Convert the string timestamp into a proper datetime object
             # if your DTO expects one (highly recommended).
             # Example format: '2023-10-27T12:00:00Z'
-            occurred_at = datetime.fromisoformat(occurred_at_str)
+            occurred_at = datetime.fromisoformat(
+                occurred_at_str,replace("Z", "+00:00")
+            )
 
             # 4. Use intermediate variables for clarity before instantiation.
-            payload_dto = dtos.ShippingWebhookPayloadDTO(
+            payload_dto = dtos.ShippingWebhookDTO(
                 provider="easypost",
                 tracking_reference=tracking_reference,
                 tenant_id=tenant_id,

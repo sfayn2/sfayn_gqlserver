@@ -14,3 +14,6 @@ class Command2(Command):
 
 class PublishAddOrderCommand(Command2):
     data: dtos.AddOrderDTO
+
+class PublishShipmentUpdatesCommand(Command2):
+    data: dict

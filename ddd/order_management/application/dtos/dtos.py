@@ -112,7 +112,7 @@ class AddOrderDTO(BaseModel):
     customer_details: CustomerDetailsDTO
     product_skus: List[ProductSkusDTO]
 
-class ShippingWebhookPayloadDTO(BaseModel):
+class ShippingWebhookDTO(BaseModel):
     provider: str
     tracking_reference: str
     tenant_id: str
