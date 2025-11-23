@@ -108,5 +108,14 @@ class ConfirmShipmentDTO(BaseModel):
 
 class AddOrderDTO(BaseModel):
     external_ref: str
+    tenant_id: str
     customer_details: CustomerDetailsDTO
     product_skus: List[ProductSkusDTO]
+
+class ShippingWebhookPayloadDTO(BaseModel):
+    provider: str
+    tracking_reference: str
+    tenant_id: str
+    status: str
+    occured_at: datetime
+    raw_payload: str

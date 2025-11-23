@@ -31,7 +31,7 @@ class NinjaVanShippingProvider:
         }
 
 
-    def create_shipment(self, shipment) -> dtos.CreateShipmentResponseDTO:
+    def create_shipment(self, shipment, tenant_id: str) -> dtos.CreateShipmentResponseDTO:
 
         if shipment.shipment_method == enums.ShipmentMethod.PICKUP:
             pickup_details = self._format_pickup_window(shipment)

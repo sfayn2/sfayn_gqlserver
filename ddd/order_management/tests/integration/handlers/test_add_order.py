@@ -13,6 +13,7 @@ from order_management import models as django_snapshots # For verifying DB state
 # Base input data for creating an order, matching the new DTO structure
 BASE_ORDER_INPUT = {
     "external_ref": "EXT-REF-123",
+    "tenant_id": "tenant_123",
     "customer_details": {
         "name": "John Doe",
         "email": "john.doe@example.com",
@@ -108,6 +109,7 @@ def test_add_order(
     
     # Override the specific part that changes
     input_data["product_skus"] = product_skus_override
+    input_data["tenant_id"] = TENANT1
 
     access_control_mock = fake_access_control()
     

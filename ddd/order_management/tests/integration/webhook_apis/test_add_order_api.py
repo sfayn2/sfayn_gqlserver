@@ -23,6 +23,7 @@ def valid_payload(tenant_id):
 
     order_to_add = {
         "external_ref": "EXT-REF-123",
+        "tenant_id": tenant_id,
         "customer_details": {
             "name": "John Doe",
             "email": "john.doe@example.com",
@@ -61,7 +62,7 @@ def mock_request_factory():
 @pytest.fixture
 def custom_headers():
     return {
-        "HTTP_X_Wss_Signature": "3d28d82da7abd22a0976a61f74a834294c28ca0c8f5ee1e8cd04b42dc391077a",
+        "HTTP_X_Wss_Signature": "761aed04f08c9b3ed233bfc75e05ef55fc5867f40a92e155ae59b1dc012a3468",
         "HTTP_X_Wss_Timestamp": str(int(time.time()))
     }
 

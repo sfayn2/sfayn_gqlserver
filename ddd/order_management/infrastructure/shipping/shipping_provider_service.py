@@ -53,7 +53,7 @@ class ShippingProviderService:
         # We trust that the concrete provider knows how to handle create_shipment().
         # The cls DeliveryProvider should implement create_shipment() appropriately.
 
-        result = provider.create_shipment(shipment)
+        result = provider.create_shipment(shipment, tenant_id)
         
         # Ensure result adheres to a consistent interface/schema
         return result

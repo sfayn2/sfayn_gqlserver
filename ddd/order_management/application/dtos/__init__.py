@@ -11,13 +11,15 @@ from .dtos import (
     ShipmentItemDTO,
     ConfirmShipmentDTO,
     AddOrderDTO,
+    ShippingWebhookPayloadDTO
 )
 
 # Integration events
 from .integration_events.auth_integration_events import UserLoggedInIntegrationEvent
 from .integration_events.order_integration_events import (
     ConfirmedShipmentIntegrationEvent,
-    AddOrderIntegrationEvent
+    AddOrderIntegrationEvent,
+    ShippingWebhookIntegrationEvent
 )
 from .integration_events.base import IntegrationEvent
 

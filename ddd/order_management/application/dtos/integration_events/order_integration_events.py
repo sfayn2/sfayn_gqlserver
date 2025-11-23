@@ -12,3 +12,7 @@ class ConfirmedShipmentIntegrationEvent(IntegrationEvent):
 
 class AddOrderIntegrationEvent(IntegrationEvent):
     data: dtos.AddOrderDTO
+
+
+class ShippingWebhookIntegrationEvent(IntegrationEvent):
+    data: dtos.ShippingWebhookPayloadDTO

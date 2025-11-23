@@ -16,13 +16,14 @@ class EasyPostShippingProvider:
     def is_self_delivery(self) -> bool:
         return False
 
-    def create_shipment(self, shipment) -> dtos.CreateShipmentResponseDTO:
+    def create_shipment(self, shipment, tenant_id: str) -> dtos.CreateShipmentResponseDTO:
 
         easypost_shipment = self.client.shipment.create(
             from_address=shipment.pickup_address,
             to_address=asdict(shipment.shipment_address),
             parcel=self._build_parcel_payload(shipment),
             metadata={
+                "tenant_id": tenant_id,
                 "shipment_id": shipment.shipment_id
             }
         )

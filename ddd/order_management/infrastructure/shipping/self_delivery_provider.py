@@ -8,5 +8,5 @@ class SelfDeliveryProvider:
     def is_self_delivery(self) -> bool:
         return True
 
-    def create_shipment(self, shipment) -> dtos.CreateShipmentResponseDTO:
+    def create_shipment(self, shipment, tenant_id: str) -> dtos.CreateShipmentResponseDTO:
         raise NotImplementedError("Self delivery does not use external shipment creation.")

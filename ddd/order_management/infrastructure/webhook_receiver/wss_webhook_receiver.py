@@ -1,6 +1,7 @@
 from __future__ import annotations
 # Our own Webhook Sender Service 
 import hmac, hashlib
+from typing import Mapping
 from ddd.order_management.application import ports
 from ddd.order_management.domain.services import DomainClock
 
@@ -32,6 +33,7 @@ class WssWebhookReceiver:
 
         # recompute signature
         expected = self.generate_signature(self.secret, raw_body)
+        #import pdb;pdb.set_trace()
 
         return hmac.compare_digest(expected, signature)
 
