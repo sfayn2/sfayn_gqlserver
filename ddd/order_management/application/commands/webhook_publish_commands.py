@@ -3,7 +3,6 @@ from ddd.order_management.application import dtos
 from .commands import Command, AddOrderCommand
 
 class Command2(Command):
-    event_type: str
     tenant_id: str
 
 # {
@@ -13,7 +12,10 @@ class Command2(Command):
 # }
 
 class PublishAddOrderCommand(Command2):
-    data: dtos.AddOrderDTO
+    #data: dtos.AddOrderDTO
+    headers: dict
+    raw_body: bytes
+    request_path: str
 
 class PublishShipmentUpdatesCommand(Command2):
     headers: dict

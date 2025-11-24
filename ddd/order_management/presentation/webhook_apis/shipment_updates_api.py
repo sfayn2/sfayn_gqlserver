@@ -8,7 +8,7 @@ from ddd.order_management.application import (
 #)
 
 @csrf_exempt
-def shipment_updates_api(request, tenant_id: str):
+def shipment_updates_api(request):
 
     if request.method != "POST":
         return HttpResponseBadRequest("Only POST is allowed")

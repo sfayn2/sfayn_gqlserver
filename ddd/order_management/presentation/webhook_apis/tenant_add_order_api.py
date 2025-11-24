@@ -3,9 +3,6 @@ from django.http import HttpResponseBadRequest, JsonResponse
 from ddd.order_management.application import (
     message_bus, commands
   )
-from ddd.order_management.infrastructure import (
-    webhook_receiver
-)
 
 @csrf_exempt
 def tenant_add_order_api(request, tenant_id: str):
@@ -14,12 +11,13 @@ def tenant_add_order_api(request, tenant_id: str):
         return HttpResponseBadRequest("Only POST is allowed")
 
     try:
-        payload = webhook_receiver.WebhookReceiverService.validate(
-                tenant_id, 
-                request
-            )
-        
-        command = commands.PublishAddOrderCommand.model_validate(payload)
+        command = commands.PublishAddOrderCommand.model_validate(
+            { "headers" : request.headers,
+              "raw_body": request.body,
+              "request_path": request.path,
+              "tenant_id": tenant_id
+            }
+        )
         result = message_bus.handle(command)
         return JsonResponse(result.model_dump())
     except Exception as e:

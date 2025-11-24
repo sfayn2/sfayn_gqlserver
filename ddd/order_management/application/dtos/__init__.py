@@ -18,7 +18,7 @@ from .dtos import (
 from .integration_events.auth_integration_events import UserLoggedInIntegrationEvent
 from .integration_events.order_integration_events import (
     ConfirmedShipmentIntegrationEvent,
-    AddOrderIntegrationEvent,
+    AddOrderWebhookIntegrationEvent,
     ShippingWebhookIntegrationEvent
 )
 from .integration_events.base import IntegrationEvent

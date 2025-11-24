@@ -140,6 +140,21 @@ TENANT_CONFIG_SEEDS  = (
 # SaaSConfig
 # Columns tenant_id, configs, last_update_dt
 SAAS_CONFIG_SEEDS  = (
+    ("SaaSOwner", json.dumps({
+        "idp": {
+            "public_key": "92alSyFzFiPHT3oYDwjXAGXFAAAQGt1Eoaag5dw",
+            "issuer": "http://idp.saasprovider.com/realms/tenant_123",
+            "audience": "AUD1",
+            "algorith": "RS256",
+        },
+        "plan": ["standard"],
+        "webhook_provider": {
+            "provider_name": "wss",
+            "shared_secret": "2323434235235",
+            "max_age_seconds": 3000
+        }
+    }), datetime.now(timezone.utc)),
+    #TODO SaaSOwner is good enought??
     (TENANT1, json.dumps({
         "idp": {
             "public_key": "92alSyFzFiPHT3oYDwjXAGXFAAAQGt1Eoaag5dw",

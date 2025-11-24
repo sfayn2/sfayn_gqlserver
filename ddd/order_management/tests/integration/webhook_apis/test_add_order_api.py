@@ -3,7 +3,6 @@ from decimal import Decimal
 from unittest.mock import patch, MagicMock
 from django.http import JsonResponse
 from django.urls import reverse
-from ddd.order_management.presentation import webhook_apis
 from ddd.order_management.application import (
     dtos, 
     commands
@@ -34,24 +33,28 @@ def valid_payload(tenant_id):
                 "order_quantity": 1, 
                 "vendor_id": "vendor-1",
                 "product_name": "Product A",
-                "product_price": {"amount": Decimal("10.00"), "currency": "USD"},
-                "package": {"weight_kg": Decimal("0.5")},
+                "product_price": {"amount": "10.00", "currency": "USD"},
+                "package": {"weight_kg": "0.5"},
             },
             {
                 "product_sku": "SKU-PROD-B", 
                 "order_quantity": 2, 
                 "vendor_id": "vendor-1",
                 "product_name": "Product B",
-                "product_price": {"amount": Decimal("5.00"), "currency": "USD"},
-                "package": {"weight_kg": Decimal("0.25")},
+                "product_price": {"amount": "5.00", "currency": "USD"},
+                "package": {"weight_kg": "0.25"},
             },
         ],
     }
 
+    json_string = json.dumps(order_to_add) # Converts the dict to a JSON string
+    encoded_order_data = json_string.encode("utf-8") # Now you can encode the string
+
     return commands.PublishAddOrderCommand(
-        event_type="order_management.internal_events.AddOrderEvent",
         tenant_id=tenant_id,
-        data=order_to_add
+        raw_body=encoded_order_data,
+        headers={"header1": "xxxx"},
+        request_path="tenant_webhook_tenant_add_order_sync"
     )
 
 @pytest.fixture
@@ -62,7 +65,7 @@ def mock_request_factory():
 @pytest.fixture
 def custom_headers():
     return {
-        "HTTP_X_Wss_Signature": "761aed04f08c9b3ed233bfc75e05ef55fc5867f40a92e155ae59b1dc012a3468",
+        "HTTP_X_Wss_Signature": "373912aa9c5af22ea8d69c0d7472eda0bbf1a02f99c810ba7d310bd210eb1c51",
         "HTTP_X_Wss_Timestamp": str(int(time.time()))
     }
 
