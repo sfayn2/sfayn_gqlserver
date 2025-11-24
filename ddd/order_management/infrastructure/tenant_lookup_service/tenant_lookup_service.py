@@ -7,7 +7,7 @@ from ddd.order_management.domain import enums
 from ddd.order_management.application import dtos
 
 #Protocol: ports.LookupServiceAbstract
-class TenantService:
+class TenantLookupService:
     def get_tenant_config(
         self,
         tenant_id: str

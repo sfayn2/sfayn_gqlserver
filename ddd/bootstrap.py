@@ -14,7 +14,7 @@ from ddd.order_management.infrastructure import (
     webhook_receiver,
     clocks,
     user_action_service,
-    tenant_service,
+    tenant_lookup_service,
     saas_lookup_service,
     shipping,
     shipping_webhook_parser,
@@ -44,7 +44,7 @@ load_dotenv(find_dotenv(filename=".env.test"))
 # ====================
 
 saas_lookup_service_instance = saas_lookup_service.SaaSLookupService()
-tenant_service_instance = tenant_service.TenantService()
+tenant_lookup_service_instance = tenant_lookup_service.TenantLookupService()
 
 # ============== resolve access control based on tenant_id ===============
 access_control1.AccessControlService.configure(
@@ -180,7 +180,7 @@ message_bus.COMMAND_HANDLERS.update({
         webhook_receiver.WebhookReceiverService,
         shipment_lookup_service.ShipmentLookupService(),
     ),
-    **handlers.user_action_command_handlers.get_command_handlers(commands, handlers, application_services, tenant_service)
+    **handlers.user_action_command_handlers.get_command_handlers(commands, handlers, application_services, tenant_lookup_service)
 })
 
 # ================= Query Handlers (read operations) ===================

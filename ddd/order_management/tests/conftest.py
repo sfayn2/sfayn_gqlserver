@@ -22,7 +22,7 @@ from ddd.order_management.infrastructure import (
     webhook_receiver,
     clocks,
     user_action_service,
-    tenant_service,
+    tenant_lookup_service,
     saas_lookup_service,
     shipping,
     exception_handler

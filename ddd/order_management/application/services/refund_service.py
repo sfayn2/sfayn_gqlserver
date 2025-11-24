@@ -10,10 +10,10 @@ from ddd.order_management.application import (
 class RefundService:
     def __init__(self, 
         uow: ports.UnitOfWorkAbstract, 
-        tenant_service: ports.LookupServiceAbstract, 
+        tenant_lookup_service: ports.LookupServiceAbstract, 
         user_action_service: ports.UserActionServiceAbstract):
         self.uow = uow
-        self.tenant_service = tenant_service
+        self.tenant_lookup_service = tenant_lookup_service
         self.user_action_service = user_action_service
 
     def process_refund(self, 
@@ -24,7 +24,7 @@ class RefundService:
         action: str = "process_refund"
     ):
         order = self.uow.order.get(order_id=order_id, tenant_id=tenant_id)
-        tenant_config = self.tenant_service.get_tenant_config(tenant_id)
+        tenant_config = self.tenant_lookup_service.get_tenant_config(tenant_id)
 
         request_return_step: Optional[dtos.UserActionDTO] = self.user_action_service.get_last_action(order_id, "request_return")
         
