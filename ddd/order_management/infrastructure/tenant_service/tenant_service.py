@@ -6,7 +6,7 @@ from order_management import models as django_models
 from ddd.order_management.domain import enums
 from ddd.order_management.application import dtos
 
-#Protocol: ports.TenantServiceAbstract
+#Protocol: ports.LookupServiceAbstract
 class TenantService:
     def get_tenant_config(
         self,

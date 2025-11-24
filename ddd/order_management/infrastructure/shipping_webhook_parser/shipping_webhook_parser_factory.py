@@ -1,8 +1,8 @@
 from __future__ import annotations
 from typing import Any, Optional, Dict, Type
 from datetime import datetime
-from .shipping_webhook_payload_parser_abstract import ShippingWebhookParserAbstract
-from .easypost_shipping_webhook_payload_parser import EasyPostShippingWebhookParser
+from .shipping_webhook_parser_abstract import ShippingWebhookParserAbstract
+from .easypost_shipping_webhook_parser import EasyPostShippingWebhookParser
 
 
 # Define a custom exception for better error clarity

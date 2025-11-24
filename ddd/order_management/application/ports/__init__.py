@@ -1,6 +1,5 @@
 
 from .user_action_service_abstract import UserActionServiceAbstract
-from .tenant_service_abstract import TenantServiceAbstract
 from .access_control1_abstract import AccessControl1Abstract
 from .exception_handler_abstract import ExceptionHandlerAbstract
 from .unit_of_work_abstract import UnitOfWorkAbstract
@@ -8,6 +7,7 @@ from .shipping_provider_service_abstract import ShippingProviderServiceAbstract
 from .shipping_webhook_resolver_abstract import ShippingWebhookResolverAbstract
 from .shipment_lookup_service_abstract import ShipmentLookupServiceAbstract
 from .webhook_receiver_service_abstract import WebhookReceiverServiceAbstract
+from .lookup_service_abstract import LookupServiceAbstract
 
 from .access_control_service_abstract import AccessControlServiceAbstract
 

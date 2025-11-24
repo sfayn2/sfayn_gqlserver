@@ -10,7 +10,7 @@ from ddd.order_management.application import (
 class RefundService:
     def __init__(self, 
         uow: ports.UnitOfWorkAbstract, 
-        tenant_service: ports.TenantServiceAbstract, 
+        tenant_service: ports.LookupServiceAbstract, 
         user_action_service: ports.UserActionServiceAbstract):
         self.uow = uow
         self.tenant_service = tenant_service

@@ -26,28 +26,28 @@ class WebhookReceiverService:
     """
     A service responsible for validating and decoding incoming webhook requests.
     """
-    saas_service: Optional[ports.TenantServiceAbstract] = None
+    saas_lookup_service: Optional[ports.LookupServiceAbstract] = None
     webhook_receiver_factory: Optional[WebhookReceiverFactory] = None
 
     @classmethod 
-    def configure(cls, saas_service, webhook_receiver_factory):
-        cls.saas_service = saas_service
+    def configure(cls, saas_lookup_service, webhook_receiver_factory):
+        cls.saas_lookup_service = saas_lookup_service
         cls.webhook_receiver_factory = webhook_receiver_factory
 
     @classmethod 
     def _get_provider(cls, tenant_id: str):
         """Internal helper to resolve the correct provider instance."""
 
-        # Note: Assuming saas_service methods are robust
-        if cls.saas_service is None:
-            raise RuntimeError("Cannot get provider: saas_service is not configured.")
+        # Note: Assuming saas_lookup_service methods are robust
+        if cls.saas_lookup_service is None:
+            raise RuntimeError("Cannot get provider: saas_lookup_service is not configured.")
             
         # Check the second dependency
         if cls.webhook_receiver_factory is None:
             raise RuntimeError("Cannot get provider: webhook_receiver_factory is not configured.")
 
-        #saas_configs = cls.saas_service.get_tenant_config(tenant_id).configs.get("webhook_provider", {})
-        saas_configs = cls.saas_service.get_tenant_config("SaaSOwner").configs.get("webhook_provider", {})
+        #saas_configs = cls.saas_lookup_service.get_tenant_config(tenant_id).configs.get("webhook_provider", {})
+        saas_configs = cls.saas_lookup_service.get_tenant_config("SaaSOwner").configs.get("webhook_provider", {})
         return cls.webhook_receiver_factory.get_webhook_receiver(saas_configs)
 
     @classmethod 
@@ -102,8 +102,8 @@ class WebhookReceiverService:
         
         # Use provider-specific logic if available
         # TODO: SaaSOwner meands default or applyies for all; should apply to all Tenants
-        if cls.saas_service:
-            provider_name = cls.saas_service.get_tenant_config("SaaSOwner").configs.get("webhook_provider", {}).get("name")
+        if cls.saas_lookup_service:
+            provider_name = cls.saas_lookup_service.get_tenant_config("SaaSOwner").configs.get("webhook_provider", {}).get("name")
             if provider_name and provider_name.lower() == 'easypost':
                 # EasyPost webhooks often nest the tracker info within an 'result' or 'data' key
                 tracking_reference = payload_data.get("result", {}).get("tracking_code") or \

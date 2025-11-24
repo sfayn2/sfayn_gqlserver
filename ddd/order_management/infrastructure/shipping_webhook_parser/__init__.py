@@ -1,2 +1,2 @@
-from .shipping_webhook_factory import ShippingWebhookParserFactory
+from .shipping_webhook_parser_factory import ShippingWebhookParserFactory
 from .shipping_webhook_resolver import ShippingWebhookResolver

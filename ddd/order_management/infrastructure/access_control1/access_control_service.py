@@ -9,21 +9,21 @@ class AccessControlService:
     dependencies and create tenant-specific AccessControl objects.
     """
     
-    _saas_service: Optional[ports.TenantServiceAbstract] = None
+    _saas_lookup_service: Optional[ports.LookupServiceAbstract] = None
     _access_control_library: Optional[Type[ports.AccessControl1Abstract]] = None
     _jwt_handler: Optional[Type[JwtTokenHandler]] = None
 
     @classmethod
     def configure(
         cls, 
-        saas_service: ports.TenantServiceAbstract, 
+        saas_lookup_service: ports.LookupServiceAbstract, 
         access_control_library: Type[ports.AccessControl1Abstract],
         jwt_handler: Type[JwtTokenHandler]
     ):
         """
         Configures the global dependencies for the service, including the JWT handler factory.
         """
-        cls._saas_service = saas_service
+        cls._saas_lookup_service = saas_lookup_service
         cls._access_control_library = access_control_library
         cls._jwt_handler = jwt_handler # Store the injected factory
 
@@ -32,10 +32,10 @@ class AccessControlService:
         """
         Private helper method to configure and create the JWT handler using the injected factory.
         """
-        if not cls._saas_service or not cls._jwt_handler:
+        if not cls._saas_lookup_service or not cls._jwt_handler:
             raise RuntimeError("AccessControlService has not been fully configured yet.")
 
-        tenant_config = cls._saas_service.get_tenant_config(tenant_id)
+        tenant_config = cls._saas_lookup_service.get_tenant_config(tenant_id)
         saas_configs = tenant_config.configs.get("idp", {})
         
         # Use the injected factory to create the handler

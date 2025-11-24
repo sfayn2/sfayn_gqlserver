@@ -13,28 +13,28 @@ class ShippingProviderService:
     """
     Service responsible for coordinating shipment creation across various providers.
     """
-    saas_service: Optional[ports.TenantServiceAbstract] = None
+    saas_lookup_service: Optional[ports.LookupServiceAbstract] = None
     shipping_provider_factory: Optional[ShippingProviderFactory] = None
 
     @classmethod
-    def configure(cls, saas_service: ports.TenantServiceAbstract, 
+    def configure(cls, saas_lookup_service: ports.LookupServiceAbstract, 
                  shipping_provider_factory: ShippingProviderFactory):
-        cls.saas_service = saas_service
+        cls.saas_lookup_service = saas_lookup_service
         cls.shipping_provider_factory = shipping_provider_factory
 
     @classmethod
     def _get_provider(cls, tenant_id: str) -> ShippingProviderAbstract:
         """Internal helper to retrieve the correct provider instance via the factory."""
         
-        if cls.saas_service is None:
-            raise RuntimeError("ShippingProviderService has not been configured yet (missing saas_service).")
+        if cls.saas_lookup_service is None:
+            raise RuntimeError("ShippingProviderService has not been configured yet (missing saas_lookup_service).")
 
         if cls.shipping_provider_factory is None:
             raise RuntimeError("ShippingProviderService has not been configured yet (missing shipping_provider_factory).")
 
             
         try:
-            saas_configs = cls.saas_service.get_tenant_config(tenant_id).configs.get("shipping_provider", {})
+            saas_configs = cls.saas_lookup_service.get_tenant_config(tenant_id).configs.get("shipping_provider", {})
             return cls.shipping_provider_factory.get_shipping_provider(saas_configs)
         except Exception as e:
             # Handle potential exceptions during config retrieval

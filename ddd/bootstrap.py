@@ -15,7 +15,7 @@ from ddd.order_management.infrastructure import (
     clocks,
     user_action_service,
     tenant_service,
-    saas_service,
+    saas_lookup_service,
     shipping,
     shipping_webhook_parser,
     shipment_lookup_service,
@@ -43,12 +43,12 @@ load_dotenv(find_dotenv(filename=".env.test"))
 #}
 # ====================
 
-saas_service_instance = saas_service.SaaSService()
+saas_lookup_service_instance = saas_lookup_service.SaaSLookupService()
 tenant_service_instance = tenant_service.TenantService()
 
 # ============== resolve access control based on tenant_id ===============
 access_control1.AccessControlService.configure(
-    saas_service=saas_service_instance,
+    saas_lookup_service=saas_lookup_service_instance,
     access_control_library=access_control1.AccessControl1,
     jwt_handler=access_control1.JwtTokenHandler
 )
@@ -56,13 +56,13 @@ access_control1.AccessControlService.configure(
 
 # =============== resolve shipping provider based on tenant_id ========
 shipping.ShippingProviderService.configure(
-    saas_service=saas_service_instance,
+    saas_lookup_service=saas_lookup_service_instance,
     shipping_provider_factory=shipping.ShippingProviderFactory()
 )
 
 # =============== resolve shipping webhook parser based on tenant_id ========
 shipping_webhook_parser.ShippingWebhookResolver.configure(
-    saas_service=saas_service_instance,
+    saas_lookup_service=saas_lookup_service_instance,
     shipping_parser_factory=shipping_webhook_parser.ShippingWebhookParserFactory()
 )
 
@@ -76,7 +76,7 @@ domain_services.DomainClock.configure(clocks.UTCClock())
 
 # ========= webhook receiver  =============
 webhook_receiver.WebhookReceiverService.configure(
-    saas_service=saas_service_instance,
+    saas_lookup_service=saas_lookup_service_instance,
     webhook_receiver_factory=webhook_receiver.WebhookReceiverFactory
 )
 
@@ -175,7 +175,7 @@ message_bus.COMMAND_HANDLERS.update({
     **handlers.webhook_publish_command_handlers.get_command_handlers(
         commands, 
         handlers, 
-        event_bus
+        event_bus,
         shipping_webhook_parser.ShippingWebhookResolver,
         webhook_receiver.WebhookReceiverService,
         shipment_lookup_service.ShipmentLookupService(),

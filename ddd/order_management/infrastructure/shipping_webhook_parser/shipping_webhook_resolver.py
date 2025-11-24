@@ -13,28 +13,28 @@ class ShippingWebhookResolver:
     """
     Service responsible for coordinating shipment creation across various parsers.
     """
-    saas_service: Optional[ports.TenantServiceAbstract] = None
+    saas_lookup_service: Optional[ports.LookupServiceAbstract] = None
     shipping_parser_factory: Optional[ShippingWebhookParserFactory] = None
 
     @classmethod
-    def configure(cls, saas_service: ports.TenantServiceAbstract, 
+    def configure(cls, saas_lookup_service: ports.LookupServiceAbstract, 
                  shipping_parser_factory: ShippingWebhookParserFactory):
-        cls.saas_service = saas_service
+        cls.saas_lookup_service = saas_lookup_service
         cls.shipping_parser_factory = shipping_parser_factory
 
     @classmethod
     def _get_parser(cls, tenant_id: str) -> ShippingWebhookParserAbstract:
         """Internal helper to retrieve the correct parser instance via the factory."""
         
-        if cls.saas_service is None:
-            raise RuntimeError("ShippingparserService has not been configured yet (missing saas_service).")
+        if cls.saas_lookup_service is None:
+            raise RuntimeError("ShippingparserService has not been configured yet (missing saas_lookup_service).")
 
         if cls.shipping_parser_factory is None:
             raise RuntimeError("ShippingparserService has not been configured yet (missing shipping_parser_factory).")
 
             
         try:
-            saas_configs = cls.saas_service.get_tenant_config(tenant_id).configs.get("shipping_webhook", {})
+            saas_configs = cls.saas_lookup_service.get_tenant_config(tenant_id).configs.get("shipping_webhook", {})
             return cls.shipping_parser_factory.get_payload_parser(saas_configs)
         except Exception as e:
             # Handle potential exceptions during config retrieval

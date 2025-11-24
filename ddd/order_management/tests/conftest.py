@@ -23,7 +23,7 @@ from ddd.order_management.infrastructure import (
     clocks,
     user_action_service,
     tenant_service,
-    saas_service,
+    saas_lookup_service,
     shipping,
     exception_handler
 )
@@ -227,11 +227,11 @@ def fake_jwt_token_handler():
 @pytest.fixture
 def fake_access_control(fake_jwt_token_handler):
 
-    saas_service_instance = saas_service.SaaSService()
+    saas_lookup_service_instance = saas_lookup_service.SaaSLookupService()
 
     # ============== resolve access control based on tenant_id ===============
     access_control1.AccessControlService.configure(
-        saas_service=saas_service_instance,
+        saas_lookup_service=saas_lookup_service_instance,
         access_control_library=access_control1.AccessControl1,
         jwt_handler=fake_jwt_token_handler
     )
