@@ -87,7 +87,10 @@ webhook_receiver.WebhookReceiverService.configure(
 
 # ============ Configure which events get published ===========
 event_bus.EXTERNAL_EVENT_WHITELIST = []
-event_bus.INTERNAL_EVENT_WHITELIST = ["add_order_webhook.received"]
+event_bus.INTERNAL_EVENT_WHITELIST = [
+    "add_order_webhook.received",
+    "shipping_tracker_webhook.received"
+]
 
 # ===========Setup Redis event publishers ==========
 event_bus.internal_publisher = event_publishers.RedisStreamPublisher(

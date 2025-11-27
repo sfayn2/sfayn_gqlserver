@@ -138,6 +138,7 @@ TENANT_CONFIG_SEEDS  = (
         "shipment_provider": "wss",
         "shipment_api_key": "api key",
         "shipment_endpoint": "https://endpoint.dev",
+        "add_order_webhook_provider": "wss",
         "add_order_webhook_shared_secret": "2323434235235",
         "add_order_webhook_max_age_seconds": 3000,
         "restocking_fee_percent": 10,

@@ -40,12 +40,14 @@ class ShippingProviderService:
             raise RuntimeError("ShippingProviderService has not been configured yet (missing shipping_provider_factory).")
 
         try:
-            # 1. Type Hinting & Clearer Variable Names
-            tenant_source = cls.tenant_lookup_service.get_tenant_config(tenant_id)
-            saas_source = cls.saas_lookup_service.get_tenant_config(tenant_id)
+            # Lets SaasOwner handle any related Shipping integration
+            ## 1. Type Hinting & Clearer Variable Names
+            #tenant_source = cls.tenant_lookup_service.get_tenant_config(tenant_id)
+            #saas_source = cls.saas_lookup_service.get_tenant_config(tenant_id)
             
-            # Determine the primary source of configuration data
-            config_source = tenant_source.configs if tenant_source and tenant_source.configs else saas_source.configs
+            ## Determine the primary source of configuration data
+            #config_source = tenant_source.configs if tenant_source and tenant_source.configs else saas_source.configs
+            config_source = cls.saas_lookup_service.get_tenant_config(tenant_id)
 
             if not config_source:
                 # 2. Raise a specific custom exception instead of a generic ValueError

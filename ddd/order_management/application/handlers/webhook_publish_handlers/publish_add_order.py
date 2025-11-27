@@ -16,6 +16,7 @@ def handle_publish_add_order(
     event_publisher: ports.EventPublisherAbstract
 ):
     try:
+        #import pdb;pdb.set_trace()
 
         # 2. Validate the raw payload with the external service
         # The service is responsible for signature checks, schema validation, etc.
@@ -28,7 +29,7 @@ def handle_publish_add_order(
 
         # 3. Normalize the third-party schema into a generic internal DTO
         # This step maps the external format to your bounded context's ubiquitous language
-        normalized_event_data: dtos.AddOrderDTO = dtos.AddOrderDTO(**json.loads(validated_payload['raw_body']))
+        normalized_event_data: dtos.AddOrderDTO = dtos.AddOrderDTO(**validated_payload)
         
 
         # 4. Create an integration event DTO for the message bus

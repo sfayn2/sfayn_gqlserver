@@ -10,9 +10,14 @@ class PublishAddOrderCommand(Command2):
     raw_body: bytes
     request_path: str
 
-class PublishShipmentUpdatesCommand(Command):
+class PublishShipmentTrackerCommand(Command):
     headers: dict
     raw_body: bytes
     request_path: str
     saas_id: str
 
+
+class PublishShipmentTrackerTenantCommand(Command2):
+    headers: dict
+    raw_body: bytes
+    request_path: str

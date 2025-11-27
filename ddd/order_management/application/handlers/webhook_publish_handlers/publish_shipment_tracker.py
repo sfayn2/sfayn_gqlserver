@@ -9,8 +9,8 @@ from ddd.order_management.application import (
 from ddd.order_management.domain import exceptions
 
 
-def handle_publish_shipment_updates(
-    command: commands.PublishShipmentUpdatesCommand, 
+def handle_publish_shipment_tracker(
+    command: commands.PublishShipmentTrackerCommand, 
     uow: ports.UnitOfWorkAbstract,
     user_action_service: ports.UserActionServiceAbstract,
     exception_handler: ports.ExceptionHandlerAbstract,
@@ -55,7 +55,7 @@ def handle_publish_shipment_updates(
 
         # 5. Create an integration event DTO for the message bus
         integration_event = dtos.ShippingWebhookIntegrationEvent(
-            event_type="shipping_webhook.received",
+            event_type="shipping_tracker_webhook.received",
             data=normalized_event_data # Use the correct DTO variable name
         )
 
