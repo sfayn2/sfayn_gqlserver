@@ -31,7 +31,7 @@ class ShippingProviderFactory:
         Factory method to create the appropriate ShippingProvider instance 
         based on configuration.
         """
-        shipment_provider = cfg.shipment_provider.lower()
+        shipment_provider = cfg.provider.lower()
         
         # Use dictionary lookup to find the correct class
         provider_class = ShippingProviderFactory._PROVIDER_MAP.get(shipment_provider)
@@ -45,8 +45,8 @@ class ShippingProviderFactory:
             else:
                 # Other providers (Easypost, Ninjavan, Shipbob) share common arguments
                 return provider_class(
-                    api_key=cfg.shipment_api_key, # type: ignore 
-                    endpoint=cfg.shipment_endpoint, # type: ignore 
+                    api_key=cfg.api_key, # type: ignore 
+                    endpoint=cfg.endpoint, # type: ignore 
                 )
         else:
             # Raise a specific, informative exception

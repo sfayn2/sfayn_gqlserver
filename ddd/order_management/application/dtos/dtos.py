@@ -122,8 +122,12 @@ class ShippingWebhookDTO(BaseModel):
 
 # SaasConfig / TenantConfig related DTOs
 class ShipmentWebhookConfigDTO(BaseModel):
-    shipment_provider: str
-    shipment_api_key: str
-    shipment_endpoint: str
-    shipment_webhook_shared_secret: str
-    shipment_webhook_max_age_seconds: Optional[int] = None
+    # all shipments tracker webhook / create shipments
+    provider: str
+    api_key: str
+    endpoint: str
+
+class WebhookReceiverConfigDTO(BaseModel):
+    provider: str
+    shared_secret: str
+    max_age_seconds: Optional[int] = None

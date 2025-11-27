@@ -29,6 +29,7 @@ def handle_publish_add_order(
         # 3. Normalize the third-party schema into a generic internal DTO
         # This step maps the external format to your bounded context's ubiquitous language
         normalized_event_data: dtos.AddOrderDTO = dtos.AddOrderDTO(**json.loads(validated_payload['raw_body']))
+        
 
         # 4. Create an integration event DTO for the message bus
         integration_event = dtos.AddOrderWebhookIntegrationEvent(

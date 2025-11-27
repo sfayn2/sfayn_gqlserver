@@ -24,27 +24,27 @@ class WebhookReceiverFactory:
 
     @staticmethod
     def get_webhook_receiver(cfg: dtos.ShipmentWebhookConfigDTO) -> WebhookReceiverAbstract:
-        shipment_provider = cfg.shipment_provider.lower()
+        provider = cfg.provider.lower()
         
         # Use dictionary lookup to find the correct class
-        receiver_class = WebhookReceiverFactory._RECEIVER_MAP.get(shipment_provider)
+        receiver_class = WebhookReceiverFactory._RECEIVER_MAP.get(provider)
 
         if receiver_class:
             # Pass configuration parameters to the constructor dynamically as needed
             # This logic depends on which parameters each class expects
-            if shipment_provider in ("easypost", "wss"):
+            if provider in ("easypost", "wss"):
                  return receiver_class(
-                    shipment_webhook_shared_secret=cfg.shipment_webhook_shared_secret,
-                    shipment_webhook_max_age_seconds=cfg.shipment_webhook_max_age_seconds
+                    shared_secret=cfg.shared_secret,
+                    max_age_seconds=cfg.max_age_seconds
                 )
             # for others that just need shipment_webhook_shared_secret
             else:
                 return receiver_class(
-                    shipment_webhook_shared_secret=cfg.shipment_webhook_shared_secret
+                    shared_secret=cfg.shared_secret
                 )
         else:
             # Raise a clear exception if the provider name isn't found
             raise UnknownProviderError(
-                f"No webhook receiver found for provider: '{shipment_provider}'"
+                f"No webhook receiver found for provider: '{provider}'"
             )
 

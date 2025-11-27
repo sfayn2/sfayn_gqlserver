@@ -10,10 +10,10 @@ class EasyPostWebhookReceiver:
     """
     Verifies the authenticity and integrity of EasyPost webhooks using HMAC-SHA256 V2 method.
     """
-    def __init__(self, shipment_webhook_shared_secret: str, shipment_webhook_max_age_seconds: int = 300):
+    def __init__(self, shared_secret: str, max_age_seconds: int = 300):
         # The secret is provided when creating the webhook in the EasyPost dashboard
-        self.secret = shipment_webhook_shared_secret.encode('utf-8')
-        self.max_age = shipment_webhook_max_age_seconds
+        self.secret = shared_secret.encode('utf-8')
+        self.max_age = max_age_seconds
 
     def verify(self, headers: Mapping[str, str], raw_body: bytes, request_path: str) -> bool:
         """

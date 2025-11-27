@@ -13,7 +13,8 @@ from .dtos import (
     AddOrderDTO,
     ShippingWebhookDTO,
 
-    ShipmentWebhookConfigDTO
+    ShipmentWebhookConfigDTO,
+    WebhookReceiverConfigDTO
 )
 
 # Integration events

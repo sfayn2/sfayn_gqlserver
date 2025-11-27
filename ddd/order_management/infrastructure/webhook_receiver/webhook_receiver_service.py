@@ -40,7 +40,7 @@ class WebhookReceiverService:
         cls.webhook_receiver_factory = webhook_receiver_factory
 
     @classmethod 
-    def _get_provider(cls, tenant_id: str):
+    def _get_provider(cls, tenant_id: str, webhook_type: str):
         """Internal helper to resolve the correct provider instance."""
 
         # it satisfies the static analysis tool.
@@ -66,11 +66,16 @@ class WebhookReceiverService:
                 # 2. Raise a specific custom exception instead of a generic ValueError
                 raise ConfigurationError(f"No configuration found for tenant_id: {tenant_id} in both tenant and SaaS lookups.")
 
-            # 3. Defensive coding: Ensure field names are consistent
-            # Corrected DTO field name 'shipment_webhook_max_age_seconds' used consistently
-            shipment_config = mappers.ConfigMapper.to_shipment_config_dto(config_source)
-        
-            return cls.webhook_receiver_factory.get_webhook_receiver(shipment_config)
+            if webhook_type == 'SHIPMENT_TRACKER':
+                # Use the specific mapper for shipment configs
+                config_dto = mappers.ConfigMapper.to_shipment_tracker_config_dto(config_source)
+            elif webhook_type == 'ADD_ORDER':
+                # Use the specific mapper for order configs
+                config_dto = mappers.ConfigMapper.to_order_config_dto(config_source)
+            else:
+                raise ConfigurationError(f"Unknown webhook type: {webhook_type}")
+
+            return cls.webhook_receiver_factory.get_webhook_receiver(config_dto)
 
         except Exception as e:
             raise ConfigurationError(f"Error getting shipment provider {e}")
@@ -81,8 +86,16 @@ class WebhookReceiverService:
         """
         Validates the request signature and decodes the payload.
         """
+        # Determine the webhook type based on the request_path
+        if "/shipment-tracker/" in request_path:
+            webhook_type = "SHIPMENT_TRACKER"
+        elif "/add-order/" in request_path:
+            webhook_type = "ADD_ORDER"
+        else:
+            raise ConfigurationError(f"Cannot determine webhook type from request path: {request_path}")
+
         # 1. Get the configured verifier instance using the factory dependency
-        verifier = cls._get_provider(tenant_id)
+        verifier = cls._get_provider(tenant_id, webhook_type)
 
         # 2. Verify the signature
         #if not verifier.verify(headers=request.headers, raw_body=request.body, request_path=request.path):

@@ -3,23 +3,19 @@ from django.http import HttpResponseBadRequest, JsonResponse
 from ddd.order_management.application import (
     message_bus, commands
   )
-#from ddd.order_management.infrastructure import (
-#    webhook_receiver
-#)
 
 @csrf_exempt
-def shipment_updates_api(request, saas_id: str):
+def add_order_webhook(request, tenant_id: str):
 
     if request.method != "POST":
         return HttpResponseBadRequest("Only POST is allowed")
 
     try:
-        
-        command = commands.PublishShipmentUpdatesCommand.model_validate(
+        command = commands.PublishAddOrderCommand.model_validate(
             { "headers" : request.headers,
               "raw_body": request.body,
               "request_path": request.path,
-              "saas_id": saas_id
+              "tenant_id": tenant_id
             }
         )
         result = message_bus.handle(command)

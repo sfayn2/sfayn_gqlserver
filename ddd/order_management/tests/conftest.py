@@ -138,8 +138,8 @@ TENANT_CONFIG_SEEDS  = (
         "shipment_provider": "wss",
         "shipment_api_key": "api key",
         "shipment_endpoint": "https://endpoint.dev",
-        "shipment_webhook_shared_secret": "2323434235235",
-        "shipment_webhook_max_age_seconds": 3000,
+        "add_order_webhook_shared_secret": "2323434235235",
+        "add_order_webhook_max_age_seconds": 3000,
         "restocking_fee_percent": 10,
         "max_refund_amount": 500.0,
     }), datetime.now(timezone.utc)),
@@ -158,6 +158,9 @@ SAAS_CONFIG_SEEDS  = (
         "shipment_endpoint": "https://endpoint.dev",
         "shipment_webhook_shared_secret": "2323434235235",
         "shipment_webhook_max_age_seconds": 3000,
+        "add_order_webhook_provider": "wss",
+        "add_order_webhook_shared_secret": "2323434235235",
+        "add_order_webhook_max_age_seconds": 3000,
     }), datetime.now(timezone.utc)),
     #TODO SaaSOwner is good enough??
     (TENANT1, json.dumps({
@@ -170,6 +173,9 @@ SAAS_CONFIG_SEEDS  = (
         "shipment_endpoint": "https://endpoint.dev",
         "shipment_webhook_shared_secret": "2323434235235",
         "shipment_webhook_max_age_seconds": 3000,
+        "add_order_webhook_provider": "wss",
+        "add_order_webhook_shared_secret": "2323434235235",
+        "add_order_webhook_max_age_seconds": 3000,
     }), datetime.now(timezone.utc)),
 )
 

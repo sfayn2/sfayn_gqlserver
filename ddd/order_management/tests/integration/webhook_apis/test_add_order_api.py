@@ -54,7 +54,7 @@ def valid_payload(tenant_id):
         tenant_id=tenant_id,
         raw_body=encoded_order_data,
         headers={"header1": "xxxx"},
-        request_path="tenant_webhook_tenant_add_order_sync"
+        request_path="add_order_webhook"
     )
 
 @pytest.fixture
@@ -72,7 +72,7 @@ def custom_headers():
 @pytest.mark.django_db
 def test_valid_post_returns_200(client, tenant_id, valid_payload, custom_headers):
     response = client.post(
-        reverse("tenant_webhook_tenant_add_order_sync", args=[tenant_id]),
+        reverse("add_order_webhook", args=[tenant_id]),
         data=valid_payload.model_dump_json(),
         content_type="application/json",
         **custom_headers
