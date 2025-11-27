@@ -25,18 +25,6 @@ class PaymentDetailsType(graphene.ObjectType):
     paid_amount = graphene.Field(MoneyType, required=True)
     transaction_id = graphene.String(required=True)
 
-class OrderResponseType(graphene.ObjectType):
-    order_id = graphene.String()
-    order_status = graphene.String()
-    success = graphene.Boolean()
-    message = graphene.String()
-    tax_details = graphene.List(graphene.String)
-    offer_details = graphene.List(graphene.String)
-    shipping_details = graphene.Field(ShippingDetailsType)
-    payment_details = graphene.Field(PaymentDetailsType)
-    tax_amount  = graphene.Field(MoneyType)
-    total_discounts_fee = graphene.Field(MoneyType)
-    final_amount = graphene.Field(MoneyType)
 
 class VendorDetailsType(graphene.ObjectType):
     vendor_id = graphene.String()
@@ -80,8 +68,6 @@ class OrderType(graphene.ObjectType):
     cancellation_reason = graphene.String()
     total_discounts_fee = graphene.Field(MoneyType)
     offer_detail = graphene.List(graphene.String)
-    tax_details = graphene.List(graphene.String)
-    tax_amount = graphene.Field(MoneyType)
     total_amount = graphene.Field(MoneyType)
     final_amount = graphene.Field(MoneyType)
     tracking_reference = graphene.String()

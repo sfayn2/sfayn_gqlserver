@@ -18,7 +18,6 @@ class ShipmentItem:
     line_item: models.LineItem
     quantity: int
     shipment_item_id: Optional[str] = None
-    allocated_shipping_tax: value_objects.Money = field(default_factory=lambda: value_objects.Money.default())
 
     #TODO how to deal w this? 
     #def __post_init__(self):
@@ -51,7 +50,6 @@ class Shipment:
 
 
     shipment_amount: value_objects.Money = field(default_factory=lambda: value_objects.Money.default())
-    shipment_tax_amount: value_objects.Money = field(default_factory=lambda: value_objects.Money.default())
     shipment_status: enums.ShipmentStatus = enums.ShipmentStatus.PENDING
     shipment_items: List[ShipmentItem] = field(default_factory=list)
 
@@ -79,18 +77,3 @@ class Shipment:
         raise exceptions.DomainError(f"Unable to determine package max dimension for shipment id {self.shipment_id}")
 
 
-
-    #def allocate_shipping_tax(self):
-    #    total_line_subtotal = sum(
-    #        sli.line_item.total_amount.amount * sli.quantity for sli in self.shipment_items
-    #    )
-
-    #    if total_line_subtotal == 0:
-    #        return
-
-    #    for sli in self.shipment_items:
-    #        proportion = (sli.line_item.total_amount.amount * sli.quantity) / total_line_subtotal
-    #        sli.allocated_shipping_tax = value_objects.Money(
-    #            self.shipment_tax_amount.amount * proportion,
-    #            self.shipment_tax_amount.currency
-    #        )

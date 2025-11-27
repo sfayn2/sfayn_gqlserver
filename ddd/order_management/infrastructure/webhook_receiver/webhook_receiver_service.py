@@ -1,13 +1,16 @@
 from __future__ import annotations
 import json
 from typing import Dict, Any, Optional
-from ddd.order_management.application import ports
+from ddd.order_management.application import ports, dtos, mappers
 from .webhook_receiver_factory import WebhookReceiverFactory
 
 
 # Define custom exceptions for specific error scenarios
 class WebhookError(Exception):
     """Base class for webhook processing errors."""
+    pass
+
+class ConfigurationError(WebhookError):
     pass
 
 class ExtractTrackingError(WebhookError):
@@ -27,28 +30,51 @@ class WebhookReceiverService:
     A service responsible for validating and decoding incoming webhook requests.
     """
     saas_lookup_service: Optional[ports.LookupServiceAbstract] = None
+    tenant_lookup_service: Optional[ports.LookupServiceAbstract] = None
     webhook_receiver_factory: Optional[WebhookReceiverFactory] = None
 
     @classmethod 
-    def configure(cls, saas_lookup_service, webhook_receiver_factory):
+    def configure(cls, saas_lookup_service, tenant_lookup_service, webhook_receiver_factory):
         cls.saas_lookup_service = saas_lookup_service
+        cls.tenant_lookup_service = tenant_lookup_service
         cls.webhook_receiver_factory = webhook_receiver_factory
 
     @classmethod 
     def _get_provider(cls, tenant_id: str):
         """Internal helper to resolve the correct provider instance."""
 
-        # Note: Assuming saas_lookup_service methods are robust
+        # it satisfies the static analysis tool.
         if cls.saas_lookup_service is None:
-            raise RuntimeError("Cannot get provider: saas_lookup_service is not configured.")
-            
-        # Check the second dependency
-        if cls.webhook_receiver_factory is None:
-            raise RuntimeError("Cannot get provider: webhook_receiver_factory is not configured.")
+            raise RuntimeError("Cannot operate: saas_lookup_service is not configured.")
 
-        #saas_configs = cls.saas_lookup_service.get_tenant_config(tenant_id).configs.get("webhook_provider", {})
-        saas_configs = cls.saas_lookup_service.get_tenant_config("SaaSOwner").configs.get("webhook_provider", {})
-        return cls.webhook_receiver_factory.get_webhook_receiver(saas_configs)
+        if cls.tenant_lookup_service is None:
+            raise RuntimeError("Cannot operate: tenant_lookup_service is not configured.")
+            
+        if cls.webhook_receiver_factory is None:
+            raise RuntimeError("Cannot operate: webhook_receiver_factory is not configured.")
+
+            
+        try:
+            # 1. Type Hinting & Clearer Variable Names
+            tenant_source = cls.tenant_lookup_service.get_tenant_config(tenant_id)
+            saas_source = cls.saas_lookup_service.get_tenant_config(tenant_id)
+            
+            # Determine the primary source of configuration data
+            config_source = tenant_source.configs if tenant_source and tenant_source.configs else saas_source.configs
+
+            if not config_source:
+                # 2. Raise a specific custom exception instead of a generic ValueError
+                raise ConfigurationError(f"No configuration found for tenant_id: {tenant_id} in both tenant and SaaS lookups.")
+
+            # 3. Defensive coding: Ensure field names are consistent
+            # Corrected DTO field name 'shipment_webhook_max_age_seconds' used consistently
+            shipment_config = mappers.ConfigMapper.to_shipment_config_dto(config_source)
+        
+            return cls.webhook_receiver_factory.get_webhook_receiver(shipment_config)
+
+        except Exception as e:
+            raise ConfigurationError(f"Error getting shipment provider {e}")
+
 
     @classmethod 
     def validate(cls, tenant_id: str, headers, raw_body, request_path) -> Dict[str, Any]:
@@ -79,46 +105,68 @@ class WebhookReceiverService:
         return payload
 
     @classmethod
-    def extract_tracking_reference(cls, raw_body: bytes) -> str:
+    def extract_tracking_reference(cls, raw_body: bytes, saas_id: str) -> str:
         """
-        Extracts the tracking reference from the raw webhook body.
-        
-        This method is static/classmethod as it doesn't depend on an instance state
-        and provides a utility function for pre-processing webhooks.
+        Extracts a tracking reference from a raw shipment webhook payload based on
+        tenant-specific configuration derived from the 'saas_id'.
+
+        This method assumes the tenant is using the default system webhook structure.
+        The SaasLookupService must be configured prior to calling this method.
 
         Args:
-            raw_body: The raw bytes received from the webhook producer.
-            provider_name: Optional name of the provider (e.g., 'easypost') 
-                           to use provider-specific logic.
+            raw_body: The raw bytes of the webhook payload.
+            saas_id: The unique identifier for the SaaS tenant, typically from the request URL.
+
+        Returns:
+            The extracted tracking reference as a string.
 
         Raises:
-            ExtractTrackingError: If the payload is invalid or the reference is missing.
+            RuntimeError: If the saas_lookup_service is not initialized or the
+                          tenant configuration is missing/invalid.
+            ExtractTrackingError: If the payload is invalid, cannot be parsed,
+                                  or the tracking reference cannot be found or is empty.
         """
+        if cls.saas_lookup_service is None:
+            # Ensures the dependency is present before any work is done.
+            raise RuntimeError("Cannot operate: saas_lookup_service is not configured.")
+
         try:
             # Decode bytes and parse JSON payload
-            payload_data = json.loads(raw_body.decode('utf-8'))
+            payload_data: dict[str, Any] = json.loads(raw_body.decode('utf-8'))
         except (json.JSONDecodeError, UnicodeDecodeError) as e:
             raise ExtractTrackingError(f"Invalid JSON payload or encoding: {e}")
-        
-        # Use provider-specific logic if available
-        # TODO: SaaSOwner meands default or applyies for all; should apply to all Tenants
-        if cls.saas_lookup_service:
-            provider_name = cls.saas_lookup_service.get_tenant_config("SaaSOwner").configs.get("webhook_provider", {}).get("name")
-            if provider_name and provider_name.lower() == 'easypost':
-                # EasyPost webhooks often nest the tracker info within an 'result' or 'data' key
-                tracking_reference = payload_data.get("result", {}).get("tracking_code") or \
-                                    payload_data.get("data", {}).get("tracking_code")
+
+        # Attempt to retrieve the SaaSOwner configuration
+        saas_config = cls.saas_lookup_service.get_tenant_config(saas_id)
+
+        # Check if the tenant_config was successfully retrieved/is not None
+        if not saas_config:
+            # Raise an appropriate error if SaaSOwner is not available
+            raise RuntimeError(f"SaaS configuration '{saas_id}' is missing or not available.")
+
+        # Proceed with getting the provider name from the configuration
+        shipment_provider: Optional[str] = saas_config.configs.get("shipment_shipment_provider")
+        tracking_reference: Optional[str] = None # Initialize variable to ensure scope
+
+        if shipment_provider and shipment_provider.lower() == 'easypost':
+            # EasyPost webhooks often nest the tracker info within an 'result' or 'data' key
+            tracking_reference = payload_data.get("result", {}).get("tracking_code") or \
+                                 payload_data.get("data", {}).get("tracking_code")
         else:
-            # Fallback for generic or unknown providers
-            tracking_reference = payload_data.get("tracking_code") or \
-                                 payload_data.get("id") # sometimes the main ID is the tracking ref
+            # Handle the default case or other providers here if necessary
+            # e.g., tracking_reference = payload_data.get("default_tracking_key")
+            pass
 
         if not tracking_reference:
-            # Log the missing key situation for debugging purposes
-            raise ExtractTrackingError(f"Tracking reference missing from payload. Attempted paths for provider '{provider_name}'.")
+            # Log the missing key situation for debugging purposes (logging statement omitted for brevity)
+            raise ExtractTrackingError(
+                f"Tracking reference missing from payload. Attempted paths for provider '{shipment_provider}'."
+            )
 
         # Basic validation that the reference is a non-empty string
+        # `isinstance(tracking_reference, str)` check is technically redundant if all paths
+        # assign a string or None, but it adds robustness.
         if not isinstance(tracking_reference, str) or not tracking_reference.strip():
             raise ExtractTrackingError("Extracted tracking reference is empty or invalid.")
 
-        return tracking_reference 
+        return tracking_reference

@@ -105,13 +105,6 @@ class Shipment(models.Model):
             blank=True, 
             help_text="shipping amount", 
         )
-    shipment_tax_amount = models.DecimalField(
-            decimal_places=settings.DEFAULT_DECIMAL_PLACES, 
-            max_digits=settings.DEFAULT_MAX_DIGITS,
-            null=True, 
-            blank=True, 
-            help_text="shipping tax amount", 
-        )
     shipment_currency = models.CharField(max_length=25, blank=True, null=True)
 
     shipment_status = models.CharField(
@@ -138,14 +131,6 @@ class ShipmentItem(models.Model):
     )
 
     quantity = models.PositiveIntegerField(null=True)
-    allocated_shipping_tax = models.DecimalField(
-            decimal_places=settings.DEFAULT_DECIMAL_PLACES, 
-            max_digits=settings.DEFAULT_MAX_DIGITS,
-            null=True, 
-            blank=True, 
-            help_text="allocated shipping tax amount", 
-        )
-    allocated_shipping_tax_currency = models.CharField(max_length=25, blank=True, null=True)
 
 
 class UserActionLog(models.Model):

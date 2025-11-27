@@ -23,8 +23,12 @@ def handle_publish_shipment_updates(
     Processes an incoming Shipping provider webhook request within a DDD context.
     """
     try:
+
         # 1. Extract the tracking reference from the raw request body
-        tracking_reference = webhook_receiver_service.extract_tracking_reference(command.raw_body)
+        tracking_reference = webhook_receiver_service.extract_tracking_reference(
+            command.raw_body, 
+            command.saas_id
+        )
         
         # 2. Identify the tenant associated with the shipment tracking reference
         tenant_id = shipment_lookup_service.get_tenant_id_by_tracking_ref(tracking_reference)
@@ -37,7 +41,7 @@ def handle_publish_shipment_updates(
         
         # 3. Validate the raw payload signature/origin using tenant-specific credentials
         validated_payload = webhook_receiver_service.validate(
-            tenant_id=tenant_id, 
+            tenant_id=tenant_id,
             headers=command.headers,
             raw_body=command.raw_body,
             request_path=command.request_path

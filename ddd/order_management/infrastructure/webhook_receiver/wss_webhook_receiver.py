@@ -12,9 +12,9 @@ from ddd.order_management.domain.services import DomainClock
 # WebhookReceiverAbstract
 class WssWebhookReceiver:
 
-    def __init__(self, shared_secret: str, max_age_seconds: int = 3000):
-        self.secret = shared_secret
-        self.max_age = max_age_seconds
+    def __init__(self, shipment_webhook_shared_secret: str, shipment_webhook_max_age_seconds: int = 3000):
+        self.secret = shipment_webhook_shared_secret
+        self.max_age = shipment_webhook_max_age_seconds
 
     #def verify(self, headers, body) -> bool:
     def verify(self, headers: Mapping[str, str], raw_body: bytes, request_path: str) -> bool:

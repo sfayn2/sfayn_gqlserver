@@ -8,24 +8,18 @@ from ddd.order_management.application import (
 #)
 
 @csrf_exempt
-def shipment_updates_api(request):
+def shipment_updates_api(request, saas_id: str):
 
     if request.method != "POST":
         return HttpResponseBadRequest("Only POST is allowed")
 
     try:
-        ##TODO how to get tenant upfront
-        #temp_payload = json.loads(request.body.decode('utf-8')) 
-        #tenant_id = temp_payload["results"]["metadata"]["tenant_id"]
-        #payload = webhook_receiver.WebhookReceiverService.validate(
-        #        tenant_id, 
-        #        request
-        #    )
         
         command = commands.PublishShipmentUpdatesCommand.model_validate(
             { "headers" : request.headers,
               "raw_body": request.body,
-              "request_path": request.path
+              "request_path": request.path,
+              "saas_id": saas_id
             }
         )
         result = message_bus.handle(command)

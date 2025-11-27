@@ -4,8 +4,8 @@ import hmac, hashlib
 # WebhookReceiverAbstract
 class GithubWebhookReceiver:
 
-    def __init__(self, shared_secret: str):
-        self.secret = shared_secret.encode()
+    def __init__(self, shipment_webhook_shared_secret: str):
+        self.secret = shipment_webhook_shared_secret.encode()
 
     def verify(self, headers, body) -> bool:
         signature = headers.get("X-Hub-Signature-256", "")

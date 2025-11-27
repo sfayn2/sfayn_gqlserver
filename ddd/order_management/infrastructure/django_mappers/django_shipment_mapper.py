@@ -22,7 +22,6 @@ class ShipmentMapper:
                     'tracking_reference': shipment.tracking_reference,
                     'shipment_amount': shipment.shipment_amount.amount,
                     'shipment_currency': shipment.shipment_amount.currency,
-                    'shipment_tax_amount': shipment.shipment_tax_amount.amount,
                     'shipment_status': shipment.shipment_status.value,
                 }
         }
@@ -44,10 +43,6 @@ class ShipmentMapper:
             tracking_reference=django_shipment.tracking_reference,
             shipment_amount=value_objects.Money(
                 amount=django_shipment.shipment_amount,
-                currency=django_shipment.shipment_currency
-            ),
-            shipment_tax_amount=value_objects.Money(
-                amount=django_shipment.shipment_tax_amount,
                 currency=django_shipment.shipment_currency
             ),
             shipment_status=enums.ShipmentStatus(django_shipment.shipment_status),

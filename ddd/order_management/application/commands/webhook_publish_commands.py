@@ -5,20 +5,14 @@ from .commands import Command, AddOrderCommand
 class Command2(Command):
     tenant_id: str
 
-# {
-#    "event_type": "events.ProductUpdateEvent",
-#    "tenant_id": "tenant1",
-#    "data": { ... }
-# }
-
 class PublishAddOrderCommand(Command2):
-    #data: dtos.AddOrderDTO
     headers: dict
     raw_body: bytes
     request_path: str
 
-class PublishShipmentUpdatesCommand(Command2):
+class PublishShipmentUpdatesCommand(Command):
     headers: dict
     raw_body: bytes
     request_path: str
+    saas_id: str
 

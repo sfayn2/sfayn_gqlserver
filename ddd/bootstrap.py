@@ -57,12 +57,14 @@ access_control1.AccessControlService.configure(
 # =============== resolve shipping provider based on tenant_id ========
 shipping.ShippingProviderService.configure(
     saas_lookup_service=saas_lookup_service_instance,
+    tenant_lookup_service=tenant_lookup_service_instance,
     shipping_provider_factory=shipping.ShippingProviderFactory()
 )
 
 # =============== resolve shipping webhook parser based on tenant_id ========
 shipping_webhook_parser.ShippingWebhookResolver.configure(
     saas_lookup_service=saas_lookup_service_instance,
+    tenant_lookup_service=tenant_lookup_service_instance,
     shipping_parser_factory=shipping_webhook_parser.ShippingWebhookParserFactory()
 )
 
@@ -77,6 +79,7 @@ domain_services.DomainClock.configure(clocks.UTCClock())
 # ========= webhook receiver  =============
 webhook_receiver.WebhookReceiverService.configure(
     saas_lookup_service=saas_lookup_service_instance,
+    tenant_lookup_service=tenant_lookup_service_instance,
     webhook_receiver_factory=webhook_receiver.WebhookReceiverFactory
 )
 
@@ -84,7 +87,7 @@ webhook_receiver.WebhookReceiverService.configure(
 
 # ============ Configure which events get published ===========
 event_bus.EXTERNAL_EVENT_WHITELIST = []
-event_bus.INTERNAL_EVENT_WHITELIST = []
+event_bus.INTERNAL_EVENT_WHITELIST = ["add_order_webhook.received"]
 
 # ===========Setup Redis event publishers ==========
 event_bus.internal_publisher = event_publishers.RedisStreamPublisher(

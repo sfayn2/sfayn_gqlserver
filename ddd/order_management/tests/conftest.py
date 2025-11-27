@@ -94,30 +94,30 @@ ORDER_LINE_SEEDS = (
 )
 
 # Shipment
-# Columns shipment_id, order_id, shipment_address_line1, shipment_address_line2, shipment_address_city, shipment_address_postal, shipment_address_country, shipment_address_state, shipment_provider, tracking_reference, shipment_amount, shipment_tax_amount, shipment_currency, shipment_status
+# Columns shipment_id, order_id, shipment_address_line1, shipment_address_line2, shipment_address_city, shipment_address_postal, shipment_address_country, shipment_address_state, shipment_provider, tracking_reference, shipment_amount, shipment_currency, shipment_status
 SHIPMENT_SEEDS = (
-    ("SH-1", "ORD-CONFIRMED-1", "line 1", "line 2", "city ", "postal here", "country here", "state here", "provider here", " tracking reference here", Decimal("2.2"), Decimal("1.2"), "SGD", enums.ShipmentStatus.PENDING.value),
-    ("SH-SHIPPED-2", "ORD-CONFIRMED_W_SHIPPED-1", "line 1", "line 2", "city ", "postal here", "country here", "state here", "provider here", " tracking reference here", Decimal("2.2"), Decimal("1.2"), "SGD", enums.ShipmentStatus.SHIPPED.value),
-    ("SH-PENDING-2", "ORD-CONFIRMED_W_PENDING-1", "line 1", "line 2", "city ", "postal here", "country here", "state here", "provider here", " tracking reference here", Decimal("2.2"), Decimal("1.2"), "SGD", enums.ShipmentStatus.PENDING.value),
-    ("SH-CONFIRMED-2", "ORD-CONFIRMED_W_CONFIRMED-1", "line 1", "line 2", "city ", "postal here", "country here", "state here", "provider here", " tracking reference here", Decimal("2.2"), Decimal("1.2"), "SGD", enums.ShipmentStatus.CONFIRMED.value),
-    ("SH-DELIVERED-2", "ORD-CONFIRMED_W_DELIVERED-1", "line 1", "line 2", "city ", "postal here", "country here", "state here", "provider here", " tracking reference here", Decimal("2.2"), Decimal("1.2"), "SGD", enums.ShipmentStatus.DELIVERED.value),
-    ("SH-READY-TO-COMPLETE-1", "ORD-READY-TO-COMPLETE-1", "line 1", "line 2", "city ", "postal here", "country here", "state here", "provider here", " tracking reference here", Decimal("2.2"), Decimal("1.2"), "SGD", enums.ShipmentStatus.DELIVERED.value),
-    ("SH-ALREADY-COMPLETED-1", "ORD-ALREADY-COMPLETED-1", "line 1", "line 2", "city ", "postal here", "country here", "state here", "provider here", " tracking reference here", Decimal("2.2"), Decimal("1.2"), "SGD", enums.ShipmentStatus.DELIVERED.value),
-    ("SH-READY-TO-COMPLETE-UNPAID-1", "ORD-READY-TO-COMPLETE-UNPAID-1", "line 1", "line 2", "city ", "postal here", "country here", "state here", "provider here", " tracking reference here", Decimal("2.2"), Decimal("1.2"), "SGD", enums.ShipmentStatus.DELIVERED.value),
+    ("SH-1", "ORD-CONFIRMED-1", "line 1", "line 2", "city ", "postal here", "country here", "state here", "provider here", " tracking reference here", Decimal("2.2"), "SGD", enums.ShipmentStatus.PENDING.value),
+    ("SH-SHIPPED-2", "ORD-CONFIRMED_W_SHIPPED-1", "line 1", "line 2", "city ", "postal here", "country here", "state here", "provider here", " tracking reference here", Decimal("2.2"), "SGD", enums.ShipmentStatus.SHIPPED.value),
+    ("SH-PENDING-2", "ORD-CONFIRMED_W_PENDING-1", "line 1", "line 2", "city ", "postal here", "country here", "state here", "provider here", " tracking reference here", Decimal("2.2"), "SGD", enums.ShipmentStatus.PENDING.value),
+    ("SH-CONFIRMED-2", "ORD-CONFIRMED_W_CONFIRMED-1", "line 1", "line 2", "city ", "postal here", "country here", "state here", "provider here", " tracking reference here", Decimal("2.2"), "SGD", enums.ShipmentStatus.CONFIRMED.value),
+    ("SH-DELIVERED-2", "ORD-CONFIRMED_W_DELIVERED-1", "line 1", "line 2", "city ", "postal here", "country here", "state here", "provider here", " tracking reference here", Decimal("2.2"), "SGD", enums.ShipmentStatus.DELIVERED.value),
+    ("SH-READY-TO-COMPLETE-1", "ORD-READY-TO-COMPLETE-1", "line 1", "line 2", "city ", "postal here", "country here", "state here", "provider here", " tracking reference here", Decimal("2.2"), "SGD", enums.ShipmentStatus.DELIVERED.value),
+    ("SH-ALREADY-COMPLETED-1", "ORD-ALREADY-COMPLETED-1", "line 1", "line 2", "city ", "postal here", "country here", "state here", "provider here", " tracking reference here", Decimal("2.2"), "SGD", enums.ShipmentStatus.DELIVERED.value),
+    ("SH-READY-TO-COMPLETE-UNPAID-1", "ORD-READY-TO-COMPLETE-UNPAID-1", "line 1", "line 2", "city ", "postal here", "country here", "state here", "provider here", " tracking reference here", Decimal("2.2"), "SGD", enums.ShipmentStatus.DELIVERED.value),
 )
 
 
 # Shipment Item
-# Columns shipment_item_id, shipment_id, line_item_id, quantity, allocated_shipping_tax, allocated_shipping_tax_currency
+# Columns shipment_item_id, shipment_id, line_item_id, quantity
 SHIPMENT_ITEM_SEEDS = (
     ("SHI-1", "SH-1", "SKU-A", 1, None, None),
-    ("SHI-SHIPPED-1", "SH-SHIPPED-2", "SKU-C", 1, None, None),
-    ("SHI-PENDING-1", "SH-PENDING-2", "SKU-D", 1, None, None),
-    ("SHI-CONFIRMED-1", "SH-CONFIRMED-2", "SKU-E", 1, None, None),
-    ("SHI-DELIVERED-1", "SH-DELIVERED-2", "SKU-F", 1, None, None),
-    ("SHI-READY-TO-COMPLETE-1", "SH-READY-TO-COMPLETE-1", "SKU-G", 1, None, None),
-    ("SHI-ALREADY-COMPLETED-1", "SH-ALREADY-COMPLETED-1", "SKU-H", 1, None, None),
-    ("SHI-READY-TO-COMPLETE-UNPAID-1", "SH-READY-TO-COMPLETE-UNPAID-1", "SKU-I", 1, None, None),
+    ("SHI-SHIPPED-1", "SH-SHIPPED-2", "SKU-C", 1),
+    ("SHI-PENDING-1", "SH-PENDING-2", "SKU-D", 1),
+    ("SHI-CONFIRMED-1", "SH-CONFIRMED-2", "SKU-E", 1),
+    ("SHI-DELIVERED-1", "SH-DELIVERED-2", "SKU-F", 1),
+    ("SHI-READY-TO-COMPLETE-1", "SH-READY-TO-COMPLETE-1", "SKU-G", 1),
+    ("SHI-ALREADY-COMPLETED-1", "SH-ALREADY-COMPLETED-1", "SKU-H", 1),
+    ("SHI-READY-TO-COMPLETE-UNPAID-1", "SH-READY-TO-COMPLETE-UNPAID-1", "SKU-I", 1),
 )
 
 # UserActionLog
@@ -131,9 +131,17 @@ USER_ACTION_SEEDS = (
 # Columns tenant_id, configs, last_update_dt
 TENANT_CONFIG_SEEDS  = (
     (TENANT1, json.dumps({
+        "idp_public_key": "92alSyFzFiPHT3oYDwjXAGXFAAAQGt1Eoaag5dw",
+        "idp_issuer": "http://idp.saasprovider.com/realms/saas_owner",
+        "idp_audience": "AUD1",
+        "idp_algorithm": "RS256",
+        "shipment_provider": "wss",
+        "shipment_api_key": "api key",
+        "shipment_endpoint": "https://endpoint.dev",
+        "shipment_webhook_shared_secret": "2323434235235",
+        "shipment_webhook_max_age_seconds": 3000,
         "restocking_fee_percent": 10,
         "max_refund_amount": 500.0,
-        "webhook_url": "https://tenant_123.app/webhook"
     }), datetime.now(timezone.utc)),
 )
 
@@ -141,33 +149,27 @@ TENANT_CONFIG_SEEDS  = (
 # Columns tenant_id, configs, last_update_dt
 SAAS_CONFIG_SEEDS  = (
     ("SaaSOwner", json.dumps({
-        "idp": {
-            "public_key": "92alSyFzFiPHT3oYDwjXAGXFAAAQGt1Eoaag5dw",
-            "issuer": "http://idp.saasprovider.com/realms/tenant_123",
-            "audience": "AUD1",
-            "algorith": "RS256",
-        },
-        "plan": ["standard"],
-        "webhook_provider": {
-            "provider_name": "wss",
-            "shared_secret": "2323434235235",
-            "max_age_seconds": 3000
-        }
+        "idp_public_key": "92alSyFzFiPHT3oYDwjXAGXFAAAQGt1Eoaag5dw",
+        "idp_issuer": "http://idp.saasprovider.com/realms/saas_owner",
+        "idp_audience": "AUD1",
+        "idp_algorithm": "RS256",
+        "shipment_provider": "wss",
+        "shipment_api_key": "api key",
+        "shipment_endpoint": "https://endpoint.dev",
+        "shipment_webhook_shared_secret": "2323434235235",
+        "shipment_webhook_max_age_seconds": 3000,
     }), datetime.now(timezone.utc)),
-    #TODO SaaSOwner is good enought??
+    #TODO SaaSOwner is good enough??
     (TENANT1, json.dumps({
-        "idp": {
-            "public_key": "92alSyFzFiPHT3oYDwjXAGXFAAAQGt1Eoaag5dw",
-            "issuer": "http://idp.saasprovider.com/realms/tenant_123",
-            "audience": "AUD1",
-            "algorith": "RS256",
-        },
-        "plan": ["standard"],
-        "webhook_provider": {
-            "provider_name": "wss",
-            "shared_secret": "2323434235235",
-            "max_age_seconds": 3000
-        }
+        "idp_public_key": "92alSyFzFiPHT3oYDwjXAGXFAAAQGt1Eoaag5dw",
+        "idp_issuer": "http://idp.saasprovider.com/realms/saas_owner",
+        "idp_audience": "AUD1",
+        "idp_algorithm": "RS256",
+        "shipment_provider": "wss",
+        "shipment_api_key": "api key",
+        "shipment_endpoint": "https://endpoint.dev",
+        "shipment_webhook_shared_secret": "2323434235235",
+        "shipment_webhook_max_age_seconds": 3000,
     }), datetime.now(timezone.utc)),
 )
 
@@ -384,9 +386,8 @@ def seeded_all(django_db_setup, django_db_blocker):
                 shipment_provider=sh[8], 
                 tracking_reference=sh[9], 
                 shipment_amount=sh[10], 
-                shipment_tax_amount=sh[11], 
-                shipment_currency=sh[12], 
-                shipment_status=sh[13]
+                shipment_currency=sh[11], 
+                shipment_status=sh[12]
             )
 
         for shi in SHIPMENT_ITEM_SEEDS:
@@ -395,8 +396,6 @@ def seeded_all(django_db_setup, django_db_blocker):
                 shipment_id=shi[1], 
                 line_item_id=shi[2], 
                 quantity=shi[3], 
-                allocated_shipping_tax=shi[4], 
-                allocated_shipping_tax_currency=shi[5]
             )
 
         for ual in USER_ACTION_SEEDS:

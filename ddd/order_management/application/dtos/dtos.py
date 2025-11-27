@@ -40,7 +40,6 @@ class LineItemDTO(BaseModel):
     vendor_id: str
     pickup_address: AddressDTO
     product_price: MoneyDTO
-    product_tax_amount: MoneyDTO
     product_total_amount: MoneyDTO
     package: PackageDTO
 
@@ -119,3 +118,12 @@ class ShippingWebhookDTO(BaseModel):
     status: str
     occured_at: datetime
     raw_payload: dict
+
+
+# SaasConfig / TenantConfig related DTOs
+class ShipmentWebhookConfigDTO(BaseModel):
+    shipment_provider: str
+    shipment_api_key: str
+    shipment_endpoint: str
+    shipment_webhook_shared_secret: str
+    shipment_webhook_max_age_seconds: Optional[int] = None

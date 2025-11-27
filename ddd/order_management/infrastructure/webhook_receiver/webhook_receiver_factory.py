@@ -1,6 +1,7 @@
 from __future__ import annotations
 from typing import Any, Dict, Type
 from datetime import datetime
+from ddd.order_management.application import dtos
 from .webhook_receiver_abstract import WebhookReceiverAbstract
 from .easypost_webhook_receiver import EasyPostWebhookReceiver
 from .github_webhook_receiver import GithubWebhookReceiver
@@ -22,28 +23,28 @@ class WebhookReceiverFactory:
     }
 
     @staticmethod
-    def get_webhook_receiver(cfg: dict) -> WebhookReceiverAbstract:
-        provider_name = cfg.get("provider_name", "").lower()
+    def get_webhook_receiver(cfg: dtos.ShipmentWebhookConfigDTO) -> WebhookReceiverAbstract:
+        shipment_provider = cfg.shipment_provider.lower()
         
         # Use dictionary lookup to find the correct class
-        receiver_class = WebhookReceiverFactory._RECEIVER_MAP.get(provider_name)
+        receiver_class = WebhookReceiverFactory._RECEIVER_MAP.get(shipment_provider)
 
         if receiver_class:
             # Pass configuration parameters to the constructor dynamically as needed
             # This logic depends on which parameters each class expects
-            if provider_name in ("easypost", "wss"):
+            if shipment_provider in ("easypost", "wss"):
                  return receiver_class(
-                    shared_secret=cfg.get("shared_secret"),
-                    max_age_seconds=cfg.get("max_age_seconds", None),
+                    shipment_webhook_shared_secret=cfg.shipment_webhook_shared_secret,
+                    shipment_webhook_max_age_seconds=cfg.shipment_webhook_max_age_seconds
                 )
-            # for others that just need shared_secret
+            # for others that just need shipment_webhook_shared_secret
             else:
                 return receiver_class(
-                    shared_secret=cfg.get("shared_secret")
+                    shipment_webhook_shared_secret=cfg.shipment_webhook_shared_secret
                 )
         else:
             # Raise a clear exception if the provider name isn't found
             raise UnknownProviderError(
-                f"No webhook receiver found for provider: '{provider_name}'"
+                f"No webhook receiver found for provider: '{shipment_provider}'"
             )
 

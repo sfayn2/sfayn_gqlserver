@@ -1,6 +1,7 @@
 from __future__ import annotations
 from typing import Any, Optional, Dict, Type
 from datetime import datetime
+from ddd.order_management.application import dtos
 from .shipping_webhook_parser_abstract import ShippingWebhookParserAbstract
 from .easypost_shipping_webhook_parser import EasyPostShippingWebhookParser
 
@@ -19,20 +20,20 @@ class ShippingWebhookParserFactory:
     }
     
     @staticmethod
-    def get_payload_parser(cfg: dict) -> ShippingWebhookParserAbstract:
+    def get_payload_parser(cfg: dtos.ShipmentWebhookConfigDTO) -> ShippingWebhookParserAbstract:
         """
         Factory method to create the appropriate ShippingProvider instance 
         based on configuration.
         """
-        provider_name = cfg.get("provider_name", "").lower()
+        shipment_provider = cfg.shipment_provider.lower()
         
         # Use dictionary lookup to find the correct class
-        provider_class = ShippingWebhookParserFactory._PARSER_MAP.get(provider_name)
+        provider_class = ShippingWebhookParserFactory._PARSER_MAP.get(shipment_provider)
 
         if provider_class:
             return provider_class() 
         else:
             # Raise a specific, informative exception
             raise UnknownShippingProviderError(
-                f"Configuration error: Unknown shipping provider name '{provider_name}'."
+                f"Configuration error: Unknown shipping provider name '{shipment_provider}'."
             )

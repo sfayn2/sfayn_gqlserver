@@ -14,8 +14,6 @@ class ShipmentItemMapper:
                 "defaults":  {
                     "line_item_id": shipment_item.line_item.product_sku,
                     'quantity': shipment_item.quantity,
-                    'allocated_shipping_tax': shipment_item.allocated_shipping_tax.amount if shipment_item.allocated_shipping_tax else None,
-                    'allocated_shipping_tax_currency': shipment_item.allocated_shipping_tax.currency if shipment_item.allocated_shipping_tax else None
                 }
             }
 
@@ -26,5 +24,4 @@ class ShipmentItemMapper:
             shipment_item_id=django_shipment_item.shipment_item_id,
             line_item=LineItemMapper.to_domain(django_shipment_item.line_item),
             quantity=django_shipment_item.quantity,
-            allocated_shipping_tax=django_shipment_item.allocated_shipping_tax
         )
