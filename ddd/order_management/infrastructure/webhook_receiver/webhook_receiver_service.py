@@ -1,4 +1,5 @@
 from __future__ import annotations
+import jmespath
 import json
 from typing import Dict, Any, Optional
 from ddd.order_management.application import ports, dtos, mappers
@@ -40,7 +41,7 @@ class WebhookReceiverService:
         cls.webhook_receiver_factory = webhook_receiver_factory
 
     @classmethod 
-    def _get_provider(cls, tenant_id: str, webhook_type: str):
+    def _get_provider(cls, tenant_id: str, validator_dto):
         """Internal helper to resolve the correct provider instance."""
 
         # it satisfies the static analysis tool.
@@ -68,14 +69,15 @@ class WebhookReceiverService:
                 # 2. Raise a specific custom exception instead of a generic ValueError
                 raise ConfigurationError(f"No configuration found for tenant_id: {tenant_id} in both tenant and SaaS lookups.")
 
-            if webhook_type == 'SHIPMENT_TRACKER':
-                # Use the specific mapper for shipment configs
-                config_dto = mappers.ConfigMapper.to_shipment_tracker_config_dto(config_source)
-            elif webhook_type == 'ADD_ORDER':
-                # Use the specific mapper for order configs
-                config_dto = mappers.ConfigMapper.to_order_config_dto(config_source)
-            else:
-                raise ConfigurationError(f"Unknown webhook type: {webhook_type}")
+            #if webhook_type == 'SHIPMENT_TRACKER':
+            #    # Use the specific mapper for shipment configs
+            #    config_dto = mappers.ConfigMapper.to_shipment_tracker_config_dto(config_source)
+            #elif webhook_type == 'ADD_ORDER':
+            #    # Use the specific mapper for order configs
+            #    config_dto = mappers.ConfigMapper.to_order_config_dto(config_source)
+            #else:
+            #    raise ConfigurationError(f"Unknown webhook type: {webhook_type}")
+            config_dto = validator_dto(config_source)
 
             return cls.webhook_receiver_factory.get_webhook_receiver(config_dto)
 
@@ -84,20 +86,20 @@ class WebhookReceiverService:
 
 
     @classmethod 
-    def validate(cls, tenant_id: str, headers, raw_body, request_path) -> Dict[str, Any]:
+    def validate(cls, tenant_id: str, headers, raw_body, request_path, validator_dto) -> Dict[str, Any]:
         """
         Validates the request signature and decodes the payload.
         """
-        # Determine the webhook type based on the request_path
-        if "/shipment-tracker/" in request_path:
-            webhook_type = "SHIPMENT_TRACKER"
-        elif "/add-order/" in request_path:
-            webhook_type = "ADD_ORDER"
-        else:
-            raise ConfigurationError(f"Cannot determine webhook type from request path: {request_path}")
+        ## Determine the webhook type based on the request_path
+        #if "/shipment-tracker/" in request_path:
+        #    webhook_type = "SHIPMENT_TRACKER"
+        #elif "/add-order/" in request_path:
+        #    webhook_type = "ADD_ORDER"
+        #else:
+        #    raise ConfigurationError(f"Cannot determine webhook type from request path: {request_path}")
 
         # 1. Get the configured verifier instance using the factory dependency
-        verifier = cls._get_provider(tenant_id, webhook_type)
+        verifier = cls._get_provider(tenant_id, validator_dto)
 
         # 2. Verify the signature
         #if not verifier.verify(headers=request.headers, raw_body=request.body, request_path=request.path):
@@ -163,14 +165,17 @@ class WebhookReceiverService:
         shipment_provider: Optional[str] = saas_config.configs.get("shipment_shipment_provider")
         tracking_reference: Optional[str] = None # Initialize variable to ensure scope
 
-        if shipment_provider and shipment_provider.lower() == 'easypost':
-            # EasyPost webhooks often nest the tracker info within an 'result' or 'data' key
-            tracking_reference = payload_data.get("result", {}).get("tracking_code") or \
-                                 payload_data.get("data", {}).get("tracking_code")
-        else:
-            # Handle the default case or other providers here if necessary
-            # e.g., tracking_reference = payload_data.get("default_tracking_key")
-            pass
+        tracking_reference = jmespath.search(sass_config.get("shipment_tracking_code_jmespath"), payload_data)
+
+
+        #if shipment_provider and shipment_provider.lower() == 'easypost':
+        #    # EasyPost webhooks often nest the tracker info within an 'result' or 'data' key
+        #    tracking_reference = payload_data.get("result", {}).get("tracking_code") or \
+        #                         payload_data.get("data", {}).get("tracking_code")
+        #else:
+        #    # Handle the default case or other providers here if necessary
+        #    # e.g., tracking_reference = payload_data.get("default_tracking_key")
+        #    pass
 
         if not tracking_reference:
             # Log the missing key situation for debugging purposes (logging statement omitted for brevity)

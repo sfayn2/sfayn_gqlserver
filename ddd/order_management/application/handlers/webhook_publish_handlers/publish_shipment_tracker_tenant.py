@@ -28,7 +28,8 @@ def handle_publish_shipment_tracker_tenant(
             tenant_id=command.tenant_id,
             headers=command.headers,
             raw_body=command.raw_body,
-            request_path=command.request_path
+            request_path=command.request_path,
+            validator_dto=mappers.ConfigMapper.to_shipment_tracker_config_dto
         )
 
         # 4. Normalize the third-party schema into a generic internal DTO
