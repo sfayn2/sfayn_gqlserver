@@ -150,34 +150,51 @@ TENANT_CONFIG_SEEDS  = (
 # Columns tenant_id, configs, last_update_dt
 SAAS_CONFIG_SEEDS  = (
     ("SaaSOwner", json.dumps({
-        "idp_public_key": "92alSyFzFiPHT3oYDwjXAGXFAAAQGt1Eoaag5dw",
-        "idp_issuer": "http://idp.saasprovider.com/realms/saas_owner",
-        "idp_audience": "AUD1",
-        "idp_algorithm": "RS256",
-        "shipment_provider": "wss",
-        "shipment_api_key": "api key",
-        "shipment_endpoint": "https://endpoint.dev",
-        "shipment_tracking_reference_jmespath": "result.tracking_code || data.tracking_code",
-        "shipment_webhook_shared_secret": "2323434235235",
-        "shipment_webhook_max_age_seconds": 3000,
-        "add_order_webhook_provider": "wss",
-        "add_order_webhook_shared_secret": "2323434235235",
-        "add_order_webhook_max_age_seconds": 3000,
+        "idp": {},
+        "webhooks": {
+            "shipment_tracker": {
+                "provider": "easypost",
+                "shared_secret": "2323434235235",
+                "max_age_seconds": 3000,
+                "tracking_reference_jmespath": "result.tracking_code || data.tracking_code",
+            },
+            "add_order": {
+                "provider": "wss",
+                "shared_secret": "2323434235235",
+                "max_age_seconds": 3000,
+            }
+        },
+        "create_shipment_api": {
+            "provider": "easypost",
+            "api_key": "api key",
+            "endpoint": "https://endpoint.dev",
+        }
     }), datetime.now(timezone.utc)),
     (TENANT1, json.dumps({
-        "idp_public_key": "92alSyFzFiPHT3oYDwjXAGXFAAAQGt1Eoaag5dw",
-        "idp_issuer": "http://idp.saasprovider.com/realms/saas_owner",
-        "idp_audience": "AUD1",
-        "idp_algorithm": "RS256",
-        "shipment_provider": "wss",
-        "shipment_api_key": "api key",
-        "shipment_endpoint": "https://endpoint.dev",
-        "shipment_tracking_reference_jmespath": "result.tracking_code || data.tracking_code",
-        "shipment_webhook_shared_secret": "2323434235235",
-        "shipment_webhook_max_age_seconds": 3000,
-        "add_order_webhook_provider": "wss",
-        "add_order_webhook_shared_secret": "2323434235235",
-        "add_order_webhook_max_age_seconds": 3000,
+        "idp": {
+            "public_key": "92alSyFzFiPHT3oYDwjXAGXFAAAQGt1Eoaag5dw",
+            "issuer": "http://idp.saasprovider.com/realms/saas_owner",
+            "audience": "AUD1",
+            "algorithm": "RS256",
+        },
+        "webhooks": {
+            "shipment_tracker": {
+                "provider": "easypost",
+                "shared_secret": "2323434235235",
+                "max_age_seconds": 3000,
+                "tracking_reference_jmespath": "result.tracking_code || data.tracking_code",
+            },
+            "add_order": {
+                "provider": "wss",
+                "shared_secret": "2323434235235",
+                "max_age_seconds": 3000,
+            }
+        },
+        "create_shipment_api": {
+            "provider": "easypost",
+            "api_key": "api key",
+            "endpoint": "https://endpoint.dev",
+        }
     }), datetime.now(timezone.utc)),
 )
 

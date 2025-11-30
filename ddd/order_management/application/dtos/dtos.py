@@ -121,7 +121,7 @@ class ShippingWebhookDTO(BaseModel):
 
 
 # SaasConfig / TenantConfig related DTOs
-class ShipmentWebhookConfigDTO(BaseModel):
+class CreateShipmentConfigDTO(BaseModel):
     # all shipments tracker webhook / create shipments
     provider: str
     api_key: str

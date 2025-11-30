@@ -13,7 +13,7 @@ from .dtos import (
     AddOrderDTO,
     ShippingWebhookDTO,
 
-    ShipmentWebhookConfigDTO,
+    CreateShipmentConfigDTO,
     WebhookReceiverConfigDTO
 )
 

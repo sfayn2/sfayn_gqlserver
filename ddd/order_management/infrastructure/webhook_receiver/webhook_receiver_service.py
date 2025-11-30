@@ -65,7 +65,12 @@ class WebhookReceiverService:
                 # 2. Raise a specific custom exception instead of a generic ValueError
                 raise ConfigurationError(f"No configuration found for tenant_id: {tenant_id} in SaaS lookups.")
 
-            config_dto: dtos.WebhookReceiverConfigDTO = validator_dto(config_source.configs)
+            webhook_config = config_source.configs.get("webhooks", {})
+            if not webhook_config:
+                raise ConfigurationError(f"No webhooks configuration found for tenant_id: {tenant_id} in SaaS lookups.")
+            
+
+            config_dto: dtos.WebhookReceiverConfigDTO = validator_dto(webhook_config)
 
             return cls.webhook_receiver_factory.get_webhook_receiver(config_dto)
 

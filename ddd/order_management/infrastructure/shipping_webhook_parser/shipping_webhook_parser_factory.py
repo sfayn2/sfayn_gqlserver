@@ -20,7 +20,7 @@ class ShippingWebhookParserFactory:
     }
     
     @staticmethod
-    def get_payload_parser(cfg: dtos.ShipmentWebhookConfigDTO) -> ShippingWebhookParserAbstract:
+    def get_payload_parser(cfg: dtos.CreateShipmentConfigDTO) -> ShippingWebhookParserAbstract:
         """
         Factory method to create the appropriate ShippingProvider instance 
         based on configuration.

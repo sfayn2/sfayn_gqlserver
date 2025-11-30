@@ -26,7 +26,7 @@ class ShippingProviderFactory:
     }
     
     @staticmethod
-    def get_shipping_provider(cfg: dtos.ShipmentWebhookConfigDTO) -> ShippingProviderAbstract:
+    def get_shipping_provider(cfg: dtos.CreateShipmentConfigDTO) -> ShippingProviderAbstract:
         """
         Factory method to create the appropriate ShippingProvider instance 
         based on configuration.

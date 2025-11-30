@@ -50,12 +50,18 @@ class AccessControlService:
             # 2. Raise a specific custom exception instead of a generic ValueError
             raise ConfigurationError(f"No configuration found for tenant_id: {tenant_id} in SaaS lookups.")
 
+        idp_config = config_source.configs.get("idp", {})
+
+        if not idp_config:
+            # 2. Raise a specific custom exception instead of a generic ValueError
+            raise ConfigurationError(f"No IdP configuration found for tenant_id: {tenant_id} in SaaS lookups.")
+
         # Use the injected factory to create the handler
         return cls._jwt_handler(
-            public_key=config_source.configs["idp_public_key"],
-            issuer=config_source.configs["idp_issuer"],
-            audience=config_source.configs["idp_audience"],
-            algorithm=config_source.configs["idp_algorithm"]
+            public_key=idp_config["public_key"],
+            issuer=idp_config["issuer"],
+            audience=idp_config["audience"],
+            algorithm=idp_config["algorithm"]
         )
 
     @classmethod

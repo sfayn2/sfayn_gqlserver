@@ -26,7 +26,7 @@ def handle_publish_add_order(
             headers=command.headers,
             raw_body=command.raw_body,
             request_path=command.request_path,
-            validator_dto=mappers.ConfigMapper.to_order_config_dto
+            validator_dto=mappers.ConfigMapper.to_add_order_config_dto
         )
 
         # 3. Normalize the third-party schema into a generic internal DTO

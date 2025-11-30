@@ -51,11 +51,15 @@ class ShippingWebhookResolver:
                 # 2. Raise a specific custom exception instead of a generic ValueError
                 raise ConfigurationError(f"No configuration found for tenant_id: {tenant_id} in SaaS lookups.")
 
+            create_shipment_api_config = config_source.configs.get("create_shipment_api", {})
+            if not create_shipment_api_config:
+                raise ConfigurationError(f"No Shipment provider api configuration found for tenant_id: {tenant_id} in SaaS lookups.")
+
             # 3. Defensive coding: Ensure field names are consistent
             # Corrected DTO field name 'shipment_webhook_max_age_seconds' used consistently
-            shipment_config = mappers.ConfigMapper.to_shipment_config_dto(config_source.configs)
+            config_dto = mappers.ConfigMapper.to_create_shipment_config_dto(create_shipment_api_config)
         
-            return cls.shipping_parser_factory.get_payload_parser(shipment_config)
+            return cls.shipping_parser_factory.get_payload_parser(config_dto)
 
         except Exception as e:
             raise ConfigurationError("Error getting shipment provider")
