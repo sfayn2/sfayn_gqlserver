@@ -57,20 +57,13 @@ class WebhookReceiverService:
         if cls.webhook_receiver_factory is None:
             raise RuntimeError("Cannot operate: webhook_receiver_factory is not configured.")
 
-            
         try:
-            # 1. Type Hinting & Clearer Variable Names
-            # Lets turn off tenant source and just get everything from Sass Source; Only Saas Handle Webhook config??
-            #tenant_source = cls.tenant_lookup_service.get_tenant_config(tenant_id)
-            #saas_source = cls.saas_lookup_service.get_tenant_config(tenant_id)
-            
-            # Determine the primary source of configuration data
-            #config_source = tenant_source.configs if tenant_source and tenant_source.configs else saas_source.configs
+            #SaaS Owner should own the tenant webhook configuration?
             config_source = cls.saas_lookup_service.get_tenant_config(tenant_id)
 
             if not config_source:
                 # 2. Raise a specific custom exception instead of a generic ValueError
-                raise ConfigurationError(f"No configuration found for tenant_id: {tenant_id} in both tenant and SaaS lookups.")
+                raise ConfigurationError(f"No configuration found for tenant_id: {tenant_id} in SaaS lookups.")
 
             config_dto: dtos.WebhookReceiverConfigDTO = validator_dto(config_source.configs)
 
@@ -145,7 +138,7 @@ class WebhookReceiverService:
         saas_config = cls.saas_lookup_service.get_tenant_config(saas_id)
 
         # Check if the tenant_config was successfully retrieved/is not None
-        if not saas_config:
+        if not saas_config.configs:
             # Raise an appropriate error if SaaSOwner is not available
             raise RuntimeError(f"SaaS configuration '{saas_id}' is missing or not available.")
 
@@ -155,7 +148,7 @@ class WebhookReceiverService:
 
         jmespath_expr = saas_config.configs.get("shipment_tracking_code_jmespath")
         if not jmespath_expr:
-            raise ConfigurationError("Misising JMESPath config: shipment_tracking_code_jmespath")
+            raise ConfigurationError("Missing JMESPath config: shipment_tracking_code_jmespath")
 
         tracking_reference = jmespath.search(jmespath_expr, payload_data)
 

@@ -44,19 +44,12 @@ class ShippingWebhookResolver:
             raise RuntimeError("ShippingparserService has not been configured yet (missing shipping_parser_factory).")
 
         try:
-            # Lets Saas Owner handl webhook related configs 
-            ## 1. Type Hinting & Clearer Variable Names
-            #tenant_source = cls.tenant_lookup_service.get_tenant_config(tenant_id)
-            #saas_source = cls.saas_lookup_service.get_tenant_config(tenant_id)
-            
-            ## Determine the primary source of configuration data
-            #config_source = tenant_source.configs if tenant_source and tenant_source.configs else saas_source.configs
-
+            #SaaS Owner should own the tenant webhook configuration?
             config_source = cls.saas_lookup_service.get_tenant_config(tenant_id)
 
-            if not config_source:
+            if not config_source.configs:
                 # 2. Raise a specific custom exception instead of a generic ValueError
-                raise ConfigurationError(f"No configuration found for tenant_id: {tenant_id} in both tenant and SaaS lookups.")
+                raise ConfigurationError(f"No configuration found for tenant_id: {tenant_id} in SaaS lookups.")
 
             # 3. Defensive coding: Ensure field names are consistent
             # Corrected DTO field name 'shipment_webhook_max_age_seconds' used consistently

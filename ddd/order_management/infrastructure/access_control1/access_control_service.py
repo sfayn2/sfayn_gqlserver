@@ -3,6 +3,14 @@ from typing import Any, Optional, Type
 from .jwt_token_handler import JwtTokenHandler
 from ddd.order_management.application import ports
 
+# Define custom exceptions for specific error scenarios
+class AccessControlServiceError(Exception):
+    """Base class for webhook processing errors."""
+    pass
+
+class ConfigurationError(AccessControlServiceError):
+    pass
+
 class AccessControlService:
     """
     A singleton-like factory service using class methods to manage global 
@@ -35,15 +43,19 @@ class AccessControlService:
         if not cls._saas_lookup_service or not cls._jwt_handler:
             raise RuntimeError("AccessControlService has not been fully configured yet.")
 
-        tenant_config = cls._saas_lookup_service.get_tenant_config(tenant_id)
-        saas_configs = tenant_config.configs.get("idp", {})
-        
+        #SaaS Owner should own the tenant webhook configuration?
+        config_source = cls._saas_lookup_service.get_tenant_config(tenant_id)
+
+        if not config_source.configs:
+            # 2. Raise a specific custom exception instead of a generic ValueError
+            raise ConfigurationError(f"No configuration found for tenant_id: {tenant_id} in SaaS lookups.")
+
         # Use the injected factory to create the handler
         return cls._jwt_handler(
-            public_key=saas_configs.get("public_key"),
-            issuer=saas_configs.get("issuer"),
-            audience=saas_configs.get("audience"),
-            algorithm=saas_configs.get("algorithm")
+            public_key=config_source.configs["idp_public_key"],
+            issuer=config_source.configs["idp_issuer"],
+            audience=config_source.configs["idp_audience"],
+            algorithm=config_source.configs["idp_algorithm"]
         )
 
     @classmethod
