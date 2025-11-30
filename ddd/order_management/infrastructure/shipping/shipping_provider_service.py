@@ -9,6 +9,14 @@ from ddd.order_management.application import (
 )
 from ddd.order_management.domain import models
 
+# Define custom exceptions for specific error scenarios
+class WebhookError(Exception):
+    """Base class for webhook processing errors."""
+    pass
+
+class ConfigurationError(WebhookError):
+    pass
+
 # ports.ShippingProviderServiceAbstract
 class ShippingProviderService:
     """
@@ -55,7 +63,7 @@ class ShippingProviderService:
 
             # 3. Defensive coding: Ensure field names are consistent
             # Corrected DTO field name 'shipment_webhook_max_age_seconds' used consistently
-            shipment_config = mappers.ConfigMapper.to_shipment_config_dto(config_source)
+            shipment_config = mappers.ConfigMapper.to_shipment_config_dto(config_source.configs)
 
             return cls.shipping_provider_factory.get_shipping_provider(shipment_config)
 

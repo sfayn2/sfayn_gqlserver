@@ -23,7 +23,7 @@ class WebhookReceiverFactory:
     }
 
     @staticmethod
-    def get_webhook_receiver(cfg: dtos.ShipmentWebhookConfigDTO) -> WebhookReceiverAbstract:
+    def get_webhook_receiver(cfg: dtos.WebhookReceiverConfigDTO) -> WebhookReceiverAbstract:
         provider = cfg.provider.lower()
         
         # Use dictionary lookup to find the correct class

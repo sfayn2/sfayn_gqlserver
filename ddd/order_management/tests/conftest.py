@@ -164,7 +164,6 @@ SAAS_CONFIG_SEEDS  = (
         "add_order_webhook_shared_secret": "2323434235235",
         "add_order_webhook_max_age_seconds": 3000,
     }), datetime.now(timezone.utc)),
-    #TODO SaaSOwner is good enough??
     (TENANT1, json.dumps({
         "idp_public_key": "92alSyFzFiPHT3oYDwjXAGXFAAAQGt1Eoaag5dw",
         "idp_issuer": "http://idp.saasprovider.com/realms/saas_owner",
@@ -176,7 +175,6 @@ SAAS_CONFIG_SEEDS  = (
         "shipment_tracking_reference_jmespath": "result.tracking_code || data.tracking_code",
         "shipment_webhook_shared_secret": "2323434235235",
         "shipment_webhook_max_age_seconds": 3000,
-        "shipment_webhook_tracking_reference_jmespath": "result.tracking_code || data.tracking_code",
         "add_order_webhook_provider": "wss",
         "add_order_webhook_shared_secret": "2323434235235",
         "add_order_webhook_max_age_seconds": 3000,

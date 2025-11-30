@@ -4,7 +4,8 @@ import logging
 from ddd.order_management.application import (
     ports, 
     dtos,
-    commands
+    commands,
+    mappers
 )
 from ddd.order_management.domain import exceptions
 
@@ -44,7 +45,7 @@ def handle_publish_shipment_tracker(
             tenant_id=tenant_id,
             headers=command.headers,
             raw_body=command.raw_body,
-            request_path=command.request_path
+            request_path=command.request_path,
             validator_dto=mappers.ConfigMapper.to_shipment_tracker_config_dto
         )
 

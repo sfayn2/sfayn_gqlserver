@@ -15,7 +15,7 @@ def shipment_tracker_webhook(request, saas_id: str):
 
     try:
         
-        command = commands.PublishShipmentUpdatesCommand.model_validate(
+        command = commands.PublishShipmentTrackerCommand.model_validate(
             { "headers" : request.headers,
               "raw_body": request.body,
               "request_path": request.path,

@@ -25,7 +25,7 @@ class ShippingWebhookParserFactory:
         Factory method to create the appropriate ShippingProvider instance 
         based on configuration.
         """
-        shipment_provider = cfg.shipment_provider.lower()
+        shipment_provider = cfg.provider.lower()
         
         # Use dictionary lookup to find the correct class
         provider_class = ShippingWebhookParserFactory._PARSER_MAP.get(shipment_provider)

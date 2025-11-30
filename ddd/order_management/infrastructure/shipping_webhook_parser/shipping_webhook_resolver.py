@@ -60,7 +60,7 @@ class ShippingWebhookResolver:
 
             # 3. Defensive coding: Ensure field names are consistent
             # Corrected DTO field name 'shipment_webhook_max_age_seconds' used consistently
-            shipment_config = mappers.ConfigMapper.to_shipment_config_dto(config_source)
+            shipment_config = mappers.ConfigMapper.to_shipment_config_dto(config_source.configs)
         
             return cls.shipping_parser_factory.get_payload_parser(shipment_config)
 
