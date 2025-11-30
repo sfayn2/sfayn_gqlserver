@@ -8,7 +8,7 @@ from ddd.order_management.application import (
 from ddd.order_management.domain import events, exceptions, models
 
 def handle_add_order_async_event(
-    event: dtos.AddOrderIntegrationEvent,
+    event: dtos.AddOrderWebhookIntegrationEvent,
     user_action_service: ports.UserActionServiceAbstract,
     uow: ports.UnitOfWorkAbstract) -> dtos.ResponseDTO:
 

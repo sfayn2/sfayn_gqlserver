@@ -43,13 +43,29 @@ Defines global SaaS-level settings, authorized tenants, and integration credenti
 ```json
     {
         "idp": {
-            "public_key": "92alSyFzFiPHT3oYDwjXAGXFAAAQGt1Eoaag5dw",
-            "issuer": "http://idp.saasprovider.com/realms/tenant1",
+            "public_key": "xyzckawe23@#%#$sdfgsdfgdfgfgdfgkjwelrt",
+            "issuer": "http://idp.saasprovider.com/realms/t1",
             "audience": "AUD1",
-            "algorith": "RS256",
+            "algorithm": "RS256",
         },
-        "plan": ["standard"],
-        "webhook_secret": "abc123secret",
+        "webhooks": {
+            "shipment_tracker": {
+                "provider": "easypost",
+                "shared_secret": "secret123",
+                "max_age_seconds": 3000,
+                "tracking_reference_jmespath": "result.tracking_code || data.tracking_code",
+            },
+            "add_order": {
+                "provider": "wss",
+                "shared_secret": "secret234",
+                "max_age_seconds": 3000,
+            }
+        },
+        "create_shipment_api": {
+            "provider": "easypost",
+            "api_key": "api key",
+            "endpoint": "https://endpoint.dev",
+        }
     }
 ```
 
@@ -60,7 +76,6 @@ Defines tenant-specific business rules and integration endpoints
     {
         "restocking_fee_percent": 10,
         "max_refund_amount": 500.0,
-        "webhook_url": "https://tenant-a.app/webhook"
     }
 ```
 

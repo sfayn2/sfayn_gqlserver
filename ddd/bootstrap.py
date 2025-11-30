@@ -121,7 +121,7 @@ event_bus.ASYNC_EXTERNAL_EVENT_HANDLERS.update({
 
 # ==================Internal async (redis/kafka/etc?) event handlers (within this service) ==================
 event_bus.ASYNC_INTERNAL_EVENT_HANDLERS.update({
-    "order_management.internal_events.AddOrderIntegrationEvent": [
+    "order_management.internal_events.AddOrderWebhookIntegrationEvent": [
         lambda event: handlers.handle_add_order_async_event(
             event=event,
             user_action_service=user_action_service.UserActionService(),

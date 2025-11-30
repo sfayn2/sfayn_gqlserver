@@ -131,16 +131,6 @@ USER_ACTION_SEEDS = (
 # Columns tenant_id, configs, last_update_dt
 TENANT_CONFIG_SEEDS  = (
     (TENANT1, json.dumps({
-        "idp_public_key": "92alSyFzFiPHT3oYDwjXAGXFAAAQGt1Eoaag5dw",
-        "idp_issuer": "http://idp.saasprovider.com/realms/saas_owner",
-        "idp_audience": "AUD1",
-        "idp_algorithm": "RS256",
-        "shipment_provider": "wss",
-        "shipment_api_key": "api key",
-        "shipment_endpoint": "https://endpoint.dev",
-        "add_order_webhook_provider": "wss",
-        "add_order_webhook_shared_secret": "2323434235235",
-        "add_order_webhook_max_age_seconds": 3000,
         "restocking_fee_percent": 10,
         "max_refund_amount": 500.0,
     }), datetime.now(timezone.utc)),
