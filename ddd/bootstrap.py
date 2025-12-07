@@ -62,7 +62,7 @@ shipping.ShippingProviderService.configure(
 )
 
 # =============== resolve shipping webhook parser based on tenant_id ========
-shipping_webhook_parser.ShippingWebhookResolver.configure(
+shipping_webhook_parser.ShippingWebhookParserResolver.configure(
     saas_lookup_service=saas_lookup_service_instance,
     tenant_lookup_service=tenant_lookup_service_instance,
     shipping_parser_factory=shipping_webhook_parser.ShippingWebhookParserFactory()
@@ -182,7 +182,7 @@ message_bus.COMMAND_HANDLERS.update({
         commands, 
         handlers, 
         event_bus,
-        shipping_webhook_parser.ShippingWebhookResolver,
+        shipping_webhook_parser.ShippingWebhookParserResolver,
         webhook_receiver.WebhookReceiverService,
         shipment_lookup_service.ShipmentLookupService(),
     ),

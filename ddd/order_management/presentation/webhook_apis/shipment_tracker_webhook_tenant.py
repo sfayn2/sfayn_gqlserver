@@ -22,6 +22,7 @@ def shipment_tracker_webhook_tenant(request, tenant_id: str):
               "tenant_id": tenant_id
             }
         )
+
         result = message_bus.handle(command)
         return JsonResponse(result.model_dump())
     except Exception as e:

@@ -5,8 +5,8 @@ class ConfigMapper:
 
     @staticmethod
     def to_create_shipment_config_dto(config_source: dict) -> dtos.CreateShipmentConfigDTO:
-        provider_value = config_source.get("shipment")
-        apikey_value = config_source.get("apikey")
+        provider_value = config_source.get("provider")
+        apikey_value = config_source.get("api_key")
         endpoint_value = config_source.get("endpoint")
     
         if provider_value is None:

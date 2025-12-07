@@ -4,6 +4,7 @@ from datetime import datetime
 from ddd.order_management.application import dtos
 from .shipping_webhook_parser_abstract import ShippingWebhookParserAbstract
 from .easypost_shipping_webhook_parser import EasyPostShippingWebhookParser
+from .wss_shipping_webhook_parser import WssShippingWebhookParser
 
 
 # Define a custom exception for better error clarity
@@ -17,15 +18,19 @@ class ShippingWebhookParserFactory:
     # A dictionary mapping provider names (lowercase for consistency) to their classes
     _PARSER_MAP: Dict[str, Type[ShippingWebhookParserAbstract]] = {
         "easypost": EasyPostShippingWebhookParser,
+        "wss": WssShippingWebhookParser,
     }
     
     @staticmethod
-    def get_payload_parser(cfg: dtos.CreateShipmentConfigDTO) -> ShippingWebhookParserAbstract:
+    def get_payload_parser(provider: str) -> ShippingWebhookParserAbstract:
         """
         Factory method to create the appropriate ShippingProvider instance 
         based on configuration.
         """
-        shipment_provider = cfg.provider.lower()
+
+        # This guarantees shipment_provider is a string, even if empty.
+        shipment_provider: str = (provider or "").lower()
+
         
         # Use dictionary lookup to find the correct class
         provider_class = ShippingWebhookParserFactory._PARSER_MAP.get(shipment_provider)

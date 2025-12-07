@@ -69,7 +69,6 @@ class WebhookReceiverService:
             if not webhook_config:
                 raise ConfigurationError(f"No webhooks configuration found for tenant_id: {tenant_id} in SaaS lookups.")
             
-
             config_dto: dtos.WebhookReceiverConfigDTO = validator_dto(webhook_config)
 
             return cls.webhook_receiver_factory.get_webhook_receiver(config_dto)
@@ -91,7 +90,7 @@ class WebhookReceiverService:
         #if not verifier.verify(headers=request.headers, raw_body=request.body, request_path=request.path):
         if not verifier.verify(headers=headers, raw_body=raw_body, request_path=request_path):
             # Raise specific error for the API handler to catch and return 401
-            raise InvalidSignatureError("Invalid webhook signature")
+            raise InvalidSignatureError("Invalid webhook signature or SaSS/Tenant Configurator is not setup properly")
 
         # 3. Decode and parse the JSON payload
         try:

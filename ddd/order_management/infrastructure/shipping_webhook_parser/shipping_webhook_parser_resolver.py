@@ -13,8 +13,8 @@ from ddd.order_management.domain import models
 class ConfigurationError(Exception):
     pass
 
-# ports.ShippingWebhookResolverAbstract
-class ShippingWebhookResolver:
+# ports.ShippingWebhookParserResolverAbstract
+class ShippingWebhookParserResolver:
     """
     Service responsible for coordinating shipment creation across various parsers.
     """
@@ -57,9 +57,11 @@ class ShippingWebhookResolver:
 
             # 3. Defensive coding: Ensure field names are consistent
             # Corrected DTO field name 'shipment_webhook_max_age_seconds' used consistently
-            config_dto = mappers.ConfigMapper.to_create_shipment_config_dto(create_shipment_api_config)
+            #config_dto = mappers.ConfigMapper.to_create_shipment_config_dto(create_shipment_api_config)
         
-            return cls.shipping_parser_factory.get_payload_parser(config_dto)
+            return cls.shipping_parser_factory.get_payload_parser(
+                create_shipment_api_config.get("provider")
+            )
 
         except Exception as e:
             raise ConfigurationError("Error getting shipment provider")

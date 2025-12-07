@@ -143,7 +143,7 @@ SAAS_CONFIG_SEEDS  = (
         "idp": {},
         "webhooks": {
             "shipment_tracker": {
-                "provider": "easypost",
+                "provider": "wss",
                 "shared_secret": "2323434235235",
                 "max_age_seconds": 3000,
                 "tracking_reference_jmespath": "result.tracking_code || data.tracking_code",
@@ -155,7 +155,7 @@ SAAS_CONFIG_SEEDS  = (
             }
         },
         "create_shipment_api": {
-            "provider": "easypost",
+            "provider": "wss",
             "api_key": "api key",
             "endpoint": "https://endpoint.dev",
         }
@@ -169,7 +169,7 @@ SAAS_CONFIG_SEEDS  = (
         },
         "webhooks": {
             "shipment_tracker": {
-                "provider": "easypost",
+                "provider": "wss",
                 "shared_secret": "2323434235235",
                 "max_age_seconds": 3000,
                 "tracking_reference_jmespath": "result.tracking_code || data.tracking_code",
@@ -181,7 +181,7 @@ SAAS_CONFIG_SEEDS  = (
             }
         },
         "create_shipment_api": {
-            "provider": "easypost",
+            "provider": "wss",
             "api_key": "api key",
             "endpoint": "https://endpoint.dev",
         }

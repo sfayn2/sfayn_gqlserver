@@ -17,7 +17,7 @@ def handle_publish_shipment_tracker(
     exception_handler: ports.ExceptionHandlerAbstract,
     webhook_receiver_service: ports.WebhookReceiverServiceAbstract,
     shipment_lookup_service: ports.ShipmentLookupServiceAbstract,
-    shipping_webhook_resolver: ports.ShippingWebhookResolverAbstract,
+    shipping_webhook_resolver: ports.ShippingWebhookParserResolverAbstract,
     event_publisher: ports.EventPublisherAbstract
 ) -> dtos.ResponseDTO:
     """
