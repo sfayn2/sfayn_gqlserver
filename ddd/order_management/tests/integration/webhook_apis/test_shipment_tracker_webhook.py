@@ -10,77 +10,47 @@ from ddd.order_management.application import (
 
 
 @pytest.fixture
-def provider():
-    return "wss"
-
-@pytest.fixture
-def tenant_id():
-    return "tenant_123"
-
-@pytest.fixture
-def order_data_dict(tenant_id):
+def tracker_data_dict():
     # The original Python dictionary you want to send in the POST request
     return {
-        "external_ref": "EXT-REF-123",
-        "tenant_id": tenant_id,
-        "customer_details": {
-            "name": "John Doe",
-            "email": "john.doe@example.com",
-        },
-        "product_skus": [
-            # ... (the rest of your product data) ...
-             {
-                "product_sku": "SKU-PROD-A", 
-                "order_quantity": 1, 
-                "vendor_id": "vendor-1",
-                "product_name": "Product A",
-                "product_price": {"amount": "10.00", "currency": "USD"},
-                "package": {"weight_kg": "0.5"},
-            },
-            {
-                "product_sku": "SKU-PROD-B", 
-                "order_quantity": 2, 
-                "vendor_id": "vendor-1",
-                "product_name": "Product B",
-                "product_price": {"amount": "5.00", "currency": "USD"},
-                "package": {"weight_kg": "0.25"},
-            },
-        ],
+        "tracking_number": "TN123456789",
+        "status": "DELIVERED",
+        "occurred_at": "2025-12-07T10:00:00Z",
     }
 
 
 @pytest.fixture
-def valid_payload(order_data_dict, tenant_id):
+def valid_payload(tracker_data_dict, custom_headers, test_constants):
+    SAAS_ID = test_constants.get("saas1")
 
-    json_string = json.dumps(order_data_dict) # Converts the dict to a JSON string
-    encoded_order_data = json_string.encode("utf-8") # Now you can encode the string
 
-    return commands.PublishAddOrderCommand(
-        tenant_id=tenant_id,
-        raw_body=encoded_order_data,
-        headers={"header1": "xxxx"},
-        request_path="add_order_webhook"
-    )
+    json_string = json.dumps(tracker_data_dict) # Converts the dict to a JSON string
+    encoded_tracker_data = json_string.encode("utf-8") # Now you can encode the string
 
-@pytest.fixture
-def mock_request_factory():
-    from django.test import RequestFactory
-    return RequestFactory()
+    return commands.PublishShipmentTrackerCommand.model_validate(
+            { "headers" : custom_headers,
+              "raw_body": encoded_tracker_data,
+              "request_path": "webhook/shipment-tracker",
+              "saas_id": SAAS_ID
+            }
+        )
+
 
 @pytest.fixture
 def custom_headers():
     return {
-        "HTTP_X_Wss_Signature": "ea956ca64bfa308dc858cef5010ff7cc5039f843345239e3b29ec33dabcfa2b7",
+        "HTTP_X_Wss_Signature": "d1f4101d6368bc38c2075bc4893293c71c61e0250c7eb8fd9c44d70a9c59906c",
         "HTTP_X_Wss_Timestamp": str(int(time.time()))
     }
 
 @pytest.mark.django_db
-def test_valid_post_returns_200(client, tenant_id, valid_payload, custom_headers, order_data_dict):
+def test_valid_post_returns_200(client, valid_payload, custom_headers, tracker_data_dict, test_constants):
+    SAAS_ID = test_constants.get("saas1")
     response = client.post(
-        reverse("add_order_webhook", args=[tenant_id]),
-        data=order_data_dict,
+        reverse("shipment_tracker_webhook", args=[SAAS_ID]),
+        data=tracker_data_dict,
         content_type="application/json",
         **custom_headers
     )
     assert response.status_code == 200
-    assert response.content == b'{"success": true, "message": "New order has been publish to queue."}'
+    assert response.content == b'{"success": true, "message": "Shipment updates have been published to queue."}'

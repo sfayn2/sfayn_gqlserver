@@ -9,9 +9,6 @@ from ddd.order_management.application import (
 )
 
 
-@pytest.fixture
-def provider():
-    return "wss"
 
 @pytest.fixture
 def tenant_id():
@@ -24,7 +21,6 @@ def tracker_data_dict(tenant_id):
         "tracking_number": "TN123456789",
         "status": "DELIVERED",
         "occurred_at": "2025-12-07T10:00:00Z",
-        "provider": "wss"
     }
 
 
@@ -52,7 +48,7 @@ def mock_request_factory():
 @pytest.fixture
 def custom_headers():
     return {
-        "HTTP_X_Wss_Signature": "b1b8c1a0732b9dd50cfe8ff93974d7e44854ade3c96cfe6ea4e4dc8a93c8c244",
+        "HTTP_X_Wss_Signature": "d1f4101d6368bc38c2075bc4893293c71c61e0250c7eb8fd9c44d70a9c59906c",
         "HTTP_X_Wss_Timestamp": str(int(time.time()))
     }
 

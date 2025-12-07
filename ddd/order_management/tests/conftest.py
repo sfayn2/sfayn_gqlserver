@@ -37,6 +37,7 @@ from cryptography.hazmat.primitives import serialization
 # === Test Data ========
 USER1 = "user-1"
 USER2 = "user-2"
+SAAS1 = "saas_123"
 TENANT1 = "tenant_123"
 TENANT2 = "tenant_456"
 VENDOR1 = "vendor-1"
@@ -97,7 +98,7 @@ ORDER_LINE_SEEDS = (
 # Columns shipment_id, order_id, shipment_address_line1, shipment_address_line2, shipment_address_city, shipment_address_postal, shipment_address_country, shipment_address_state, shipment_provider, tracking_reference, shipment_amount, shipment_currency, shipment_status
 SHIPMENT_SEEDS = (
     ("SH-1", "ORD-CONFIRMED-1", "line 1", "line 2", "city ", "postal here", "country here", "state here", "provider here", " tracking reference here", Decimal("2.2"), "SGD", enums.ShipmentStatus.PENDING.value),
-    ("SH-SHIPPED-2", "ORD-CONFIRMED_W_SHIPPED-1", "line 1", "line 2", "city ", "postal here", "country here", "state here", "provider here", " tracking reference here", Decimal("2.2"), "SGD", enums.ShipmentStatus.SHIPPED.value),
+    ("SH-SHIPPED-2", "ORD-CONFIRMED_W_SHIPPED-1", "line 1", "line 2", "city ", "postal here", "country here", "state here", "provider here", "TN123456789", Decimal("2.2"), "SGD", enums.ShipmentStatus.SHIPPED.value),
     ("SH-PENDING-2", "ORD-CONFIRMED_W_PENDING-1", "line 1", "line 2", "city ", "postal here", "country here", "state here", "provider here", " tracking reference here", Decimal("2.2"), "SGD", enums.ShipmentStatus.PENDING.value),
     ("SH-CONFIRMED-2", "ORD-CONFIRMED_W_CONFIRMED-1", "line 1", "line 2", "city ", "postal here", "country here", "state here", "provider here", " tracking reference here", Decimal("2.2"), "SGD", enums.ShipmentStatus.CONFIRMED.value),
     ("SH-DELIVERED-2", "ORD-CONFIRMED_W_DELIVERED-1", "line 1", "line 2", "city ", "postal here", "country here", "state here", "provider here", " tracking reference here", Decimal("2.2"), "SGD", enums.ShipmentStatus.DELIVERED.value),
@@ -139,14 +140,14 @@ TENANT_CONFIG_SEEDS  = (
 # SaaSConfig
 # Columns tenant_id, configs, last_update_dt
 SAAS_CONFIG_SEEDS  = (
-    ("SaaSOwner", json.dumps({
+    (SAAS1, json.dumps({
         "idp": {},
         "webhooks": {
             "shipment_tracker": {
                 "provider": "wss",
                 "shared_secret": "2323434235235",
                 "max_age_seconds": 3000,
-                "tracking_reference_jmespath": "result.tracking_code || data.tracking_code",
+                "tracking_reference_jmespath": "tracking_number",
             },
             "add_order": {
                 "provider": "wss",
@@ -193,6 +194,7 @@ SAAS_CONFIG_SEEDS  = (
 @pytest.fixture(scope="session", autouse=True)
 def test_constants():
     return {
+        "saas1": SAAS1,
         "tenant1": TENANT1,
         "tenant2": TENANT2,
         "vendor1": VENDOR1,

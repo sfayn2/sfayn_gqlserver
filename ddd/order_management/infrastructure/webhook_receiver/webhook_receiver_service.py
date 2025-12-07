@@ -142,17 +142,18 @@ class WebhookReceiverService:
         saas_config = cls.saas_lookup_service.get_tenant_config(saas_id)
 
         # Check if the tenant_config was successfully retrieved/is not None
-        if not saas_config.configs:
+        if not saas_config or not saas_config.configs:
             # Raise an appropriate error if SaaSOwner is not available
             raise RuntimeError(f"SaaS configuration '{saas_id}' is missing or not available.")
 
         # Proceed with getting the provider name from the configuration
-        shipment_provider: Optional[str] = saas_config.configs.get("shipment_shipment_provider")
+        webhook_shipment_config = saas_config.configs.get("webhooks", {}).get("shipment_tracker", {})
+        shipment_provider: Optional[str] = webhook_shipment_config.get("provider")
         tracking_reference: Optional[str] = None # Initialize variable to ensure scope
 
-        jmespath_expr = saas_config.configs.get("shipment_tracking_code_jmespath")
+        jmespath_expr = webhook_shipment_config.get("tracking_reference_jmespath")
         if not jmespath_expr:
-            raise ConfigurationError("Missing JMESPath config: shipment_tracking_code_jmespath")
+            raise ConfigurationError("Missing JMESPath config: tracking_reference_jmespath")
 
         tracking_reference = jmespath.search(jmespath_expr, payload_data)
 

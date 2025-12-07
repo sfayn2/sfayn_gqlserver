@@ -17,7 +17,7 @@ def handle_publish_shipment_tracker(
     exception_handler: ports.ExceptionHandlerAbstract,
     webhook_receiver_service: ports.WebhookReceiverServiceAbstract,
     shipment_lookup_service: ports.ShipmentLookupServiceAbstract,
-    shipping_webhook_resolver: ports.ShippingWebhookParserResolverAbstract,
+    shipping_webhook_parser: ports.ShippingWebhookParserResolverAbstract,
     event_publisher: ports.EventPublisherAbstract
 ) -> dtos.ResponseDTO:
     """
@@ -50,7 +50,7 @@ def handle_publish_shipment_tracker(
         )
 
         # 4. Normalize the third-party schema into a generic internal DTO
-        normalized_event_data: dtos.ShippingWebhookDTO = shipping_webhook_resolver.resolve(
+        normalized_event_data: dtos.ShippingWebhookDTO = shipping_webhook_parser.resolve(
             tenant_id=tenant_id,
             payload=validated_payload
         )
