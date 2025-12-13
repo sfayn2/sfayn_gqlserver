@@ -36,11 +36,11 @@ class PackageDTO(BaseModel):
 
 class LineItemDTO(BaseModel):
     product_sku: str
+    product_name: str
     order_quantity: int
     vendor_id: str
-    pickup_address: AddressDTO
+    #pickup_address: AddressDTO
     product_price: MoneyDTO
-    product_total_amount: MoneyDTO
     package: PackageDTO
 
 

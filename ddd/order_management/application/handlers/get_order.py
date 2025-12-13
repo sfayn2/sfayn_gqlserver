@@ -11,20 +11,29 @@ def handle_get_order(
         query: queries.GetOrderQuery, 
         access_control: ports.AccessControl1Abstract,
         user_ctx: dtos.UserContextDTO,
-        uow: ports.UnitOfWorkAbstract) -> dtos.OrderResponseDTO:
+        exception_handler: ports.ExceptionHandlerAbstract,
+        user_action_service: ports.UserActionServiceAbstract,
+        uow: ports.UnitOfWorkAbstract):
+
+        # GraphQl Object Type already control fields to return
+        #uow: ports.UnitOfWorkAbstract) -> dtos.OrderResponseDTO:
+
 
     access_control.ensure_user_is_authorized_for(
         user_ctx,
         required_permission="get_order",
-        required_scope={"customer_id": user_ctx.sub }
+        required_scope={"role": ["vendor"] }
     )
 
     order = uow.order.get(order_id=query.order_id, tenant_id=user_ctx.tenant_id)
 
-    return dtos.OrderResponseDTO(
-        **mappers.OrderMapper.to_dto(
-            order=order
-        ).model_dump()
-    )
+    # GraphQl Object Type already control fields to return
+    #return dtos.OrderResponseDTO(
+    #    **mappers.OrderMapper.to_dto(
+    #        order=order
+    #    ).model_dump()
+    #)
+
+    return order
 
 

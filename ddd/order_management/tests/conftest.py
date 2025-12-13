@@ -51,6 +51,7 @@ VENDOR_PERMISSIONS = [
     "confirm_shipment",
     "deliver_shipment",
     "mark_as_completed",
+    "get_order",
     # Add more permissions here easily
 ]
 
@@ -163,8 +164,8 @@ SAAS_CONFIG_SEEDS  = (
     }), datetime.now(timezone.utc)),
     (TENANT1, json.dumps({
         "idp": {
-            "public_key": "92alSyFzFiPHT3oYDwjXAGXFAAAQGt1Eoaag5dw",
-            "issuer": "http://idp.saasprovider.com/realms/saas_owner",
+            "public_key": "http://localhost:8080/realms/ecommerce_realm/protocol/openid-connect/certs",
+            "issuer": "http://localhost:8080/realms/ecommerce_realm",
             "audience": "AUD1",
             "algorithm": "RS256",
         },
@@ -200,7 +201,8 @@ def test_constants():
         "vendor1": VENDOR1,
         "vendor2": VENDOR2,
         "user1": USER1,
-        "user2": USER2
+        "user2": USER2,
+        "user_seeds": USER_SEEDS
     }
 
 

@@ -1,4 +1,5 @@
 import os, jwt
+import traceback
 from ddd.order_management.domain import exceptions
 
 def get_token_from_context(info):
