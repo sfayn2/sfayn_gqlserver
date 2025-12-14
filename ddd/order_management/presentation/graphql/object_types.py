@@ -8,6 +8,7 @@ from ddd.order_management.application import (
 GrapheneOrderStatus = graphene.Enum.from_enum(enums.OrderStatus)
 GrapheneShipmentMethod = graphene.Enum.from_enum(enums.ShipmentMethod)
 GrapheneShipmentStatus = graphene.Enum.from_enum(enums.ShipmentStatus)
+GraphenePaymentStatus = graphene.Enum.from_enum(enums.PaymentStatus)
 
 # ====================
 # Object Types
@@ -27,7 +28,7 @@ class AddressType(graphene.ObjectType):
     postal = graphene.String(required=False)
 
 class PackageType(graphene.ObjectType):
-    weight = graphene.Decimal()
+    weight_kg = graphene.Decimal()
     #dimensions = graphene.List(graphene.Int)
 
 class CustomerDetailsType(graphene.ObjectType):
@@ -83,6 +84,7 @@ class OrderType(graphene.ObjectType):
     customer_details = graphene.Field(CustomerDetailsType)
     currency = graphene.String()
     tenant_id = graphene.String()
+    payment_status = GraphenePaymentStatus()
     order_status = GrapheneOrderStatus()
     date_modified = graphene.DateTime()
     date_created = graphene.String()

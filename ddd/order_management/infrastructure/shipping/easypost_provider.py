@@ -50,7 +50,7 @@ class EasyPostShippingProvider:
 
         return dtos.CreateShipmentResponseDTO(
             tracking_reference=tracking_code,
-            total_amount=dtos.MoneyDTO(
+            total_amount=dtos.MoneyResponseDTO(
                 amount=total_amount,
                 currency=currency
             ),

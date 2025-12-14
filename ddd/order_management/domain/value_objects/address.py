@@ -10,5 +10,5 @@ class Address:
     country: str
     line2: Optional[str] = None
     state: Optional[str] = None
-    postal: Optional[int] = None
+    postal: Optional[str] = None
 

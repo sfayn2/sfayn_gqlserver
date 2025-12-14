@@ -7,12 +7,15 @@ from ddd.order_management.application import dtos
 
 
 class ConfirmedShipmentIntegrationEvent(IntegrationEvent):
-    data: dtos.ConfirmShipmentDTO
+     # This data is an input request payload, so use the RequestDTO type
+    data: dtos.ConfirmShipmentRequestDTO
     
 
 class AddOrderWebhookIntegrationEvent(IntegrationEvent):
-    data: dtos.AddOrderDTO
+     # This data is an input request payload, so use the RequestDTO type
+    data: dtos.AddOrderRequestDTO
 
 
 class ShippingWebhookIntegrationEvent(IntegrationEvent):
-    data: dtos.ShippingWebhookDTO
+     # This data is an input request payload, so use the RequestDTO type
+    data: dtos.ShippingWebhookRequestDTO

@@ -16,7 +16,7 @@ class WssShippingWebhookParser:
     Handles parsing EasyPost webhook payloads into a standardized DTO.
     """
 
-    def parse(self, payload: dict[str, Any]) -> dtos.ShippingWebhookDTO:
+    def parse(self, payload: dict[str, Any]) -> dtos.ShippingWebhookRequestDTO:
         """
         Parses the raw webhook payload dictionary into a structured integration event DTO.
 
@@ -53,7 +53,7 @@ class WssShippingWebhookParser:
                 raise ShippingWebhookParserError("The 'occurred_at/updated_at' fields is missing or empty in the payload.")
 
             # 4. Use intermediate variables for clarity before instantiation.
-            payload_dto = dtos.ShippingWebhookDTO(
+            payload_dto = dtos.ShippingWebhookRequestDTO(
                 provider="wss",
                 tracking_reference=tracking_reference,
                 tenant_id=tenant_id,

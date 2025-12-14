@@ -7,21 +7,22 @@ from ddd.order_management.domain import models, value_objects
 class OrderMapper:
 
     @staticmethod
-    def to_dto(order: models.Order) -> dtos.OrderDTO:
-        response_dto = dtos.OrderDTO(
-            tenant_id=order.tenant_id,
-            customer_details=dtos.CustomerDetailsDTO(
-                **asdict(order.customer_details)
-
-            ),
+    def to_response_dto(order: models.Order) -> dtos.OrderResponseDTO:
+        response_dto = dtos.OrderResponseDTO(
             order_id=order.order_id,
+            line_items=[
+                mappers.LineItemMapper.to_response_dto(item)
+                for item in order.line_items
+            ],
+            shipments=[
+                mappers.ShipmentMapper.to_response_dto(item) 
+                for item in order.shipments
+            ],
+            customer_details=mappers.CustomerDetailsMapper.to_response_dto(order.customer_details),
             currency=order.currency,
+            tenant_id=order.tenant_id,
             order_status=order.order_status,
             payment_status=order.payment_status,
-            line_items=[dtos.LineItemDTO(
-                **asdict(line_item)
-            ) for line_item in order.line_items],
-            shipments=[dtos.ShipmentItemDTO(**asdict(item)) for item in order.shipments],
             date_created=order.date_created,
             date_modified=order.date_modified
         )

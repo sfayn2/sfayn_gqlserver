@@ -11,7 +11,7 @@ class TenantLookupService:
     def get_tenant_config(
         self,
         tenant_id: str
-    ) -> dtos.TenantDTO:
+    ) -> dtos.TenantResponseDTO:
         try:
             tenant = django_models.TenantConfig.objects.get(
                 tenant_id=tenant_id
@@ -19,7 +19,7 @@ class TenantLookupService:
         except django_models.TenantConfig.DoesNotExist:
             raise Exception(f"Tenant {tenant_id} not found")
 
-        return dtos.TenantDTO(
+        return dtos.TenantResponseDTO(
             tenant_id=tenant_id,
             configs=json.loads(tenant.configs)
         )

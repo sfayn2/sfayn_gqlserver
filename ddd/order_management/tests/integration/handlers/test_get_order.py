@@ -83,6 +83,7 @@ def test_graphql_endpoint_retrieves_order_successfully(
           getOrderByOrderId(orderId: "{target_order_id}") {{
             orderId,
             orderStatus,
+            paymentStatus,
             tenantId,
             currency,
             dateModified,
@@ -102,7 +103,7 @@ def test_graphql_endpoint_retrieves_order_successfully(
                 currency
               }},
               package {{
-                weight
+                weightKg
               }}
             }},
             shipments {{
@@ -150,7 +151,7 @@ def test_graphql_endpoint_retrieves_order_successfully(
                     currency
                   }},
                   package {{
-                    weight
+                    weightKg
                   }}
                 }},
                 quantity,
@@ -173,6 +174,7 @@ def test_graphql_endpoint_retrieves_order_successfully(
     assert data['orderId'] == target_order_id
     # Assuming enums.OrderStatus.CONFIRMED.value is 'CONFIRMED'
     assert data['orderStatus'] == 'CONFIRMED' 
+    assert data['paymentStatus'] == 'UNPAID' 
     assert data['tenantId'] == 'tenant_123'
     assert data['currency'] == 'SGD'
 
@@ -212,7 +214,7 @@ def test_graphql_endpoint_retrieves_order_successfully(
     assert item1['vendorId'] == 'vendor-1'
     assert item1['productPrice']['amount'] == '1.12' # Graphene Decimal returns as string
     assert item1['productPrice']['currency'] == 'SGD'
-    assert item1['package']['weight'] is None
+    assert item1['package']['weightKg'] == '20.00'
     
     # Assert details for the second line item
     item2 = data['lineItems'][1]
@@ -222,7 +224,7 @@ def test_graphql_endpoint_retrieves_order_successfully(
     assert item2['vendorId'] == 'vendor-1'
     assert item2['productPrice']['amount'] == '1.12'
     assert item2['productPrice']['currency'] == 'SGD'
-    assert item2['package']['weight'] is None
+    assert item2['package']['weightKg'] == '20.00'
 
 
     # -----------------------------------------------

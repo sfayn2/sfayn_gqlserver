@@ -5,5 +5,5 @@ from ddd.order_management.domain import models, value_objects, enums
 class MoneyMapper:
 
     @staticmethod
-    def to_domain(dto: dtos.MoneyDTO) -> value_objects.Money:
+    def to_domain(dto: dtos.MoneyResponseDTO) -> value_objects.Money:
         return value_objects.Money(**dto.model_dump())

@@ -6,5 +6,5 @@ class LookupServiceAbstract(Protocol):
     def get_tenant_config(
         self,
         tenant_id: str
-    ) -> dtos.TenantDTO:
+    ) -> dtos.TenantResponseDTO:
         ...

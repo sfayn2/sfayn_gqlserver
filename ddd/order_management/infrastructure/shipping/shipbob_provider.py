@@ -64,7 +64,7 @@ class ShipBobShippingProvider:
 
         return dtos.CreateShipmentResponseDTO(
             tracking_reference=data.get("tracking_number") or data.get("id"),
-            total_amount=dtos.MoneyDTO(
+            total_amount=dtos.MoneyResponseDTO(
                 amount=data.get("shipping_cost", 0),
                 currency=data.get("currency")
             ),

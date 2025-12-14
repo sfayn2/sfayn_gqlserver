@@ -16,7 +16,7 @@ class ReviewOrderCommand(Command):
 class RequestReturnCommand(Command):
     order_id: str
     comments: str
-    product_skus: List[dtos.ProductSkusDTO]
+    product_skus: List[dtos.ProductSkusRequestDTO]
 
 class ProcessRefundCommand(Command):
     order_id: str

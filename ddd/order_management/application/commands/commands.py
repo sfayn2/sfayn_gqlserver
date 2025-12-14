@@ -38,13 +38,13 @@ class AddShipmentCommand(Command):
     package_height_cm: Optional[Decimal] = None
 
     # pickup mode
-    pickup_address: Optional[dtos.AddressDTO] = None
+    pickup_address: Optional[dtos.AddressRequestDTO] = None
     pickup_window_start: Optional[datetime] = None
     pickup_window_end: Optional[datetime] = None
     pickup_instructions: Optional[str] = None
 
-    shipment_address: dtos.AddressDTO
-    shipment_items: list[dtos.ShipmentItemDTO]
+    shipment_address: dtos.AddressRequestDTO
+    shipment_items: list[dtos.ShipmentItemRequestDTO]
 
 
 
@@ -60,5 +60,5 @@ class CancelShipmentCommand(Command):
     order_id: str
     shipment_id: str
 
-class AddOrderCommand(Command, dtos.AddOrderDTO):
+class AddOrderCommand(Command, dtos.AddOrderRequestDTO):
     pass

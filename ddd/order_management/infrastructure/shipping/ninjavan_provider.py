@@ -72,7 +72,7 @@ class NinjaVanShippingProvider:
 
         return dtos.CreateShipmentResponseDTO(
             tracking_reference=data.get("tracking_number") or data.get("id"),
-            total_amount=dtos.MoneyDTO(
+            total_amount=dtos.MoneyResponseDTO(
                 amount=Decimal("0"),
                 currency="SGD"
             ),

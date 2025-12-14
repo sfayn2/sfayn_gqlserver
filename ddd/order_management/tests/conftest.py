@@ -221,7 +221,7 @@ def fake_rsa_keys():
 # =========
 @pytest.fixture
 def fake_customer_details():
-    return dtos.CustomerDetailsDTO(
+    return dtos.CustomerDetailsRequestDTO(
             customer_id="customer id",
             name="name here",
             email="email1@gmail.com"
@@ -229,7 +229,7 @@ def fake_customer_details():
 
 @pytest.fixture
 def fake_address():
-    return dtos.AddressDTO(
+    return dtos.AddressRequestDTO(
             line1="line 1",
             city="city 1",
             country="country 1",

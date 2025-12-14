@@ -6,5 +6,5 @@ from ddd.order_management.domain import models
 
 class ShippingWebhookParserResolverAbstract(Protocol):
     @classmethod
-    def resolve(cls, tenant_id: str, payload: Any) -> dtos.ShippingWebhookDTO: ...
+    def resolve(cls, tenant_id: str, payload: Any) -> dtos.ShippingWebhookRequestDTO: ...
     # The 'configure' and internal methods should not be part of the application port

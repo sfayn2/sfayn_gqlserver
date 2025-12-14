@@ -5,7 +5,7 @@ from ddd.order_management.domain import models, value_objects
 class AddressMapper:
 
     @staticmethod
-    def to_domain(address: dtos.AddressDTO) -> value_objects.Address:
+    def to_domain(address: dtos.AddressRequestDTO) -> value_objects.Address:
         return value_objects.Address(
             line1=address.line1,
             city=address.city,

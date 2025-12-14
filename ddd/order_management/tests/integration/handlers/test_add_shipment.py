@@ -19,13 +19,13 @@ BASE_SHIPMENT_INPUT = {
     "package_width_cm": 5.0,
     "package_height_cm": 2.0,
     "pickup_address": {
-        "line1": "123 Main St", "city": "Anytown", "state": "CA", "postal": 90210, "country": "USA",
+        "line1": "123 Main St", "city": "Anytown", "state": "CA", "postal": "90210", "country": "USA",
     },
     "pickup_window_start": datetime(2025, 12, 1, 10, 0, 0).isoformat(),
     "pickup_window_end": datetime(2025, 12, 1, 12, 0, 0).isoformat(),
     "pickup_instructions": "Leave package on the porch.",
     "shipment_address": {
-        "line1": "456 Oak Ave", "city": "Otherville", "state": "NY", "postal": 10001, "country": "USA",
+        "line1": "456 Oak Ave", "city": "Otherville", "state": "NY", "postal": "10001", "country": "USA",
     },
     "instructions": "Deliver with care.",
     # This part will change per test case

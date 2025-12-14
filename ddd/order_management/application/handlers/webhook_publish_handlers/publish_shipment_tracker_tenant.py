@@ -34,7 +34,7 @@ def handle_publish_shipment_tracker_tenant(
         )
 
         # 4. Normalize the third-party schema into a generic internal DTO
-        normalized_event_data: dtos.ShippingWebhookDTO = shipping_webhook_parser.resolve(
+        normalized_event_data: dtos.ShippingWebhookRequestDTO = shipping_webhook_parser.resolve(
             tenant_id=command.tenant_id,
             payload=validated_payload
         )

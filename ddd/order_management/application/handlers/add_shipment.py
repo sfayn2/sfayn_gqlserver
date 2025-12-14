@@ -25,9 +25,22 @@ def handle_add_shipment(
             )
 
             order = uow.order.get(order_id=command.order_id, tenant_id=user_ctx.tenant_id)
+
+            shipment_items_domain_models = []
+            for item_request in command.shipment_items or []:
+                # 1. Retrieve the domain model for the line item
+                line_item_model = order.get_line_item(item_request.product_sku, item_request.vendor_id)
+                
+                # 2. Map directly to the domain object using the mapper
+                shipment_item_domain = mappers.ShipmentItemMapper.to_domain(
+                    quantity=item_request.quantity,
+                    line_item=line_item_model # Pass the correct domain model type
+                )
+                shipment_items_domain_models.append(shipment_item_domain)
+
             order.create_shipment(
                 shipment_address=mappers.AddressMapper.to_domain(command.shipment_address),
-                shipment_items=[mappers.ShipmentItemMapper.to_domain(si, order.get_line_item(si.product_sku, si.vendor_id)) for si in command.shipment_items]
+                shipment_items=shipment_items_domain_models
             )
 
             user_action_service.save_action(

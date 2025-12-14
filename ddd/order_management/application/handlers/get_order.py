@@ -13,10 +13,7 @@ def handle_get_order(
         user_ctx: dtos.UserContextDTO,
         exception_handler: ports.ExceptionHandlerAbstract,
         user_action_service: ports.UserActionServiceAbstract,
-        uow: ports.UnitOfWorkAbstract):
-
-        # GraphQl Object Type already control fields to return
-        #uow: ports.UnitOfWorkAbstract) -> dtos.OrderResponseDTO:
+        uow: ports.UnitOfWorkAbstract) -> dtos.OrderResponseDTO:
 
 
     access_control.ensure_user_is_authorized_for(
@@ -28,12 +25,10 @@ def handle_get_order(
     order = uow.order.get(order_id=query.order_id, tenant_id=user_ctx.tenant_id)
 
     # GraphQl Object Type already control fields to return
-    #return dtos.OrderResponseDTO(
-    #    **mappers.OrderMapper.to_dto(
-    #        order=order
-    #    ).model_dump()
-    #)
+    return mappers.OrderMapper.to_response_dto(
+            order=order
+        )
 
-    return order
+    #return order
 
 

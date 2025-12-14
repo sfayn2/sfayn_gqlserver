@@ -11,7 +11,7 @@ class SaaSLookupService:
     def get_tenant_config(
         self,
         tenant_id: str
-    ) -> dtos.TenantDTO:
+    ) -> dtos.TenantResponseDTO:
         try:
             tenant = django_models.SaaSConfig.objects.get(
                 tenant_id=tenant_id
@@ -19,7 +19,7 @@ class SaaSLookupService:
         except django_models.SaaSConfig.DoesNotExist:
             raise Exception(f"Tenant {tenant_id} not found")
 
-        return dtos.TenantDTO(
+        return dtos.TenantResponseDTO(
             tenant_id=tenant_id,
             configs=json.loads(tenant.configs)
         )
