@@ -1,7 +1,7 @@
 import graphene
 from graphene import relay
 from ddd.order_management.application import (
-    message_bus, commands
+    message_bus, commands, dtos
   )
 from ddd.order_management.infrastructure import (
     access_control1

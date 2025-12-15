@@ -5,10 +5,13 @@ from ddd.order_management.infrastructure import django_mappers
 #ok to return Domain for repository
 class DjangoOrderRepositoryImpl(repositories.OrderAbstract):
     def get(self, order_id: str, tenant_id: str) -> models.Order:
-        django_order = django_models.Order.objects.get(order_id=order_id, tenant_id=tenant_id)
-        order_domain = django_mappers.OrderMapper.to_domain(django_order)
-        self.seen.add(order_domain) #Track Entitry for Uow
-        return order_domain
+        try:
+            django_order = django_models.Order.objects.get(order_id=order_id, tenant_id=tenant_id)
+            order_domain = django_mappers.OrderMapper.to_domain(django_order)
+            self.seen.add(order_domain) #Track Entitry for Uow
+            return order_domain
+        except Exception as e:
+            raise exceptions.InvalidOrderOperation(f"Order entity with ID '{order_id}' could not be located.")
     
     def save(self, order: models.Order): 
         django_order = django_mappers.OrderMapper.to_django(order)

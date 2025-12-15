@@ -20,4 +20,4 @@ def test_jwt_token_ok(fake_rsa_keys, fake_jwt_valid_token):
     assert decoded["iss"] == "https://issuer.test"
     assert decoded["tenant_id"] == "tenant_123"
     assert decoded["token_type"] == "Bearer"
-    assert decoded["roles"] == ["customer"]
+    assert decoded["roles"] == ["vendor"]

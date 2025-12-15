@@ -70,7 +70,8 @@ USER_SEEDS = tuple(
 
 # Columns order_id, tenant_id, external_ref, order_status, customer_id, customer_name, customer_email, payment_status, currency, date_created, date_modified
 ORDER_SEEDS = (
-    ("ORD-CONFIRMED-1", TENANT1, "external ref here", enums.OrderStatus.CONFIRMED.value, "customer id here", " customer name", " customer email", enums.PaymentStatus.UNPAID.value, "SGD", datetime.now(timezone.utc), datetime.now(timezone.utc)), ("ORD-NOTCONFIRMED-1", TENANT1, "external ref here", enums.OrderStatus.PENDING.value, "customer id here", " customer name", " customer email", enums.PaymentStatus.UNPAID.value, "SGD", datetime.now(timezone.utc), datetime.now(timezone.utc)),
+    ("ORD-CONFIRMED-1", TENANT1, "external ref here", enums.OrderStatus.CONFIRMED.value, "customer id here", " customer name", " customer email", enums.PaymentStatus.UNPAID.value, "SGD", datetime.now(timezone.utc), datetime.now(timezone.utc)), 
+    ("ORD-NOTCONFIRMED-1", TENANT1, "external ref here", enums.OrderStatus.PENDING.value, "customer id here", " customer name", " customer email", enums.PaymentStatus.UNPAID.value, "SGD", datetime.now(timezone.utc), datetime.now(timezone.utc)),
     ("ORD-DRAFT-1", TENANT1, "external ref here", enums.OrderStatus.DRAFT.value, "customer id here", " customer name", " customer email", enums.PaymentStatus.UNPAID.value, "SGD", datetime.now(timezone.utc), datetime.now(timezone.utc)),
     ("ORD-CONFIRMED_W_SHIPPED-1", TENANT1, "external ref here", enums.OrderStatus.CONFIRMED.value, "customer id here", " customer name", " customer email", enums.PaymentStatus.UNPAID.value, "SGD", datetime.now(timezone.utc), datetime.now(timezone.utc)),
     ("ORD-CONFIRMED_W_PENDING-1", TENANT1, "external ref here", enums.OrderStatus.PENDING.value, "customer id here", " customer name", " customer email", enums.PaymentStatus.UNPAID.value, "SGD", datetime.now(timezone.utc), datetime.now(timezone.utc)),
@@ -326,6 +327,18 @@ def fake_jwt_expired_token(fake_rsa_keys):
     }
     token = jwt.encode(payload, private_key, algorithm="RS256")
     return token
+
+@pytest.fixture
+def user_context_tenant1_vendor_all_perms(test_constants) -> dtos.UserContextDTO:
+    """Provides a valid UserContextDTO for TENANT1 with all vendor permissions."""
+    TENANT1 = test_constants.get("tenant1")
+    USER1 = test_constants.get("user1")
+    return dtos.UserContextDTO(
+        sub=USER1,
+        token_type="Bearer",
+        tenant_id=TENANT1,
+        roles=["vendor"]
+    )
 
 
 
