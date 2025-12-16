@@ -83,7 +83,7 @@ class ProductSkusRequestDTO(BaseModel):
     
 class AddOrderRequestDTO(BaseModel):
     external_ref: str
-    #tenant_id: str
+    tenant_id: Optional[str] = None
     customer_details: CustomerDetailsRequestDTO
     product_skus: List[ProductSkusRequestDTO]
 
