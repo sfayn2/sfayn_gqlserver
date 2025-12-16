@@ -11,7 +11,7 @@ class LineItem:
     order_quantity: int
     vendor_id: str
     #pickup_address: value_objects.Address
-    package: value_objects.Package
+    package: Optional[value_objects.Package] = None
     product_price: value_objects.Money = field(default_factory=lambda: value_objects.Money.default())
 
 

@@ -11,7 +11,7 @@ class LineItemMapper:
             product_name=dto.product_name,
             order_quantity=dto.order_quantity,
             vendor_id=dto.vendor_id,
-            package=value_objects.Package(dto.package.weight_kg),
+            package=value_objects.Package(dto.package.weight_kg) if dto.package else None,
             product_price=value_objects.Money(amount=dto.product_price.amount, currency=dto.product_price.currency),
         )
 

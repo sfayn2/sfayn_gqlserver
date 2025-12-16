@@ -78,12 +78,12 @@ class ProductSkusRequestDTO(BaseModel):
     vendor_id: str
     product_name: str
     product_price: MoneyRequestDTO
-    package: PackageRequestDTO
+    package: Optional[PackageRequestDTO] = None
 
     
 class AddOrderRequestDTO(BaseModel):
     external_ref: str
-    tenant_id: str
+    #tenant_id: str
     customer_details: CustomerDetailsRequestDTO
     product_skus: List[ProductSkusRequestDTO]
 

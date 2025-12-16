@@ -99,10 +99,11 @@ class WebhookReceiverService:
         except (json.JSONDecodeError, UnicodeDecodeError):
             # Raise specific error for the API handler to catch and return 400
             raise InvalidPayloadError("Invalid JSON payload or encoding")
-        
-        # 4. Enrich the payload with domain data (e.g., tenant_id)
-        # This is a common pattern in a service layer
-        payload["tenant_id"] = tenant_id
+
+        # TODO tenant_id is relevant here? 
+        ## 4. Enrich the payload with domain data (e.g., tenant_id)
+        ## This is a common pattern in a service layer
+        #payload["tenant_id"] = tenant_id
 
         return payload
 

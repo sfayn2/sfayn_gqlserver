@@ -26,10 +26,13 @@ class CustomerDetailsInput(graphene.InputObjectType):
     name = graphene.String(required=True)
     email = graphene.String(required=True)
 
+class PackageInput(graphene.InputObjectType):
+    weight_kg = graphene.Decimal()
+
 class ProductSkusInput(graphene.InputObjectType):
     product_sku = graphene.String(required=True)
     product_name = graphene.String(required=True)
     product_price = graphene.Field(MoneyInput, required=True)
-    product_weight_kg = graphene.Decimal(required=False)
     order_quantity = graphene.Int(required=True)
     vendor_id = graphene.String(required=True)
+    package = graphene.Field(PackageInput, required=False)

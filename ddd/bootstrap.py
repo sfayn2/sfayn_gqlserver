@@ -98,6 +98,7 @@ event_bus.internal_publisher = event_publishers.RedisStreamPublisher(
             stream_name=os.getenv("REDIS_INTERNAL_STREAM", "stream.internal.oms"),
             event_whitelist=event_bus.INTERNAL_EVENT_WHITELIST
         )
+#TODO how to isolate based on tenant, need svc?
 event_bus.external_publisher = event_publishers.RedisStreamPublisher(
             redis_client=redis.Redis.from_url(os.getenv("REDIS_EXTERNAL_URL"), decode_responses=True),
             stream_name=os.getenv("REDIS_EXTERNAL_STREAM", "stream.external.oms"),
@@ -153,6 +154,10 @@ message_bus.USER_ACTION_SERVICE_IMPL = user_action_service.UserActionService()
 
 # ========= Command Handlers (write operations) ==================
 message_bus.COMMAND_HANDLERS.update({
+    commands.AddOrderCommand: lambda command, **deps: handlers.handle_add_order(
+        command=command,
+        **deps
+    ),
     commands.AddShipmentCommand: lambda command, **deps: handlers.handle_add_shipment(
         command=command,
         **deps

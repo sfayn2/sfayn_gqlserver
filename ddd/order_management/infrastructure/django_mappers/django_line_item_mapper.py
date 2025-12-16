@@ -17,7 +17,7 @@ class LineItemMapper:
                     'product_currency': line_item.product_price.currency, 
                     'order_quantity': line_item.order_quantity, 
                     'vendor_id': line_item.vendor_id, 
-                    'package_weight_kg': line_item.package.weight_kg,
+                    'package_weight_kg': line_item.package.weight_kg if line_item.package else None,
                 }
             }
 
