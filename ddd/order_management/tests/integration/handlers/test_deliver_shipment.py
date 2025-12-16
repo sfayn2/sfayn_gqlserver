@@ -41,7 +41,7 @@ DELIVER_SHIPMENT_ALREADY_DELIVERED_INPUT = {
             # Valid delivery of a SHIPPED shipment (uses our BASE input pointing to a SHIPPED seed)
             BASE_DELIVER_SHIPMENT_INPUT,
             True,
-            "w Shipment Id SH-SHIPPED-2 successfully shipped.", # Message seems generic ("shipped") but implies success
+            "w Shipment Id SH-SHIPPED-2 successfully delivered.", # Message seems generic ("shipped") but implies success
             enums.ShipmentStatus.DELIVERED.value,       # Shipment status should be DELIVERED
             enums.OrderStatus.DELIVERED.value           # <-- ROLL-UP: Order status should now be DELIVERED (as all items are covered)
         ),
