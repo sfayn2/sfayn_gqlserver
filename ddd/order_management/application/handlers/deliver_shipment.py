@@ -43,7 +43,7 @@ def handle_deliver_shipment(
 
             return dtos.ResponseDTO(
                 success=True,
-                message=f"Order {order.order_id} w Shipment Id {command.shipment_id} successfully shipped."
+                message=f"Order {order.order_id} w Shipment Id {command.shipment_id} successfully delivered."
             )
 
 
