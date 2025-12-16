@@ -5,7 +5,7 @@ from unittest.mock import MagicMock, PropertyMock
 from ddd.order_management.application import commands, handlers, dtos, ports
 from ddd.order_management.domain import enums
 from order_management import models as django_snapshots
-from ddd.order_management.presentation.graphql.mutations.deliver_shipment_mutation import DeliverShipmentMutation 
+from ddd.order_management.presentation.graphql.mutations.mark_as_completed_mutation import MarkAsCompletedMutation
 
 # Use global constants defined in conftest.py (assumed to be in scope)
 
@@ -26,7 +26,7 @@ def graphene_client(mocker, user_context_tenant1_vendor_all_perms):
     # 1. Define a local temporary Mutation container class
     class RootTestMutation(graphene.ObjectType):
         # Update this to use the new mutation class
-        deliver_shipment = DeliverShipmentMutation.Field() 
+        mark_as_completed = MarkAsCompletedMutation.Field()
     
     # 2. Define a DUMMY Query class to satisfy the Client's requirement
     class DummyQuery(graphene.ObjectType):
@@ -53,8 +53,7 @@ def graphene_client(mocker, user_context_tenant1_vendor_all_perms):
 
 
 @pytest.mark.django_db
-def test_graphql_endpoint_deliver_shipment_successfully_e2e(
-
+def test_graphql_endpoint_mark_as_completed_successfully_e2e(
     fake_jwt_valid_token,
     graphene_client, 
     test_constants):
@@ -65,8 +64,8 @@ def test_graphql_endpoint_deliver_shipment_successfully_e2e(
     in the fixture setup.
     """
     
-    target_order_id = "ORD-CONFIRMED_W_SHIPPED-1"
-    target_shipment_id = "SH-SHIPPED-2"
+    target_order_id = "ORD-READY-TO-COMPLETE-PAID-1"
+
     TENANT1 = test_constants.get("tenant1")
     VENDOR1 = test_constants.get("vendor1")
 
@@ -77,11 +76,10 @@ def test_graphql_endpoint_deliver_shipment_successfully_e2e(
         "HTTP_AUTHORIZATION": f"Bearer {fake_jwt_valid_token}"
     })
 
-
-# The GraphQL mutation query updated for DeliverShipment
+ # The GraphQL mutation query updated for MarkAsCompleted
     query = """
-            mutation DeliverShipment($input: DeliverShipmentMutationInput!) {
-                deliverShipment(input: $input) {
+            mutation MarkAsCompleted($input: MarkAsCompletedMutationInput!) {
+                markAsCompleted(input: $input) {
                     result {
                         success
                         message
@@ -94,7 +92,6 @@ def test_graphql_endpoint_deliver_shipment_successfully_e2e(
     variables = {
         "input": {
             "orderId": target_order_id,
-            "shipmentId": target_shipment_id
         }
     }
     
@@ -103,8 +100,8 @@ def test_graphql_endpoint_deliver_shipment_successfully_e2e(
 
     # --- Assertions on the GraphQL Response ---
     assert response.get('errors') is None
-    data = response['data']['deliverShipment']['result']
+    data = response['data']['markAsCompleted']['result']
     assert data['success'] is True
     # Update expected message to match the handler's output message format
-    expected_message = f"Order {target_order_id} w Shipment Id {target_shipment_id} successfully delivered."
+    expected_message = f"Order {target_order_id} successfully mark as completed."
     assert data['message'] == expected_message
