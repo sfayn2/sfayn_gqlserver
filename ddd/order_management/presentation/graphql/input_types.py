@@ -14,7 +14,7 @@ class AddressInput(graphene.InputObjectType):
     country = graphene.String(required=True)
     line2 = graphene.String(required=False)
     state = graphene.String(required=False)
-    postal = graphene.Int(required=False)
+    postal = graphene.String(required=False)
 
 class ShipmentItemInput(graphene.InputObjectType):
     product_sku = graphene.String(required=True)
