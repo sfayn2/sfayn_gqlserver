@@ -4,7 +4,23 @@ from ddd.order_management.domain import exceptions
 
 def get_token_from_context(info):
 
-    auth_header = info.context.META.get("HTTP_AUTHORIZATION")
+    ctx = info.context
+    
+    # CASE 1: Standard Django Request (On-Prem)
+    if hasattr(ctx, "META"):
+        auth_header = ctx.META.get("HTTP_AUTHORIZATION")
+    
+    # CASE 2: Lambda Event (AWS)
+    elif isinstance(ctx, dict) and "request_event" in ctx:
+        # Lambda Proxy integration puts headers in 'headers' key
+        headers = ctx["request_event"].get("headers", {})
+        # Headers in Lambda can be lowercase or capitalized depending on API Gateway version
+        auth_header = headers.get("Authorization") or headers.get("authorization")
+    
+    else:
+        raise exceptions.AccessControlException("Invalid context type")
+
+    #auth_header = info.context.META.get("HTTP_AUTHORIZATION")
     #token_type = os.getenv("IDP_TOKEN_TYPE")
     token_type = "Bearer"
 

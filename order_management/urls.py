@@ -1,5 +1,5 @@
 from django.urls import path
-from ddd.order_management.presentation import webhook_apis
+from ddd.order_management.entrypoints import webhook_apis
 
 urlpatterns = [
     path('add-order/<str:tenant_id>', webhook_apis.add_order_webhook, name='add_order_webhook'),

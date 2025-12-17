@@ -9,7 +9,7 @@ from graphene.test import Client
 from ddd.order_management.application import queries, dtos
 from ddd.order_management.domain import exceptions, enums
 # Import the code under test (GetOrderQuery class)
-from ddd.order_management.presentation.graphql.queries.get_order_query import GetOrderQuery
+from ddd.order_management.entrypoints.graphql.queries.get_order_query import GetOrderQuery
 # Import the handler function to test handler logic directly
 from ddd.order_management.application.handlers import handle_get_order
 
@@ -29,7 +29,7 @@ def graphene_client(mocker, user_context_tenant1_vendor_all_perms):
     # Mock the internal infrastructure calls within the resolver function 
     # to return a controlled user_ctx for predictable tests.
     mocker.patch(
-        "ddd.order_management.presentation.graphql.common.get_tenant_id",
+        "ddd.order_management.entrypoints.graphql.common.get_tenant_id",
         return_value="tenant_123"
     )
     mocker.patch(

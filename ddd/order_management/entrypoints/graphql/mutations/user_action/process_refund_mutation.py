@@ -4,7 +4,7 @@ from graphene.types.generic import GenericScalar
 from ddd.order_management.application import (
     message_bus, commands
   )
-from ddd.order_management.presentation.graphql import object_types, common
+from ddd.order_management.entrypoints.graphql import object_types, common
 from ddd.order_management.infrastructure import (
     access_control1,
 )
@@ -13,10 +13,9 @@ from ddd.order_management.infrastructure import (
 # ==========================
 # Mutations 
 # ===================
-class EscalateReviewerMutation(relay.ClientIDMutation):
+class ProcessRefundMutation(relay.ClientIDMutation):
     class Input:
         order_id = graphene.String(required=True)
-        reviewer = graphene.String(required=True)
         comments = graphene.String(required=True)
 
     result = graphene.Field(object_types.ResponseType)
@@ -26,7 +25,7 @@ class EscalateReviewerMutation(relay.ClientIDMutation):
         token = common.get_token_from_context(info)
         user_ctx = access_control1.get_user_context(token)
 
-        command = commands.EscalateReviewerCommand.model_validate(input)
+        command = commands.ProcessRefundCommand.model_validate(input)
         result = message_bus.handle(command, user_ctx=user_ctx)
 
         return cls(result=object_types.ResponseType(**result.model_dump()))

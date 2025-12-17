@@ -3,7 +3,7 @@ from graphene import relay
 from ddd.order_management.application import (
     message_bus, commands, dtos
   )
-from ddd.order_management.presentation.graphql import object_types, common, input_types
+from ddd.order_management.entrypoints.graphql import object_types, common, input_types
 
 
 # ==========================

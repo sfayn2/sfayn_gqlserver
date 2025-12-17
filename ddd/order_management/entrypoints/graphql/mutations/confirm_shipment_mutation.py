@@ -3,17 +3,16 @@ from graphene import relay
 from ddd.order_management.application import (
     message_bus, commands, dtos
   )
-from ddd.order_management.presentation.graphql import object_types, common, input_types
+from ddd.order_management.entrypoints.graphql import object_types, common, input_types
 
 
 # ==========================
 # Mutations 
 # ===================
-class AddOrderMutation(relay.ClientIDMutation):
+class ConfirmShipmentMutation(relay.ClientIDMutation):
     class Input:
-        external_ref = graphene.String(required=True)
-        customer_details = graphene.Field(input_types.CustomerDetailsInput, required=True)
-        product_skus = graphene.List(input_types.ProductSkusInput, required=True)
+        order_id = graphene.String(required=True)
+        shipment_id = graphene.String(required=True)
 
     result = graphene.Field(object_types.ResponseType)
 
@@ -28,11 +27,12 @@ class AddOrderMutation(relay.ClientIDMutation):
             tenant_id=request_tenant_id
         )
 
-        command = commands.AddOrderCommand.model_validate(input)
+        command = commands.ConfirmShipmentCommand.model_validate(input)
 
         # 2. Pass this raw context data DTO to the message bus handler
         # The message bus (Application Layer) should handle resolving authentication/authorization logic.
         result = message_bus.handle(command, context_data=context_data)
+
 
         return cls(result=object_types.ResponseType(**result.model_dump()))
 

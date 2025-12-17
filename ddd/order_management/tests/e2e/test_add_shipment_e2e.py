@@ -5,7 +5,7 @@ from unittest.mock import MagicMock, PropertyMock
 from ddd.order_management.application import commands, handlers, dtos, ports
 from ddd.order_management.domain import enums
 from order_management import models as django_snapshots
-from ddd.order_management.presentation.graphql.mutations.add_shipment_mutation import AddShipmentMutation 
+from ddd.order_management.entrypoints.graphql.mutations.add_shipment_mutation import AddShipmentMutation 
 
 # Use global constants defined in conftest.py (assumed to be in scope)
 
@@ -38,7 +38,7 @@ def graphene_client(mocker, user_context_tenant1_vendor_all_perms):
     # Mock the internal infrastructure calls within the resolver function 
     # to return a controlled user_ctx for predictable tests.
     mocker.patch(
-        "ddd.order_management.presentation.graphql.common.get_tenant_id",
+        "ddd.order_management.entrypoints.graphql.common.get_tenant_id",
         return_value="tenant_123"
     )
     # Mock the actual access control service call within the infrastructure

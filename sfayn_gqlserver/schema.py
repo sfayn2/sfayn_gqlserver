@@ -1,5 +1,5 @@
 import graphene
-from ddd.order_management.presentation.graphql import queries, mutations
+from ddd.order_management.entrypoints.graphql import queries, mutations
 
 
 

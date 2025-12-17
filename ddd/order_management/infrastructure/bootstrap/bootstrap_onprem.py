@@ -30,7 +30,7 @@ from ddd.order_management.application import (
     services as application_services
 )
 
-load_dotenv(find_dotenv(filename=".env.test"))
+load_dotenv(find_dotenv(filename=".env.onprem.test"))
 
 #Depending on the framework arch this might be inside manage.py , app.py, or main.py ?
 #if project grows, breakdown handlers by feature

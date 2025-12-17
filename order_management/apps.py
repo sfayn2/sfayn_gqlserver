@@ -7,7 +7,10 @@ class OrderManagementConfig(AppConfig):
 
     def ready(self):
         #load bootstrap is good enough
-        #from ddd.order_management.infrastructure import bootstrap_handlers
-        import ddd.bootstrap
+
+        #from ddd.order_management.infrastructure.bootstrap import bootstrap_aws
+
+        from ddd.order_management.infrastructure.bootstrap import bootstrap_onprem
+
 
 

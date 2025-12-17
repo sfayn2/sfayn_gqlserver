@@ -3,16 +3,18 @@ from graphene import relay
 from ddd.order_management.application import (
     message_bus, commands, dtos
   )
-from ddd.order_management.presentation.graphql import object_types, common, input_types
+from ddd.order_management.infrastructure import (
+    access_control1
+)
+from ddd.order_management.entrypoints.graphql import object_types, common, input_types
 
 
 # ==========================
 # Mutations 
 # ===================
-class CancelShipmentMutation(relay.ClientIDMutation):
+class MarkAsCompletedMutation(relay.ClientIDMutation):
     class Input:
         order_id = graphene.String(required=True)
-        shipment_id = graphene.String(required=True)
 
     result = graphene.Field(object_types.ResponseType)
 
@@ -27,11 +29,14 @@ class CancelShipmentMutation(relay.ClientIDMutation):
             tenant_id=request_tenant_id
         )
 
-        command = commands.CancelShipmentCommand.model_validate(input)
+        command = commands.CompleteOrderCommand.model_validate(input)
 
         # 2. Pass this raw context data DTO to the message bus handler
         # The message bus (Application Layer) should handle resolving authentication/authorization logic.
         result = message_bus.handle(command, context_data=context_data)
 
         return cls(result=object_types.ResponseType(**result.model_dump()))
+
+
+
 
