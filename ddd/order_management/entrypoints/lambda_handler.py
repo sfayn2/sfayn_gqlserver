@@ -4,8 +4,6 @@ from ddd.order_management.entrypoints.graphql.schema import schema
 
 def handler(event, context):
     try:
-        # Bootstrap infrastructure OUTSIDE the handler if possible for reuse
-        bootstrap_aws.initialize() 
 
         body = json.loads(event.get("body", "{}"))
         
