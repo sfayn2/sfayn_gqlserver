@@ -8,6 +8,7 @@ from ddd.order_management.domain import enums, models as domain_models, value_ob
 # Create your models here.
 
 class Order(models.Model):
+    version = models.IntegerField(null=True, blank=True)
     order_id = models.CharField(max_length=100, primary_key=True, help_text="ORD-1234")
     tenant_id = models.CharField(max_length=150)
     external_ref = models.CharField(max_length=100, null=True, blank=True, help_text="{app}-{identifier} . eg. checkoutapp-1234")

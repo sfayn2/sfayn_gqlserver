@@ -30,6 +30,7 @@ class Order:
     date_created: Optional[datetime] = None
     date_modified: Optional[datetime] = None
     _events: List[events.DomainEvent] = field(default_factory=list, init=False)
+    _version: int = 1
 
     def raise_event(self, event: events.DomainEvent):
         self._events.append(event)

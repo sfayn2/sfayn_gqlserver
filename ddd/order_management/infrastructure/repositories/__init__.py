@@ -1,2 +1,5 @@
-from .django_order_repository import DjangoOrderRepositoryImpl
-from .unit_of_work import DjangoOrderUnitOfWork
+from .onprem_django.django_order_repository import DjangoOrderRepositoryImpl
+from .onprem_django.unit_of_work import DjangoOrderUnitOfWork
+
+from .aws_dynamodb.aws_dynamodb_order_repository import DynamoOrderRepositoryImpl
+from .aws_dynamodb.aws_dynamodb_uow import DynamoOrderUnitOfWork

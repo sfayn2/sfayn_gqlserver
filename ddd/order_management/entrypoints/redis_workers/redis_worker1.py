@@ -47,9 +47,11 @@ def run_worker():
 
 if __name__ == "__main__":
     # Ensure Django environment is loaded if using Django models in handlers
-    import django
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
-    django.setup()
+
+    #Lets configure this in OS env variable
+    #import django
+    #os.environ.setdefault("DJANGO_SETTINGS_MODULE", "sfayn_gqlserver.settings")
+    #django.setup()
     
     run_worker()
 
