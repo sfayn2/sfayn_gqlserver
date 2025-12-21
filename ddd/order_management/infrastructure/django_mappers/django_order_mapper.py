@@ -21,7 +21,7 @@ class OrderMapper:
         return {
             'order_id': order.order_id,
             'defaults': {
-                    '_version': order._version,
+                    'version': order._version,
                     'tenant_id': order.tenant_id, 
                     'external_ref': order.external_ref,
                     'customer_id': order.customer_details.customer_id, 
@@ -46,7 +46,7 @@ class OrderMapper:
         customer_email = django_order_object.customer_email
 
         return models.Order(
-            _version=django_order_object.vesion,
+            _version=django_order_object.version,
             order_id=django_order_object.order_id,
             external_ref=django_order_object.external_ref,
             tenant_id=django_order_object.tenant_id, 

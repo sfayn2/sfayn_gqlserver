@@ -10,8 +10,10 @@ class DjangoOrderRepositoryImpl(repositories.OrderAbstract):
             order_domain = django_mappers.OrderMapper.to_domain(django_order)
             self.seen.add(order_domain) #Track Entitry for Uow
             return order_domain
-        except Exception as e:
+        except django_models.Order.DoesNotExist:
             raise exceptions.InvalidOrderOperation(f"Order entity with ID '{order_id}' could not be located.")
+        except Exception as e:
+            raise Exception(f"Unexpected error in Django Order Repository impl > {e} ")
     
     def save(self, order: models.Order): 
         django_order = django_mappers.OrderMapper.to_django(order)

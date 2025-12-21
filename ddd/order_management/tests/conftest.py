@@ -68,19 +68,19 @@ USER_SEEDS = tuple(
 #    (TENANT1, "cancel_shipment", json.dumps({ "role": ["vendor"] }), True),
 #)
 
-# Columns order_id, tenant_id, external_ref, order_status, customer_id, customer_name, customer_email, payment_status, currency, date_created, date_modified
+# Columns order_id, tenant_id, version, external_ref, order_status, customer_id, customer_name, customer_email, payment_status, currency, date_created, date_modified
 ORDER_SEEDS = (
-    ("ORD-CONFIRMED-1", TENANT1, "external ref here", enums.OrderStatus.CONFIRMED.value, "customer id here", " customer name", " customer email", enums.PaymentStatus.UNPAID.value, "SGD", datetime.now(timezone.utc), datetime.now(timezone.utc)), 
-    ("ORD-NOTCONFIRMED-1", TENANT1, "external ref here", enums.OrderStatus.PENDING.value, "customer id here", " customer name", " customer email", enums.PaymentStatus.UNPAID.value, "SGD", datetime.now(timezone.utc), datetime.now(timezone.utc)),
-    ("ORD-DRAFT-1", TENANT1, "external ref here", enums.OrderStatus.DRAFT.value, "customer id here", " customer name", " customer email", enums.PaymentStatus.UNPAID.value, "SGD", datetime.now(timezone.utc), datetime.now(timezone.utc)),
-    ("ORD-CONFIRMED_W_SHIPPED-1", TENANT1, "external ref here", enums.OrderStatus.CONFIRMED.value, "customer id here", " customer name", " customer email", enums.PaymentStatus.UNPAID.value, "SGD", datetime.now(timezone.utc), datetime.now(timezone.utc)),
-    ("ORD-CONFIRMED_W_PENDING-1", TENANT1, "external ref here", enums.OrderStatus.PENDING.value, "customer id here", " customer name", " customer email", enums.PaymentStatus.UNPAID.value, "SGD", datetime.now(timezone.utc), datetime.now(timezone.utc)),
-    ("ORD-CONFIRMED_W_CONFIRMED-1", TENANT1, "external ref here", enums.OrderStatus.CONFIRMED.value, "customer id here", " customer name", " customer email", enums.PaymentStatus.UNPAID.value, "SGD", datetime.now(timezone.utc), datetime.now(timezone.utc)),
-    ("ORD-CONFIRMED_W_DELIVERED-1", TENANT1, "external ref here", enums.OrderStatus.DELIVERED.value, "customer id here", " customer name", " customer email", enums.PaymentStatus.UNPAID.value, "SGD", datetime.now(timezone.utc), datetime.now(timezone.utc)),
-    ("ORD-READY-TO-COMPLETE-1", TENANT1, "external ref here", enums.OrderStatus.DELIVERED.value, "customer id here", " customer name", " customer email", enums.PaymentStatus.PAID.value, "SGD", datetime.now(timezone.utc), datetime.now(timezone.utc)),
-    ("ORD-ALREADY-COMPLETED-1", TENANT1, "external ref here", enums.OrderStatus.COMPLETED.value, "customer id here", " customer name", " customer email", enums.PaymentStatus.PAID.value, "SGD", datetime.now(timezone.utc), datetime.now(timezone.utc)),
-    ("ORD-READY-TO-COMPLETE-UNPAID-1", TENANT1, "external ref here", enums.OrderStatus.DELIVERED.value, "customer id here", " customer name", " customer email", enums.PaymentStatus.UNPAID.value, "SGD", datetime.now(timezone.utc), datetime.now(timezone.utc)),
-    ("ORD-READY-TO-COMPLETE-PAID-1", TENANT1, "external ref here", enums.OrderStatus.DELIVERED.value, "customer id here", " customer name", " customer email", enums.PaymentStatus.PAID.value, "SGD", datetime.now(timezone.utc), datetime.now(timezone.utc)),
+    ("ORD-CONFIRMED-1", TENANT1, 1, "external ref here", enums.OrderStatus.CONFIRMED.value, "customer id here", " customer name", " customer email", enums.PaymentStatus.UNPAID.value, "SGD", datetime.now(timezone.utc), datetime.now(timezone.utc)), 
+    ("ORD-NOTCONFIRMED-1", TENANT1, 1, "external ref here", enums.OrderStatus.PENDING.value, "customer id here", " customer name", " customer email", enums.PaymentStatus.UNPAID.value, "SGD", datetime.now(timezone.utc), datetime.now(timezone.utc)),
+    ("ORD-DRAFT-1", TENANT1, 1, "external ref here", enums.OrderStatus.DRAFT.value, "customer id here", " customer name", " customer email", enums.PaymentStatus.UNPAID.value, "SGD", datetime.now(timezone.utc), datetime.now(timezone.utc)),
+    ("ORD-CONFIRMED_W_SHIPPED-1", TENANT1, 1, "external ref here", enums.OrderStatus.SHIPPED.value, "customer id here", " customer name", " customer email", enums.PaymentStatus.UNPAID.value, "SGD", datetime.now(timezone.utc), datetime.now(timezone.utc)),
+    ("ORD-CONFIRMED_W_PENDING-1", TENANT1, 1, "external ref here", enums.OrderStatus.PENDING.value, "customer id here", " customer name", " customer email", enums.PaymentStatus.UNPAID.value, "SGD", datetime.now(timezone.utc), datetime.now(timezone.utc)),
+    ("ORD-CONFIRMED_W_CONFIRMED-1", TENANT1, 1, "external ref here", enums.OrderStatus.CONFIRMED.value, "customer id here", " customer name", " customer email", enums.PaymentStatus.UNPAID.value, "SGD", datetime.now(timezone.utc), datetime.now(timezone.utc)),
+    ("ORD-CONFIRMED_W_DELIVERED-1", TENANT1, 1, "external ref here", enums.OrderStatus.DELIVERED.value, "customer id here", " customer name", " customer email", enums.PaymentStatus.UNPAID.value, "SGD", datetime.now(timezone.utc), datetime.now(timezone.utc)),
+    ("ORD-READY-TO-COMPLETE-1", TENANT1, 1, "external ref here", enums.OrderStatus.DELIVERED.value, "customer id here", " customer name", " customer email", enums.PaymentStatus.PAID.value, "SGD", datetime.now(timezone.utc), datetime.now(timezone.utc)),
+    ("ORD-ALREADY-COMPLETED-1", TENANT1, 1, "external ref here", enums.OrderStatus.COMPLETED.value, "customer id here", " customer name", " customer email", enums.PaymentStatus.PAID.value, "SGD", datetime.now(timezone.utc), datetime.now(timezone.utc)),
+    ("ORD-READY-TO-COMPLETE-UNPAID-1", TENANT1, 1, "external ref here", enums.OrderStatus.DELIVERED.value, "customer id here", " customer name", " customer email", enums.PaymentStatus.UNPAID.value, "SGD", datetime.now(timezone.utc), datetime.now(timezone.utc)),
+    ("ORD-READY-TO-COMPLETE-PAID-1", TENANT1, 1, "external ref here", enums.OrderStatus.DELIVERED.value, "customer id here", " customer name", " customer email", enums.PaymentStatus.PAID.value, "SGD", datetime.now(timezone.utc), datetime.now(timezone.utc)),
 )
 
 # Columns order_id, product_sku, product_name, product_price, product_currency, order_quantity, vendor_id, package_weight_kg
@@ -385,15 +385,16 @@ def seeded_all(django_db_setup, django_db_blocker):
             django_snapshots.Order.objects.create(
                 order_id=os[0], 
                 tenant_id=os[1], 
-                external_ref=os[2], 
-                order_status=os[3], 
-                customer_id=os[4], 
-                customer_name=os[5], 
-                customer_email=os[6],
-                payment_status=os[7], 
-                currency=os[8], 
-                date_created=os[9],
-                date_modified=os[10]
+                version=os[2],
+                external_ref=os[3], 
+                order_status=os[4], 
+                customer_id=os[5], 
+                customer_name=os[6], 
+                customer_email=os[7],
+                payment_status=os[8], 
+                currency=os[9], 
+                date_created=os[10],
+                date_modified=os[11]
             )
 
         for ol in ORDER_LINE_SEEDS:

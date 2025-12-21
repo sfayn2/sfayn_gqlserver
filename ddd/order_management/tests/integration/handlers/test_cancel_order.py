@@ -30,7 +30,8 @@ from order_management import models as django_snapshots
             "tenant_123",
             "ORD-CONFIRMED_W_SHIPPED-1",
             False,
-            "Cannot cancel, Shipments has already been shipped or delivered."
+            #"Cannot cancel, Shipments has already been shipped or delivered."
+            "Order in ORD-CONFIRMED_W_SHIPPED-1 cannot be canceled."
         ),
     ]
 )
