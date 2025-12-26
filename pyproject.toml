@@ -1,4 +1,35 @@
-# pyproject.toml
+[project]
+name = "tenantomsapi"
+version = "0.1.0"
+requires-python = ">=3.10"
+
+# PRODUCTION CORE: Essential for the app to run on AWS
+dependencies = [
+    "pydantic-settings>=2.7.1",
+    "easypost>=10.1.0",
+    "python-dotenv>=1.0.1",
+    "pillow>=11.0.0",
+    "boto3>=1.42.13",
+    "s3fs>=0.4.2",
+]
+
+[dependency-groups]
+# LOCAL TOOLING: Not needed in AWS production
+dev = [
+    "django>=5.2.6",
+    "django-cors-headers>=4.6.0",
+    "graphene-django>=3.2.2",
+    "redis>=6.2.0",
+    "pytest-django>=4.9.0",
+    "pytest-mock>=3.15.1",
+    "mypy>=1.18.2",
+    "django-stubs-ext>=5.2.7",
+    "bpython>=0.24",
+    "awscli-local>=0.22.2",   # For LocalStack
+    "terraform-local>=0.25.0", # For LocalStack
+    "localstack>=4.12.0",      # For LocalStack
+]
+
 
 [tool.mypy]
 # Set your global mypy options here (e.g., strict = true)
