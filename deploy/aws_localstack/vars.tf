@@ -13,3 +13,10 @@ variable "environment" {
   default = "prod"
 }
 
+variable "lambda_runtime" {
+  type        = string
+  description = "The Python runtime for all Lambda functions"
+  default     = "python3.10"
+}
+
+

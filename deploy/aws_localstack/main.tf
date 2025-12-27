@@ -114,7 +114,7 @@ resource "aws_lambda_layer_version" "tenantoms_shared_layer" {
   s3_bucket           = aws_s3_bucket.assets.id
   s3_key              = aws_s3_object.tenantoms_layer_zip.key
   s3_object_version   = aws_s3_object.tenantoms_layer_zip.version_id
-  compatible_runtimes = ["python3.10"]
+  compatible_runtimes = [var.lambda_runtime]
 
   # FORCED PROTECTION: Extra layer of safety
   depends_on = [aws_s3_object.tenantoms_layer_zip]
@@ -136,7 +136,7 @@ resource "aws_lambda_function" "tenantoms_graphql_handler" {
   function_name = "${var.project_name}-${var.environment}-graphql-api"
   role          = aws_iam_role.tenantoms_lambda_role.arn
   handler       = "lambda_function.handler"
-  runtime       = "python3.10"
+  runtime       = var.lambda_runtime # Reference variable here
 
   s3_bucket         = aws_s3_bucket.assets.id
   s3_key            = aws_s3_object.graphql_handler_zip.key
@@ -151,6 +151,41 @@ resource "aws_lambda_function" "tenantoms_graphql_handler" {
     }
   }
 }
+
+
+# WEBHOOK RECEIVER LAMBDA HANDLER start here
+
+# WEBHOOK RECEIVER HANDLER
+# ---------------------------------------------------------
+resource "aws_s3_object" "webhook_handler_zip" {
+  bucket = aws_s3_bucket.assets.id
+  key    = "src/webhook_handler.zip"
+  source = "${path.module}/webhook_handler.zip"
+  etag   = filemd5("${path.module}/webhook_handler.zip")
+}
+
+resource "aws_lambda_function" "tenantoms_webhook_receiver" {
+  function_name = "${var.project_name}-${var.environment}-webhook-receiver"
+  role          = aws_iam_role.tenantoms_lambda_role.arn
+  handler       = "webhook_handler.handler" # Assumes webhook_handler.py with handler()
+  runtime       = var.lambda_runtime # Reference variable here
+
+  s3_bucket         = aws_s3_bucket.assets.id
+  s3_key            = aws_s3_object.webhook_handler_zip.key
+  s3_object_version = aws_s3_object.webhook_handler_zip.version_id
+  layers            = [aws_lambda_layer_version.tenantoms_shared_layer.arn]
+
+  depends_on = [aws_s3_object.webhook_handler_zip]
+  
+  environment {
+    variables = {
+      TABLE_NAME = aws_dynamodb_table.tenantoms_db.name
+    }
+  }
+}
+
+
+# WEBHOOK RECEIVER LAMBDA HANDLER end here
 
 # ASYNC WORKER EVENTBRIDGE CONSUMER
 # ---------------------------------------------------------
@@ -168,7 +203,7 @@ resource "aws_lambda_function" "tenantoms_event_worker" {
   function_name = "${var.project_name}-${var.environment}-event-worker"
   role          = aws_iam_role.tenantoms_lambda_role.arn
   handler       = "worker_handler.handler"
-  runtime       = "python3.10"
+  runtime       = var.lambda_runtime # Reference variable here
 
   s3_bucket         = aws_s3_bucket.assets.id
   s3_key            = aws_s3_object.worker_handler_zip.key
@@ -185,13 +220,13 @@ resource "aws_lambda_function" "tenantoms_event_worker" {
 }
 
 
-# API GATEWAY
+# API GATEWAY start here
 
 # 1. THE REST API CONTAINER
 # ---------------------------------------------------------
 resource "aws_api_gateway_rest_api" "tenantoms_api" {
   name        = "${var.project_name}-${var.environment}-api"
-  description = "GraphQL Gateway for TenantOMS"
+  description = "GraphQL/WebHook Receiver Gateway for TenantOMS"
   
   endpoint_configuration {
     types = ["REGIONAL"]
@@ -250,6 +285,9 @@ resource "aws_api_gateway_deployment" "api_deployment" {
       aws_api_gateway_resource.graphql_resource.id,
       aws_api_gateway_method.graphql_post.id,
       aws_api_gateway_integration.graphql_lambda_integration.id,
+      aws_api_gateway_resource.webhook_proxy.id,
+      aws_api_gateway_method.webhook_post.id,
+      aws_api_gateway_integration.webhook_lambda_integration.id
     ]))
   }
 
@@ -267,7 +305,60 @@ resource "aws_api_gateway_stage" "api_stage" {
 }
 
 
-# API GATEWAY
+# API GATEWAY end here
+
+
+# API GATEWAY FOR WEBHOOK HANDLER start here
+
+# THE /webhook BASE RESOURCE
+# ---------------------------------------------------------
+resource "aws_api_gateway_resource" "webhook_resource" {
+  rest_api_id = aws_api_gateway_rest_api.tenantoms_api.id
+  parent_id   = aws_api_gateway_rest_api.tenantoms_api.root_resource_id
+  path_part   = "webhook"
+}
+
+# THE GREEDY PROXY {proxy+}
+# This captures any subpath: /webhook/add-order/123, /webhook/shipment-tracker, etc.
+resource "aws_api_gateway_resource" "webhook_proxy" {
+  rest_api_id = aws_api_gateway_rest_api.tenantoms_api.id
+  parent_id   = aws_api_gateway_resource.webhook_resource.id
+  path_part   = "{proxy+}"
+}
+
+# THE WEBHOOK POST METHOD
+# ---------------------------------------------------------
+resource "aws_api_gateway_method" "webhook_post" {
+  rest_api_id   = aws_api_gateway_rest_api.tenantoms_api.id
+  resource_id   = aws_api_gateway_resource.webhook_proxy.id
+  http_method   = "POST"
+  authorization = "NONE"
+}
+
+# WEBHOOK LAMBDA INTEGRATION
+# ---------------------------------------------------------
+resource "aws_api_gateway_integration" "webhook_lambda_integration" {
+  rest_api_id             = aws_api_gateway_rest_api.tenantoms_api.id
+  resource_id             = aws_api_gateway_resource.webhook_proxy.id
+  http_method             = aws_api_gateway_method.webhook_post.http_method
+  integration_http_method = "POST"
+  type                    = "AWS_PROXY"
+  uri                     = aws_lambda_function.tenantoms_webhook_receiver.invoke_arn
+}
+
+# PERMISSION FOR API GATEWAY TO CALL WEBHOOK LAMBDA
+# ---------------------------------------------------------
+resource "aws_lambda_permission" "allow_api_gateway_webhook" {
+  statement_id  = "AllowWebhookExecutionFromAPIGateway"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.tenantoms_webhook_receiver.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_api_gateway_rest_api.tenantoms_api.execution_arn}/*/*"
+}
+
+
+
+# API GATEWAY FOR WEBHOOK HANDLER end here
 
 
 
