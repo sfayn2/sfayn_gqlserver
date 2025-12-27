@@ -124,18 +124,18 @@ resource "aws_lambda_layer_version" "tenantoms_shared_layer" {
 # ---------------------------------------------------------
 resource "aws_s3_object" "graphql_handler_zip" {
   bucket = aws_s3_bucket.assets.id
-  key    = "src/graphql_handler.zip"
-  source = "${path.module}/graphql_handler.zip"
+  key    = "src/lambda_handler_graphql.zip"
+  source = "${path.module}/lambda_handler_graphql.zip"
 
   # Trigger a re-upload if the local file changes
-  etag   = filemd5("${path.module}/graphql_handler.zip")
+  etag   = filemd5("${path.module}/lambda_handler_graphql.zip")
 
 }
 
 resource "aws_lambda_function" "tenantoms_graphql_handler" {
   function_name = "${var.project_name}-${var.environment}-graphql-api"
   role          = aws_iam_role.tenantoms_lambda_role.arn
-  handler       = "lambda_function.handler"
+  handler       = "ddd.order_management.entrypoints.lambda_handlers.lambda_handler_graphql.handler"
   runtime       = var.lambda_runtime # Reference variable here
 
   s3_bucket         = aws_s3_bucket.assets.id
