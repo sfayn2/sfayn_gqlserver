@@ -1,0 +1,38 @@
+@startuml
+title Deployment Architecture to AWS Serverless
+
+actor Client
+
+rectangle "API Gateway (AWS)" as api
+rectangle "Lambda (GraphQL Adapter)" as graphql
+rectangle "Lambda (Webhook Adapter)" as webhook
+rectangle "Lambda Layer\n(Shared Python libraries)" as layer
+database "DynamoDB (AWS)" as dynamo
+rectangle "EventBridge (AWS Event Bus)" as eventbus
+rectangle "Lambda (Event Processor)" as processor
+
+Client --> api
+api --> graphql
+api --> webhook
+
+graphql --> layer
+webhook --> layer
+
+graphql --> dynamo
+webhook --> dynamo
+
+graphql --> eventbus
+webhook --> eventbus
+
+eventbus --> processor
+processor --> dynamo
+
+
+note as N2
+  All Lambda functions attach reusable DDD business code.
+  Each handler acts only as an adapter,
+  keeping AWS deployment code close to zero/minimal.
+end note
+
+@enduml
+

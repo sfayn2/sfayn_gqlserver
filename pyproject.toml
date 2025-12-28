@@ -32,6 +32,7 @@ dev = [
     "awscli-local>=0.22.2",   # For LocalStack
     "terraform-local>=0.25.0", # For LocalStack
     "localstack>=4.12.0",      # For LocalStack
+    "aws-sam-cli-local>=1.70.0",
 ]
 
 
