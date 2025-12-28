@@ -8,14 +8,15 @@ dependencies = [
     "pydantic-settings>=2.7.1",
     "easypost>=10.1.0",
     "python-dotenv>=1.0.1",
-    "pillow>=11.0.0",
-    "boto3>=1.42.13",
-    "s3fs>=0.4.2",
+    #"s3fs>=0.4.2",
+    #"boto3" provided by AWS runtime
 ]
+
 
 [dependency-groups]
 # LOCAL TOOLING: Not needed in AWS production
 dev = [
+    "pillow>=11.0.0",
     "django>=5.2.6",
     "django-cors-headers>=4.6.0",
     "graphene-django>=3.2.2",
