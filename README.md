@@ -3,7 +3,7 @@
 [![Django CI](https://github.com/sfayn2/sfayn_gqlserver/actions/workflows/django.yml/badge.svg)](https://github.com/sfayn2/sfayn_gqlserver/actions/workflows/django.yml)
 
 **TenantOMSAPi**  is a multi-tenant backend API for managing orders, shipments, etc built with Domain-Driven Design (DDD), GraphQL, and JWT-secured access.
-it is IDP-agnostic, supports plan-based onboarding, and allows tenant-specific business configurations.
+it is IDP-agnostic, supports plan-based onboarding, and allows tenant-specific business configurations while remaining deployable to AWS Serverless infrastructure.
 
 
 # Architecture Roles
@@ -13,11 +13,11 @@ it is IDP-agnostic, supports plan-based onboarding, and allows tenant-specific b
 
 # Core Features
 * **Multi-Tenant Isolation**: All operations scoped by tenant_id to ensure data separation
-* **JWT Authentication (IDP-Agnostic)**: Works with any OIDC-compatible provider (e.g Keycloak)
+* **JWT Authentication (IDP-Agnostic)**: Works with any OIDC-compatible provider (e.g Keycloak, AWS Cognito, etc.)
 * **Permission-Based API Access**: SaaS provider enables or restricts endpoints for each tenant via permissions.
 * **Tenant Configuration**: Defines fees, refund policies, and other tenant-level behaviors.
 * **Webhook Automation**: Tenants/B2B can automate order or shipment creation via shared-key secured webhook integration.
-* **Event-Driven Integration**: Supports message-queue based integration (e.g. Redis Streams) for real-time synchronization between SaaS and tenant systems.
+* **Event-Driven Integration**: Supports message-queue based integration (e.g. Redis Streams, AWS EventBridge) for real-time synchronization between SaaS and tenant systems.
 * **User Action Logging**: Trackes vendor actions (approveOrder, shipShipment, et) for audit and validations.
 
 
@@ -78,6 +78,12 @@ Defines tenant-specific business rules and integration endpoints
         "max_refund_amount": 500.0,
     }
 ```
+# Deployment Architecture (AWS Serverless)
+## High-Level Overview
+
+TenantOMSApi is fully deployable as a serverless system using AWS managed services:
+<img width="1099" height="955" alt="image" src="https://github.com/user-attachments/assets/c8ee3016-f717-4ed7-b439-ef2f39399ad2" />
+
 
 ## Contributing
 Contributions welcome! Please open issues or submit pull requests
