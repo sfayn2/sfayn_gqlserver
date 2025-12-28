@@ -120,17 +120,18 @@ resource "aws_lambda_layer_version" "tenantoms_shared_layer" {
   depends_on = [aws_s3_object.tenantoms_layer_zip]
 }
 
-# PRIMARY HANDLER (GraphQL)
-# ---------------------------------------------------------
-resource "aws_s3_object" "graphql_handler_zip" {
+resource "aws_s3_object" "lambda_handler_zip" {
   bucket = aws_s3_bucket.assets.id
-  key    = "src/lambda_handler_graphql.zip"
-  source = "${path.module}/lambda_handler_graphql.zip"
+  key    = "src/lambda_handler.zip"
+  source = "${path.module}/lambda_handler.zip"
 
   # Trigger a re-upload if the local file changes
-  etag   = filemd5("${path.module}/lambda_handler_graphql.zip")
+  etag   = filemd5("${path.module}/lambda_handler.zip")
 
 }
+
+# PRIMARY HANDLER (GraphQL)
+# ---------------------------------------------------------
 
 resource "aws_lambda_function" "tenantoms_graphql_handler" {
   function_name = "${var.project_name}-${var.environment}-graphql-api"
@@ -139,12 +140,12 @@ resource "aws_lambda_function" "tenantoms_graphql_handler" {
   runtime       = var.lambda_runtime # Reference variable here
 
   s3_bucket         = aws_s3_bucket.assets.id
-  s3_key            = aws_s3_object.graphql_handler_zip.key
-  s3_object_version = aws_s3_object.graphql_handler_zip.version_id
+  s3_key            = aws_s3_object.lambda_handler_zip.key
+  s3_object_version = aws_s3_object.lambda_handler_zip.version_id
   layers            = [aws_lambda_layer_version.tenantoms_shared_layer.arn]
 
 
-  depends_on = [aws_s3_object.graphql_handler_zip]
+  depends_on = [aws_s3_object.lambda_handler_zip]
   environment {
     variables = {
       TABLE_NAME  = aws_dynamodb_table.tenantoms_db.name
@@ -157,25 +158,19 @@ resource "aws_lambda_function" "tenantoms_graphql_handler" {
 
 # WEBHOOK RECEIVER HANDLER
 # ---------------------------------------------------------
-resource "aws_s3_object" "webhook_handler_zip" {
-  bucket = aws_s3_bucket.assets.id
-  key    = "src/webhook_handler.zip"
-  source = "${path.module}/webhook_handler.zip"
-  etag   = filemd5("${path.module}/webhook_handler.zip")
-}
 
 resource "aws_lambda_function" "tenantoms_webhook_receiver" {
   function_name = "${var.project_name}-${var.environment}-webhook-receiver"
   role          = aws_iam_role.tenantoms_lambda_role.arn
-  handler       = "webhook_handler.handler" # Assumes webhook_handler.py with handler()
+  handler       = "ddd.order_management.entrypoints.lambda_handlers.lambda_handler_webhook.handler"
   runtime       = var.lambda_runtime # Reference variable here
 
   s3_bucket         = aws_s3_bucket.assets.id
-  s3_key            = aws_s3_object.webhook_handler_zip.key
-  s3_object_version = aws_s3_object.webhook_handler_zip.version_id
+  s3_key            = aws_s3_object.lambda_handler_zip.key
+  s3_object_version = aws_s3_object.lambda_handler_zip.version_id
   layers            = [aws_lambda_layer_version.tenantoms_shared_layer.arn]
 
-  depends_on = [aws_s3_object.webhook_handler_zip]
+  depends_on = [aws_s3_object.lambda_handler_zip]
   
   environment {
     variables = {
@@ -189,29 +184,20 @@ resource "aws_lambda_function" "tenantoms_webhook_receiver" {
 
 # ASYNC WORKER EVENTBRIDGE CONSUMER
 # ---------------------------------------------------------
-resource "aws_s3_object" "worker_handler_zip" {
-  bucket = aws_s3_bucket.assets.id
-  key    = "src/worker_handler.zip"
-  source = "${path.module}/worker_handler.zip"
-
-  # Trigger a re-upload if the local file changes
-  etag   = filemd5("${path.module}/worker_handler.zip")
-
-}
 
 resource "aws_lambda_function" "tenantoms_event_worker" {
   function_name = "${var.project_name}-${var.environment}-event-worker"
   role          = aws_iam_role.tenantoms_lambda_role.arn
-  handler       = "worker_handler.handler"
+  handler       = "ddd.order_management.entrypoints.lambda_handlers.lambda_handler_eventbridge.handler"
   runtime       = var.lambda_runtime # Reference variable here
 
   s3_bucket         = aws_s3_bucket.assets.id
-  s3_key            = aws_s3_object.worker_handler_zip.key
-  s3_object_version = aws_s3_object.worker_handler_zip.version_id
+  s3_key            = aws_s3_object.lambda_handler_zip.key
+  s3_object_version = aws_s3_object.lambda_handler_zip.version_id
   layers            = [aws_lambda_layer_version.tenantoms_shared_layer.arn]
 
 
-  depends_on = [aws_s3_object.worker_handler_zip]
+  depends_on = [aws_s3_object.lambda_handler_zip]
   environment {
     variables = {
       TABLE_NAME  = aws_dynamodb_table.tenantoms_db.name

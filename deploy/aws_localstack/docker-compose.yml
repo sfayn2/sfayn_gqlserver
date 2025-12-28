@@ -1,0 +1,28 @@
+services:
+  localstack:
+    container_name: localstack_main
+    image: localstack/localstack:latest
+    ports:
+      - "127.0.0.1:4566:4566"            # LocalStack Gateway
+      - "127.0.0.1:4510-4559:4510-4559"  # External services range
+    environment:
+      # Use the path LocalStack expects internally
+      - DOCKER_HOST=unix:///var/run/docker.sock
+      # Enable common services (optional, LocalStack starts them on demand)
+      - DEBUG=1
+      - LAMBDA_EXECUTOR=docker
+      # Tell the child Lambda container to mount the host's layer folder to /opt/python
+      - LAMBDA_DOCKER_FLAGS=-v ${PWD}/src:/opt/python
+    volumes:
+      # 1. Map your Rootless Socket (Correct for Fedora UID 1000)
+      - "/run/user/1000/docker.sock:/var/run/docker.sock"
+      # 2. Persist LocalStack data between restarts
+      - "./localstack_data:/var/lib/localstack"
+    privileged: false  # Better for security
+    networks:
+      - localstack-net
+
+networks:
+  localstack-net:
+    driver: bridge
+
