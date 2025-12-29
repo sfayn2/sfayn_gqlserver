@@ -14,6 +14,8 @@
 !include AWSPuml/Compute/Lambda.puml
 !include AWSPuml/Database/DynamoDB.puml
 !include AWSPuml/Storage/SimpleStorageService.puml
+!include AWSPuml/ApplicationIntegration/EventBridge.puml
+
 
 left to right direction
 
@@ -26,11 +28,12 @@ Lambda(graphqlRequest, "Graphql Adapter", "delegate the graphql request handling
 Lambda(webhookRequest, "Webhook Adapter", "delegate the webhook request handling to DDD w built-in internal message bus, handlers, etc.")
 Lambda(eventHandler, "Event Handler Adapter", "delegate the webhook request handling to DDD w built-in internal event bus, etc.")
 DynamoDB(orderDb, "Order Database", "single order table")
+EventBridge(event, "Event Bus", "default event bus")
 
 ' sources --> userAuth
 sources --> tenantOMSApi
 ' userAuth <--> generateToken
-agent "Event Bus (EventBridge)" as event
+
 DDD --> graphqlRequest
 DDD --> webhookRequest
 DDD --> eventHandler
