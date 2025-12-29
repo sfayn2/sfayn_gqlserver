@@ -83,7 +83,7 @@ Defines tenant-specific business rules and integration endpoints
 
 TenantOMSApi is fully deployable as a serverless system using AWS managed services:
 
-<img width="1729" height="609" alt="image" src="https://github.com/user-attachments/assets/c6beab23-9411-4d46-afce-062892766828" />
+<img width="1736" height="662" alt="image" src="https://github.com/user-attachments/assets/cd4a9f4a-abb9-46af-b050-975188a72d7f" />
 
 
 
