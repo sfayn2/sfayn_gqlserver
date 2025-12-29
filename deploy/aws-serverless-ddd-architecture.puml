@@ -1,38 +1,44 @@
-@startuml
-title Deployment Architecture to AWS Serverless
+@startuml Two Modes - Technical View
+' Uncomment the line below for "dark mode" styling
+'!$AWS_DARK = true
 
-actor Client
+!define AWSPuml https://raw.githubusercontent.com/awslabs/aws-icons-for-plantuml/v20.0/dist
+!include AWSPuml/AWSCommon.puml
 
-rectangle "API Gateway (AWS)" as api
-rectangle "Lambda (GraphQL Adapter)" as graphql
-rectangle "Lambda (Webhook Adapter)" as webhook
-rectangle "Lambda Layer\n(Shared Python libraries)" as layer
-database "DynamoDB (AWS)" as dynamo
-rectangle "EventBridge (AWS Event Bus)" as eventbus
-rectangle "Lambda (Event Processor)" as processor
+' Uncomment the following line to create simplified view
+' !include AWSPuml/AWSSimplified.puml
 
-Client --> api
-api --> graphql
-api --> webhook
+!include AWSPuml/General/Users.puml
+!include AWSPuml/NetworkingContentDelivery/APIGateway.puml
+!include AWSPuml/SecurityIdentityCompliance/Cognito.puml
+!include AWSPuml/Compute/Lambda.puml
+!include AWSPuml/Database/DynamoDB.puml
+!include AWSPuml/Storage/SimpleStorageService.puml
 
-graphql --> layer
-webhook --> layer
+left to right direction
 
-graphql --> dynamo
-webhook --> dynamo
+Users(sources, "User/Webhook Request", "millions of users/webhooks")
+APIGateway(tenantOMSApi, "Tenant OMS API", "receive graphql request or webhook request")
+' Cognito(userAuth, "User Authentication", "jwt to submit order")
+' Lambda(generateToken, "User Credentials", "return jwt")
+SimpleStorageService(DDD, "DDD", "Attach DDD python code to lambda's / Lambda layers to serve Python Non standard lib")
+Lambda(graphqlRequest, "Graphql Adapter", "delegate the graphql request handling to DDD w built-in internal message bus, handlers, etc.")
+Lambda(webhookRequest, "Webhook Adapter", "delegate the webhook request handling to DDD w built-in internal message bus, handlers, etc.")
+Lambda(eventHandler, "Event Handler Adapter", "delegate the webhook request handling to DDD w built-in internal event bus, etc.")
+DynamoDB(orderDb, "Order Database", "single order table")
 
-graphql --> eventbus
-webhook --> eventbus
-
-eventbus --> processor
-processor --> dynamo
-
-
-note as N2
-  All Lambda functions attach reusable DDD business code.
-  Each handler acts only as an adapter,
-  keeping AWS deployment code close to zero/minimal.
-end note
-
+' sources --> userAuth
+sources --> tenantOMSApi
+' userAuth <--> generateToken
+agent "Event Bus (EventBridge)" as event
+DDD --> graphqlRequest
+DDD --> webhookRequest
+DDD --> eventHandler
+tenantOMSApi <--> graphqlRequest
+graphqlRequest <--> orderDb
+graphqlRequest --> event
+tenantOMSApi <--> webhookRequest
+webhookRequest --> event
+webhookRequest <--> orderDb
+event --> eventHandler
 @enduml
-
