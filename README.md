@@ -1,7 +1,5 @@
 # TenantOMSApi
 
-[![Django CI](https://github.com/sfayn2/sfayn_gqlserver/actions/workflows/django.yml/badge.svg)](https://github.com/sfayn2/sfayn_gqlserver/actions/workflows/django.yml)
-
 **TenantOMSAPi**  is a multi-tenant backend API for managing orders, shipments, etc built with Domain-Driven Design (DDD), GraphQL, and JWT-secured access.
 it is IDP-agnostic, supports plan-based onboarding, and allows tenant-specific business configurations while remaining deployable to AWS Serverless infrastructure.
 
@@ -83,7 +81,9 @@ Defines tenant-specific business rules and integration endpoints
 
 TenantOMSApi is fully deployable as a serverless system using AWS managed services:
 
-<img width="1736" height="662" alt="image" src="https://github.com/user-attachments/assets/cd4a9f4a-abb9-46af-b050-975188a72d7f" />
+<img width="2342" height="650" alt="image" src="https://github.com/user-attachments/assets/f7ef8838-e96e-4f39-bbe9-f30447c56625" />
+
+
 
 
 
