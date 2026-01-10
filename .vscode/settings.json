@@ -1,3 +1,19 @@
 {
-    "python.analysis.typeCheckingMode": "basic"
+
+    // Turn off Pylance's built-in type checker to avoid duplicates
+    "python.analysis.typeCheckingMode": "off",
+
+    // Required to check files that are not currently open
+    "mypy-type-checker.reportingScope": "workspace",
+
+    // Recommended for performance in large projects
+    "mypy-type-checker.preferDaemon": true,
+
+    // Recommended to use the Mypy version installed in your venv/environment
+    "mypy-type-checker.importStrategy": "fromEnvironment",
+
+    "mypy-type-checker.args": [
+        "--config-file", "${workspaceFolder}/pyproject.toml"
+    ]
+
 }

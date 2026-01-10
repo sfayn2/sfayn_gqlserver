@@ -9,14 +9,14 @@ class Query(BaseModel):
     pass
     #token: str
 
-class ListShippingOptionsQuery(Query):
-    order_id: str
+#class ListShippingOptionsQuery(Query):
+#    order_id: str
 
-class ListPaymentOptionsQuery(Query):
-    order_id: str
+#class ListPaymentOptionsQuery(Query):
+#    order_id: str
 
 class GetOrderQuery(Query):
     order_id: str
 
-class ListCustomerAddressesQuery(Query):
-    customer_id: str
+#class ListCustomerAddressesQuery(Query):
+#    customer_id: str

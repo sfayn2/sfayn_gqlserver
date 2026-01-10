@@ -137,7 +137,7 @@ MEDIA_URL = 'media/'
 
 #GRAPHENE
 GRAPHENE = {
-    "SCHEMA": "ddd.order_management.entrypoints.graphql",
+    "SCHEMA": "ddd.order_management.entrypoints.graphql.schema.schema",
 }
 
 #CORS

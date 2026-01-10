@@ -42,6 +42,7 @@ from .response_dtos import (
 # Integration events
 from .integration_events.auth_integration_events import UserLoggedInIntegrationEvent
 from .integration_events.order_integration_events import (
+    AddOrderIntegrationDTO,
     ConfirmedShipmentIntegrationEvent,
     AddOrderWebhookIntegrationEvent,
     ShippingWebhookIntegrationEvent

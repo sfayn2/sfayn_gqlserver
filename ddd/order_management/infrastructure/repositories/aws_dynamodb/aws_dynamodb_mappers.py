@@ -24,6 +24,7 @@ class OrderDynamoMapper:
             "line_items": [
                 {
                     "sku": li.product_sku,
+                    "vendor_id": li.vendor_id,
                     "name": li.product_name,
                     "price": Decimal(str(li.product_price.amount)),
                     "currency": li.product_price.currency,
@@ -44,8 +45,8 @@ class OrderDynamoMapper:
                     ]
                 } for s in order.shipments
             ],
-            "date_created": order.date_created.isoformat(),
-            "date_modified": order.date_modified.isoformat(),
+            "date_created": order.date_created.isoformat() if order.date_created else None,
+            "date_modified": order.date_modified.isoformat() if order.date_modified else None,
         }
 
     @staticmethod
@@ -68,7 +69,8 @@ class OrderDynamoMapper:
                     product_name=li["name"],
                     product_price=value_objects.Money(amount=li["price"], currency=li["currency"]),
                     order_quantity=li["qty"],
-                    package=value_objects.Package(weight_kg=li["weight"])
+                    vendor_id=li.get("vendor_id"),
+                    package=(value_objects.Package(weight_kg=li["weight"]) if li.get("weight") is not None else None)
                 ) for li in item.get("line_items", [])
             ],
             # ... repeat similar mapping for shipments ...

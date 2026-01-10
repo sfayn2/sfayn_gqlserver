@@ -26,7 +26,7 @@ class DynamoOrderRepositoryImpl(repositories.OrderAbstract):
 
     def save(self, order: models.Order):
         try:
-            current_version = order.version  # Assumes domain model has .version
+            current_version = order._version  # Assumes domain model has ._version
             item = OrderDynamoMapper.to_dynamo(order)
             
             # Increment version for the NEXT state
@@ -43,13 +43,13 @@ class DynamoOrderRepositoryImpl(repositories.OrderAbstract):
             )
             
             # Update domain model version on success
-            order.version = item["version"]
+            order._version = item["version"]
             self.seen.add(order)
 
         except ClientError as e:
             if e.response['Error']['Code'] == 'ConditionalCheckFailedException':
                 # This error means someone else updated the record in the meantime
-                raise exceptions.ConcurrencyException(
+                raise exceptions.InvalidOrderOperation(
                     f"Order {order.order_id} was modified by another process."
                 )
             raise exceptions.InvalidOrderOperation(f"Failed to save order: {str(e)}")

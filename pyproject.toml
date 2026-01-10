@@ -49,3 +49,6 @@ ignore_errors = true
 # from django when analyzing your code, which can speed up checks slightly.
 # follow_imports = "skip" 
 
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "sfayn_gqlserver.settings"
