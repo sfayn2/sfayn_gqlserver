@@ -1,47 +1,48 @@
 @startuml Two Modes - Technical View
-' Uncomment the line below for "dark mode" styling
-'!$AWS_DARK = true
-
 !define AWSPuml https://raw.githubusercontent.com/awslabs/aws-icons-for-plantuml/v20.0/dist
 !include AWSPuml/AWSCommon.puml
-
-' Uncomment the following line to create simplified view
-' !include AWSPuml/AWSSimplified.puml
-
 !include AWSPuml/General/Users.puml
 !include AWSPuml/NetworkingContentDelivery/APIGateway.puml
-!include AWSPuml/SecurityIdentityCompliance/Cognito.puml
 !include AWSPuml/Compute/Lambda.puml
 !include AWSPuml/Database/DynamoDB.puml
 !include AWSPuml/Storage/SimpleStorageService.puml
 !include AWSPuml/ApplicationIntegration/EventBridge.puml
 
-
 left to right direction
 
-Users(sources, "User/Webhook Request", "millions of users/webhooks")
-APIGateway(tenantOMSApi, "Tenant OMS API", "receive graphql request or webhook request")
-' Cognito(userAuth, "User Authentication", "jwt to submit order")
-' Lambda(generateToken, "User Credentials", "return jwt")
-SimpleStorageService(DDD, "DDD", "Attach DDD python code to lambda's / Lambda layers to serve Python Non standard lib")
-Lambda(graphqlRequest, "Graphql Adapter", "delegate the graphql request handling to DDD w built-in internal message bus, handlers, etc.")
-Lambda(webhookRequest, "Webhook Adapter", "delegate the webhook request handling to DDD w built-in internal message bus, handlers, etc.")
-Lambda(eventHandler, "Event Handler Adapter", "delegate the webhook request handling to DDD w built-in internal event bus, etc.")
-DynamoDB(orderDb, "Order Database", "single order table")
-EventBridge(event, "Event Bus", "default event bus")
+'--- Actors ---
+Users(sources, "Multi Tenants", "Request via GraphQL or Webhook ")
 
-' sources --> userAuth
-sources --> tenantOMSApi
-' userAuth <--> generateToken
+'--- Entry Points (Primary Adapters) ---
+APIGateway(tenantOMSApi, "Unified Entry Point", "GraphQL & Webhook Gateway")
 
-DDD --> graphqlRequest
-DDD --> webhookRequest
-DDD --> eventHandler
-tenantOMSApi <--> graphqlRequest
-graphqlRequest <--> orderDb
-graphqlRequest --> event
-tenantOMSApi <--> webhookRequest
-webhookRequest --> event
-webhookRequest <--> orderDb
-event --> eventHandler
+'--- The Business Logic (Domain Core) ---
+SimpleStorageService(DDD, "Domain Core (DDD)", "Python Logic & Lambda Layers")
+
+'--- Adapters ---
+Lambda(graphqlRequest, "GraphQL Adapter", "Translates API requests to Domain commands")
+Lambda(webhookRequest, "Webhook Adapter", "Translates external webhooks to Domain commands")
+Lambda(eventHandler, "Async Event Adapter", "Consumes Bus events for Domain processing")
+
+'--- Infrastructure (Secondary Adapters) ---
+DynamoDB(orderDb, "State Store", "Single-Table Design (Orders)")
+EventBridge(event, "Domain Event Bus", "Central Asynchronous Message Backbone")
+
+'--- Relationships ---
+sources --> tenantOMSApi : "Submits Request"
+
+' Logical coupling to Domain Core
+DDD ..> graphqlRequest : "Injected via Layers"
+DDD ..> webhookRequest : "Injected via Layers"
+DDD ..> eventHandler   : "Injected via Layers"
+
+tenantOMSApi --> graphqlRequest : "Routes GraphQL"
+graphqlRequest <--> orderDb : "Reads/Writes State"
+graphqlRequest --> event : "Publishes Domain Event"
+
+tenantOMSApi --> webhookRequest : "Routes Webhook"
+webhookRequest --> event : "Publishes Domain Event"
+webhookRequest <--> orderDb : "Reads/Writes State"
+
+event --> eventHandler : "Triggers Handler"
 @enduml
