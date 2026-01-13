@@ -1,4 +1,5 @@
 import boto3
+import json
 from botocore.exceptions import ClientError
 from ddd.order_management.application import dtos
 
@@ -12,10 +13,13 @@ class DynamodbTenantLookupService:
         try:
             # Equivalent to django_models.TenantConfig.objects.get(tenant_id=tenant_id)
             response = self.table.get_item(
-                Key={'tenant_id': tenant_id}
+                Key={
+                    'pk': f'TENANT#{tenant_id}',
+                    'sk': 'CONFIG#TENANT'
+                }
             )
         except ClientError as e:
-            raise Exception(f"Database error: {e.response['Error']['Message']}")
+            raise Exception(f"Dynamodb TenantLookupService error: {e.response['Error']['Message']}")
 
         item = response.get('Item')
         if not item:
@@ -25,6 +29,15 @@ class DynamodbTenantLookupService:
         # so json.loads() is typically no longer needed if stored as a Document.
         configs = item.get('configs', {})
         
+        # SAFETY CHECK: If it's a string, parse it. If it's already a dict, leave it.
+        if isinstance(configs, str):
+            try:
+                configs = json.loads(configs)
+            except json.JSONDecodeError:
+                # Fallback if the string isn't valid JSON
+                configs = {}
+
+
         return dtos.TenantResponseDTO(
             tenant_id=tenant_id,
             configs=configs

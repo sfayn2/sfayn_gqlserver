@@ -4,7 +4,7 @@ from typing import List
 from ddd.order_management.infrastructure import event_bus, repositories as impl_repositories
 
 class DynamoOrderUnitOfWork:
-    def __init__(self, table_name: str = "OrdersTable"):
+    def __init__(self, table_name: str):
         # Initialize the DynamoDB repository
         self.order = impl_repositories.DynamoOrderRepositoryImpl(table_name=table_name)
         self.event_publisher = event_bus

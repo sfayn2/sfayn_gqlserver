@@ -5,7 +5,7 @@ from ddd.order_management.domain import repositories
 
 class UnitOfWorkAbstract(Protocol):
 
-    #order: repositories.OrderAbstract 
+    order: repositories.OrderAbstract 
 
     def __enter__(self):
         return self

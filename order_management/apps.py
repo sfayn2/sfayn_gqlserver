@@ -10,7 +10,10 @@ class OrderManagementConfig(AppConfig):
 
         #from ddd.order_management.infrastructure.bootstrap import bootstrap_aws
 
-        from ddd.order_management.infrastructure.bootstrap import bootstrap_onprem
+        #from ddd.order_management.infrastructure.bootstrap import bootstrap_onprem
+
+        print("Order Management initialization complete. To enable on-premise infrastructure, ensure you invoke the bootstrap handler: \n" \
+        "from ddd.order_management.infrastructure.bootstrap import bootstrap_onprem")
 
 
 

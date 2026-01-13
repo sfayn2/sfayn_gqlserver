@@ -137,7 +137,7 @@ event_bus.ASYNC_INTERNAL_EVENT_HANDLERS.update({
         lambda event: handlers.handle_add_order_async_event(
             event=event,
             user_action_service=user_action_service.DynamodbUserActionService(table_name=DYNAMODB_TABLE_NAME),
-            uow=repositories.DynamoOrderUnitOfWork()
+            uow=repositories.DynamoOrderUnitOfWork(table_name=DYNAMODB_TABLE_NAME)
         ),
     ],
     "order_management.internal_events.ConfirmedShipmentEvent": [
@@ -145,7 +145,7 @@ event_bus.ASYNC_INTERNAL_EVENT_HANDLERS.update({
             event=event,
             user_action_service=user_action_service.DynamodbUserActionService(table_name=DYNAMODB_TABLE_NAME),
             shipping_provider_service=shipping.ShippingProviderService,
-            uow=repositories.DynamoOrderUnitOfWork()
+            uow=repositories.DynamoOrderUnitOfWork(table_name=DYNAMODB_TABLE_NAME)
         ),
     ],
 })
@@ -160,7 +160,7 @@ event_bus.EVENT_HANDLERS.update({
 message_bus.ACCESS_CONTROL_SERVICE_IMPL = access_control1.AccessControlService
 #message_bus.LOGGING_SERVICE_IMPL = loggings.LoggingService
 message_bus.EXCEPTION_HANDLER_FACTORY = exception_handler.OrderExceptionHandler()
-message_bus.UOW = repositories.DynamoOrderUnitOfWork()
+message_bus.UOW = repositories.DynamoOrderUnitOfWork(table_name=DYNAMODB_TABLE_NAME)
 message_bus.USER_ACTION_SERVICE_IMPL = user_action_service.DynamodbUserActionService(table_name=DYNAMODB_TABLE_NAME)
 
 # ========= Command Handlers (write operations) ==================

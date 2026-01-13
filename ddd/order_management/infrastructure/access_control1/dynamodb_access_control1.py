@@ -1,5 +1,5 @@
 from __future__ import annotations
-import boto3, os
+import boto3, os, json
 from boto3.dynamodb.conditions import Key
 from typing import Optional
 from ddd.order_management.domain import exceptions
@@ -29,14 +29,15 @@ class DynamodbAccessControl1:
         required_permission: str, 
         required_scope: Optional[dict] = None
     ) -> bool:
-        # Construct the query for the tenant and permission
-        # Using begins_with on the Sort Key to find all scopes for this permission
-        sort_key_prefix = f"{required_permission}#"
+
+        # 1. Match your Seed prefixes:
+        # PK is usually "TENANT#<id>"
+        # SK for users is usually "AUTH#USER#<id>"
         
         response = self.table.query(
-            KeyConditionExpression=Key('tenant_id').eq(user_context.tenant_id) & 
-                                   Key('permission_codename_scope').begins_with(sort_key_prefix),
-            # Filter for only active permissions
+            KeyConditionExpression=Key('pk').eq(f"TENANT#{user_context.tenant_id}") & 
+                                   Key('sk').begins_with(f"AUTH#USER#{required_permission}") # Or your specific prefix
+            ,
             FilterExpression="is_active = :active",
             ExpressionAttributeValues={":active": True}
         )
@@ -50,7 +51,14 @@ class DynamodbAccessControl1:
         if required_scope:
             for item in items:
                 # DynamoDB Map types are returned as native Python dicts
-                auth_scope = item.get('raw_scope', {})
+                auth_scope = item.get('scope', {})
+                # FIX: If DynamoDB returned a stringified JSON, parse it into a dict
+                if isinstance(auth_scope, str):
+                    try:
+                        auth_scope = json.loads(auth_scope)
+                    except json.JSONDecodeError:
+                        auth_scope = {}
+
                 if all(auth_scope.get(k) == v for k, v in required_scope.items()):
                     return True
             raise exceptions.AccessControlException("Access denied: required scoped permission not found")

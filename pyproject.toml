@@ -51,4 +51,3 @@ ignore_errors = true
 
 
 [tool.pytest.ini_options]
-DJANGO_SETTINGS_MODULE = "sfayn_gqlserver.settings"

@@ -1,4 +1,5 @@
 import boto3
+import json
 from botocore.exceptions import ClientError
 from ddd.order_management.application import dtos
 
@@ -12,11 +13,15 @@ class DynamodbSaaSLookupService:
         try:
             # Perform a primary key lookup for the tenant_id
             response = self.table.get_item(
-                Key={'tenant_id': tenant_id}
+                Key={
+                    'pk': f'TENANT#{tenant_id}',
+                    'sk': 'CONFIG#SAAS'
+                }
             )
+
         except ClientError as e:
             # Handle AWS service-side errors (e.g., throttling, access issues)
-            raise Exception(f"Database error: {e.response['Error']['Message']}")
+            raise Exception(f"Dynamodb SaasLookupService error: {e.response['Error']['Message']}")
 
         # DynamoDB get_item returns an empty dict if the key is not found
         item = response.get('Item')
@@ -26,6 +31,15 @@ class DynamodbSaaSLookupService:
         # In DynamoDB, 'configs' is typically stored as a Map (dict),
         # so native JSON parsing (json.loads) is usually unnecessary.
         configs = item.get('configs', {})
+
+        # SAFETY CHECK: If it's a string, parse it. If it's already a dict, leave it.
+        if isinstance(configs, str):
+            try:
+                configs = json.loads(configs)
+            except json.JSONDecodeError:
+                # Fallback if the string isn't valid JSON
+                configs = {}
+
 
         return dtos.TenantResponseDTO(
             tenant_id=tenant_id,
