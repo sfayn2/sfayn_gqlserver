@@ -4,10 +4,23 @@ from boto3.dynamodb.conditions import Key
 from ddd.order_management.domain import models, repositories, exceptions
 from .aws_dynamodb_mappers import OrderDynamoMapper
 
+class OrderAggregateConflictException(Exception):
+    def __init__(self, order_id: str, version: int):
+        self.order_id = order_id
+        self.version = version
+        super().__init__(
+            f"Action failed for Order '{order_id}'. This order was recently updated "
+            f"by another process (expected version {version}). Please refresh and try again."
+        )
+
+
 class DynamoOrderRepositoryImpl(repositories.OrderAbstract):
     def __init__(self, table_name: str):
         super().__init__()
         self.table = boto3.resource("dynamodb").Table(table_name)
+        self.table_name = table_name
+        # We need the client for transactions
+        self.client = self.table.meta.client
 
 
     def get(self, order_id: str, tenant_id: str) -> models.Order:
@@ -42,43 +55,52 @@ class DynamoOrderRepositoryImpl(repositories.OrderAbstract):
 
     def save(self, order: models.Order):
         try:
-            # 1. Get all items from mapper (Header + Lines + Shipments)
             all_items = OrderDynamoMapper.to_dynamo(order)
             
-            # 2. Extract the Header (Aggregate Root) for versioning
-            # In your mapper, the header is the first item or the one with entity_type "ORDER"
             header_item = next(i for i in all_items if i.get("entity_type") == "ORDER")
             child_items = [i for i in all_items if i.get("entity_type") != "ORDER"]
 
-            # 3. Prepare Versioning
             current_version = getattr(order, "_version", 1)
-            header_item["version"] = current_version + 1 
+            new_version = current_version + 1
+            header_item["version"] = new_version
 
-            # 4. Save Header with Optimistic Locking
-            # This ensures the Order Aggregate hasn't been changed by another process
-            condition = "attribute_not_exists(pk) OR version = :expected_version"
-            expression_values = {":expected_version": current_version}
+            # 1. Build the Transaction Actions
+            transact_items = []
 
-            self.table.put_item(
-                Item=header_item,
-                ConditionExpression=condition,
-                ExpressionAttributeValues=expression_values
-            )
+            # Add the Header with Optimistic Locking
+            transact_items.append({
+                'Put': {
+                    'TableName': self.table_name,
+                    'Item': header_item,
+                    'ConditionExpression': "attribute_not_exists(pk) OR version = :expected",
+                    'ExpressionAttributeValues': {':expected': current_version}
+                }
+            })
 
-            # 5. Save all Children (Lines/Shipments)
-            # We use batch_writer here because we already "locked" the aggregate via the Header
-            if child_items:
-                with self.table.batch_writer() as batch:
-                    for child in child_items:
-                        batch.put_item(Item=child)
+            # Add all children to the same transaction
+            for child in child_items:
+                transact_items.append({
+                    'Put': {
+                        'TableName': self.table_name,
+                        'Item': child
+                    }
+                })
+
+            # 2. Execute Atomically (All or Nothing)
+            # Max 100 items per transaction in DynamoDB
+            self.client.transact_write_items(TransactItems=transact_items)
             
-            # Update domain version on success
-            order._version = header_item["version"]
+            order._version = new_version
 
         except ClientError as e:
-            if e.response['Error']['Code'] == 'ConditionalCheckFailedException':
-                raise exceptions.InvalidOrderOperation(
-                    f"Order {order.order_id} was modified by another process."
-                )
-            raise exceptions.InvalidOrderOperation(f"Failed to save order: {str(e)}")
+            code = e.response['Error']['Code']
+            # Transactional lock failures return TransactionCanceledException
+            if code == 'TransactionCanceledException':
+                reasons = e.response['CancellationReasons']
+                if reasons[0]['Code'] == 'ConditionalCheckFailed':
+                    raise OrderAggregateConflictException(
+                            order_id=order.order_id, 
+                            version=order._version
+                        )
+
 
