@@ -3,145 +3,115 @@ from decimal import Decimal
 from .fixtures import *
 from .data import *
 
-
 @pytest.fixture
 def fake_get_user_context():    
     return 'ddd.order_management.infrastructure.access_control1.DynamodbAccessControl1.get_user_context'
 
-# =================
-# Seeded Fixtures
-# ==============
 @pytest.fixture(scope="session", autouse=True)
 def seeded_all():
-    """
-    Equivalent seeder for DynamoDB using Single Table Design.
-    """
-    # Use environment variables for LocalStack flexibility
     table_name = os.getenv("DYNAMODB_TABLE_NAME")
-    
     dynamodb = boto3.resource("dynamodb")
     table = dynamodb.Table(table_name)
-    
 
-    # Lets PreWipe the table first
-    # Scan for all keys
+    # 1. Pre-Wipe the Table
     scan = table.scan(ProjectionExpression='pk, sk')
-    
-    # Batch delete to stay fast
     with table.batch_writer() as batch:
         for each in scan.get('Items', []):
             batch.delete_item(Key={'pk': each['pk'], 'sk': each['sk']})
-    # Lets PreWipe the table first
 
-    # Batch writer handles buffering and efficiency
+    # 2. Batch Seed using Named Unpacking
     with table.batch_writer() as batch:
         
-
         # 1. Tenant Configs
         for tc in TENANT_CONFIG_SEEDS:
+            t_id, configs, dt = tc
             batch.put_item(Item={
-                "pk": f"TENANT#{tc[0]}", 
+                "pk": f"TENANT#{t_id}", 
                 "sk": "CONFIG#TENANT",
-                "configs": tc[1], 
-                "last_update_dt": tc[2].isoformat() if hasattr(tc[2], 'isoformat') else tc[2]
+                "configs": configs, 
+                "last_update_dt": dt.isoformat() if hasattr(dt, 'isoformat') else dt
             })
 
         # 2. SaaS Configs
         for sas in SAAS_CONFIG_SEEDS:
+            t_id, configs, dt = sas
             batch.put_item(Item={
-                "pk": f"TENANT#{sas[0]}", 
+                "pk": f"TENANT#{t_id}", 
                 "sk": "CONFIG#SAAS",
-                "configs": sas[1], 
-                "last_update_dt": sas[2].isoformat() if hasattr(sas[2], 'isoformat') else sas[2]
+                "configs": configs, 
+                "last_update_dt": dt.isoformat() if hasattr(dt, 'isoformat') else dt
             })
 
         # 3. User Authorizations
         for us in USER_SEEDS:
+            t_id, perm, scope, active = us
             batch.put_item(Item={
-                "pk": f"TENANT#{us[0]}", 
-                "sk": f"AUTH#USER#{us[1]}",
-                "scope": us[2],
-                "is_active": us[3]
+                "pk": f"TENANT#{t_id}", 
+                "sk": f"AUTH#USER#{perm}",
+                "scope": scope,
+                "is_active": active
             })
 
-        # 4. Orders (The Header)
+        # 4. Orders
         for os_data in ORDER_SEEDS:
+            (oid, tid, ver, ref, stat, cid, cname, cmail, pstat, curr, cdt, mdt) = os_data
             batch.put_item(Item={
-                "pk": f"TENANT#{os_data[1]}", 
-                "sk": f"ORDER#{os_data[0]}",
-                "order_id": os_data[0],
-                "tenant_id": os_data[1],   
-                "version": os_data[2],
-                "external_ref": os_data[3],
-                "order_status": os_data[4],
-                "customer_id": os_data[5],
-                "customer_name": os_data[6],
-                "customer_email": os_data[7],
-                "payment_status": os_data[8],
-                "currency": os_data[9],
-                "date_created": os_data[10].isoformat(),
-                "date_modified": os_data[11].isoformat(),
+                "pk": f"TENANT#{tid}", 
+                "sk": f"ORDER#{oid}",
+                "order_id": oid, "tenant_id": tid, "version": ver,
+                "external_ref": ref, "order_status": stat,
+                "customer_id": cid, "customer_name": cname, "customer_email": cmail,
+                "payment_status": pstat, "currency": curr,
+                "date_created": cdt.isoformat(), "date_modified": mdt.isoformat(),
                 "entity_type": "ORDER"
             })
 
         # 5. Order Lines
         for ol in ORDER_LINE_SEEDS:
+            oid, sku, name, price, curr, qty, vid, weight = ol
             batch.put_item(Item={
-                "pk": f"ORDER#{ol[0]}", 
-                "sk": f"LINE#{ol[1]}",
-                "product_sku": ol[1],  
-                "product_name": ol[2],
-                "product_price": Decimal(str(ol[3])),
-                "product_currency": ol[4],
-                "order_quantity": ol[5],
-                "vendor_id": ol[6],
-                "package_weight_kg": Decimal(str(ol[7])),
+                "pk": f"ORDER#{oid}", 
+                "sk": f"LINE#{sku}",
+                "product_sku": sku, "product_name": name,
+                "product_price": Decimal(str(price)),
+                "product_currency": curr, "order_quantity": qty,
+                "vendor_id": vid, "package_weight_kg": Decimal(str(weight)),
                 "entity_type": "LINE_ITEM"
             })
 
         # 6. Shipments
         for sh in SHIPMENT_SEEDS:
+            (sid, oid, l1, l2, city, post, country, state, prov, track, amt, curr, stat) = sh
             batch.put_item(Item={
-                "pk": f"ORDER#{sh[1]}", 
-                "sk": f"SHIPMENT#{sh[0]}",
-                "line1": sh[2],
-                "line2": sh[3],
-                "city": sh[4],
-                "postal": sh[5],
-                "country": sh[6],
-                "state": sh[7],
-                "provider": sh[8],
-                "tracking": sh[9],
-                "amount": Decimal(str(sh[10])),
-                "currency": sh[11],
-                "status": sh[12],
+                "pk": f"ORDER#{oid}", 
+                "sk": f"SHIPMENT#{sid}",
+                "line1": l1, "line2": l2, "city": city, "postal": post,
+                "country": country, "state": state, "provider": prov,
+                "tracking": track, "amount": Decimal(str(amt)),
+                "currency": curr, "status": stat,
                 "entity_type": "SHIPMENT"
             })
 
-
-        # 7. Shipment Items (Flattened in DynamoDB)
+        # 7. Shipment Items
         for shi in SHIPMENT_ITEM_SEEDS:
+            item_id, order_id, ship_id, sku, qty = shi
             batch.put_item(Item={
-                # PK is still the Order ID so we can fetch everything at once
-                "pk": f"ORDER#{shi[1]}", # Assuming index 4 is OrderID, or look it up from Shipment
-                # Hierarchical SK to group items under their specific shipment
-                "sk": f"SHIPMENT#{shi[2]}#ITEM#{shi[0]}#SKU#{shi[3]}",
-                "shipment_id": shi[2],
-                "shipment_item_id": shi[0],
-                "line_item_sku": shi[3], 
-                "quantity": shi[4],
+                "pk": f"ORDER#{order_id}", 
+                "sk": f"SHIPMENT#{ship_id}#ITEM#{item_id}#SKU#{sku}",
+                "shipment_id": ship_id,
+                "shipment_item_id": item_id,
+                "line_item_sku": sku, 
+                "quantity": qty,
                 "entity_type": "SHIPMENT_ITEM"
             })
 
-
         # 8. User Action Logs
         for ual in USER_ACTION_SEEDS:
+            oid, act, by, inp, ts = ual
             batch.put_item(Item={
-                "pk": f"ORDER#{ual[0]}", 
-                "sk": f"LOG#{ual[4].isoformat()}#{ual[1]}",
-                "action": ual[1],
-                "performed_by": ual[2],
-                "user_input": ual[3]
+                "pk": f"ORDER#{oid}", 
+                "sk": f"LOG#{ts.isoformat()}#{act}",
+                "action": act, "performed_by": by, "user_input": inp
             })
-    print("✅ DynamoDB Seeding Complete.")
-
+            
+    print("✅ DynamoDB Seeding Completed Successfully.")
