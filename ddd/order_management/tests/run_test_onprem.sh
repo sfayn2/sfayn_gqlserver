@@ -14,6 +14,4 @@ export SECRET_KEY="local-testing-secret-key-123"
 
 export DJANGO_SETTINGS_MODULE="sfayn_gqlserver.settings"
 
-# Use the absolute path to the tests folder
-# We use $PROJECT_ROOT/ddd/... instead of ../ddd/...
-uv run pytest "$PROJECT_ROOT/ddd/order_management/tests" --ignore-glob="*aws*"
+uv run pytest "$PROJECT_ROOT/ddd/order_management/tests"

@@ -30,13 +30,6 @@ else
 fi
 
 
-uv run pytest "$PROJECT_ROOT/ddd/order_management/tests/e2e_aws" -vv --tb=long -l
-#uv run pytest "$PROJECT_ROOT/ddd/order_management/tests/e2e_aws/test_add_order_e2e.py" -vv --tb=long -l
-#uv run pytest "$PROJECT_ROOT/ddd/order_management/tests/e2e_aws/test_add_shipment_e2e.py" -vv --tb=long -l
-#uv run pytest "$PROJECT_ROOT/ddd/order_management/tests/e2e_aws/test_cancel_order_e2e.py" -vv --tb=long -l
-#uv run pytest "$PROJECT_ROOT/ddd/order_management/tests/e2e_aws/test_cancel_shipment_e2e.py" -vv --tb=long -l
-#uv run pytest "$PROJECT_ROOT/ddd/order_management/tests/e2e_aws/test_confirm_shipment_e2e.py" -vv --tb=long -l
-#uv run pytest "$PROJECT_ROOT/ddd/order_management/tests/e2e_aws/test_deliver_shipment_e2e.py" -vv --tb=long -l
-#uv run pytest "$PROJECT_ROOT/ddd/order_management/tests/e2e_aws/test_mark_as_completed_e2e.py" -vv --tb=long -l
 
-
+#uv run pytest "$PROJECT_ROOT/ddd/order_management/tests/e2e" -vv --tb=long -l -p no:django
+uv run pytest "$PROJECT_ROOT/ddd/order_management/tests/e2e" -p no:django

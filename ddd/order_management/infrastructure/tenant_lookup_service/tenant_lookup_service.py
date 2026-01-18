@@ -17,7 +17,7 @@ class TenantLookupService:
                 tenant_id=tenant_id
             )
         except django_models.TenantConfig.DoesNotExist:
-            raise Exception(f"Tenant {tenant_id} not found")
+            raise Exception(f"TenantLookupService: Tenant {tenant_id} not found")
 
         return dtos.TenantResponseDTO(
             tenant_id=tenant_id,

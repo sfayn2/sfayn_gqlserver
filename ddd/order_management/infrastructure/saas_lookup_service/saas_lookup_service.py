@@ -17,7 +17,7 @@ class SaaSLookupService:
                 tenant_id=tenant_id
             )
         except django_models.SaaSConfig.DoesNotExist:
-            raise Exception(f"Tenant {tenant_id} not found")
+            raise Exception(f"SaaSLookupService: SaaS Tenant {tenant_id} not found")
 
         return dtos.TenantResponseDTO(
             tenant_id=tenant_id,

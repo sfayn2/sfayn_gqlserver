@@ -51,3 +51,8 @@ ignore_errors = true
 
 
 [tool.pytest.ini_options]
+# Register the mark to prevent UnknownMarkWarning (applicable for AWS Dynamodb)
+markers = [
+    "django_db: mark a test as requiring a Django database setup."
+]
+

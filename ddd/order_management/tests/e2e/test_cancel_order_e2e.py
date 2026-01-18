@@ -4,7 +4,6 @@ from graphene.test import Client
 from unittest.mock import MagicMock
 from ddd.order_management.application import commands, handlers, dtos, ports
 from ddd.order_management.domain import enums
-from order_management import models as django_snapshots
 from ddd.order_management.entrypoints.graphql.mutations.cancel_order_mutation import CancelOrderMutation
 
 # Use global constants defined in conftest.py (assumed to be in scope)
@@ -16,7 +15,7 @@ from ddd.order_management.entrypoints.graphql.mutations.cancel_order_mutation im
 # =====================================================================
 
 @pytest.fixture
-def graphene_client(mocker, user_context_tenant1_vendor_all_perms):
+def graphene_client(mocker, user_context_tenant1_vendor_all_perms, fake_get_user_context):
     """
     Fixture to create a Graphene client configured for testing the GraphQL endpoint.
     
@@ -44,7 +43,7 @@ def graphene_client(mocker, user_context_tenant1_vendor_all_perms):
         return_value="tenant_123"
     )
     mocker.patch(
-        'ddd.order_management.infrastructure.access_control1.AccessControl1.get_user_context',
+        fake_get_user_context,
         return_value=user_context_tenant1_vendor_all_perms # Use our seeded context
     )
     
@@ -52,9 +51,52 @@ def graphene_client(mocker, user_context_tenant1_vendor_all_perms):
 
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db # boto3 can ignore so we can use for AWS too
+@pytest.mark.parametrize(
+    "target_order_id, expected_success, expected_message",
+    [
+        (
+            "ORD-CONFIRMED_W_CONFIRMED-1",
+            # expected_success
+            True,
+            # expected_message
+            "Order ORD-CONFIRMED_W_CONFIRMED-1 successfully canceled."
+        ),
+        (
+            "ORD-CONFIRMED_W_PENDING-1",
+            # expected_success
+            True,
+            # expected_message
+            "Order ORD-CONFIRMED_W_PENDING-1 successfully canceled."
+        ),
+        (
+            "ORD-CONFIRMED_W_SHIPPED-1",
+            # expected_success
+            False,
+            # expected_message
+            "Order in ORD-CONFIRMED_W_SHIPPED-1 cannot be canceled."
+        ),
+        (
+            "ORD-CONFIRMED_W_DELIVERED-1",
+            # expected_success
+            False,
+            # expected_message
+            "Order in ORD-CONFIRMED_W_DELIVERED-1 cannot be canceled."
+        ),
+        (
+            "ORD-ALREADY-COMPLETED-1",
+            # expected_success
+            False,
+            # expected_message
+            "Order in ORD-ALREADY-COMPLETED-1 cannot be canceled."
+        ),
+    ]
+)
 def test_graphql_endpoint_cancels_order_successfully_e2e(
     fake_jwt_valid_token,
+    target_order_id,
+    expected_success,
+    expected_message,
     graphene_client, 
     test_constants):
     """
@@ -63,8 +105,7 @@ def test_graphql_endpoint_cancels_order_successfully_e2e(
     but has the UserContext injected via the mocked access control layers 
     in the fixture setup.
     """
-    
-    target_order_id = "ORD-CONFIRMED-1"
+
     TENANT1 = test_constants.get("tenant1")
 
     # Create a mock object that looks like a Django request object
@@ -93,5 +134,5 @@ def test_graphql_endpoint_cancels_order_successfully_e2e(
     assert response.get('errors') is None
     # Check the data returned matches the seeded data
     data = response['data']['cancelOrder']['result']
-    assert data['success'] == True
-    assert data['message'] == 'Order ORD-CONFIRMED-1 successfully canceled.'
+    assert data['success'] == expected_success
+    assert data['message'] == expected_message

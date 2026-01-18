@@ -4,7 +4,6 @@ from graphene.test import Client
 from unittest.mock import MagicMock, PropertyMock
 from ddd.order_management.application import commands, handlers, dtos, ports
 from ddd.order_management.domain import enums
-from order_management import models as django_snapshots
 from ddd.order_management.entrypoints.graphql.mutations.add_shipment_mutation import AddShipmentMutation 
 
 # Use global constants defined in conftest.py (assumed to be in scope)
@@ -14,7 +13,7 @@ from ddd.order_management.entrypoints.graphql.mutations.add_shipment_mutation im
 # =====================================================================
 
 @pytest.fixture
-def graphene_client(mocker, user_context_tenant1_vendor_all_perms):
+def graphene_client(mocker, user_context_tenant1_vendor_all_perms, fake_get_user_context):
     """
     Fixture to create a Graphene client configured for testing the GraphQL endpoint.
     
@@ -43,7 +42,7 @@ def graphene_client(mocker, user_context_tenant1_vendor_all_perms):
     )
     # Mock the actual access control service call within the infrastructure
     mocker.patch(
-        'ddd.order_management.infrastructure.access_control1.AccessControl1.get_user_context',
+        fake_get_user_context,
         return_value=user_context_tenant1_vendor_all_perms # Use our seeded context
     )
     
@@ -51,7 +50,7 @@ def graphene_client(mocker, user_context_tenant1_vendor_all_perms):
     return client
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db # boto3 can ignore so we can use for AWS too
 def test_graphql_endpoint_add_shipment_successfully_e2e(
     fake_jwt_valid_token,
     graphene_client, 

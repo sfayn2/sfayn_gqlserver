@@ -4,7 +4,6 @@ from graphene.test import Client
 from unittest.mock import MagicMock, PropertyMock
 from ddd.order_management.application import commands, handlers, dtos, ports
 from ddd.order_management.domain import enums
-from order_management import models as django_snapshots
 from ddd.order_management.entrypoints.graphql.mutations.cancel_shipment_mutation import CancelShipmentMutation 
 
 # Use global constants defined in conftest.py (assumed to be in scope)
@@ -14,7 +13,7 @@ from ddd.order_management.entrypoints.graphql.mutations.cancel_shipment_mutation
 # =====================================================================
 
 @pytest.fixture
-def graphene_client(mocker, user_context_tenant1_vendor_all_perms):
+def graphene_client(mocker, user_context_tenant1_vendor_all_perms, fake_get_user_context):
     """
     Fixture to create a Graphene client configured for testing the GraphQL endpoint.
     
@@ -43,7 +42,7 @@ def graphene_client(mocker, user_context_tenant1_vendor_all_perms):
     )
     # Mock the actual access control service call within the infrastructure
     mocker.patch(
-        'ddd.order_management.infrastructure.access_control1.AccessControl1.get_user_context',
+        fake_get_user_context,
         return_value=user_context_tenant1_vendor_all_perms # Use our seeded context
     )
     
@@ -51,10 +50,43 @@ def graphene_client(mocker, user_context_tenant1_vendor_all_perms):
     return client
 
 
-@pytest.mark.django_db
-def test_graphql_endpoint_add_shipment_successfully_e2e(
+@pytest.mark.django_db # boto3 can ignore so we can use for AWS too
+@pytest.mark.parametrize(
+    "target_order_id, target_shipment_id, expected_success, expected_message",
+    [
+        (
+            "ORD-CONFIRMED_W_SHIPPED-1",
+            "SH-SHIPPED-SHIPPED-1",
+            # expected_success
+            False,
+            # expected_message
+            "Cannot cancel shipment after in_transit/shipped/delivered/cancelled"
+        ),
+        (
+            "ORD-CONFIRMED_W_SHIPPED-1",
+            "SH-SHIPPED-PENDING-1",
+            # expected_success
+            True,
+            # expected_message
+            "Order ORD-CONFIRMED_W_SHIPPED-1 w Shipment Id SH-SHIPPED-PENDING-1 successfully shipped."
+        ),
+        (
+            "ORD-CONFIRMED_W_SHIPPED-1",
+            "SH-SHIPPED-CONFIRMED-1",
+            # expected_success
+            True,
+            # expected_message
+            "Order ORD-CONFIRMED_W_SHIPPED-1 w Shipment Id SH-SHIPPED-CONFIRMED-1 successfully shipped."
+        ),
+    ]
+)
+def test_graphql_endpoint_cannot_cancel_shipment_shipped_successfully_e2e(
     fake_jwt_valid_token,
     graphene_client, 
+    target_order_id,
+    target_shipment_id,
+    expected_success,
+    expected_message,
     test_constants):
     """
     Test the GraphQL API using the Graphene test client. 
@@ -63,8 +95,8 @@ def test_graphql_endpoint_add_shipment_successfully_e2e(
     in the fixture setup.
     """
     
-    target_order_id = "ORD-CONFIRMED_W_PENDING-1"
-    target_shipment_id = "SH-PENDING-2"
+    #target_order_id = "ORD-CONFIRMED_W_SHIPPED-1"
+    #target_shipment_id = "SH-SHIPPED-2"
     TENANT1 = test_constants.get("tenant1")
     VENDOR1 = test_constants.get("vendor1")
 
@@ -101,6 +133,5 @@ def test_graphql_endpoint_add_shipment_successfully_e2e(
     # --- Assertions on the GraphQL Response ---
     assert response.get('errors') is None
     data = response['data']['cancelShipment']['result']
-    assert data['success'] is True
-    expected_message = f"Order {target_order_id} w Shipment Id {target_shipment_id} successfully shipped."
+    assert data['success'] is expected_success
     assert data['message'] == expected_message
