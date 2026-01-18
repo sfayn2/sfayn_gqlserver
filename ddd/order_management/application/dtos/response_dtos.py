@@ -1,7 +1,7 @@
 from decimal import Decimal
 from datetime import datetime
 from typing import List, Optional, Dict, Any
-from pydantic import BaseModel, Field, AliasChoices, parse_obj_as
+from pydantic import BaseModel, Field, AliasChoices, ConfigDict
 from ddd.order_management.domain import enums
 
 
@@ -95,8 +95,15 @@ class OrderResponseDTO(BaseModel):
     date_modified: Optional[datetime] = None 
     date_created: Optional[datetime] = None 
 
-    class Config:
-        use_enum_values = True
+    # Use ConfigDict for Pydantic V2 configuration
+    model_config = ConfigDict(
+        use_enum_values=True,
+        from_attributes=True  # Replacement for 'orm_mode=True'
+    )
+
+
+    #class Config:
+    #    use_enum_values = True
 
 # use for shipping provider
 class CreateShipmentResponseDTO(BaseModel):

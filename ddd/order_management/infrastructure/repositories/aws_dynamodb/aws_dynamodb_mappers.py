@@ -61,6 +61,7 @@ class OrderDynamoMapper:
                 "provider": s.shipment_provider,
                 "tracking": s.tracking_reference,
                 "amount": s.shipment_amount.amount if s.shipment_amount else None,
+                "currency": s.shipment_amount.currency if s.shipment_amount else None,
                 "entity_type": "SHIPMENT"
             })
 
@@ -69,6 +70,7 @@ class OrderDynamoMapper:
                 items.append({
                     "pk": f"ORDER#{order.order_id}",
                     "sk": f"SHIPMENT#{s.shipment_id}#ITEM#{si.shipment_item_id}SKU#{si.line_item.product_sku}",
+                    "shipment_id": s.shipment_id,
                     "shipment_item_id": si.shipment_item_id,
                     "line_item_sku": si.line_item.product_sku if hasattr(si.line_item, 'product_sku') else None,
                     "quantity": si.quantity,

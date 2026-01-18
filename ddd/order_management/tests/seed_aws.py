@@ -103,7 +103,10 @@ ORDER_LINE_SEEDS = (
 # Columns shipment_id, order_id, shipment_address_line1, shipment_address_line2, shipment_address_city, shipment_address_postal, shipment_address_country, shipment_address_state, shipment_provider, tracking_reference, shipment_amount, shipment_currency, shipment_status
 SHIPMENT_SEEDS = (
     ("SH-1", "ORD-CONFIRMED-1", "line 1", "line 2", "city ", "postal here", "country here", "state here", "provider here", " tracking reference here", Decimal("2.2"), "SGD", enums.ShipmentStatus.PENDING.value),
-    ("SH-SHIPPED-2", "ORD-CONFIRMED_W_SHIPPED-1", "line 1", "line 2", "city ", "postal here", "country here", "state here", "provider here", "TN123456789", Decimal("2.2"), "SGD", enums.ShipmentStatus.SHIPPED.value),
+    ("SH-SHIPPED-SHIPPED-1", "ORD-CONFIRMED_W_SHIPPED-1", "line 1", "line 2", "city ", "postal here", "country here", "state here", "provider here", "TN123456789", Decimal("2.2"), "SGD", enums.ShipmentStatus.SHIPPED.value),
+    ("SH-SHIPPED-SHIPPED-2", "ORD-CONFIRMED_W_SHIPPED-1", "line 1", "line 2", "city ", "postal here", "country here", "state here", "provider here", "TN123456789", Decimal("2.2"), "SGD", enums.ShipmentStatus.SHIPPED.value),
+    ("SH-SHIPPED-PENDING-1", "ORD-CONFIRMED_W_SHIPPED-1", "line 1", "line 2", "city ", "postal here", "country here", "state here", "provider here", "TN123456789", Decimal("2.2"), "SGD", enums.ShipmentStatus.PENDING.value),
+    ("SH-SHIPPED-CONFIRMED-1", "ORD-CONFIRMED_W_SHIPPED-1", "line 1", "line 2", "city ", "postal here", "country here", "state here", "provider here", "TN123456789", Decimal("2.2"), "SGD", enums.ShipmentStatus.CONFIRMED.value),
     ("SH-PENDING-2", "ORD-CONFIRMED_W_PENDING-1", "line 1", "line 2", "city ", "postal here", "country here", "state here", "provider here", " tracking reference here", Decimal("2.2"), "SGD", enums.ShipmentStatus.PENDING.value),
     ("SH-CONFIRMED-2", "ORD-CONFIRMED_W_CONFIRMED-1", "line 1", "line 2", "city ", "postal here", "country here", "state here", "provider here", " tracking reference here", Decimal("2.2"), "SGD", enums.ShipmentStatus.CONFIRMED.value),
     ("SH-DELIVERED-2", "ORD-CONFIRMED_W_DELIVERED-1", "line 1", "line 2", "city ", "postal here", "country here", "state here", "provider here", " tracking reference here", Decimal("2.2"), "SGD", enums.ShipmentStatus.DELIVERED.value),
@@ -118,7 +121,10 @@ SHIPMENT_SEEDS = (
 # Columns shipment_item_id, order_id, shipment_id, line_item_id, quantity
 SHIPMENT_ITEM_SEEDS = (
     ("SHI-1", "ORD-CONFIRMED-1", "SH-1", "SKU-A", 1, None, None),
-    ("SHI-SHIPPED-1", "ORD-CONFIRMED_W_SHIPPED-1", "SH-SHIPPED-2", "SKU-C", 1),
+    ("SHI-SHIPPED-1", "ORD-CONFIRMED_W_SHIPPED-1", "SH-SHIPPED-SHIPPED-1", "SKU-C", 1),
+    ("SHI-SHIPPED-2", "ORD-CONFIRMED_W_SHIPPED-1", "SH-SHIPPED-PENDING-1", "SKU-C", 1),
+    ("SHI-SHIPPED-3", "ORD-CONFIRMED_W_SHIPPED-1", "SH-SHIPPED-CONFIRMED-1", "SKU-C", 1),
+    ("SHI-SHIPPED-4", "ORD-CONFIRMED_W_SHIPPED-1", "SH-SHIPPED-SHIPPED-2", "SKU-C", 1),
     ("SHI-PENDING-1", "ORD-CONFIRMED_W_PENDING-1", "SH-PENDING-2", "SKU-D", 1),
     ("SHI-CONFIRMED-1", "ORD-CONFIRMED_W_CONFIRMED-1", "SH-CONFIRMED-2", "SKU-E", 1),
     ("SHI-DELIVERED-1", "ORD-CONFIRMED_W_DELIVERED-1", "SH-DELIVERED-2", "SKU-F", 1),

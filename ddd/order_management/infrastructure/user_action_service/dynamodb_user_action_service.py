@@ -1,7 +1,7 @@
 
 from __future__ import annotations
 import boto3
-import datetime
+from datetime import datetime, UTC
 from typing import Optional
 from boto3.dynamodb.conditions import Key
 from ddd.order_management.application import dtos
@@ -13,7 +13,7 @@ class DynamodbUserActionService:
 
     def save_action(self, user_action_data: dtos.UserActionDTO) -> None:
         # Generate a timestamp for the sort key to allow ordering
-        now = datetime.datetime.utcnow().isoformat()
+        now = datetime.now(UTC).isoformat()
         
         self.table.put_item(
             Item={

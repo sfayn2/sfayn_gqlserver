@@ -51,9 +51,32 @@ def graphene_client(mocker, user_context_tenant1_vendor_all_perms):
     return client
 
 
+@pytest.mark.parametrize(
+    "target_order_id, target_shipment_id, expected_success, expected_message",
+    [
+        (
+            "ORD-CONFIRMED_W_PENDING-1",
+            "SH-PENDING-2",
+            # expected_success
+            True,
+            # expected_message
+            "Order ORD-CONFIRMED_W_PENDING-1 w Shipment Id SH-PENDING-2 successfully confirmed."
+        ),
+        (
+            "ORD-CONFIRMED_W_SHIPPED-1",
+            "SH-SHIPPED-CONFIRMED-1",
+            # expected_success
+            False,
+            # expected_message
+            "Only pending shipment can be confirm"
+        ),
+    ]
+)
 def test_graphql_endpoint_confirm_shipment_successfully_e2e(
     fake_jwt_valid_token,
     graphene_client, 
+    target_order_id, target_shipment_id,
+    expected_success, expected_message,
     test_constants):
     """
     Test the GraphQL API using the Graphene test client. 
@@ -62,8 +85,6 @@ def test_graphql_endpoint_confirm_shipment_successfully_e2e(
     in the fixture setup.
     """
     
-    target_order_id = "ORD-CONFIRMED_W_PENDING-1"
-    target_shipment_id = "SH-PENDING-2"
     TENANT1 = test_constants.get("tenant1")
     VENDOR1 = test_constants.get("vendor1")
 
@@ -101,7 +122,6 @@ def test_graphql_endpoint_confirm_shipment_successfully_e2e(
     # --- Assertions on the GraphQL Response ---
     assert response.get('errors') is None
     data = response['data']['confirmShipment']['result']
-    assert data['success'] is True
+    assert data['success'] is expected_success
     # Update expected message to match the handler's output message format
-    expected_message = f"Order {target_order_id} w Shipment Id {target_shipment_id} successfully confirmed."
     assert data['message'] == expected_message
