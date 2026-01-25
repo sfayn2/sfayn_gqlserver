@@ -44,7 +44,6 @@ def handler(event, context):
             "statusCode": 200,
             "headers": {
                 "Content-Type": "application/json",
-                "Access-Control-Allow-Origin": "*", # Critical for CORS
                 "X-Content-Type-Options": "nosniff"  # Security header
             },
             "body": json.dumps(response_payload)
