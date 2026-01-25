@@ -3,35 +3,62 @@ from ddd.order_management.infrastructure.bootstrap import bootstrap_aws
 from ddd.order_management.entrypoints.graphql.schema import schema
 
 def handler(event, context):
-    try:
 
-        body = json.loads(event.get("body", "{}"))
-        #print("Received event body:", body)
+        # 2. Early Method Validation
+    if event.get("httpMethod") != "POST":
+        return {
+            "statusCode": 405,
+            "body": json.dumps({"errors": [{"message": "Method Not Allowed"}]})
+        }
+
+    try:
+        # 3. Defensive Parsing
+        raw_body = event.get("body")
+        if not raw_body:
+            return {"statusCode": 400, "body": json.dumps({"errors": [{"message": "Missing body"}]})}
+            
+        body = json.loads(raw_body)
         
-        # Execute with context_value so info.context is populated
+        # 4. Execution
         result = schema.execute(
             body.get("query"),
             variable_values=body.get("variables", {}),
-            # Pass the event as context so resolvers can see headers/cookies
             context_value={"request_event": event} 
         )
 
-
-        # Graphene results need to be manually formatted
+        # 5. Robust Response Construction
         response_payload = {}
-        
         if result.data is not None:
             response_payload["data"] = result.data
         
         if result.errors:
-            # Format errors into a list of strings or dicts
-            response_payload["errors"] = [{"message": str(e)} for e in result.errors]
+            # Log errors for internal debugging, but filter what goes to user
+            response_payload["errors"] = [
+                {"message": e.message if hasattr(e, 'message') else str(e)} 
+                for e in result.errors
+            ]
+
+
 
         return {
             "statusCode": 200,
-            "headers": {"Content-Type": "application/json"},
+            "headers": {
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Origin": "*", # Critical for CORS
+                "X-Content-Type-Options": "nosniff"  # Security header
+            },
             "body": json.dumps(response_payload)
         }
 
+    except json.JSONDecodeError:
+        return {"statusCode": 400, "body": json.dumps({"errors": [{"message": "Invalid JSON"}]})}
     except Exception as e:
-        return {"statusCode": 500, "body": json.dumps({"errors": [{"message": str(e)}]})}
+        # Log the real error to CloudWatch
+        # Return generic error to user
+        return {
+            "statusCode": 500, 
+            "body": json.dumps({"errors": [{"message": "Internal Server Error"}]})
+        }
+
+
+

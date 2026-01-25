@@ -3,6 +3,10 @@ import json
 from botocore.exceptions import ClientError
 from ddd.order_management.application import dtos
 
+class TenantLookupException(Exception):
+    """Unified exception for Tenant Lookup Service failures."""
+    pass
+
 class DynamodbTenantLookupService:
     def __init__(self, table_name: str ):
         # Initialize the DynamoDB resource

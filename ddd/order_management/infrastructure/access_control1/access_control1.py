@@ -12,12 +12,25 @@ class AccessControl1:
 
     def get_user_context(self, token: str, request_tenant_id: str) -> dtos.UserContextDTO:
         identity_claims = self.jwt_handler.decode(token)
-        token_type = identity_claims.get("token_type", "Bearer")
-        user_ctx = dtos.UserContextDTO.model_validate(identity_claims)
 
-        # verify tenant_id
-        if user_ctx.tenant_id != request_tenant_id:
-            raise exceptions.AccessControlException(f"Tenant mismatch token={user_ctx.tenant_id}, request={request_tenant_id}")
+        # Normalize Keycloak's 'organization' claim or other iDps follow the same way w keycloak
+        raw_orgs = identity_claims.get("organization", [])
+        
+        # Extract keys if it's a dict, otherwise treat as list
+        allowed_tenants = list(raw_orgs.keys()) if isinstance(raw_orgs, dict) else list(raw_orgs)
+        allowed_tenants = [str(t) for t in allowed_tenants]
+
+        # SECURITY CHECK: Match the request to the allowed list
+        if request_tenant_id not in allowed_tenants:
+            #logger.error(f"Unauthorized: User {identity_claims.get('sub')} tried to access {request_tenant_id}")
+            raise exceptions.AccessControlException(f"You do not have access to tenant: {request_tenant_id}")
+
+        user_ctx = dtos.UserContextDTO.model_validate({
+            "sub": identity_claims.get("sub"),
+            "token_type": identity_claims.get("typ"),
+            "tenant_id": request_tenant_id,  # Use the validated requested ID
+            "roles": identity_claims.get("roles", []),
+        })
 
         return user_ctx
 

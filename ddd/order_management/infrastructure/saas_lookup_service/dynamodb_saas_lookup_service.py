@@ -3,6 +3,10 @@ import json
 from botocore.exceptions import ClientError
 from ddd.order_management.application import dtos
 
+class SaaSLookupException(Exception):
+    """Unified exception for SaaS Lookup Service failures."""
+    pass
+
 class DynamodbSaaSLookupService:
     def __init__(self, table_name: str):
         # Initialize the DynamoDB resource
@@ -21,12 +25,12 @@ class DynamodbSaaSLookupService:
 
         except ClientError as e:
             # Handle AWS service-side errors (e.g., throttling, access issues)
-            raise Exception(f"Dynamodb SaasLookupService error: {e.response['Error']['Message']}")
+            raise SaaSLookupException(f"Dynamodb SaasLookupService error: {e.response['Error']['Message']}")
 
         # DynamoDB get_item returns an empty dict if the key is not found
         item = response.get('Item')
         if not item:
-            raise Exception(f"Tenant {tenant_id} not found")
+            raise SaaSLookupException(f"Dynamodb SaasLookupService Tenant {tenant_id} not found")
 
         # In DynamoDB, 'configs' is typically stored as a Map (dict),
         # so native JSON parsing (json.loads) is usually unnecessary.

@@ -88,6 +88,7 @@ def test_graphql_endpoint_add_order_successfully_e2e(
     # Updated variables dictionary to match the `AddOrderMutation.Input` fields
     variables = {
         "input": {
+            "tenantId": TENANT1,
             "externalRef": target_external_ref,
             "customerDetails": {
                 "name": "Jane Doe",

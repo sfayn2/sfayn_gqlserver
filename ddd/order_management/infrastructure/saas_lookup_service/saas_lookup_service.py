@@ -6,6 +6,10 @@ from order_management import models as django_models
 from ddd.order_management.domain import enums
 from ddd.order_management.application import dtos
 
+class SaaSLookupException(Exception):
+    """Unified exception for SaaS Lookup Service failures."""
+    pass
+
 #Protocol: ports.LookupServiceAbstract
 class SaaSLookupService:
     def get_tenant_config(
@@ -17,7 +21,7 @@ class SaaSLookupService:
                 tenant_id=tenant_id
             )
         except django_models.SaaSConfig.DoesNotExist:
-            raise Exception(f"SaaSLookupService: SaaS Tenant {tenant_id} not found")
+            raise SaaSLookupException(f"SaaSLookupService: SaaS Tenant {tenant_id} not found")
 
         return dtos.TenantResponseDTO(
             tenant_id=tenant_id,

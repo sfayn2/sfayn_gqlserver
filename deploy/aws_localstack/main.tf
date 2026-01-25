@@ -101,32 +101,35 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "assets_encryption
 # This tells Terraform: "Manage the metadata for this file in S3".
 resource "aws_s3_object" "tenantoms_layer_zip" {
   bucket = aws_s3_bucket.assets.id
-  key    = "python_libs/layer.zip"
-  source = "${path.module}/python-libs/layer.zip"
+  key    = "for_lambda/python_env.zip"
+  source = "${path.module}/python_env.zip"
 
   # Trigger a re-upload if the local file changes
-  etag   = filemd5("${path.module}/python-libs/layer.zip")
+  etag   = filemd5("${path.module}/python_env.zip")
 
 }
 
 resource "aws_lambda_layer_version" "tenantoms_shared_layer" {
   layer_name          = "${var.project_name}-shared-dependencies"
-  s3_bucket           = aws_s3_bucket.assets.id
-  s3_key              = aws_s3_object.tenantoms_layer_zip.key
-  s3_object_version   = aws_s3_object.tenantoms_layer_zip.version_id
+  s3_bucket     = "hot-reload"
+  s3_key        = "/home/pao/Documents/Dev/sfayn_gqlserver/.venv/lib/python3.14/site-packages/" # Absolute path
+
+  #s3_bucket           = aws_s3_bucket.assets.id
+  #s3_key              = aws_s3_object.tenantoms_layer_zip.key
+  #s3_object_version   = aws_s3_object.tenantoms_layer_zip.version_id
   compatible_runtimes = [var.lambda_runtime]
 
   # FORCED PROTECTION: Extra layer of safety
-  depends_on = [aws_s3_object.tenantoms_layer_zip]
+  #depends_on = [aws_s3_object.tenantoms_layer_zip]
 }
 
 resource "aws_s3_object" "lambda_handler_zip" {
   bucket = aws_s3_bucket.assets.id
-  key    = "src/lambda_handler.zip"
-  source = "${path.module}/lambda_handler.zip"
+  key    = "for_lambda/source_ddd.zip"
+  source = "${path.module}/source_ddd.zip"
 
   # Trigger a re-upload if the local file changes
-  etag   = filemd5("${path.module}/lambda_handler.zip")
+  etag   = filemd5("${path.module}/source_ddd.zip")
 
 }
 
@@ -139,16 +142,30 @@ resource "aws_lambda_function" "tenantoms_graphql_handler" {
   handler       = "ddd.order_management.entrypoints.lambda_handlers.lambda_handler_graphql.handler"
   runtime       = var.lambda_runtime # Reference variable here
 
-  s3_bucket         = aws_s3_bucket.assets.id
-  s3_key            = aws_s3_object.lambda_handler_zip.key
-  s3_object_version = aws_s3_object.lambda_handler_zip.version_id
-  layers            = [aws_lambda_layer_version.tenantoms_shared_layer.arn]
+  architectures = var.architectures
+  s3_bucket     = "hot-reload"
+  s3_key        = var.lambda_function_s3_key_hot_reload
+
+  #s3_bucket         = aws_s3_bucket.assets.id
+  #s3_key            = aws_s3_object.lambda_handler_zip.key
+  #s3_object_version = aws_s3_object.lambda_handler_zip.version_id
+  #layers            = [aws_lambda_layer_version.tenantoms_shared_layer.arn]
+
+  # --- PRODUCTION PERFORMANCE TWEAKS slow JWKS fetches ---
+  memory_size   = 256
+  timeout       = 10
+  # --------------------------------------
 
 
-  depends_on = [aws_s3_object.lambda_handler_zip]
+
+
+  #depends_on = [aws_s3_object.lambda_handler_zip]
   environment {
     variables = {
-      TABLE_NAME  = aws_dynamodb_table.tenantoms_db.name
+      DYNAMODB_TABLE_NAME  = aws_dynamodb_table.tenantoms_db.name
+      PYTHONPATH = var.lambda_pythonpath
+      ORDER_MANAGEMENT_INFRA_TYPE = "AWS"
+      SKIP_JWT_VERIFY = "false"
     }
   }
 }
@@ -164,17 +181,30 @@ resource "aws_lambda_function" "tenantoms_webhook_receiver" {
   role          = aws_iam_role.tenantoms_lambda_role.arn
   handler       = "ddd.order_management.entrypoints.lambda_handlers.lambda_handler_webhook.handler"
   runtime       = var.lambda_runtime # Reference variable here
+  architectures = var.architectures
 
-  s3_bucket         = aws_s3_bucket.assets.id
-  s3_key            = aws_s3_object.lambda_handler_zip.key
-  s3_object_version = aws_s3_object.lambda_handler_zip.version_id
-  layers            = [aws_lambda_layer_version.tenantoms_shared_layer.arn]
+  s3_bucket     = "hot-reload"
+  s3_key        = var.lambda_function_s3_key_hot_reload
 
-  depends_on = [aws_s3_object.lambda_handler_zip]
+  #s3_bucket         = aws_s3_bucket.assets.id
+  #s3_key            = aws_s3_object.lambda_handler_zip.key
+  #s3_object_version = aws_s3_object.lambda_handler_zip.version_id
+  #layers            = [aws_lambda_layer_version.tenantoms_shared_layer.arn]
+
+  #depends_on = [aws_s3_object.lambda_handler_zip]
+
+  # --- PRODUCTION PERFORMANCE TWEAKS slow JWKS fetches ---
+  memory_size   = 256
+  timeout       = 10
+  # --------------------------------------
+
   
   environment {
     variables = {
-      TABLE_NAME = aws_dynamodb_table.tenantoms_db.name
+      DYNAMODB_TABLE_NAME  = aws_dynamodb_table.tenantoms_db.name
+      PYTHONPATH = var.lambda_pythonpath
+      ORDER_MANAGEMENT_INFRA_TYPE = "AWS"
+      SKIP_JWT_VERIFY = "false"
     }
   }
 }
@@ -191,16 +221,29 @@ resource "aws_lambda_function" "tenantoms_event_worker" {
   handler       = "ddd.order_management.entrypoints.lambda_handlers.lambda_handler_eventbridge.handler"
   runtime       = var.lambda_runtime # Reference variable here
 
-  s3_bucket         = aws_s3_bucket.assets.id
-  s3_key            = aws_s3_object.lambda_handler_zip.key
-  s3_object_version = aws_s3_object.lambda_handler_zip.version_id
-  layers            = [aws_lambda_layer_version.tenantoms_shared_layer.arn]
+  s3_bucket     = "hot-reload"
+  architectures = var.architectures
+  s3_key        = var.lambda_function_s3_key_hot_reload
+
+  #s3_bucket         = aws_s3_bucket.assets.id
+  #s3_key            = aws_s3_object.lambda_handler_zip.key
+  #s3_object_version = aws_s3_object.lambda_handler_zip.version_id
+  #layers            = [aws_lambda_layer_version.tenantoms_shared_layer.arn]
+
+  # --- PRODUCTION PERFORMANCE TWEAKS slow JWKS fetches ---
+  memory_size   = 256
+  timeout       = 10
+  # --------------------------------------
 
 
-  depends_on = [aws_s3_object.lambda_handler_zip]
+
+  #depends_on = [aws_s3_object.lambda_handler_zip]
   environment {
     variables = {
-      TABLE_NAME  = aws_dynamodb_table.tenantoms_db.name
+      DYNAMODB_TABLE_NAME = aws_dynamodb_table.tenantoms_db.name
+      PYTHONPATH = var.lambda_pythonpath
+      ORDER_MANAGEMENT_INFRA_TYPE = "AWS"
+      SKIP_JWT_VERIFY = "false"
     }
   }
 }

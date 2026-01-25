@@ -34,6 +34,7 @@ def get_token_from_context(info):
 
     return info.context.COOKIES.get("access_token")
 
+#TODO to remove w respect of user to provide tenant_id as input?
 def get_tenant_id(token: str):
     try:
         # to verify later in app handler
@@ -43,8 +44,11 @@ def get_tenant_id(token: str):
     except jwt.DecodeError:
         raise exceptions.AccessControlException("Invalid JWT format")
 
-    tenant_id = unverified_payload.get("tenant_id")
-    if not tenant_id:
-        raise exceptions.AccessControlException("Missing tenant_id in token")
+    # Keycloak Organizations feature puts IDs in the 'organizations' claim (list)
+    # Format is usually: "organizations": ["org-uuid-1", "org-uuid-2"]
+    # We assume the first organization is the tenant_id or can we improve the code below?
+    # All iDPs should follow this convention for multi-tenancy
+    organizations = unverified_payload.get("organization")
 
-    return tenant_id
+    # TODO: Not safe to assume first organization is tenant_id
+    return organizations[0] if organizations and len(organizations) > 0 else None

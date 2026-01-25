@@ -1,7 +1,32 @@
 import pytest, boto3, os
+import requests
 from decimal import Decimal 
 from .fixtures import *
 from .data import *
+
+
+@pytest.fixture(scope="session")
+def api_gateway_url():
+    """Discover the LocalStack API Gateway URL automatically."""
+    return "http://localhost:4566/_aws/execute-api/kxgxoqgg9t/tst/graphql"
+
+
+@pytest.fixture()
+def live_keycloak_token():
+    """Grabs a real token from a running Keycloak instance."""
+    url = "http://localhost:8080/realms/TenantOMSAPI-Realm/protocol/openid-connect/token"
+    data = {
+        "client_id": "TenantOMSAPI-Client",
+        "client_secret": os.getenv("KC_CLIENT_SECRET"),
+        "grant_type": "password",
+        "username": "pao",
+        "password": os.getenv("KC_PWD")
+    }
+    response = requests.post(url, data=data)
+    response.raise_for_status()
+    return str(response.json()["access_token"])
+    #return "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJMajBEQWQ2TmhYWjNrSDQwUVRwNmNqTDJkSG5RZlVsSXdoNjJkanUtYkxVIn0.eyJleHAiOjE3NjkzNTA3NjMsImlhdCI6MTc2OTM1MDQ2MywianRpIjoib25ydHJvOjhiMzliODczLWRmMWYtODExMy00YTk3LTQ1MGIyOGUyMmE1MiIsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6ODA4MC9yZWFsbXMvVGVuYW50T01TQVBJLVJlYWxtIiwiYXVkIjoiVGVuYW50T01TQVBJLUNsaWVudCIsInN1YiI6Ijc0OTRkNzMzLTUwMzAtNDk3OS04YWE5LTYzNzU3MWY1MzNhNyIsInR5cCI6IkJlYXJlciIsImF6cCI6IlRlbmFudE9NU0FQSS1DbGllbnQiLCJzaWQiOiJXcUJxNXludUdPWFlmSUNuNzhoTUQ3OTAiLCJzY29wZSI6Im9wZW5pZCBvcmdhbml6YXRpb24iLCJvcmdhbml6YXRpb24iOlsidGVuYW50XzEyMyJdLCJyb2xlcyI6WyJ2ZW5kb3IiXSwidXNlcm5hbWUiOiJwYW8ifQ.j8R74iFGvqi6tqlWVl5SwLKoA71HZDoixU-30bp6FA1CHBPS4985k5238cF-_zZjTvU410nenYM0hXC81iGtLCAmM7GNL0wENfOWBbo8pkG6W3PfNapyTka_F36xhuyPHoumTxbU0AVa_suevwiBhbQc6xDJ1eDkGucjew363FIp-Drb8izq_eEXi3lRMQGXyIeG0mFJU7UIteaDYGOJslDS8yPA3WlNuMj3Cn6NFkgSMT3qpMDEbBw5jZDF4E_hUX-25YDIVgIpZbQW-hJVE4Jy1fl6lyVyjnrU_Pej5zs78L1gsOs5iU1fgJhCDCrQDdtxXaHkiC5w6nTxzC29NA"
+
 
 @pytest.fixture
 def fake_get_user_context():    

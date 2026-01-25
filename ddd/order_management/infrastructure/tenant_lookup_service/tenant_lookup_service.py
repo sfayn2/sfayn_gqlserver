@@ -6,6 +6,10 @@ from order_management import models as django_models
 from ddd.order_management.domain import enums
 from ddd.order_management.application import dtos
 
+class TenantLookupException(Exception):
+    """Unified exception for Tenant Lookup Service failures."""
+    pass
+
 #Protocol: ports.LookupServiceAbstract
 class TenantLookupService:
     def get_tenant_config(
@@ -17,7 +21,7 @@ class TenantLookupService:
                 tenant_id=tenant_id
             )
         except django_models.TenantConfig.DoesNotExist:
-            raise Exception(f"TenantLookupService: Tenant {tenant_id} not found")
+            raise TenantLookupException(f"TenantLookupService: Tenant {tenant_id} not found")
 
         return dtos.TenantResponseDTO(
             tenant_id=tenant_id,

@@ -146,9 +146,9 @@ SAAS_CONFIG_SEEDS  = (
     }), datetime.now(timezone.utc)),
     (TENANT1, json.dumps({
         "idp": {
-            "public_key": "http://localhost:8080/realms/ecommerce_realm/protocol/openid-connect/certs",
-            "issuer": "http://localhost:8080/realms/ecommerce_realm",
-            "audience": "AUD1",
+            "public_key": "http://keycloak_main:8080/realms/TenantOMSAPI-Realm/protocol/openid-connect/certs",
+            "issuer": "http://localhost:8080/realms/TenantOMSAPI-Realm",
+            "audience": "TenantOMSAPI-Client",
             "algorithm": "RS256",
         },
         "webhooks": {

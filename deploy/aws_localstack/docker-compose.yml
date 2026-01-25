@@ -3,26 +3,35 @@ services:
     container_name: localstack_main
     image: localstack/localstack:latest
     ports:
-      - "127.0.0.1:4566:4566"            # LocalStack Gateway
-      - "127.0.0.1:4510-4559:4510-4559"  # External services range
+      - "127.0.0.1:4566:4566"
+      - "127.0.0.1:4510-4559:4510-4559"
     environment:
-      # Use the path LocalStack expects internally
       - DOCKER_HOST=unix:///var/run/docker.sock
-      # Enable common services (optional, LocalStack starts them on demand)
       - DEBUG=1
       - LAMBDA_EXECUTOR=docker
-      # Tell the child Lambda container to mount the host's layer folder to /opt/python
-      - LAMBDA_DOCKER_FLAGS=-v ${PWD}/src:/opt/python
+      - LOCALSTACK_FILE_WATCHER_STRATEGY=polling
     volumes:
-      # 1. Map your Rootless Socket (Correct for Fedora UID 1000)
-      - "/run/user/1000/docker.sock:/var/run/docker.sock"
-      # 2. Persist LocalStack data between restarts
+      - "/run/user/1001/docker.sock:/var/run/docker.sock"
       - "./localstack_data:/var/lib/localstack"
-    privileged: false  # Better for security
+    networks:
+      - localstack-net
+
+  keycloak:
+    container_name: keycloak_main
+    image: quay.io/keycloak/keycloak:latest
+    command: start-dev --db=dev-file # Force file-based DB instead of in-memory
+    environment:
+      - KC_BOOTSTRAP_ADMIN_USERNAME=admin
+      - KC_BOOTSTRAP_ADMIN_PASSWORD=admin
+      - KC_HOSTNAME=localhost
+      - KC_HOSTNAME_STRICT=false
+    volumes:
+      - "./keycloak_data:/opt/keycloak/data" # Persist the actual DB files
+    ports:
+      - "8080:8080"
     networks:
       - localstack-net
 
 networks:
   localstack-net:
     driver: bridge
-
