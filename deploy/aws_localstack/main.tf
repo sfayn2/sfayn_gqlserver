@@ -193,10 +193,6 @@ resource "aws_lambda_function" "tenantoms_webhook_receiver" {
 
   #depends_on = [aws_s3_object.lambda_handler_zip]
 
-  # --- PRODUCTION PERFORMANCE TWEAKS slow JWKS fetches ---
-  memory_size   = 256
-  timeout       = 10
-  # --------------------------------------
 
   
   environment {
@@ -230,10 +226,6 @@ resource "aws_lambda_function" "tenantoms_event_worker" {
   #s3_object_version = aws_s3_object.lambda_handler_zip.version_id
   #layers            = [aws_lambda_layer_version.tenantoms_shared_layer.arn]
 
-  # --- PRODUCTION PERFORMANCE TWEAKS slow JWKS fetches ---
-  memory_size   = 256
-  timeout       = 10
-  # --------------------------------------
 
 
 

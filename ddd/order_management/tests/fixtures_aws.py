@@ -6,9 +6,38 @@ from .data import *
 
 
 @pytest.fixture(scope="session")
-def api_gateway_url():
-    """Discover the LocalStack API Gateway URL automatically."""
-    return "http://localhost:4566/_aws/execute-api/kxgxoqgg9t/tst/graphql"
+def api_gateway_url_graphql_api():
+    """Dynamically discover the LocalStack API Gateway URL by API name."""
+    
+    endpoint_url="http://localhost:4566"
+
+    # 1. Connect to LocalStack APIGateway
+    client = boto3.client(
+        "apigateway",
+        endpoint_url=endpoint_url
+    )
+
+    # 2. Get all REST APIs and find yours by name
+    # Ensure this matches 'name' in your aws_api_gateway_rest_api terraform resource
+    target_api_name = "tntoms-tst-api" 
+    
+    apis = client.get_rest_apis()
+    api_id = next(
+        (item["id"] for item in apis["items"] if item["name"] == target_api_name), 
+        None
+    )
+
+    if not api_id:
+        # Debugging tip: Print what WAS found if it fails
+        found_names = [item["name"] for item in apis["items"]]
+        raise Exception(
+            f"Could not find API '{target_api_name}'. Found: {found_names}. "
+            "Is your Terraform applied?"
+        )
+
+    # 3. Construct the URL
+    stage = "tst"
+    return f"{endpoint_url}/restapis/{api_id}/{stage}/_user_request_/graphql"
 
 
 @pytest.fixture()

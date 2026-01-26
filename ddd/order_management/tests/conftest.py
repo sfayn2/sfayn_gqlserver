@@ -1,7 +1,11 @@
 import os
+from dotenv import load_dotenv
 from ddd.order_management.infrastructure.bootstrap import (
     enums as infra_enums
 )
+
+# Load environment variables from .env file
+load_dotenv()
 
 INFRA_TYPE = os.getenv("ORDER_MANAGEMENT_INFRA_TYPE")
 

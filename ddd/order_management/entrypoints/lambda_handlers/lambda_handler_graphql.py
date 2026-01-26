@@ -4,13 +4,6 @@ from ddd.order_management.entrypoints.graphql.schema import schema
 
 def handler(event, context):
 
-        # 2. Early Method Validation
-    if event.get("httpMethod") != "POST":
-        return {
-            "statusCode": 405,
-            "body": json.dumps({"errors": [{"message": "Method Not Allowed"}]})
-        }
-
     try:
         # 3. Defensive Parsing
         raw_body = event.get("body")
@@ -38,13 +31,10 @@ def handler(event, context):
                 for e in result.errors
             ]
 
-
-
         return {
             "statusCode": 200,
             "headers": {
-                "Content-Type": "application/json",
-                "X-Content-Type-Options": "nosniff"  # Security header
+                "Content-Type": "application/json"
             },
             "body": json.dumps(response_payload)
         }
