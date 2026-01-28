@@ -8,8 +8,6 @@ dependencies = [
     "pydantic-settings>=2.7.1",
     "easypost>=10.1.0",
     "python-dotenv>=1.0.1",
-    #"s3fs>=0.4.2",
-    #"boto3" provided by AWS runtime
 ]
 
 

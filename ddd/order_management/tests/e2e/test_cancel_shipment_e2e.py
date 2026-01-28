@@ -122,6 +122,7 @@ def test_graphql_endpoint_cannot_cancel_shipment_shipped_successfully_e2e(
     # The variables matching the Graphene input types
     variables = {
         "input": {
+            "tenantId": TENANT1,
             "orderId": target_order_id,
             "shipmentId": target_shipment_id
         }

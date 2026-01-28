@@ -89,6 +89,7 @@ def test_graphql_endpoint_add_shipment_successfully_e2e(
     # Updated variables dictionary to match the `AddOrderMutation.Input` fields
     variables = {
         "input": {
+            "tenantId": TENANT1,
             "orderId": target_order_id,
             "shipmentMode": "dropoff",
             "shipmentProvider": "FEDEX",

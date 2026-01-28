@@ -115,8 +115,8 @@ def test_graphql_endpoint_cancels_order_successfully_e2e(
     }
 
     query = """
-            mutation CancelOrder($orderId: String!) {
-                cancelOrder(input: { orderId: $orderId }) {
+            mutation CancelOrder($orderId: String!, $tenantId: String!) {
+                cancelOrder(input: { orderId: $orderId, tenantId: $tenantId }) {
                     result {
                         success
                         message
@@ -124,7 +124,7 @@ def test_graphql_endpoint_cancels_order_successfully_e2e(
                 }
             }
         """
-    variables = {"orderId": target_order_id}
+    variables = {"orderId": target_order_id, "tenantId": TENANT1}
     
     # Execute the GraphQL query
     # We use a mock 'info' context here if needed, but the fixtures handle the common calls

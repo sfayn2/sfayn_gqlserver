@@ -11,6 +11,7 @@ from ddd.order_management.entrypoints.graphql import object_types, common, input
 # ===================
 class AddShipmentMutation(relay.ClientIDMutation):
     class Input:
+        tenant_id = graphene.String(required=True)
         order_id = graphene.String(required=True)
         shipment_mode = graphene.String(required=True) # pickup, dropoff, warehouse
         shipment_provider = graphene.String(required=True)
@@ -38,12 +39,11 @@ class AddShipmentMutation(relay.ClientIDMutation):
     @classmethod
     def mutate_and_get_payload(cls, root, info, **input):
         token = common.get_token_from_context(info)
-        request_tenant_id = common.get_tenant_id(token)
 
         # 1. Create a DTO with the raw necessary context data
         context_data = dtos.RequestContextDTO( # A new DTO we define
             token=token,
-            tenant_id=request_tenant_id
+            tenant_id=input.get("tenant_id")
         )
 
         command = commands.AddShipmentCommand.model_validate(input)

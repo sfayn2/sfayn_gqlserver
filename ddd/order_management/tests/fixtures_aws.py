@@ -1,20 +1,19 @@
-import pytest, boto3, os
-import requests
+import pytest, boto3, os, time, requests
 from decimal import Decimal 
 from .fixtures import *
 from .data import *
 
 
-@pytest.fixture(scope="session")
+
+@pytest.fixture()
 def api_gateway_url_graphql_api():
     """Dynamically discover the LocalStack API Gateway URL by API name."""
-    
+
     endpoint_url="http://localhost:4566"
 
     # 1. Connect to LocalStack APIGateway
     client = boto3.client(
-        "apigateway",
-        endpoint_url=endpoint_url
+        "apigateway"
     )
 
     # 2. Get all REST APIs and find yours by name
@@ -37,10 +36,10 @@ def api_gateway_url_graphql_api():
 
     # 3. Construct the URL
     stage = "tst"
-    return f"{endpoint_url}/restapis/{api_id}/{stage}/_user_request_/graphql"
+    return f"{endpoint_url}/_aws/execute-api/{api_id}/{stage}/graphql"
 
 
-@pytest.fixture()
+@pytest.fixture(scope="session")
 def live_keycloak_token():
     """Grabs a real token from a running Keycloak instance."""
     url = "http://localhost:8080/realms/TenantOMSAPI-Realm/protocol/openid-connect/token"
@@ -53,8 +52,8 @@ def live_keycloak_token():
     }
     response = requests.post(url, data=data)
     response.raise_for_status()
-    return str(response.json()["access_token"])
-    #return "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJMajBEQWQ2TmhYWjNrSDQwUVRwNmNqTDJkSG5RZlVsSXdoNjJkanUtYkxVIn0.eyJleHAiOjE3NjkzNTA3NjMsImlhdCI6MTc2OTM1MDQ2MywianRpIjoib25ydHJvOjhiMzliODczLWRmMWYtODExMy00YTk3LTQ1MGIyOGUyMmE1MiIsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6ODA4MC9yZWFsbXMvVGVuYW50T01TQVBJLVJlYWxtIiwiYXVkIjoiVGVuYW50T01TQVBJLUNsaWVudCIsInN1YiI6Ijc0OTRkNzMzLTUwMzAtNDk3OS04YWE5LTYzNzU3MWY1MzNhNyIsInR5cCI6IkJlYXJlciIsImF6cCI6IlRlbmFudE9NU0FQSS1DbGllbnQiLCJzaWQiOiJXcUJxNXludUdPWFlmSUNuNzhoTUQ3OTAiLCJzY29wZSI6Im9wZW5pZCBvcmdhbml6YXRpb24iLCJvcmdhbml6YXRpb24iOlsidGVuYW50XzEyMyJdLCJyb2xlcyI6WyJ2ZW5kb3IiXSwidXNlcm5hbWUiOiJwYW8ifQ.j8R74iFGvqi6tqlWVl5SwLKoA71HZDoixU-30bp6FA1CHBPS4985k5238cF-_zZjTvU410nenYM0hXC81iGtLCAmM7GNL0wENfOWBbo8pkG6W3PfNapyTka_F36xhuyPHoumTxbU0AVa_suevwiBhbQc6xDJ1eDkGucjew363FIp-Drb8izq_eEXi3lRMQGXyIeG0mFJU7UIteaDYGOJslDS8yPA3WlNuMj3Cn6NFkgSMT3qpMDEbBw5jZDF4E_hUX-25YDIVgIpZbQW-hJVE4Jy1fl6lyVyjnrU_Pej5zs78L1gsOs5iU1fgJhCDCrQDdtxXaHkiC5w6nTxzC29NA"
+    time.sleep(2) # Wait for eventual consistency for unknown reasons, it needs to have a breathing time
+    return response.json()["access_token"]
 
 
 @pytest.fixture

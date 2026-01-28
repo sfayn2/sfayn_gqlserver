@@ -2,7 +2,7 @@ import requests
 import pytest
 
 @pytest.mark.django_db
-def test_graphql_add_order_via_http_e2e(api_gateway_url_graphql_api, live_keycloak_token):
+def test_add_order_full_e2e(api_gateway_url_graphql_api, live_keycloak_token):
     """
     Full E2E: Network -> API Gateway -> Lambda -> DynamoDB/Django.
     """
@@ -45,7 +45,6 @@ def test_graphql_add_order_via_http_e2e(api_gateway_url_graphql_api, live_keyclo
         "Authorization": f"Bearer {live_keycloak_token}",
         "Content-Type": "application/json"
     }
-    print("API Gateway URL:", api_gateway_url_graphql_api)
 
     # 3. The Action: Send the physical POST request
     response = requests.post(
@@ -54,10 +53,11 @@ def test_graphql_add_order_via_http_e2e(api_gateway_url_graphql_api, live_keyclo
         headers=headers,
     )
 
+    response_data = response.json()
+
     # 4. Assertions
     assert response.status_code == 200
     
-    response_data = response.json()
     assert response_data.get("errors") is None
     
     result = response_data["data"]["addOrder"]["result"]
