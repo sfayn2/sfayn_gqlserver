@@ -36,10 +36,10 @@ def graphene_client(mocker, user_context_tenant1_vendor_all_perms, fake_get_user
 
     # Mock the internal infrastructure calls within the resolver function 
     # to return a controlled user_ctx for predictable tests.
-    mocker.patch(
-        "ddd.order_management.entrypoints.graphql.common.get_tenant_id",
-        return_value="tenant_123"
-    )
+    #mocker.patch(
+    #    "ddd.order_management.entrypoints.graphql.common.get_tenant_id",
+    #    return_value="tenant_123"
+    #)
     # Mock the actual access control service call within the infrastructure
     mocker.patch(
         fake_get_user_context,

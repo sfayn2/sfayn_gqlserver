@@ -132,6 +132,7 @@ def test_add_order(
         user_action_service=fake_user_action_service
     )
 
+
     # --- Assertions ---
     assert response.success is expected_success
     # Use 'in' check for dynamic messages like "Order {order_id} successfully created."
@@ -160,6 +161,6 @@ def test_add_order(
             action="add_order",
             performed_by=USER1
         ).exists()
-        
+
         assert action_log_exists == expected_success
 

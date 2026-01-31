@@ -41,9 +41,9 @@ Defines global SaaS-level settings, authorized tenants, and integration credenti
 ```json
     {
         "idp": {
-            "public_key": "xyzckawe23@#%#$sdfgsdfgdfgfgdfgkjwelrt",
-            "issuer": "http://idp.saasprovider.com/realms/t1",
-            "audience": "AUD1",
+            "public_key": "http://keycloak_main:8080/realms/TenantOMSAPI-Realm/protocol/openid-connect/certs",
+            "issuer": "http://localhost:8080/realms/TenantOMSAPI-Realm",
+            "audience": "TenantOMSAPI-Client",
             "algorithm": "RS256",
         },
         "webhooks": {
@@ -62,7 +62,7 @@ Defines global SaaS-level settings, authorized tenants, and integration credenti
         "create_shipment_api": {
             "provider": "easypost",
             "api_key": "api key",
-            "endpoint": "https://endpoint.dev",
+            "endpoint": "https://api.easypost.com/v2/shipments",
         }
     }
 ```

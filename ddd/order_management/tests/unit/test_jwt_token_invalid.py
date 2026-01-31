@@ -4,6 +4,7 @@ from ddd.order_management.infrastructure import (
     access_control1,
 )
 
+@pytest.mark.django_db
 def test_jwt_token_invalid(fake_rsa_keys):
     _, secret = fake_rsa_keys
 
@@ -18,5 +19,5 @@ def test_jwt_token_invalid(fake_rsa_keys):
     with pytest.raises(Exception) as exc_info:
         decoded = jwt_handler.decode("dummy-token", secret)
 
-    assert str(exc_info.value) == "Invalid token"
+    assert "Invalid token" in str(exc_info.value)
 

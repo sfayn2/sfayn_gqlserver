@@ -23,7 +23,8 @@ class AccessControl1:
         # SECURITY CHECK: Match the request to the allowed list
         if request_tenant_id not in allowed_tenants:
             #logger.error(f"Unauthorized: User {identity_claims.get('sub')} tried to access {request_tenant_id}")
-            raise exceptions.AccessControlException(f"You do not have access to tenant: {request_tenant_id}")
+            raise exceptions.AccessControlException(f"Access denied. Your account is not authorized for Organization: {request_tenant_id}")
+
 
         user_ctx = dtos.UserContextDTO.model_validate({
             "sub": identity_claims.get("sub"),

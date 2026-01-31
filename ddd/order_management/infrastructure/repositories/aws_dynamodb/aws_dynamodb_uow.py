@@ -26,9 +26,6 @@ class DynamoOrderUnitOfWork:
         """
         In DDD, commit() persists all changes tracked by the repository.
         """
-        # 1. Persist all seen aggregates to DynamoDB
-        for entity in self.order.seen:
-            self.order.save(entity)
 
         # 2. Handle side effects (Domain Events)
         while True:

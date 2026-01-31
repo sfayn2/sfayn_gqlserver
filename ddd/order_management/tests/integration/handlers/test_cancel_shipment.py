@@ -22,7 +22,7 @@ BASE_CANCEL_SHIPMENT_INPUT = {
 # Order "ORD-CONFIRMED_W_SHIPPED-1" has a SHIPPED shipment "SH-SHIPPED-2".
 CANCEL_SHIPMENT_SHIPPED_INPUT = {
     "order_id": "ORD-CONFIRMED_W_SHIPPED-1",
-    "shipment_id": "SH-SHIPPED-2"
+    "shipment_id": "SH-SHIPPED-SHIPPED-2"
 }
 
 

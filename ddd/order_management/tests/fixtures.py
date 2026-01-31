@@ -1,4 +1,4 @@
-import pytest, jwt
+import pytest, jwt, os
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives import serialization
 from typing import Optional
@@ -40,7 +40,9 @@ from .data import (
     VENDOR1,
     VENDOR2,
     USER1,
-    USER2
+    USER2,
+    JWT_VENDOR_PAYLOAD,
+    JWT_EXPIRED_CUSTOMER_PAYLOAD
 )        
 
 
@@ -102,16 +104,8 @@ def fake_jwt_token_handler():
             self.algorithm = algorithm
 
         def decode(self, token: str, secret: Optional[str] = None) -> dict:
-            return {
-                "sub": USER1,
-                "token_type": "Bearer",
-                "tenant_id": TENANT1,
-                "roles": ["vendor"]
-            }
+            return JWT_VENDOR_PAYLOAD
     return JwtTokenHandler
-
-
-
 
 
 @pytest.fixture
@@ -157,8 +151,8 @@ def fake_jwt_valid_token(fake_rsa_keys):
         "sub": USER1,
         "aud": "my-app",
         "iss":"https://issuer.test",
-        "tenant_id": TENANT1,
-        "token_type": "Bearer",
+        "typ": "Bearer",
+        "organization": [TENANT1],
         "roles": ["vendor"],
         "exp": datetime.now() + timedelta(minutes=5)
     }
@@ -173,8 +167,8 @@ def fake_jwt_expired_token(fake_rsa_keys):
         "sub": USER1,
         "aud": "my-app",
         "iss":"https://issuer.test",
-        "tenant_id": TENANT1,
-        "token_type": "Bearer",
+        "typ": "Bearer",
+        "organization": [TENANT1],
         "roles": ["customer"],
         "exp": datetime.now() - timedelta(minutes=5)
     }

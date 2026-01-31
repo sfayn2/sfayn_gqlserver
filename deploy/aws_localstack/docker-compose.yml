@@ -8,8 +8,8 @@ services:
     environment:
       - DOCKER_HOST=unix:///var/run/docker.sock
       - DEBUG=1
-      - LAMBDA_EXECUTOR=docker
       - LOCALSTACK_FILE_WATCHER_STRATEGY=polling
+      - LAMBDA_RUNTIME_ENVIRONMENT_TIMEOUT=60
     volumes:
       - "/run/user/1001/docker.sock:/var/run/docker.sock"
       - "./localstack_data:/var/lib/localstack"

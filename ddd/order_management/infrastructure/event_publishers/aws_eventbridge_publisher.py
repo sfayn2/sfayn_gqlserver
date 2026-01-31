@@ -12,7 +12,7 @@ class EventBridgePublisher:
     def __init__(self, event_bus_name: str, source: str = "saas.oms", aws_region: str = "us-east-1"):
         self.event_bus_name = event_bus_name
         self.source = source # Get from environment
-        self.client = boto3.client("events", region_name=aws_region)
+        self.client = boto3.client("events")
 
     def publish(self, event):
         try:

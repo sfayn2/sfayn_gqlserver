@@ -14,4 +14,6 @@ export SECRET_KEY="local-testing-secret-key-123"
 
 export DJANGO_SETTINGS_MODULE="sfayn_gqlserver.settings"
 
-uv run pytest "$PROJECT_ROOT/ddd/order_management/tests"
+uv run pytest "$PROJECT_ROOT/ddd/order_management/tests/e2e"
+uv run pytest "$PROJECT_ROOT/ddd/order_management/tests/integration"
+uv run pytest "$PROJECT_ROOT/ddd/order_management/tests/unit/"

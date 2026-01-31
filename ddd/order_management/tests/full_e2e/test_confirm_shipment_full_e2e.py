@@ -67,6 +67,7 @@ def test_confirm_shipment_full_e2e(
         "Content-Type": "application/json"
     }
 
+
     # 3. The Action: Send the physical POST request
     response = requests.post(
         api_gateway_url_graphql_api, 

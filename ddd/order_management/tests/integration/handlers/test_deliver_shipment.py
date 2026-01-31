@@ -19,7 +19,7 @@ from order_management import models as django_snapshots # For verifying DB state
 # Note: The provided seeds have "SH-SHIPPED-2" as SHIPPED. We'll use that.
 BASE_DELIVER_SHIPMENT_INPUT = {
     "order_id": "ORD-CONFIRMED_W_SHIPPED-1", 
-    "shipment_id": "SH-SHIPPED-2" # This shipment is already SHIPPED and ready for DELIVERY
+    "shipment_id": "SH-SHIPPED-SHIPPED-2" # This shipment is already SHIPPED and ready for DELIVERY
 }
 
 # Define an input that is already DELIVERED (should cause an error)
@@ -41,7 +41,7 @@ DELIVER_SHIPMENT_ALREADY_DELIVERED_INPUT = {
             # Valid delivery of a SHIPPED shipment (uses our BASE input pointing to a SHIPPED seed)
             BASE_DELIVER_SHIPMENT_INPUT,
             True,
-            "w Shipment Id SH-SHIPPED-2 successfully delivered.", # Message seems generic ("shipped") but implies success
+            "w Shipment Id SH-SHIPPED-SHIPPED-2 successfully delivered.", # Message seems generic ("shipped") but implies success
             enums.ShipmentStatus.DELIVERED.value,       # Shipment status should be DELIVERED
             enums.OrderStatus.DELIVERED.value           # <-- ROLL-UP: Order status should now be DELIVERED (as all items are covered)
         ),

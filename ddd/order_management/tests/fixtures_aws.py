@@ -53,6 +53,7 @@ def live_keycloak_token():
     response = requests.post(url, data=data)
     response.raise_for_status()
     time.sleep(2) # Wait for eventual consistency for unknown reasons, it needs to have a breathing time
+
     return response.json()["access_token"]
 
 

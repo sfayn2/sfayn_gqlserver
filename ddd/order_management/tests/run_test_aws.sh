@@ -34,5 +34,4 @@ fi
 
 #uv run pytest "$PROJECT_ROOT/ddd/order_management/tests/e2e" -vv --tb=long -l -p no:django
 uv run pytest "$PROJECT_ROOT/ddd/order_management/tests/e2e" -p no:django
-#uv run pytest "$PROJECT_ROOT/ddd/order_management/tests/full_e2e/test_confirm_shipment_full_e2e.py" -p no:django
 uv run pytest "$PROJECT_ROOT/ddd/order_management/tests/full_e2e" -p no:django

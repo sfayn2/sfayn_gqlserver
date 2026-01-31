@@ -4,6 +4,7 @@ from ddd.order_management.infrastructure import (
     access_control1,
 )
 
+@pytest.mark.django_db
 def test_jwt_token_expired(fake_rsa_keys, fake_jwt_expired_token):
     _, secret = fake_rsa_keys
 

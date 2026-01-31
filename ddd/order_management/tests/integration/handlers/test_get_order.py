@@ -11,7 +11,6 @@ from ddd.order_management.domain import exceptions, enums
 # Import the code under test (GetOrderQuery class)
 from ddd.order_management.entrypoints.graphql.queries.get_order_query import GetOrderQuery
 # Import the handler function to test handler logic directly
-from ddd.order_management.application.handlers import handle_get_order
 
 
 @pytest.fixture
@@ -28,10 +27,6 @@ def graphene_client(mocker, user_context_tenant1_vendor_all_perms):
 
     # Mock the internal infrastructure calls within the resolver function 
     # to return a controlled user_ctx for predictable tests.
-    mocker.patch(
-        "ddd.order_management.entrypoints.graphql.common.get_tenant_id",
-        return_value="tenant_123"
-    )
     mocker.patch(
         'ddd.order_management.infrastructure.access_control1.AccessControl1.get_user_context',
         return_value=user_context_tenant1_vendor_all_perms # Use our seeded context
@@ -80,7 +75,7 @@ def test_graphql_endpoint_retrieves_order_successfully(
     # GraphQL query string expanded to include ALL fields
     query = f"""
         query {{
-          getOrderByOrderId(orderId: "{target_order_id}") {{
+          getOrderByOrderId(tenantId: "{TENANT1}", orderId: "{target_order_id}") {{
             orderId,
             orderStatus,
             paymentStatus,
@@ -279,13 +274,15 @@ def test_graphql_endpoint_retrieves_order_successfully(
 @pytest.mark.django_db
 def test_graphql_endpoint_returns_null_for_missing_order(
     fake_jwt_valid_token,
-    graphene_client, mocker):
+    test_constants,
+    graphene_client):
     """
     Test the GraphQL API behavior when the underlying handler raises a NotFound exception.
     Graphene resolvers often return `None` (null in JSON) if an expected object isn't found, 
     rather than causing a top-level GraphQL error, depending on your schema definition.
     """
     invalid_order_id = "ORD-DOES-NOT-EXIST"
+    TENANT1 = test_constants.get("tenant1")
 
     # Create a mock object that looks like a Django request object
     mock_context = MagicMock()
@@ -296,7 +293,7 @@ def test_graphql_endpoint_returns_null_for_missing_order(
 
     query = f"""
         query {{
-          getOrderByOrderId(orderId: "{invalid_order_id}") {{
+          getOrderByOrderId(tenantId: "{TENANT1}", orderId: "{invalid_order_id}") {{
             orderId
           }}
         }}

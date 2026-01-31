@@ -1,4 +1,5 @@
 import os
+from dotenv import load_dotenv, find_dotenv
 from ddd.order_management.domain import (
     events, 
     enums, 
@@ -30,6 +31,8 @@ from ddd.order_management.application import (
 )
 
 
+# Not applicable for AWS Lambda has its own env mgmt
+#load_dotenv(find_dotenv(filename=".env.aws.test"))
 
 #Depending on the framework arch this might be inside manage.py , app.py, or main.py ?
 #if project grows, breakdown handlers by feature

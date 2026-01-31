@@ -1,13 +1,16 @@
 import json
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from decimal import Decimal
 from ddd.order_management.domain import (
     enums
 )
 
 # === Test Data ========
-USER1 = "user-1"
+USER1 = "7494d733-5030-4979-8aa9-637571f533a7" #equivalent to sub in JWT
 USER2 = "user-2"
+
+USERNAME1 = "pao" #equivalent to username in JWT
+
 SAAS1 = "saas_123"
 TENANT1 = "tenant_123"
 TENANT2 = "tenant_456"
@@ -74,9 +77,9 @@ ORDER_LINE_SEEDS = (
 SHIPMENT_SEEDS = (
     ("SH-1", "ORD-CONFIRMED-1", "line 1", "line 2", "city ", "postal here", "country here", "state here", "provider here", " tracking reference here", Decimal("2.2"), "SGD", enums.ShipmentStatus.PENDING.value),
     ("SH-SHIPPED-SHIPPED-1", "ORD-CONFIRMED_W_SHIPPED-1", "line 1", "line 2", "city ", "postal here", "country here", "state here", "provider here", "TN123456789", Decimal("2.2"), "SGD", enums.ShipmentStatus.SHIPPED.value),
-    ("SH-SHIPPED-SHIPPED-2", "ORD-CONFIRMED_W_SHIPPED-1", "line 1", "line 2", "city ", "postal here", "country here", "state here", "provider here", "TN123456789", Decimal("2.2"), "SGD", enums.ShipmentStatus.SHIPPED.value),
-    ("SH-SHIPPED-PENDING-1", "ORD-CONFIRMED_W_SHIPPED-1", "line 1", "line 2", "city ", "postal here", "country here", "state here", "provider here", "TN123456789", Decimal("2.2"), "SGD", enums.ShipmentStatus.PENDING.value),
-    ("SH-SHIPPED-CONFIRMED-1", "ORD-CONFIRMED_W_SHIPPED-1", "line 1", "line 2", "city ", "postal here", "country here", "state here", "provider here", "TN123456789", Decimal("2.2"), "SGD", enums.ShipmentStatus.CONFIRMED.value),
+    ("SH-SHIPPED-SHIPPED-2", "ORD-CONFIRMED_W_SHIPPED-1", "line 1", "line 2", "city ", "postal here", "country here", "state here", "provider here", "TN123456790", Decimal("2.2"), "SGD", enums.ShipmentStatus.SHIPPED.value),
+    ("SH-SHIPPED-PENDING-1", "ORD-CONFIRMED_W_SHIPPED-1", "line 1", "line 2", "city ", "postal here", "country here", "state here", "provider here", "TN123456791", Decimal("2.2"), "SGD", enums.ShipmentStatus.PENDING.value),
+    ("SH-SHIPPED-CONFIRMED-1", "ORD-CONFIRMED_W_SHIPPED-1", "line 1", "line 2", "city ", "postal here", "country here", "state here", "provider here", "TN123456792", Decimal("2.2"), "SGD", enums.ShipmentStatus.CONFIRMED.value),
     ("SH-PENDING-2", "ORD-CONFIRMED_W_PENDING-1", "line 1", "line 2", "city ", "postal here", "country here", "state here", "provider here", " tracking reference here", Decimal("2.2"), "SGD", enums.ShipmentStatus.PENDING.value),
     ("SH-CONFIRMED-2", "ORD-CONFIRMED_W_CONFIRMED-1", "line 1", "line 2", "city ", "postal here", "country here", "state here", "provider here", " tracking reference here", Decimal("2.2"), "SGD", enums.ShipmentStatus.CONFIRMED.value),
     ("SH-DELIVERED-2", "ORD-CONFIRMED_W_DELIVERED-1", "line 1", "line 2", "city ", "postal here", "country here", "state here", "provider here", " tracking reference here", Decimal("2.2"), "SGD", enums.ShipmentStatus.DELIVERED.value),
@@ -173,3 +176,43 @@ SAAS_CONFIG_SEEDS  = (
 )
 
 # === Test Data ========
+
+JWT_VENDOR_PAYLOAD = {
+    "exp": datetime.now() + timedelta(minutes=5),
+    "iat": datetime.now(),
+    "jti": "onrtro:cbe35fc0-4bd2-8af7-e403-6aacbf565d51",
+    "iss": "http://localhost:8080/realms/TenantOMSAPI-Realm",
+    "aud": "TenantOMSAPI-Client",
+    "sub": "7494d733-5030-4979-8aa9-637571f533a7",
+    "typ": "Bearer",
+    "azp": "TenantOMSAPI-Client",
+    "sid": "0FlQ-6gO1EE66LvRQ9SxDqsJ",
+    "scope": "openid organization",
+    "organization": [
+        TENANT1
+    ],
+    "roles": [
+        "vendor"
+    ],
+    "username": USERNAME1
+    }
+
+JWT_EXPIRED_CUSTOMER_PAYLOAD = {
+    "exp": datetime.now() - timedelta(minutes=5),
+    "iat": datetime.now(),
+    "jti": "onrtro:cbe35fc0-4bd2-8af7-e403-6aacbf565d51",
+    "iss": "http://localhost:8080/realms/TenantOMSAPI-Realm",
+    "aud": "TenantOMSAPI-Client",
+    "sub": "7494d733-5030-4979-8aa9-637571f533a7",
+    "typ": "Bearer",
+    "azp": "TenantOMSAPI-Client",
+    "sid": "0FlQ-6gO1EE66LvRQ9SxDqsJ",
+    "scope": "openid organization",
+    "organization": [
+        TENANT1
+    ],
+    "roles": [
+        "customer"
+    ],
+    "username": USERNAME1
+    }
