@@ -1,3 +1,5 @@
+[![OnPrem Test](https://github.com/sfayn2/sfayn_gqlserver/actions/workflows/onprem_test.yml/badge.svg)](https://github.com/sfayn2/sfayn_gqlserver/actions/workflows/onprem_test.yml)
+
 # TenantOMSApi
 
 **TenantOMSAPi**  is a multi-tenant backend API for managing orders, shipments, etc built with Domain-Driven Design (DDD), GraphQL, and JWT-secured access.
