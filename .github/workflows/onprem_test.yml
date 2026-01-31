@@ -25,6 +25,11 @@ jobs:
       # Ensures Python includes your root folder in the search path
       PYTHONPATH: "." 
       SECRET_KEY: "local-testing-secret-key-123"
+      REDIS_INTERNAL_URL: "redis://localhost:6379"
+      REDIS_INTERNAL_STREAM: "stream.internal_events.order_management"
+      
+      REDIS_EXTERNAL_URL: "redis://localhost:6379"
+      REDIS_EXTERNAL_STREAM: "stream.external_events.order_management"
 
 
 
