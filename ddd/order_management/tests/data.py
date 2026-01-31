@@ -153,6 +153,7 @@ SAAS_CONFIG_SEEDS  = (
             "issuer": "http://localhost:8080/realms/TenantOMSAPI-Realm",
             "audience": "TenantOMSAPI-Client",
             "algorithm": "RS256",
+            "token_type": "Bearer", 
         },
         "webhooks": {
             "shipment_tracker": {

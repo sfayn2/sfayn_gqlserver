@@ -54,6 +54,7 @@ def graphene_client(mocker, user_context_tenant1_vendor_all_perms, fake_get_user
 def test_graphql_endpoint_add_shipment_successfully_e2e(
     fake_jwt_valid_token,
     graphene_client, 
+    mock_context_w_auth_header_token,
     test_constants):
     """
     Test the GraphQL API using the Graphene test client. 
@@ -65,14 +66,6 @@ def test_graphql_endpoint_add_shipment_successfully_e2e(
     target_order_id = "ORD-CONFIRMED-1"
     TENANT1 = test_constants.get("tenant1")
     VENDOR1 = test_constants.get("vendor1")
-
-    # Create a mock object that looks like a Django request object for context passing
-    mock_context = MagicMock()
-    # Ensure the 'META' attribute behaves like a dictionary
-    type(mock_context).META = PropertyMock(return_value={
-        "HTTP_AUTHORIZATION": f"Bearer {fake_jwt_valid_token}"
-    })
-
 
     # Updated query string to match the `AddShipmentMutation`'s input structure
     query = """
@@ -127,7 +120,7 @@ def test_graphql_endpoint_add_shipment_successfully_e2e(
     
     # Execute the GraphQL query
     # We pass the mock_context to the client execution
-    response = graphene_client.execute(query, variables=variables, context=mock_context)
+    response = graphene_client.execute(query, variables=variables, context=mock_context_w_auth_header_token)
 
     # Check that no errors occurred in the GraphQL execution
     assert response.get('errors') is None

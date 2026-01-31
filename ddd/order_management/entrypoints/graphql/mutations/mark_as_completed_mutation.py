@@ -21,13 +21,7 @@ class MarkAsCompletedMutation(relay.ClientIDMutation):
 
     @classmethod
     def mutate_and_get_payload(cls, root, info, **input):
-        token = common.get_token_from_context(info)
-
-        # 1. Create a DTO with the raw necessary context data
-        context_data = dtos.RequestContextDTO( # A new DTO we define
-            token=token,
-            tenant_id=input.get("tenant_id")
-        )
+        context_data = common.get_request_context(info, **input)
 
         command = commands.CompleteOrderCommand.model_validate(input)
 

@@ -13,6 +13,6 @@ from .access_control_service_abstract import AccessControlServiceAbstract
 
 from .event_publisher_abstract import EventPublisherAbstract
 from .event_payload_decoder_abstract import EventPayloadDecoderAbstract
+from .context_header_extractor_abstract import ContextHeaderExtractorAbstract
 
 
-from ddd.order_management.application.services import RefundService

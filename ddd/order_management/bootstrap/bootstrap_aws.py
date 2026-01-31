@@ -1,4 +1,4 @@
-import os, redis
+import os
 from dotenv import load_dotenv, find_dotenv
 from ddd.order_management.domain import (
     events, 
@@ -7,7 +7,8 @@ from ddd.order_management.domain import (
     services as domain_services
 )
 from ddd.order_management.infrastructure import (
-    event_bus, 
+    event_bus,
+    header_extractor, 
     repositories,
     access_control1,
     event_publishers,
@@ -19,7 +20,8 @@ from ddd.order_management.infrastructure import (
     shipping,
     shipping_webhook_parser,
     shipment_lookup_service,
-    exception_handler
+    exception_handler,
+    header_extractor
 )
 from ddd.order_management.application import (
     handlers,
@@ -30,7 +32,14 @@ from ddd.order_management.application import (
     services as application_services
 )
 
-load_dotenv(find_dotenv(filename=".env.onprem.test"))
+# entrypoint imports
+from ddd.order_management.entrypoints.graphql.common import  (
+    GraphqlContext
+)
+
+
+# Not applicable for AWS Lambda has its own env mgmt
+#load_dotenv(find_dotenv(filename=".env.aws.test"))
 
 #Depending on the framework arch this might be inside manage.py , app.py, or main.py ?
 #if project grows, breakdown handlers by feature
@@ -42,14 +51,22 @@ load_dotenv(find_dotenv(filename=".env.onprem.test"))
 #    "oms.escalate_reviewer", "oms.review_order", "oms.request_return", "oms.process_refund"],
 #}
 # ====================
+DYNAMODB_TABLE_NAME = os.getenv("DYNAMODB_TABLE_NAME", "tenantoms_db")
 
-saas_lookup_service_instance = saas_lookup_service.SaaSLookupService()
-tenant_lookup_service_instance = tenant_lookup_service.TenantLookupService()
+saas_lookup_service_instance = saas_lookup_service.DynamodbSaaSLookupService(table_name=DYNAMODB_TABLE_NAME)
+tenant_lookup_service_instance = tenant_lookup_service.DynamodbTenantLookupService(table_name=DYNAMODB_TABLE_NAME)
+
+
+# ============== configure entrypoints GraphQL context resolver ==================
+GraphqlContext.configure(
+    saas_lookup_service=saas_lookup_service_instance,
+    header_extractor=header_extractor.APIGatewayHeaderExtractor()
+)
 
 # ============== resolve access control based on tenant_id ===============
 access_control1.AccessControlService.configure(
     saas_lookup_service=saas_lookup_service_instance,
-    access_control_library=access_control1.AccessControl1,
+    access_control_library=access_control1.DynamodbAccessControl1,
     jwt_handler=access_control1.JwtTokenHandler
 )
 
@@ -93,17 +110,28 @@ event_bus.INTERNAL_EVENT_WHITELIST = [
 ]
 
 # ===========Setup Redis event publishers ==========
-event_bus.internal_publisher = event_publishers.RedisStreamPublisher(
-            redis_client=redis.Redis.from_url(os.environ["REDIS_INTERNAL_URL"], decode_responses=True),
-            stream_name=os.getenv("REDIS_INTERNAL_STREAM", "stream.internal.oms"),
-            event_whitelist=event_bus.INTERNAL_EVENT_WHITELIST
-        )
-#TODO how to isolate based on tenant, need svc?
-event_bus.external_publisher = event_publishers.RedisStreamPublisher(
-            redis_client=redis.Redis.from_url(os.environ["REDIS_EXTERNAL_URL"], decode_responses=True),
-            stream_name=os.getenv("REDIS_EXTERNAL_STREAM", "stream.external.oms"),
-            event_whitelist=event_bus.EXTERNAL_EVENT_WHITELIST
-        )
+# Get configuration from environment variables
+bus_name = os.getenv("AWS_EVENT_BUS_NAME", "default_internal")
+aws_region = os.getenv("AWS_REGION", "us-east-1")
+app_source = os.getenv("EVENT_SOURCE_NAME", "saas.oms")
+
+event_bus.internal_publisher = event_publishers.EventBridgePublisher(
+    event_bus_name=bus_name,
+    aws_region=aws_region,
+    source=app_source
+)
+
+# Get configuration from environment variables
+bus_name = os.getenv("AWS_EVENT_BUS_NAME", "default_external")
+aws_region = os.getenv("AWS_REGION", "us-east-1")
+app_source = os.getenv("EVENT_SOURCE_NAME", "saas.oms")
+
+# Inject the AWS-specific publisher
+event_bus.external_publisher = event_publishers.EventBridgePublisher(
+    event_bus_name=bus_name,
+    aws_region=aws_region,
+    source=app_source
+)
 
 
 #  ================ Map event types to validation models; define to support event payloads decoder w validation ============
@@ -125,16 +153,16 @@ event_bus.ASYNC_INTERNAL_EVENT_HANDLERS.update({
     "order_management.internal_events.AddOrderWebhookIntegrationEvent": [
         lambda event: handlers.handle_add_order_async_event(
             event=event,
-            user_action_service=user_action_service.UserActionService(),
-            uow=repositories.DjangoOrderUnitOfWork()
+            user_action_service=user_action_service.DynamodbUserActionService(table_name=DYNAMODB_TABLE_NAME),
+            uow=repositories.DynamoOrderUnitOfWork(table_name=DYNAMODB_TABLE_NAME)
         ),
     ],
     "order_management.internal_events.ConfirmedShipmentEvent": [
         lambda event: handlers.handle_dispatch_shipment_async_event(
             event=event,
-            user_action_service=user_action_service.UserActionService(),
+            user_action_service=user_action_service.DynamodbUserActionService(table_name=DYNAMODB_TABLE_NAME),
             shipping_provider_service=shipping.ShippingProviderService,
-            uow=repositories.DjangoOrderUnitOfWork()
+            uow=repositories.DynamoOrderUnitOfWork(table_name=DYNAMODB_TABLE_NAME)
         ),
     ],
 })
@@ -149,8 +177,8 @@ event_bus.EVENT_HANDLERS.update({
 message_bus.ACCESS_CONTROL_SERVICE_IMPL = access_control1.AccessControlService
 #message_bus.LOGGING_SERVICE_IMPL = loggings.LoggingService
 message_bus.EXCEPTION_HANDLER_FACTORY = exception_handler.OrderExceptionHandler()
-message_bus.UOW = repositories.DjangoOrderUnitOfWork()
-message_bus.USER_ACTION_SERVICE_IMPL = user_action_service.UserActionService()
+message_bus.UOW = repositories.DynamoOrderUnitOfWork(table_name=DYNAMODB_TABLE_NAME)
+message_bus.USER_ACTION_SERVICE_IMPL = user_action_service.DynamodbUserActionService(table_name=DYNAMODB_TABLE_NAME)
 
 # ========= Command Handlers (write operations) ==================
 message_bus.COMMAND_HANDLERS.update({
@@ -189,7 +217,7 @@ message_bus.COMMAND_HANDLERS.update({
         event_bus,
         shipping_webhook_parser.ShippingWebhookParserResolver,
         webhook_receiver.WebhookReceiverService,
-        shipment_lookup_service.ShipmentLookupService(),
+        shipment_lookup_service.DynamodbShipmentLookupService(table_name=DYNAMODB_TABLE_NAME)
     ),
     **handlers.user_action_command_handlers.get_command_handlers(commands, handlers, application_services, tenant_lookup_service)
 })

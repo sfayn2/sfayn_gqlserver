@@ -1,5 +1,5 @@
 import json
-from ddd.order_management.infrastructure.bootstrap import bootstrap_aws
+from ddd.order_management.bootstrap import bootstrap_aws
 from ddd.order_management.entrypoints.graphql.schema import schema
 
 def handler(event, context):

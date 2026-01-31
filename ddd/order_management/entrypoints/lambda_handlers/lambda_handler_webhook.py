@@ -1,5 +1,6 @@
 import json
 import logging
+from ddd.order_management.bootstrap import bootstrap_aws
 from ddd.order_management.application import message_bus, commands
 
 logger = logging.getLogger()

@@ -3,6 +3,7 @@ import boto3
 from typing import List
 from ddd.order_management.infrastructure import event_bus, repositories as impl_repositories
 
+#ports.UnitOfWorkAbstract
 class DynamoOrderUnitOfWork:
     def __init__(self, table_name: str):
         # Initialize the DynamoDB repository

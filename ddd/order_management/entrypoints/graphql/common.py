@@ -1,35 +1,67 @@
-import os, jwt
-import traceback
+from typing import Optional
 from ddd.order_management.domain import exceptions
+from ddd.order_management.application import ports, dtos
 
-def get_token_from_context(info):
+class GraphqlContext:
+    saas_lookup_service: Optional[ports.LookupServiceAbstract] = None
+    header_extractor: Optional[ports.ContextHeaderExtractorAbstract] = None
 
-    ctx = info.context
+
+    @classmethod
+    def configure(cls, saas_lookup_service: ports.LookupServiceAbstract, header_extractor: ports.ContextHeaderExtractorAbstract) -> None:
+        cls.saas_lookup_service = saas_lookup_service
+        cls.header_extractor = header_extractor
+
+
+
+def get_token_from_context(info, tenant_id) -> str:
+
+    # 1. Strategy-based extraction (Clean & Fast)
+    if not GraphqlContext.header_extractor:
+        raise exceptions.AccessControlException("Context extractor not configured")
     
-    # CASE 1: Standard Django Request (On-Prem)
-    if hasattr(ctx, "META"):
-        auth_header = ctx.META.get("HTTP_AUTHORIZATION")
+    auth_header = GraphqlContext.header_extractor.get_auth_header(info.context)
+    if not auth_header:
+        raise exceptions.AccessControlException("Authorization header not found in context")
+
+    # Determine tenant ID from the request to fetch correct token type
+    if GraphqlContext.saas_lookup_service is None:
+        raise exceptions.AccessControlException("SaaS lookup service not configured")
     
-    # CASE 2: Lambda Event (AWS)
-    elif isinstance(ctx, dict) and "request_event" in ctx:
-        # Lambda Proxy integration puts headers in 'headers' key
-        headers = ctx["request_event"].get("headers", {})
-        # Headers in Lambda can be lowercase or capitalized depending on API Gateway version
-        auth_header = headers.get("Authorization") or headers.get("authorization")
+    config_source = GraphqlContext.saas_lookup_service.get_tenant_config(tenant_id)
+
+    if not config_source.configs:
+        # 2. Raise a specific custom exception instead of a generic ValueError
+        raise Exception(f"No configuration found for tenant_id: {tenant_id} in SaaS lookups.")
+
+    token_type = config_source.configs.get("idp", {}).get("token_type", "Bearer")
     
-    else:
-        raise exceptions.AccessControlException("Invalid context type")
 
-    #auth_header = info.context.META.get("HTTP_AUTHORIZATION")
-    #token_type = os.getenv("IDP_TOKEN_TYPE")
-    token_type = "Bearer"
-
-    if not token_type:
-        raise exceptions.AccessControlException("Missing token type")
-
+    #token_type = "Bearer"
     if auth_header:
         if not auth_header.startswith(f"{token_type} "):
             raise exceptions.AccessControlException("Unsupported token type.")
         return auth_header.removeprefix(f"{token_type} ")
 
     return info.context.COOKIES.get("access_token")
+
+
+
+
+def get_request_context(info, **input_data) -> dtos.RequestContextDTO:
+    """
+    Common factory to extract tenant_id and token, returning a 
+    validated RequestContextDTO.
+    """
+    tenant_id = input_data.get("tenant_id")
+    if not tenant_id:
+        # Extra safety check if a developer forgets required=True in GraphQL
+        raise Exception("tenant_id is required to establish request context.")
+        
+    token = get_token_from_context(info, tenant_id=tenant_id)
+
+    return dtos.RequestContextDTO(
+        token=token,
+        tenant_id=tenant_id
+    )
+

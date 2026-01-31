@@ -45,6 +45,7 @@ Defines global SaaS-level settings, authorized tenants, and integration credenti
             "issuer": "http://localhost:8080/realms/TenantOMSAPI-Realm",
             "audience": "TenantOMSAPI-Client",
             "algorithm": "RS256",
+            "token_type": "Bearer", // supported token type
         },
         "webhooks": {
             "shipment_tracker": {

@@ -1,7 +1,7 @@
 import os
 import redis
 import logging
-from ddd.order_management.infrastructure.bootstrap import bootstrap_onprem
+from ddd.order_management.bootstrap import bootstrap_onprem
 
 # 1. Setup Logging
 logging.basicConfig(level=logging.INFO)

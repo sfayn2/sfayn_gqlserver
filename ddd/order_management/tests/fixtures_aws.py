@@ -1,4 +1,5 @@
 import pytest, boto3, os, time, requests
+from unittest.mock import MagicMock, PropertyMock
 from decimal import Decimal 
 from .fixtures import *
 from .data import *
@@ -169,3 +170,14 @@ def seeded_all():
             })
             
     print("✅ DynamoDB Seeding Completed Successfully.")
+
+@pytest.fixture
+def mock_context_w_auth_header_token(fake_jwt_valid_token):
+    # Satisfies CASE 2: Lambda (isinstance(ctx, dict) and "request_event" in ctx)
+    # Note: To pass isinstance(mock_context, dict), you must use a different approach:
+    mock_context = {
+        "request_event": {
+            "headers": {"Authorization": f"Bearer {fake_jwt_valid_token}"}
+        }
+    }
+    return mock_context

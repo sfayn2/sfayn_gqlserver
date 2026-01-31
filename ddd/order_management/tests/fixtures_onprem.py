@@ -1,4 +1,5 @@
 import pytest, boto3, os
+from unittest.mock import MagicMock, PropertyMock
 from django.db import connection
 from .fixtures import *
 from .data import *
@@ -90,3 +91,14 @@ def seeded_all(django_db_setup, django_db_blocker):
         # Re-enable to ensure data integrity during test execution
         #with connection.cursor() as cursor:
         #    cursor.execute("PRAGMA foreign_keys = ON;")
+
+@pytest.fixture
+def mock_context_w_auth_header_token(fake_jwt_valid_token):
+    # Create a mock object that looks like a Django request object for context passing
+    mock_context = MagicMock()
+    # Ensure the 'META' attribute behaves like a dictionary
+    type(mock_context).META = PropertyMock(return_value={
+        "HTTP_AUTHORIZATION": f"Bearer {fake_jwt_valid_token}"
+    })
+
+    return mock_context

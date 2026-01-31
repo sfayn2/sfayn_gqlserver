@@ -1,5 +1,5 @@
 import os
-from ddd.order_management.infrastructure.bootstrap import (
+from ddd.order_management.bootstrap import (
     enums as infra_enums
 )
 

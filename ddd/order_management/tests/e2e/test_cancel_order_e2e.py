@@ -98,6 +98,7 @@ def test_graphql_endpoint_cancels_order_successfully_e2e(
     expected_success,
     expected_message,
     graphene_client, 
+    mock_context_w_auth_header_token,
     test_constants):
     """
     Test the GraphQL API using the Graphene test client. 
@@ -108,11 +109,6 @@ def test_graphql_endpoint_cancels_order_successfully_e2e(
 
     TENANT1 = test_constants.get("tenant1")
 
-    # Create a mock object that looks like a Django request object
-    mock_context = MagicMock()
-    mock_context.META = {
-        "HTTP_AUTHORIZATION": f"Bearer {fake_jwt_valid_token}"
-    }
 
     query = """
             mutation CancelOrder($orderId: String!, $tenantId: String!) {
@@ -128,7 +124,7 @@ def test_graphql_endpoint_cancels_order_successfully_e2e(
     
     # Execute the GraphQL query
     # We use a mock 'info' context here if needed, but the fixtures handle the common calls
-    response = graphene_client.execute(query, variables=variables, context=mock_context)
+    response = graphene_client.execute(query, variables=variables, context=mock_context_w_auth_header_token)
 
     # Check that no errors occurred in the GraphQL execution
     assert response.get('errors') is None
