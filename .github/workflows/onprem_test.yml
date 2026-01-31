@@ -48,8 +48,8 @@ jobs:
 
       - name: Run Pytest via Shell Script
         run: |
-          python manage.py migrate
-          python manage.py createsuperuser --no-input      
+          uv run python manage.py migrate
+          uv run python manage.py createsuperuser --no-input      
 
           # 1. Grant execution permission to your script
           chmod +x ./ddd/order_management/tests/run_test_onprem.sh
