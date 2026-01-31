@@ -1,0 +1,61 @@
+name: Python Tests (uv)
+
+on:
+  push:
+    branches: [ "main", "develop" ]
+  pull_request:
+    branches: [ "main", "develop" ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    # Global Environment Variables for CI
+    env:
+      ORDER_MANAGEMENT_INFRA_TYPE: "ONPREM_DJANGO"
+      # Ensure Django finds your settings module
+      DJANGO_SETTINGS_MODULE: "sfayn_gqlserver.settings"
+      # Ensures Python includes your root folder in the search path
+      PYTHONPATH: "." 
+      SECRET_KEY: "local-testing-secret-key-123"
+
+
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: "latest"
+          enable-cache: true # Uses GitHub Actions cache for lightning speed
+
+      - name: Set up Python
+        # uv automatically detects the version from your .python_version file
+        run: uv python install
+
+      - name: Install Dependencies
+        # Syncs your environment exactly with uv.lock
+        run: uv sync --all-extras --dev
+
+      - name: Run Pytest via Shell Script
+        run: |
+          python manage.py migrate
+          python manage.py createsuperuser --no-input      
+
+          # 1. Grant execution permission to your script
+          chmod +x ./ddd/order_management/tests/run_test_onprem.sh
+          
+          # 2. Execute the script. 
+          # Note: uv run ensures the script uses the virtualenv created in 'uv sync'
+          uv run ./ddd/order_management/tests/run_test_onprem.sh
+        
+      - name: Upload Test Results (Optional)
+        if: always() # Runs even if tests fail
+        uses: actions/upload-artifact@v4
+        with:
+          name: pytest-results
+          path: |
+            *.log
+            test-reports/
