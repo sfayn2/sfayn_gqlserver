@@ -1,4 +1,4 @@
-name: Python Tests (uv)
+name: OnPrem Test
 
 on:
   push:
