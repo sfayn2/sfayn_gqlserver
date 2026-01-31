@@ -1,10 +1,15 @@
+<<<<<<< HEAD
 name: OnPrem Test
+=======
+name: Python Tests (uv)
+>>>>>>> 7aa9b6f (github action on prem test)
 
 on:
   push:
     branches: [ "main", "develop" ]
   pull_request:
     branches: [ "main", "develop" ]
+<<<<<<< HEAD
   workflow_dispatch:
     inputs:
       reason:
@@ -12,6 +17,8 @@ on:
         required: false
         default: 'Manual trigger'
 
+=======
+>>>>>>> 7aa9b6f (github action on prem test)
 
 jobs:
   test:
@@ -34,7 +41,6 @@ jobs:
       
       REDIS_EXTERNAL_URL: "redis://localhost:6379"
       REDIS_EXTERNAL_STREAM: "stream.external_events.order_management"
-
 
 
     steps:
@@ -67,11 +73,3 @@ jobs:
           # Note: uv run ensures the script uses the virtualenv created in 'uv sync'
           uv run ./ddd/order_management/tests/run_test_onprem.sh
         
-      - name: Upload Test Results (Optional)
-        if: always() # Runs even if tests fail
-        uses: actions/upload-artifact@v4
-        with:
-          name: pytest-results
-          path: |
-            *.log
-            test-reports/
