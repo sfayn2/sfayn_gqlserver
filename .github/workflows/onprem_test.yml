@@ -22,6 +22,10 @@ jobs:
       ORDER_MANAGEMENT_INFRA_TYPE: "ONPREM_DJANGO"
       # Ensure Django finds your settings module
       DJANGO_SETTINGS_MODULE: "sfayn_gqlserver.settings"
+      DJANGO_SUPERUSER_USERNAME: "admin"
+      DJANGO_SUPERUSER_PASSWORD: "password123"
+      DJANGO_SUPERUSER_EMAIL: "admin@example.com"
+
       # Ensures Python includes your root folder in the search path
       PYTHONPATH: "." 
       SECRET_KEY: "local-testing-secret-key-123"
@@ -45,7 +49,7 @@ jobs:
 
       - name: Set up Python
         # uv automatically detects the version from your .python_version file
-        run: uv python install 3.14
+        run: uv python install
 
       - name: Install Dependencies
         # Syncs your environment exactly with uv.lock
