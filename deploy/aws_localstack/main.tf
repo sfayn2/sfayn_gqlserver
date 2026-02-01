@@ -99,15 +99,15 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "assets_encryption
 # ---------------------------------------------------------
 # We define the S3 object but DO NOT provide a local "source".
 # This tells Terraform: "Manage the metadata for this file in S3".
-resource "aws_s3_object" "tenantoms_layer_zip" {
-  bucket = aws_s3_bucket.assets.id
-  key    = "for_lambda/python_env.zip"
-  source = "${path.module}/python_env.zip"
-
-  # Trigger a re-upload if the local file changes
-  etag   = filemd5("${path.module}/python_env.zip")
-
-}
+#resource "aws_s3_object" "tenantoms_layer_zip" {
+#  bucket = aws_s3_bucket.assets.id
+#  key    = "for_lambda/python_env.zip"
+#  source = "${path.module}/python_env.zip"
+#
+#  # Trigger a re-upload if the local file changes
+#  etag   = filemd5("${path.module}/python_env.zip")
+#
+#}
 
 resource "aws_lambda_layer_version" "tenantoms_shared_layer" {
   layer_name          = "${var.project_name}-shared-dependencies"
