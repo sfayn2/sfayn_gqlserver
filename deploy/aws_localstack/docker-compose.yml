@@ -6,7 +6,6 @@ services:
       - "127.0.0.1:4566:4566"
       - "127.0.0.1:4510-4559:4510-4559"
     environment:
-      - DOCKER_HOST=unix:///var/run/docker.sock
       - DEBUG=1
       - LOCALSTACK_FILE_WATCHER_STRATEGY=polling
       - LAMBDA_RUNTIME_ENVIRONMENT_TIMEOUT=60
@@ -19,13 +18,14 @@ services:
   keycloak:
     container_name: keycloak_main
     image: quay.io/keycloak/keycloak:latest
-    command: start-dev --db=dev-file # Force file-based DB instead of in-memory
+    command: start-dev --import-realm --db=dev-file # Force file-based DB instead of in-memory
     environment:
       - KC_BOOTSTRAP_ADMIN_USERNAME=admin
       - KC_BOOTSTRAP_ADMIN_PASSWORD=admin
       - KC_HOSTNAME=localhost
       - KC_HOSTNAME_STRICT=false
     volumes:
+      - ./realm-export.json:/opt/keycloak/data/import/realm-export.json
       - "./keycloak_data:/opt/keycloak/data" # Persist the actual DB files
     ports:
       - "8080:8080"

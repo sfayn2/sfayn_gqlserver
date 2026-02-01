@@ -53,7 +53,7 @@ jobs:
       - name: Spin up Infrastructure
         working-directory: ./deploy/aws_localstack/
         run: |
-          docker compose up -d --wait
+          docker compose -f docker-compose.yml -f docker-compose.ci.yml up -d --wait
 
       - name: Provision AWS Services via LocalStack
         # Run this from your Terraform directory
