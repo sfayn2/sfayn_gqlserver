@@ -29,6 +29,11 @@ jobs:
       KC_PWD: "kc pass"
       KC_CLIENT_SECRET: "keycloak secret key"
 
+      # Dynamically set the absolute paths using $GITHUB_WORKSPACE
+      TF_VAR_lambda_function_s3_key_hot_reload: "${{ github.workspace }}"
+      TF_VAR_lambda_function_s3_key_hot_reload_packages: "${{ github.workspace }}/.venv/lib/python3.10/site-packages/"
+
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4

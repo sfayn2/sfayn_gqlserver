@@ -29,6 +29,11 @@ variable "lambda_function_s3_key_hot_reload" {
   description = "the absolute path to your source code for localstack hot-reloading"
 }
 
+variable "lambda_function_s3_key_hot_reload_packages" {
+  type        = string
+  description = "the absolute path to your packages for localstack hot-reloading"
+}
+
 
 
 variable "architectures" {

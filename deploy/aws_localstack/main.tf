@@ -112,7 +112,7 @@ resource "aws_s3_object" "tenantoms_layer_zip" {
 resource "aws_lambda_layer_version" "tenantoms_shared_layer" {
   layer_name          = "${var.project_name}-shared-dependencies"
   s3_bucket     = "hot-reload"
-  s3_key        = "/home/pao/Documents/Dev/sfayn_gqlserver/.venv/lib/python3.14/site-packages/" # Absolute path
+  s3_key        = var.lambda_function_s3_key_hot_reload_packages
 
   #s3_bucket           = aws_s3_bucket.assets.id
   #s3_key              = aws_s3_object.tenantoms_layer_zip.key
