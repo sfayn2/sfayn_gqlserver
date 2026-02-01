@@ -37,6 +37,13 @@ jobs:
         uses: astral-sh/setup-uv@v5
         with:
           enable-cache: true
+    
+    - name: Install Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.14.3" # Specify your version
+          terraform_wrapper: false   # Recommended for tflocal
+
 
       - name: Spin up Infrastructure
         working-directory: ./deploy/aws_localstack/
