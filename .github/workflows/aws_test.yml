@@ -18,7 +18,6 @@ jobs:
     
     # Global Environment Variables for CI
     env:
-      ORDER_MANAGEMENT_INFRA_TYPE: "AWS"
       PYTHONPATH: "." 
       # AWS/LocalStack config
       AWS_ENDPOINT_URL: "http://localhost:4566"
