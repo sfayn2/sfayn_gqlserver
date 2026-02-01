@@ -1,5 +1,4 @@
 [![OnPrem Test](https://github.com/sfayn2/sfayn_gqlserver/actions/workflows/onprem_test.yml/badge.svg)](https://github.com/sfayn2/sfayn_gqlserver/actions/workflows/onprem_test.yml)
-
 [![AWS Localstack Test](https://github.com/sfayn2/sfayn_gqlserver/actions/workflows/aws_test.yml/badge.svg)](https://github.com/sfayn2/sfayn_gqlserver/actions/workflows/aws_test.yml)
 
 # TenantOMSApi
