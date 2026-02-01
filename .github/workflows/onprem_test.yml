@@ -1,4 +1,6 @@
-name: OnPrem Test
+name: CI | OnPrem Infra & DDD Business Domain Validation
+# This workflow sets up the On-Premises environment and runs tests to validate
+# the business logic in a REDIS/Django-based On-Premises setup.
 
 on:
   push:

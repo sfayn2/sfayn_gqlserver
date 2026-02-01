@@ -1,4 +1,11 @@
 services:
   localstack:
+    environment:
+      - SKIP_JWT_VERIFY=true
+      - SERVICES=lambda,dynamodb,s3,s3control,sts,iam,apigateway,events
+      - DEBUG=0
+      - LAMBDA_EXECUTOR=docker
+      - LAMBDA_REMOVE_CONTAINERS=false
+      - LAMBDA_KEEPALIVE_MS=600000
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"

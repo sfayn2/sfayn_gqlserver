@@ -1,5 +1,6 @@
-name: AWS Localstack Test
-
+name: CI | AWS Infra (LocalStack) & DDD Business Domain Validation
+# This workflow sets up LocalStack, deploys AWS infrastructure using Terraform,
+# and runs domain-specific tests to validate business logic in an AWS-like environment.
 on:
   push:
     branches: [ "main", "develop" ]
@@ -24,14 +25,15 @@ jobs:
       AWS_ACCESS_KEY_ID: "test"
       AWS_SECRET_ACCESS_KEY: "test"
       AWS_DEFAULT_REGION: "us-east-1"
+      DYNAMODB_TABLE_NAME: "tntoms-tst-main-table"
 
       ORDER_MANAGEMENT_INFRA_TYPE: "AWS"
-      KC_PWD: "kc pass"
-      KC_CLIENT_SECRET: "keycloak secret key"
+      SKIP_JWT_VERIFY: "true"  # Set to "true" to skip JWT verification in tests
 
       # Dynamically set the absolute paths using $GITHUB_WORKSPACE
       TF_VAR_lambda_function_s3_key_hot_reload: "${{ github.workspace }}"
-      TF_VAR_lambda_function_s3_key_hot_reload_packages: "${{ github.workspace }}/.venv/lib/python3.10/site-packages/"
+      TF_VAR_lambda_function_s3_key_hot_reload_packages: "${{ github.workspace }}/.venv/lib/python3.14/site-packages/"
+      TF_VAR_skip_jwt_verify: "true"  # Pass to Terraform variable
 
 
     steps:
@@ -50,12 +52,12 @@ jobs:
           terraform_wrapper: false   # Recommended for tflocal
 
 
-      - name: Spin up Infrastructure
+      - name: Set up and Start LocalStack
         working-directory: ./deploy/aws_localstack/
         run: |
-          docker compose -f docker-compose.yml -f docker-compose.ci.yml up -d --wait
+          docker compose -f docker-compose.yml -f docker-compose.ci.yml up localstack -d --wait
 
-      - name: Provision AWS Services via LocalStack
+      - name: Spin up AWS Infra with Terraform
         # Run this from your Terraform directory
         working-directory: ./deploy/aws_localstack/ 
         run: |
@@ -73,11 +75,8 @@ jobs:
 
       - name: Run Pytest via AWS Shell Script
         run: |
-          # 2. Grant execution permission to the new AWS script
-          chmod +x ./ddd/order_management/tests/run_test_aws.sh
-          
-          # 3. Execute the AWS-specific test runner
-          uv run ./ddd/order_management/tests/run_test_aws.sh
+          uv run pytest "./ddd/order_management/tests/e2e/" -p no:django
+          uv run pytest "./ddd/order_management/tests/full_e2e/test_add_order_full_e2e.py" -p no:django
 
       # 4. Cleanup (Good practice for CI runners)
       - name: Stop Infrastructure

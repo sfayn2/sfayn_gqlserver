@@ -16,7 +16,6 @@ export AWS_DEFAULT_REGION="us-east-1"
 export AWS_REGION="us-east-1"
 export DYNAMODB_TABLE_NAME="tntoms-tst-main-table"
 export AWS_ENDPOINT_URL="http://localhost:4566"
-export SKIP_JWT_VERIFY="true"
 
 
 # Ensure LocalStack is running before proceeding (optional but recommended)
@@ -34,4 +33,4 @@ fi
 
 #uv run pytest "$PROJECT_ROOT/ddd/order_management/tests/e2e" -vv --tb=long -l -p no:django
 uv run pytest "$PROJECT_ROOT/ddd/order_management/tests/e2e" -p no:django
-uv run pytest "$PROJECT_ROOT/ddd/order_management/tests/full_e2e" -p no:django
+uv run pytest "$PROJECT_ROOT/ddd/order_management/tests/full_e2e/" -p no:django

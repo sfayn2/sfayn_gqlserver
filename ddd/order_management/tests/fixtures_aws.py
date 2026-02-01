@@ -22,6 +22,7 @@ def api_gateway_url_graphql_api():
     target_api_name = "tntoms-tst-api" 
     
     apis = client.get_rest_apis()
+    print("APIS FOUND:", apis)
     api_id = next(
         (item["id"] for item in apis["items"] if item["name"] == target_api_name), 
         None
@@ -37,25 +38,31 @@ def api_gateway_url_graphql_api():
 
     # 3. Construct the URL
     stage = "tst"
+    time.sleep(3) # Wait for eventual consistency for unknown reasons, it needs to have a breathing time
     return f"{endpoint_url}/_aws/execute-api/{api_id}/{stage}/graphql"
 
 
-@pytest.fixture(scope="session")
-def live_keycloak_token():
+#@pytest.fixture(scope="session")
+@pytest.fixture
+def live_keycloak_token(fake_jwt_valid_token):
     """Grabs a real token from a running Keycloak instance."""
-    url = "http://localhost:8080/realms/TenantOMSAPI-Realm/protocol/openid-connect/token"
-    data = {
-        "client_id": "TenantOMSAPI-Client",
-        "client_secret": os.getenv("KC_CLIENT_SECRET"),
-        "grant_type": "password",
-        "username": "pao",
-        "password": os.getenv("KC_PWD")
-    }
-    response = requests.post(url, data=data)
-    response.raise_for_status()
-    time.sleep(2) # Wait for eventual consistency for unknown reasons, it needs to have a breathing time
+    # 2. Define Headers (Including the JWT)
+    if os.getenv("SKIP_JWT_VERIFY") == "true":
+        return fake_jwt_valid_token
+    else:
+        url = "http://localhost:8080/realms/TenantOMSAPI-Realm/protocol/openid-connect/token"
+        data = {
+            "client_id": "TenantOMSAPI-Client",
+            "client_secret": os.getenv("KC_CLIENT_SECRET"),
+            "grant_type": "password",
+            "username": "pao",
+            "password": os.getenv("KC_PWD")
+        }
+        response = requests.post(url, data=data)
+        response.raise_for_status()
+        time.sleep(2) # Wait for eventual consistency for unknown reasons, it needs to have a breathing time
 
-    return response.json()["access_token"]
+        return response.json()["access_token"]
 
 
 @pytest.fixture

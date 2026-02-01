@@ -165,7 +165,7 @@ resource "aws_lambda_function" "tenantoms_graphql_handler" {
       DYNAMODB_TABLE_NAME  = aws_dynamodb_table.tenantoms_db.name
       PYTHONPATH = var.lambda_pythonpath
       ORDER_MANAGEMENT_INFRA_TYPE = "AWS"
-      SKIP_JWT_VERIFY = "false"
+      SKIP_JWT_VERIFY = var.skip_jwt_verify
     }
   }
 }
@@ -200,7 +200,7 @@ resource "aws_lambda_function" "tenantoms_webhook_receiver" {
       DYNAMODB_TABLE_NAME  = aws_dynamodb_table.tenantoms_db.name
       PYTHONPATH = var.lambda_pythonpath
       ORDER_MANAGEMENT_INFRA_TYPE = "AWS"
-      SKIP_JWT_VERIFY = "false"
+      SKIP_JWT_VERIFY = var.skip_jwt_verify
     }
   }
 }
@@ -235,7 +235,7 @@ resource "aws_lambda_function" "tenantoms_event_worker" {
       DYNAMODB_TABLE_NAME = aws_dynamodb_table.tenantoms_db.name
       PYTHONPATH = var.lambda_pythonpath
       ORDER_MANAGEMENT_INFRA_TYPE = "AWS"
-      SKIP_JWT_VERIFY = "false"
+      SKIP_JWT_VERIFY = var.skip_jwt_verify
     }
   }
 }

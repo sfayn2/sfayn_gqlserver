@@ -34,6 +34,11 @@ variable "lambda_function_s3_key_hot_reload_packages" {
   description = "the absolute path to your packages for localstack hot-reloading"
 }
 
+variable "skip_jwt_verify" {
+  type        = string
+  description = "whether to skip JWT verification in localstack mode"
+  default     = "false"
+}
 
 
 variable "architectures" {
