@@ -1,15 +1,10 @@
-<<<<<<< HEAD
 name: OnPrem Test
-=======
-name: Python Tests (uv)
->>>>>>> 7aa9b6f (github action on prem test)
 
 on:
   push:
     branches: [ "main", "develop" ]
   pull_request:
     branches: [ "main", "develop" ]
-<<<<<<< HEAD
   workflow_dispatch:
     inputs:
       reason:
@@ -17,8 +12,6 @@ on:
         required: false
         default: 'Manual trigger'
 
-=======
->>>>>>> 7aa9b6f (github action on prem test)
 
 jobs:
   test:
