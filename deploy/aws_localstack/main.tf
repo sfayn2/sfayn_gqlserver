@@ -123,15 +123,15 @@ resource "aws_lambda_layer_version" "tenantoms_shared_layer" {
   #depends_on = [aws_s3_object.tenantoms_layer_zip]
 }
 
-resource "aws_s3_object" "lambda_handler_zip" {
-  bucket = aws_s3_bucket.assets.id
-  key    = "for_lambda/source_ddd.zip"
-  source = "${path.module}/source_ddd.zip"
-
-  # Trigger a re-upload if the local file changes
-  etag   = filemd5("${path.module}/source_ddd.zip")
-
-}
+#resource "aws_s3_object" "lambda_handler_zip" {
+#  bucket = aws_s3_bucket.assets.id
+#  key    = "for_lambda/source_ddd.zip"
+#  source = "${path.module}/source_ddd.zip"
+#
+#  # Trigger a re-upload if the local file changes
+#  etag   = filemd5("${path.module}/source_ddd.zip")
+#
+#}
 
 # PRIMARY HANDLER (GraphQL)
 # ---------------------------------------------------------
