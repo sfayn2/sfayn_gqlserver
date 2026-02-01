@@ -1,0 +1,74 @@
+name: AWS Localstack Test
+
+on:
+  push:
+    branches: [ "main", "develop" ]
+  pull_request:
+    branches: [ "main", "develop" ]
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: 'Reason for manual run'
+        required: false
+        default: 'Manual trigger'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    # Global Environment Variables for CI
+    env:
+      ORDER_MANAGEMENT_INFRA_TYPE: "AWS"
+      PYTHONPATH: "." 
+      # AWS/LocalStack config
+      AWS_ENDPOINT_URL: "http://localhost:4566"
+      AWS_ACCESS_KEY_ID: "test"
+      AWS_SECRET_ACCESS_KEY: "test"
+      AWS_DEFAULT_REGION: "us-east-1"
+
+      ORDER_MANAGEMENT_INFRA_TYPE: "AWS"
+      KC_PWD: "kc pass"
+      KC_CLIENT_SECRET: "keycloak secret key"
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Spin up Infrastructure
+        working-directory: ./deploy/aws_localstack/
+        run: |
+          docker compose up -d --wait
+
+      - name: Provision AWS Services via LocalStack
+        # Run this from your Terraform directory
+        working-directory: ./deploy/aws_localstack/ 
+        run: |
+          # 1. Initialize Terraform (using tflocal wrapper)
+          uv run tflocal init
+          
+          # 2. Apply configuration without manual approval
+          uv run tflocal apply --auto-approve
+
+      - name: Set up Python
+        run: uv python install
+
+      - name: Install Dependencies
+        run: uv sync --all-extras --dev
+
+      - name: Run Pytest via AWS Shell Script
+        run: |
+          # 2. Grant execution permission to the new AWS script
+          chmod +x ./ddd/order_management/tests/run_test_aws.sh
+          
+          # 3. Execute the AWS-specific test runner
+          uv run ./ddd/order_management/tests/run_test_aws.sh
+
+      # 4. Cleanup (Good practice for CI runners)
+      - name: Stop Infrastructure
+        if: always()
+        run: docker compose down
