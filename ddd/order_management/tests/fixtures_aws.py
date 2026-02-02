@@ -48,6 +48,7 @@ def live_keycloak_token(fake_jwt_valid_token):
     """Grabs a real token from a running Keycloak instance."""
     # 2. Define Headers (Including the JWT)
     if os.getenv("SKIP_JWT_VERIFY") == "true":
+        print("⚠️ SKIP_JWT_VERIFY is true, using fake token.", fake_jwt_valid_token)
         return fake_jwt_valid_token
     else:
         url = "http://localhost:8080/realms/TenantOMSAPI-Realm/protocol/openid-connect/token"
