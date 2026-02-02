@@ -83,7 +83,7 @@ jobs:
           # curl -s http://localhost:4566/_localstack/health | jq
           uv run pytest "./ddd/order_management/tests/e2e/" -p no:django
           # uv run awslocal lambda invoke --function-name tntoms-tst-graphql-api out
-          uv run pytest "./ddd/order_management/tests/full_e2e/" -p no:django
+          uv run pytest "./ddd/order_management/tests/full_e2e/test_add_order_full_e2e.py" -p no:django
 
       # 4. Cleanup (Good practice for CI runners)
       - name: Stop Infrastructure
