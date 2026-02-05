@@ -73,20 +73,20 @@ ORDER_LINE_SEEDS = (
 )
 
 # Shipment
-# Columns shipment_id, order_id, shipment_address_line1, shipment_address_line2, shipment_address_city, shipment_address_postal, shipment_address_country, shipment_address_state, shipment_provider, tracking_reference, shipment_amount, shipment_currency, shipment_status
+# Columns shipment_id, order_id, shipment_address_line1, shipment_address_line2, shipment_address_city, shipment_address_postal, shipment_address_country, shipment_address_state, shipment_provider, tracking_reference, shipment_amount, shipment_currency, shipment_status, tenant_id
 SHIPMENT_SEEDS = (
-    ("SH-1", "ORD-CONFIRMED-1", "line 1", "line 2", "city ", "postal here", "country here", "state here", "provider here", " tracking reference here", Decimal("2.2"), "SGD", enums.ShipmentStatus.PENDING.value),
-    ("SH-SHIPPED-SHIPPED-1", "ORD-CONFIRMED_W_SHIPPED-1", "line 1", "line 2", "city ", "postal here", "country here", "state here", "provider here", "TN123456789", Decimal("2.2"), "SGD", enums.ShipmentStatus.SHIPPED.value),
-    ("SH-SHIPPED-SHIPPED-2", "ORD-CONFIRMED_W_SHIPPED-1", "line 1", "line 2", "city ", "postal here", "country here", "state here", "provider here", "TN123456790", Decimal("2.2"), "SGD", enums.ShipmentStatus.SHIPPED.value),
-    ("SH-SHIPPED-PENDING-1", "ORD-CONFIRMED_W_SHIPPED-1", "line 1", "line 2", "city ", "postal here", "country here", "state here", "provider here", "TN123456791", Decimal("2.2"), "SGD", enums.ShipmentStatus.PENDING.value),
-    ("SH-SHIPPED-CONFIRMED-1", "ORD-CONFIRMED_W_SHIPPED-1", "line 1", "line 2", "city ", "postal here", "country here", "state here", "provider here", "TN123456792", Decimal("2.2"), "SGD", enums.ShipmentStatus.CONFIRMED.value),
-    ("SH-PENDING-2", "ORD-CONFIRMED_W_PENDING-1", "line 1", "line 2", "city ", "postal here", "country here", "state here", "provider here", " tracking reference here", Decimal("2.2"), "SGD", enums.ShipmentStatus.PENDING.value),
-    ("SH-CONFIRMED-2", "ORD-CONFIRMED_W_CONFIRMED-1", "line 1", "line 2", "city ", "postal here", "country here", "state here", "provider here", " tracking reference here", Decimal("2.2"), "SGD", enums.ShipmentStatus.CONFIRMED.value),
-    ("SH-DELIVERED-2", "ORD-CONFIRMED_W_DELIVERED-1", "line 1", "line 2", "city ", "postal here", "country here", "state here", "provider here", " tracking reference here", Decimal("2.2"), "SGD", enums.ShipmentStatus.DELIVERED.value),
-    ("SH-READY-TO-COMPLETE-1", "ORD-READY-TO-COMPLETE-1", "line 1", "line 2", "city ", "postal here", "country here", "state here", "provider here", " tracking reference here", Decimal("2.2"), "SGD", enums.ShipmentStatus.DELIVERED.value),
-    ("SH-ALREADY-COMPLETED-1", "ORD-ALREADY-COMPLETED-1", "line 1", "line 2", "city ", "postal here", "country here", "state here", "provider here", " tracking reference here", Decimal("2.2"), "SGD", enums.ShipmentStatus.DELIVERED.value),
-    ("SH-READY-TO-COMPLETE-UNPAID-1", "ORD-READY-TO-COMPLETE-UNPAID-1", "line 1", "line 2", "city ", "postal here", "country here", "state here", "provider here", " tracking reference here", Decimal("2.2"), "SGD", enums.ShipmentStatus.DELIVERED.value),
-    ("SH-READY-TO-COMPLETE-PAID-1", "ORD-READY-TO-COMPLETE-PAID-1", "line 1", "line 2", "city ", "postal here", "country here", "state here", "provider here", " tracking reference here", Decimal("2.2"), "SGD", enums.ShipmentStatus.DELIVERED.value),
+    ("SH-1", "ORD-CONFIRMED-1", "line 1", "line 2", "city ", "postal here", "country here", "state here", "provider here", " tracking reference here", Decimal("2.2"), "SGD", enums.ShipmentStatus.PENDING.value, TENANT1),
+    ("SH-SHIPPED-SHIPPED-1", "ORD-CONFIRMED_W_SHIPPED-1", "line 1", "line 2", "city ", "postal here", "country here", "state here", "provider here", "TN123456789", Decimal("2.2"), "SGD", enums.ShipmentStatus.SHIPPED.value, TENANT1),
+    ("SH-SHIPPED-SHIPPED-2", "ORD-CONFIRMED_W_SHIPPED-1", "line 1", "line 2", "city ", "postal here", "country here", "state here", "provider here", "TN123456790", Decimal("2.2"), "SGD", enums.ShipmentStatus.SHIPPED.value, TENANT1),
+    ("SH-SHIPPED-PENDING-1", "ORD-CONFIRMED_W_SHIPPED-1", "line 1", "line 2", "city ", "postal here", "country here", "state here", "provider here", "TN123456791", Decimal("2.2"), "SGD", enums.ShipmentStatus.PENDING.value, TENANT1),
+    ("SH-SHIPPED-CONFIRMED-1", "ORD-CONFIRMED_W_SHIPPED-1", "line 1", "line 2", "city ", "postal here", "country here", "state here", "provider here", "TN123456792", Decimal("2.2"), "SGD", enums.ShipmentStatus.CONFIRMED.value, TENANT1),
+    ("SH-PENDING-2", "ORD-CONFIRMED_W_PENDING-1", "line 1", "line 2", "city ", "postal here", "country here", "state here", "provider here", " tracking reference here", Decimal("2.2"), "SGD" , enums.ShipmentStatus.PENDING.value, TENANT1),
+    ("SH-CONFIRMED-2", "ORD-CONFIRMED_W_CONFIRMED-1", "line 1", "line 2", "city ", "postal here", "country here", "state here", "provider here", " tracking reference here", Decimal("2.2"), "SGD", enums.ShipmentStatus.CONFIRMED.value, TENANT1),
+    ("SH-DELIVERED-2", "ORD-CONFIRMED_W_DELIVERED-1", "line 1", "line 2", "city ", "postal here", "country here", "state here", "provider here", " tracking reference here", Decimal("2.2"), "SGD", enums.ShipmentStatus.DELIVERED.value, TENANT1),
+    ("SH-READY-TO-COMPLETE-1", "ORD-READY-TO-COMPLETE-1", "line 1", "line 2", "city ", "postal here", "country here", "state here", "provider here", " tracking reference here", Decimal("2.2"), "SGD", enums.ShipmentStatus.DELIVERED.value, TENANT1),
+    ("SH-ALREADY-COMPLETED-1", "ORD-ALREADY-COMPLETED-1", "line 1", "line 2", "city ", "postal here", "country here", "state here", "provider here", " tracking reference here", Decimal("2.2"), "SGD", enums.ShipmentStatus.DELIVERED.value, TENANT1),
+    ("SH-READY-TO-COMPLETE-UNPAID-1", "ORD-READY-TO-COMPLETE-UNPAID-1", "line 1", "line 2", "city ", "postal here", "country here", "state here", "provider here", " tracking reference here", Decimal("2.2"), "SGD" , enums.ShipmentStatus.DELIVERED.value, TENANT1),
+    ("SH-READY-TO-COMPLETE-PAID-1","ORD-READY-TO-COMPLETE-PAID-1","line 1","line 2","city ","postal here","country here","state here","provider here"," tracking reference here" ,Decimal("2.2"),"SGD" ,enums.ShipmentStatus.DELIVERED.value,TENANT1),
 )
 
 

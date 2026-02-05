@@ -403,6 +403,12 @@ resource "aws_dynamodb_table" "tenantoms_db" {
     type = "S"
   }
 
+
+  attribute {
+    name = "tracking_reference"
+    type = "S"
+  }
+
   # Global Secondary Index (GSI) for Tenant-based lookups
   # Useful for: "Get all orders for Tenant X"
   attribute {
@@ -416,6 +422,16 @@ resource "aws_dynamodb_table" "tenantoms_db" {
     range_key          = "pk"
     projection_type    = "ALL"
   }
+
+
+  # 2. ADD THIS INDEX for getting tenant_id by tracking ref
+  global_secondary_index {
+    name               = "TrackingIndex"
+    hash_key           = "tracking_reference" # This is the HASH key for the index
+    projection_type    = "INCLUDE"            # Optimization: Only project what you need
+    non_key_attributes = ["tenant_id"]        # This allows .get('tenant_id') to work
+  }
+
 
   tags = {
     Project     = var.project_name

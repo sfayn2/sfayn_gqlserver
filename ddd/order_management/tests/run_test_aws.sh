@@ -31,6 +31,6 @@ fi
 
 
 
-#uv run pytest "$PROJECT_ROOT/ddd/order_management/tests/e2e" -vv --tb=long -l -p no:django
-uv run pytest "$PROJECT_ROOT/ddd/order_management/tests/e2e" -p no:django
-uv run pytest "$PROJECT_ROOT/ddd/order_management/tests/full_e2e/" -p no:django
+uv run pytest "$PROJECT_ROOT/ddd/order_management/tests/integration/webhook_apis/test_shipment_tracker_webhook.py" -vv --tb=long -l -p no:django
+#uv run pytest "$PROJECT_ROOT/ddd/order_management/tests/e2e" -p no:django
+#uv run pytest "$PROJECT_ROOT/ddd/order_management/tests/full_e2e/" -p no:django

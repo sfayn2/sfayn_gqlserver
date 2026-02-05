@@ -5,7 +5,9 @@ from ddd.order_management.application import dtos
 
 class SaaSLookupException(Exception):
     """Unified exception for SaaS Lookup Service failures."""
-    pass
+    def __init__(self, message):
+        # If you forgot to call super(), the base Exception doesn't get the msg
+        super().__init__(message) 
 
 class DynamodbSaaSLookupService:
     def __init__(self, table_name: str):

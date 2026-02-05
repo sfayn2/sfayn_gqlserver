@@ -16,11 +16,15 @@ class EventBridgePublisher:
 
     def publish(self, event):
         try:
+            # Pydantic's model_dump_json() automatically converts 
+            # datetimes to ISO format strings.
+            detail_json = event.data.model_dump_json()
+
             response = self.client.put_events(
                 Entries=[{
                     "Source": self.source,
                     "DetailType": event.event_type,
-                    "Detail": json.dumps(event.data.model_dump()),
+                    "Detail": detail_json,
                     "EventBusName": self.event_bus_name
                 }]
             )

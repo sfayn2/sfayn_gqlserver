@@ -25,6 +25,8 @@ def handle_publish_shipment_tracker(
     """
     try:
 
+        print("Handling publish shipment tracker command")
+
         # 1. Extract the tracking reference from the raw request body
         tracking_reference = webhook_receiver_service.extract_tracking_reference(
             command.raw_body, 

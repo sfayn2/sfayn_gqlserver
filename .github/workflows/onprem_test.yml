@@ -4,9 +4,9 @@ name: CI | OnPrem Infra & DDD Business Domain Validation
 
 on:
   push:
-    branches: [ "main", "develop" ]
+    branches: [ "main", "Dev" ]
   pull_request:
-    branches: [ "main", "develop" ]
+    branches: [ "main", "Dev" ]
   workflow_dispatch:
     inputs:
       reason:

@@ -54,6 +54,7 @@ def test_add_order_full_e2e(api_gateway_url_graphql_api, live_keycloak_token):
     )
 
     response_data = response.json()
+    print("response_data XXXXXXX:", response_data)
 
     # 4. Assertions
     assert response.status_code == 200

@@ -1,9 +1,15 @@
 import json
-from ddd.order_management.bootstrap import bootstrap_aws
-from ddd.order_management.infrastructure import event_bus
+
+BOOTSTRAPPED = False
 
 
 def handler(event, context):
+    global BOOTSTRAPPED
+    if not BOOTSTRAPPED:
+        from ddd.order_management.infrastructure import event_bus
+        from ddd.order_management.bootstrap import bootstrap_aws
+        bootstrap_aws.bootstrap_aws()
+        BOOTSTRAPPED = True
     # AWS EventBridge top-level metadata
     event_type = event.get("detail-type")
     # 'detail' in EventBridge is already a dict if sent from boto3/PutEvents

@@ -43,6 +43,9 @@ variable "skip_jwt_verify" {
 
 variable "architectures" {
   type        = list(string)
-  default     = ["arm64"]
+  description = "The CPU architecture for all Lambda functions"
+  #default     = ["arm64"]
 }
+
+#x86_64
 

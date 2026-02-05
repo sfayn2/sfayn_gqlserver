@@ -48,6 +48,7 @@ def live_keycloak_token(fake_jwt_valid_token):
     """Grabs a real token from a running Keycloak instance."""
     # 2. Define Headers (Including the JWT)
     if os.getenv("SKIP_JWT_VERIFY") == "true":
+        print("⚠️ SKIP_JWT_VERIFY is true, using fake token.", fake_jwt_valid_token)
         return fake_jwt_valid_token
     else:
         url = "http://localhost:8080/realms/TenantOMSAPI-Realm/protocol/openid-connect/token"
@@ -143,13 +144,14 @@ def seeded_all():
 
         # 6. Shipments
         for sh in SHIPMENT_SEEDS:
-            (sid, oid, l1, l2, city, post, country, state, prov, track, amt, curr, stat) = sh
+            (sid, oid, l1, l2, city, post, country, state, prov, track, amt, curr, stat, tenant_id) = sh
             batch.put_item(Item={
                 "pk": f"ORDER#{oid}", 
                 "sk": f"SHIPMENT#{sid}",
+                "tenant_id": tenant_id,
                 "line1": l1, "line2": l2, "city": city, "postal": post,
                 "country": country, "state": state, "provider": prov,
-                "tracking": track, "amount": Decimal(str(amt)),
+                "tracking_reference": track, "amount": Decimal(str(amt)),
                 "currency": curr, "status": stat,
                 "entity_type": "SHIPMENT"
             })
@@ -188,3 +190,58 @@ def mock_context_w_auth_header_token(fake_jwt_valid_token):
         }
     }
     return mock_context
+
+@pytest.fixture
+def generic_request_post_shipment_tracker_webhook(tracker_data_dict, test_constants):
+
+    # Get the API ID dynamically from the environment
+    SAAS_ID = test_constants.get("saas1")
+
+    endpoint_url = "http://localhost:4566"
+
+    # 1. Connect to LocalStack APIGateway
+    client = boto3.client(
+        "apigateway"
+    )
+
+    # 2. Get all REST APIs and find yours by name
+    # Ensure this matches 'name' in your aws_api_gateway_rest_api terraform resource
+    target_api_name = "tntoms-tst-api" 
+    
+    apis = client.get_rest_apis()
+    print("APIS FOUND:", apis)
+    api_id = next(
+        (item["id"] for item in apis["items"] if item["name"] == target_api_name), 
+        None
+    )
+
+    if not api_id:
+        # Debugging tip: Print what WAS found if it fails
+        found_names = [item["name"] for item in apis["items"]]
+        raise Exception(
+            f"Could not find API '{target_api_name}'. Found: {found_names}. "
+            "Is your Terraform applied?"
+        )
+
+    # 3. Construct the URL
+    stage = "tst"
+
+    # AWS API Gateway Endpoint Format for LocalStack
+    #url = f"{endpoint_url}/restapis/{api_id}/{stage}/_user_request_/webhook/shipment-tracker/{SAAS_ID}"
+    url = f"{endpoint_url}/_aws/execute-api/{api_id}/{stage}/webhook/shipment-tracker/{SAAS_ID}"
+
+    # Standard HTTP headers (no 'HTTP_' prefix)
+    headers = {
+        "x-wss-signature": "d1f4101d6368bc38c2075bc4893293c71c61e0250c7eb8fd9c44d70a9c59906c",
+        "x-wss-timestamp": str(int(time.time())),
+        "Content-Type": "application/json"
+    }
+
+    # Real network POST request
+    response = requests.post(
+        url,
+        data=json.dumps(tracker_data_dict),
+        headers=headers
+    )
+
+    return response

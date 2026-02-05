@@ -3,9 +3,9 @@ name: CI | AWS Infra (LocalStack) & DDD Business Domain Validation
 # and runs domain-specific tests to validate business logic in an AWS-like environment.
 on:
   push:
-    branches: [ "main", "develop" ]
+    branches: [ "master", "Dev" ]
   pull_request:
-    branches: [ "main", "develop" ]
+    branches: [ "master", "Dev" ]
   workflow_dispatch:
     inputs:
       reason:
@@ -27,6 +27,7 @@ jobs:
       AWS_DEFAULT_REGION: "us-east-1"
       DYNAMODB_TABLE_NAME: "tntoms-tst-main-table"
 
+
       ORDER_MANAGEMENT_INFRA_TYPE: "AWS"
       SKIP_JWT_VERIFY: "true"  # Set to "true" to skip JWT verification in tests
 
@@ -34,6 +35,7 @@ jobs:
       TF_VAR_lambda_function_s3_key_hot_reload: "${{ github.workspace }}"
       TF_VAR_lambda_function_s3_key_hot_reload_packages: "${{ github.workspace }}/.venv/lib/python3.14/site-packages/"
       TF_VAR_skip_jwt_verify: "true"  # Pass to Terraform variable
+      TF_VAR_architectures: '["x86_64"]'
 
 
     steps:
@@ -67,18 +69,27 @@ jobs:
           # 2. Apply configuration without manual approval
           uv run tflocal apply --auto-approve
 
-      - name: Set up Python
-        run: uv python install
+      - name: Set up Python & Install Dependencies
+        run: |
+          cd ${{ github.workspace }}
+          uv python install
+          uv sync --all-extras --dev
 
-      - name: Install Dependencies
-        run: uv sync --all-extras --dev
+      - name: Verify site-packages
+        run: ls -d ${{ github.workspace }}/.venv/lib/python3.14/site-packages/
 
       - name: Run Pytest via AWS Shell Script
         run: |
+          # curl -s http://localhost:4566/_localstack/health | jq
           uv run pytest "./ddd/order_management/tests/e2e/" -p no:django
+          # uv run awslocal lambda invoke --function-name tntoms-tst-graphql-api out
           uv run pytest "./ddd/order_management/tests/full_e2e/test_add_order_full_e2e.py" -p no:django
 
       # 4. Cleanup (Good practice for CI runners)
       - name: Stop Infrastructure
         if: always()
-        run: docker compose down
+        working-directory: ./deploy/aws_localstack/
+        run: |
+          uv run tflocal destroy --auto-approve
+          # docker logs localstack_main
+          docker compose down

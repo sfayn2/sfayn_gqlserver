@@ -3,9 +3,14 @@ services:
     environment:
       - SKIP_JWT_VERIFY=true
       - SERVICES=lambda,dynamodb,s3,s3control,sts,iam,apigateway,events
-      - DEBUG=0
-      - LAMBDA_EXECUTOR=docker
-      - LAMBDA_REMOVE_CONTAINERS=false
-      - LAMBDA_KEEPALIVE_MS=600000
+      - DEBUG=0            # Enables verbose logging and stack traces
+      #- LS_LOG=debug       # Sets the log level (trace, debug, info, etc
+      #- LAMBDA_REMOVE_CONTAINERS=false
+      #- LAMBDA_REMOTE_DOCKER=false
+      #- LAMBDA_KEEPALIVE_MS=600000
+      #- LAMBDA_DOCKER_NETWORK=aws_localstack_localstack-net
+      #- LAMBDA_RUNTIME_ENVIRONMENT_TIMEOUT=500
+      #- LOCALSTACK_HOST=localstack_main
+      #- EXTERNAL_HOSTNAME=localstack_main
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"

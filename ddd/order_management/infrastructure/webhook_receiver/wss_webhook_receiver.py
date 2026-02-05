@@ -18,8 +18,13 @@ class WssWebhookReceiver:
 
     #def verify(self, headers, body) -> bool:
     def verify(self, headers: Mapping[str, str], raw_body: bytes, request_path: str) -> bool:
-        signature = headers.get("X-Wss-Signature", "")
-        timestamp = headers.get("X-Wss-Timestamp", "") #to protect from replay
+        # 1. Normalize all incoming headers to lowercase
+        normalized_headers = {k.lower(): v for k, v in headers.items()}
+        
+        # 2. Extract using lowercase keys (consistent with Lambda Adapter)
+        signature = normalized_headers.get("x-wss-signature", "")
+        timestamp = normalized_headers.get("x-wss-timestamp", "") #to protect from replay
+
         if not signature or not timestamp:
             return False
 

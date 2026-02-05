@@ -19,6 +19,7 @@ package_temp
 *.tfvars
 *.tfstate
 *.tfstate.backup
+.terraform*
 .terraform/
 .venv/
 .uv/
@@ -33,3 +34,4 @@ dist/
 build/
 pip-wheel-metadata/
 *.egg-info/
+

@@ -192,3 +192,12 @@ def user_context_tenant1_vendor_all_perms(test_constants) -> dtos.UserContextDTO
 # =======================
 # JWT fixtures
 # ==========
+
+@pytest.fixture
+def tracker_data_dict():
+    # The original Python dictionary you want to send in the POST request
+    return {
+        "tracking_number": "TN123456789",
+        "status": "DELIVERED",
+        "occurred_at": "2025-12-07T10:00:00Z",
+    }

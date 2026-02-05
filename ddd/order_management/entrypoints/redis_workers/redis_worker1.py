@@ -3,6 +3,8 @@ import redis
 import logging
 from ddd.order_management.bootstrap import bootstrap_onprem
 
+bootstrap_onprem.bootstrap_onprem
+
 # 1. Setup Logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

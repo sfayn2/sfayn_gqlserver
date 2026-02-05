@@ -1,8 +1,15 @@
 import json
-from ddd.order_management.bootstrap import bootstrap_aws
-from ddd.order_management.entrypoints.graphql.schema import schema
+
+
+BOOTSTRAPPED = False
 
 def handler(event, context):
+    global BOOTSTRAPPED
+    if not BOOTSTRAPPED:
+        from ddd.order_management.entrypoints.graphql.schema import schema
+        from ddd.order_management.bootstrap import bootstrap_aws
+        bootstrap_aws.bootstrap_aws()
+        BOOTSTRAPPED = True
 
     try:
         # 3. Defensive Parsing
@@ -46,7 +53,7 @@ def handler(event, context):
         # Return generic error to user
         return {
             "statusCode": 500, 
-            "body": json.dumps({"errors": [{"message": "Internal Server Error"}]})
+            "body": json.dumps({"errors": [{"message": f"Internal Server Error"}]})
         }
 
 

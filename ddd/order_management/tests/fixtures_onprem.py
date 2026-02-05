@@ -1,4 +1,5 @@
-import pytest, boto3, os
+import pytest, boto3, os, time
+from django.urls import reverse
 from unittest.mock import MagicMock, PropertyMock
 from django.db import connection
 from .fixtures import *
@@ -60,7 +61,7 @@ def seeded_all(django_db_setup, django_db_blocker):
 
         # 6. Shipments
         for sh in SHIPMENT_SEEDS:
-            (sid, oid, l1, l2, city, post, country, state, prov, track, amt, curr, stat) = sh
+            (sid, oid, l1, l2, city, post, country, state, prov, track, amt, curr, stat, tenant_id) = sh
             django_snapshots.Shipment.objects.create(
                 shipment_id=sid, order_id=oid, shipment_address_line1=l1,
                 shipment_address_line2=l2, shipment_address_city=city,
@@ -102,3 +103,19 @@ def mock_context_w_auth_header_token(fake_jwt_valid_token):
     })
 
     return mock_context
+
+
+@pytest.fixture
+def generic_request_post_shipment_tracker_webhook(client, tracker_data_dict, test_constants):
+    custom_headers = {
+        "HTTP_X_Wss_Signature": "d1f4101d6368bc38c2075bc4893293c71c61e0250c7eb8fd9c44d70a9c59906c",
+        "HTTP_X_Wss_Timestamp": str(int(time.time()))
+    }
+    SAAS_ID = test_constants.get("saas1")
+    response = client.post(
+        reverse("shipment_tracker_webhook", args=[SAAS_ID]),
+        data=tracker_data_dict,
+        content_type="application/json",
+        **custom_headers
+    )
+    return response

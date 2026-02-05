@@ -51,6 +51,7 @@ class OrderDynamoMapper:
             items.append({
                 "pk": f"ORDER#{order.order_id}",
                 "sk": f"SHIPMENT#{s.shipment_id}",
+                "tenant_id": order.tenant_id,      # CRITICAL: For TrackingIndex lookup
                 "line1": s.shipment_address.line1 if s.shipment_address else None,
                 "line2": s.shipment_address.line2 if s.shipment_address else None,
                 "city": s.shipment_address.city if s.shipment_address else None,
@@ -59,7 +60,7 @@ class OrderDynamoMapper:
                 "country": s.shipment_address.country if s.shipment_address else None,
                 "state": s.shipment_address.state if s.shipment_address else None,
                 "provider": s.shipment_provider,
-                "tracking": s.tracking_reference,
+                "tracking_reference": s.tracking_reference,
                 "amount": s.shipment_amount.amount if s.shipment_amount else None,
                 "currency": s.shipment_amount.currency if s.shipment_amount else None,
                 "entity_type": "SHIPMENT"
@@ -151,7 +152,7 @@ class OrderDynamoMapper:
                     shipment_id=s_id,
                     shipment_address=addr,
                     shipment_provider=item.get("provider"),
-                    tracking_reference=item.get("tracking"),
+                    tracking_reference=item.get("tracking_reference"),
                     shipment_status=enums.ShipmentStatus(item["status"]),
                     shipment_amount=value_objects.Money(
                         amount=Decimal(str(item["amount"])) if item.get("amount") is not None else Decimal("0.00"),
