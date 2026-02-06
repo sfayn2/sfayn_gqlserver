@@ -10,8 +10,8 @@ load_dotenv()
 INFRA_TYPE = os.getenv("ORDER_MANAGEMENT_INFRA_TYPE")
 
 if INFRA_TYPE == infra_enums.InfraType.AWS.value:
-    from ddd.order_management.bootstrap import bootstrap_aws
-    bootstrap_aws.bootstrap_aws()
+    #from ddd.order_management.bootstrap import bootstrap_aws
+    #bootstrap_aws.bootstrap_aws()
     pytest_plugins = ["ddd.order_management.tests.fixtures_aws"] 
 else:
     #bootstrap onprem by default

@@ -1,2 +1,2 @@
 from .redis_stream_publisher import RedisStreamPublisher
-from .aws_eventbridge_publisher import EventBridgePublisher
+from .eventbridge_publisher import EventBridgePublisher

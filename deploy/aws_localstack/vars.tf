@@ -49,3 +49,41 @@ variable "architectures" {
 
 #x86_64
 
+
+
+variable "internal_event_bus_name" {
+  description = "The name of the internal EventBridge event bus"
+  type        = string
+  default     = "internal-bus"
+}
+
+variable "external_event_bus_name" {
+  description = "The name of the external EventBridge event bus"
+  type        = string
+  default     = "external-bus"
+}
+
+variable "internal_event_source_name" {
+  description = "The internal source name for EventBridge events"
+  type        = list(string)
+  default     = ["tenantoms.api"]
+}
+
+variable "external_event_source_name" {
+  description = "The external source name for EventBridge events"
+  type        = list(string)
+  default     = ["tenantoms.api"]
+}
+
+variable "internal_order_detail_types" {
+  description = "List of event detail-types to listen for internal event bus"
+  type        = list(string)
+  default     = ["shipping_tracker_webhook.received", "OrderUpdated"]
+}
+
+variable "external_order_detail_types" {
+  description = "List of event detail-types to listen for external event bus"
+  type        = list(string)
+  default     = ["shipping_tracker_webhook.received", "OrderUpdated"]
+}
+

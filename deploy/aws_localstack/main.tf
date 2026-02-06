@@ -166,6 +166,11 @@ resource "aws_lambda_function" "tenantoms_graphql_handler" {
       PYTHONPATH = var.lambda_pythonpath
       ORDER_MANAGEMENT_INFRA_TYPE = "AWS"
       SKIP_JWT_VERIFY = var.skip_jwt_verify
+      INTERNAL_EVENT_BUS_NAME = var.internal_event_bus_name
+      EXTERNAL_EVENT_BUS_NAME = var.external_event_bus_name
+      # Converts ["source.a", "source.b"] into "source.a,source.b"
+      INTERNAL_EVENT_SOURCE_NAMES  = join(",", var.internal_event_source_name) 
+      EXTERNAL_EVENT_SOURCE_NAMES  = join(",", var.external_event_source_name) 
     }
   }
 }
@@ -201,6 +206,11 @@ resource "aws_lambda_function" "tenantoms_webhook_receiver" {
       PYTHONPATH = var.lambda_pythonpath
       ORDER_MANAGEMENT_INFRA_TYPE = "AWS"
       SKIP_JWT_VERIFY = var.skip_jwt_verify
+      INTERNAL_EVENT_BUS_NAME = var.internal_event_bus_name
+      EXTERNAL_EVENT_BUS_NAME = var.external_event_bus_name
+      # Converts ["source.a", "source.b"] into "source.a,source.b"
+      INTERNAL_EVENT_SOURCE_NAMES  = join(",", var.internal_event_source_name) 
+      EXTERNAL_EVENT_SOURCE_NAMES  = join(",", var.external_event_source_name) 
     }
   }
 }
@@ -236,6 +246,11 @@ resource "aws_lambda_function" "tenantoms_event_worker" {
       PYTHONPATH = var.lambda_pythonpath
       ORDER_MANAGEMENT_INFRA_TYPE = "AWS"
       SKIP_JWT_VERIFY = var.skip_jwt_verify
+      INTERNAL_EVENT_BUS_NAME = var.internal_event_bus_name
+      EXTERNAL_EVENT_BUS_NAME = var.external_event_bus_name
+      # Converts ["source.a", "source.b"] into "source.a,source.b"
+      INTERNAL_EVENT_SOURCE_NAMES  = join(",", var.internal_event_source_name) 
+      EXTERNAL_EVENT_SOURCE_NAMES  = join(",", var.external_event_source_name) 
     }
   }
 }
@@ -442,27 +457,35 @@ resource "aws_dynamodb_table" "tenantoms_db" {
 
 
 
-# EVENT BRIDGE Start Here
+# EVENT BRIDGE Start Here for internal events
+# 0. THE EVENTBRIDGE BUS
+# ---------------------------------------------------------
+resource "aws_cloudwatch_event_bus" "internal" {
+  name = var.internal_event_bus_name
+}
+
 # 1. THE EVENTBRIDGE RULE
 # ---------------------------------------------------------
 # This rule watches the "default" bus for specific events
-resource "aws_cloudwatch_event_rule" "order_events" {
-  name        = "${var.project_name}-${var.environment}-order-rule"
-  description = "Triggers worker when GraphQL handler puts an order event"
+resource "aws_cloudwatch_event_rule" "internal_order_events" {
+  name        = "${var.project_name}-${var.environment}-internal-order-rule"
+  event_bus_name = aws_cloudwatch_event_bus.internal.name
+  description = "Triggers worker when GraphQL handler puts an order event for internal events"
 
   # The JSON pattern that must match the event sent by your first Lambda
   event_pattern = jsonencode({
-    "source": ["tenantoms.api"],
-    "detail-type": ["OrderCreated", "OrderUpdated"]
+    "source": var.internal_event_source_name,
+    "detail-type": var.internal_order_detail_types
   })
 }
 
 # 2. THE EVENTBRIDGE TARGET
 # ---------------------------------------------------------
 # This links the Rule to the Worker Lambda
-resource "aws_cloudwatch_event_target" "worker_target" {
-  rule      = aws_cloudwatch_event_rule.order_events.name
-  target_id = "TenantOMSWorkerTarget"
+resource "aws_cloudwatch_event_target" "internal_worker_target" {
+  rule      = aws_cloudwatch_event_rule.internal_order_events.name
+  event_bus_name = aws_cloudwatch_event_bus.internal.name
+  target_id = "TenantOMSInternalWorkerTarget"
   arn       = aws_lambda_function.tenantoms_event_worker.arn
 }
 
@@ -470,11 +493,58 @@ resource "aws_cloudwatch_event_target" "worker_target" {
 # ---------------------------------------------------------
 # Allows EventBridge to actually call (Invoke) your Worker Lambda
 resource "aws_lambda_permission" "allow_eventbridge_to_worker" {
-  statement_id  = "AllowExecutionFromEventBridge"
+  statement_id  = "AllowExecutionFromInternalEventBridge"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.tenantoms_event_worker.function_name
   principal     = "events.amazonaws.com"
-  source_arn    = aws_cloudwatch_event_rule.order_events.arn
+  source_arn    = aws_cloudwatch_event_rule.internal_order_events.arn
+}
+
+# EVENT BRIDGE Internal End Here
+
+
+# EVENT BRIDGE Start Here for external events
+
+# 0. THE EVENTBRIDGE BUS
+# ---------------------------------------------------------
+resource "aws_cloudwatch_event_bus" "external" {
+  name = var.external_event_bus_name
+}
+
+# 1. THE EVENTBRIDGE RULE
+# ---------------------------------------------------------
+# This rule watches the "default" bus for specific events
+resource "aws_cloudwatch_event_rule" "external_order_events" {
+  name        = "${var.project_name}-${var.environment}-external-order-rule"
+  event_bus_name = aws_cloudwatch_event_bus.external.name
+  description = "Triggers worker when GraphQL handler puts an order event for external events"
+
+  # The JSON pattern that must match the event sent by your first Lambda
+  event_pattern = jsonencode({
+    "source": var.external_event_source_name,
+    "detail-type": var.external_order_detail_types
+  })
+}
+
+# 2. THE EVENTBRIDGE TARGET
+# ---------------------------------------------------------
+# This links the Rule to the Worker Lambda
+resource "aws_cloudwatch_event_target" "external_worker_target" {
+  rule      = aws_cloudwatch_event_rule.external_order_events.name
+  event_bus_name = aws_cloudwatch_event_bus.external.name
+  target_id = "TenantOMSExternalWorkerTarget"
+  arn       = aws_lambda_function.tenantoms_event_worker.arn
+}
+
+# 3. LAMBDA PERMISSION FOR EVENTBRIDGE
+# ---------------------------------------------------------
+# Allows EventBridge to actually call (Invoke) your Worker Lambda
+resource "aws_lambda_permission" "allow_external_eventbridge_to_worker" {
+  statement_id  = "AllowExecutionFromExternalEventBridge"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.tenantoms_event_worker.function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.external_order_events.arn
 }
 
 # EVENT BRIDGE End Here

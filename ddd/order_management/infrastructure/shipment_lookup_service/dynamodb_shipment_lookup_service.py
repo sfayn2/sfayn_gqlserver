@@ -17,7 +17,6 @@ class DynamodbShipmentLookupService:
         )
 
         items = response.get('Items', [])
-        print("DynamodbShipmentLookupService - get_tenant_id_by_tracking_ref - items:", items, tracking_reference)
         
         if not items:
             return None

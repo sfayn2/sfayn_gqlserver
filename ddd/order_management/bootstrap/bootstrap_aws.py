@@ -110,34 +110,30 @@ def bootstrap_aws():
 
 
     # ============ Configure which events get published ===========
+    # Not applicable for AWS EventBridge setup
     event_bus.EXTERNAL_EVENT_WHITELIST = []
-    event_bus.INTERNAL_EVENT_WHITELIST = [
-        "add_order_webhook.received",
-        "shipping_tracker_webhook.received"
-    ]
+    event_bus.INTERNAL_EVENT_WHITELIST = []
 
-    # ===========Setup Redis event publishers ==========
+    # ===========Setup EventBridge event publishers ==========
+
     # Get configuration from environment variables
-    bus_name = os.getenv("AWS_EVENT_BUS_NAME", "default_internal")
-    aws_region = os.getenv("AWS_REGION", "us-east-1")
-    app_source = os.getenv("EVENT_SOURCE_NAME", "saas.oms")
+    bus_name = os.getenv("INTERNAL_EVENT_BUS_NAME")
+    app_sources = os.getenv("INTERNAL_EVENT_SOURCE_NAMES").split(",")
 
     event_bus.internal_publisher = event_publishers.EventBridgePublisher(
         event_bus_name=bus_name,
-        aws_region=aws_region,
-        source=app_source
+        source_list=app_sources
     )
 
     # Get configuration from environment variables
-    bus_name = os.getenv("AWS_EVENT_BUS_NAME", "default_external")
-    aws_region = os.getenv("AWS_REGION", "us-east-1")
-    app_source = os.getenv("EVENT_SOURCE_NAME", "saas.oms")
+    # TODO : external not yet setup in terraform
+    bus_name = os.getenv("EXTERNAL_EVENT_BUS_NAME")
+    app_sources = os.getenv("EXTERNAL_EVENT_SOURCE_NAMES").split(",")
 
     # Inject the AWS-specific publisher
     event_bus.external_publisher = event_publishers.EventBridgePublisher(
         event_bus_name=bus_name,
-        aws_region=aws_region,
-        source=app_source
+        source_list=app_sources
     )
 
 
@@ -172,6 +168,13 @@ def bootstrap_aws():
                 uow=repositories.DynamoOrderUnitOfWork(table_name=DYNAMODB_TABLE_NAME)
             ),
         ],
+        "shipping_tracker_webhook.received": [
+            lambda event: handlers.handle_shipment_tracker_async_event(
+                event=event,
+                user_action_service=user_action_service.DynamodbUserActionService(table_name=DYNAMODB_TABLE_NAME),
+                uow=repositories.DynamoOrderUnitOfWork(table_name=DYNAMODB_TABLE_NAME)
+            ),
+        ]
     })
 
     # ======================= Domain event handlers (immediate processing) ==============
