@@ -2,10 +2,12 @@ from .dtos import (
     UserContextDTO,
     UserActionDTO,
     CreateShipmentConfigDTO,
-    WebhookReceiverConfigDTO
+    WebhookReceiverConfigDTO,
+    ShipmentLookupContextDTO,
 )
 
 #request
+# can be merged to Command later
 from .request_dtos import (
     RequestContextDTO, 
     PackageRequestDTO, 
@@ -47,4 +49,4 @@ from .integration_events.order_integration_events import (
     AddOrderWebhookIntegrationEvent,
     ShippingWebhookIntegrationEvent
 )
-from .integration_events.base import IntegrationEvent
+from .integration_events.base import IntegrationEvent, IntegrationEventType

@@ -26,6 +26,7 @@ def handler(event, context):
             # If payload was serialized as a string (common for legacy/external), parse it
             if isinstance(payload, str):
                 payload = json.loads(payload)
+            print(f"[Lambda EventBridge Handler] Processing event type: {event_type} with payload: {payload}")
                 
             event_handler(payload)
     else:

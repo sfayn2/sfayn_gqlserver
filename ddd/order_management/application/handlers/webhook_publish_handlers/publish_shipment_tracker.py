@@ -1,6 +1,7 @@
 from __future__ import annotations
 import json
 import logging
+from typing import Optional
 from ddd.order_management.application import (
     ports, 
     dtos,
@@ -18,33 +19,35 @@ def handle_publish_shipment_tracker(
     webhook_receiver_service: ports.WebhookReceiverServiceAbstract,
     shipment_lookup_service: ports.ShipmentLookupServiceAbstract,
     shipping_webhook_parser: ports.ShippingWebhookParserResolverAbstract,
-    event_publisher: ports.EventPublisherAbstract
+    event_publisher: ports.EventPublisherAbstract,
+    tracking_reference_extractor: ports.TrackingReferenceExtractorAbstract
 ) -> dtos.ResponseDTO:
     """
     Processes an incoming Shipping provider webhook request within a DDD context.
     """
     try:
 
-        print("Handling publish shipment tracker command")
 
         # 1. Extract the tracking reference from the raw request body
-        tracking_reference = webhook_receiver_service.extract_tracking_reference(
+        tracking_reference = tracking_reference_extractor.extract_tracking_reference(
             command.raw_body, 
-            command.saas_id
+
+            #the name tenant_id is used here even if the command carries saas_id
+            command.tenant_id
         )
         
         # 2. Identify the tenant associated with the shipment tracking reference
-        tenant_id = shipment_lookup_service.get_tenant_id_by_tracking_ref(tracking_reference)
+        context: Optional[dtos.ShipmentLookupContextDTO] = shipment_lookup_service.get_context_by_tracking_ref(tracking_reference)
 
-        if not tenant_id:
+        if not context:
             # Raise an explicit domain exception if we cannot route the webhook
             raise exceptions.InvalidOrderOperation(
-                f"No tenant found for tracking reference {tracking_reference}. Cannot process webhook."
+                f"No shipment found for tracking reference {tracking_reference}. Cannot process webhook."
             )
         
         # 3. Validate the raw payload signature/origin using tenant-specific credentials
-        validated_payload = webhook_receiver_service.validate(
-            tenant_id=tenant_id,
+        webhook_receiver_service.validate_signature(
+            tenant_id=context.tenant_id,
             headers=command.headers,
             raw_body=command.raw_body,
             request_path=command.request_path,
@@ -52,15 +55,16 @@ def handle_publish_shipment_tracker(
         )
 
         # 4. Normalize the third-party schema into a generic internal DTO
-        normalized_event_data: dtos.ShippingWebhookRequestDTO = shipping_webhook_parser.resolve(
-            tenant_id=tenant_id,
-            payload=validated_payload
+        normalized_dto: dtos.ShippingWebhookRequestDTO = shipping_webhook_parser.parse(
+            tenant_id=context.tenant_id,
+            order_id=context.order_id,
+            raw_body=command.raw_body
         )
 
         # 5. Create an integration event DTO for the message bus
         integration_event = dtos.ShippingWebhookIntegrationEvent(
-            event_type="shipping_tracker_webhook.received",
-            data=normalized_event_data # Use the correct DTO variable name
+            event_type=dtos.IntegrationEventType.SHIPPING_TRACKER_WEBHOOK_RECEIVED,
+            data=normalized_dto # Use the correct DTO variable name
         )
 
         # 6. Publish the event asynchronously for downstream consumers

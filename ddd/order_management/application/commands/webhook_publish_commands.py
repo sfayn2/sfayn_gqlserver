@@ -14,10 +14,12 @@ class PublishShipmentTrackerCommand(Command):
     headers: dict
     raw_body: bytes
     request_path: str
-    saas_id: str
+
+    #this can accept either saas_id or tenant_id depending on the webhook type
+    tenant_id: str
 
 
-class PublishShipmentTrackerTenantCommand(Command2):
-    headers: dict
-    raw_body: bytes
-    request_path: str
+#class PublishShipmentTrackerTenantCommand(Command2):
+#    headers: dict
+#    raw_body: bytes
+#    request_path: str

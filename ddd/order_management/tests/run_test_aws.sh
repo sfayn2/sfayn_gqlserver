@@ -14,9 +14,10 @@ export AWS_ACCESS_KEY_ID="test"
 export AWS_SECRET_ACCESS_KEY="test"
 export AWS_DEFAULT_REGION="us-east-1"
 export AWS_REGION="us-east-1"
-export DYNAMODB_TABLE_NAME="tntoms-tst-main-table"
 export AWS_ENDPOINT_URL="http://localhost:4566"
 
+# DynamoDB Table Name used in tests Preparation of Test data
+export DYNAMODB_TABLE_NAME="tntoms-tst-main-table"
 
 # Ensure LocalStack is running before proceeding (optional but recommended)
 # Check if the port is open and if DynamoDB/Lambda are 'available'

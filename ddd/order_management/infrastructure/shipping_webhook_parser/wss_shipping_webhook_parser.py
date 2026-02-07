@@ -11,6 +11,7 @@ from datetime import datetime
 class ShippingWebhookParserError(Exception):
     pass
 
+
 class WssShippingWebhookParser:
     """
     Handles parsing EasyPost webhook payloads into a standardized DTO.
@@ -41,6 +42,7 @@ class WssShippingWebhookParser:
             tenant_id = result["tenant_id"]
             status = result["status"]
             occurred_at_str = result["occurred_at"]
+            order_id = result["order_id"]
 
             # 3. Data Transformation: Convert the string timestamp into a proper datetime object
             # if your DTO expects one (highly recommended).
@@ -54,12 +56,13 @@ class WssShippingWebhookParser:
 
             # 4. Use intermediate variables for clarity before instantiation.
             payload_dto = dtos.ShippingWebhookRequestDTO(
-                provider="wss",
+                #provider="wss",
                 tracking_reference=tracking_reference,
                 tenant_id=tenant_id,
+                order_id=order_id,
                 status=status,
                 occured_at=occurred_at,
-                raw_payload=payload
+                #raw_payload=payload
             )
 
             return payload_dto
@@ -67,8 +70,8 @@ class WssShippingWebhookParser:
 
         except KeyError as e:
             # Handle missing mandatory fields gracefully
-            raise Exception(f"Missing required key in EasyPost payload: {e}") from e
+            raise ShippingWebhookParserError(f"Missing required key in Wss payload: {e}")
         except (TypeError, ValueError) as e:
             # Handle invalid data types or formats (e.g., bad date string)
-            raise Exception(f"Invalid data format in EasyPost payload: {e}") from e
+            raise ShippingWebhookParserError(f"Invalid data format in Wss payload: {e}")
 

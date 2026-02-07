@@ -19,7 +19,7 @@ def shipment_tracker_webhook(request, saas_id: str):
             { "headers" : request.headers,
               "raw_body": request.body,
               "request_path": request.path,
-              "saas_id": saas_id
+              "tenant_id": saas_id
             }
         )
         result = message_bus.handle(command)

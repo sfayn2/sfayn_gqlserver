@@ -20,7 +20,8 @@ from ddd.order_management.infrastructure import (
     shipping_webhook_parser,
     shipment_lookup_service,
     exception_handler,
-    header_extractor
+    header_extractor,
+    tracking_reference_extractor
 )
 from ddd.order_management.application import (
     handlers,
@@ -89,6 +90,11 @@ def bootstrap_onprem():
         shipping_parser_factory=shipping_webhook_parser.ShippingWebhookParserFactory()
     )
 
+    # =============== resolve tracking reference extractor based on saas_id ========
+    tracking_reference_extractor.TrackingReferenceExtractor.configure(
+        saas_lookup_service=saas_lookup_service_instance
+    )
+
     # ============== domain clock =============
     domain_services.DomainClock.configure(clocks.UTCClock())
 
@@ -110,7 +116,7 @@ def bootstrap_onprem():
     event_bus.EXTERNAL_EVENT_WHITELIST = []
     event_bus.INTERNAL_EVENT_WHITELIST = [
         "add_order_webhook.received",
-        "shipping_tracker_webhook.received"
+        dtos.IntegrationEventType.SHIPPING_TRACKER_WEBHOOK_RECEIVED.value,
     ]
 
     # ===========Setup Redis event publishers ==========
@@ -211,7 +217,7 @@ def bootstrap_onprem():
             shipping_webhook_parser.ShippingWebhookParserResolver,
             webhook_receiver.WebhookReceiverService,
             shipment_lookup_service.ShipmentLookupService(),
-        ),
+            tracking_reference_extractor=tracking_reference_extractor.TrackingReferenceExtractor
         **handlers.user_action_command_handlers.get_command_handlers(commands, handlers, application_services, tenant_lookup_service)
     })
 

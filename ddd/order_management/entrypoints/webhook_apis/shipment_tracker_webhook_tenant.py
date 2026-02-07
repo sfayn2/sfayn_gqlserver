@@ -15,7 +15,7 @@ def shipment_tracker_webhook_tenant(request, tenant_id: str):
 
     try:
         
-        command = commands.PublishShipmentTrackerTenantCommand.model_validate(
+        command = commands.PublishShipmentTrackerCommand.model_validate(
             { "headers" : request.headers,
               "raw_body": request.body,
               "request_path": request.path,

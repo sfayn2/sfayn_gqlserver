@@ -38,6 +38,7 @@ class EasyPostShippingWebhookParser:
             result = payload["result"]
             tracking_reference = result["tracking_code"]
             tenant_id = result["metadata"]["tenant_id"]
+            order_id = result["metadata"]["order_id"]
             status = result["status"]
             occurred_at_str = payload.get("created_at") or payload.get("updated_at")
 
@@ -53,12 +54,13 @@ class EasyPostShippingWebhookParser:
 
             # 4. Use intermediate variables for clarity before instantiation.
             payload_dto = dtos.ShippingWebhookRequestDTO(
-                provider="easypost",
+                #provider="easypost",
                 tracking_reference=tracking_reference,
                 tenant_id=tenant_id,
                 status=status,
                 occured_at=occurred_at,
-                raw_payload=payload
+                order_id=order_id,
+                #raw_payload=payload
             )
 
             return payload_dto

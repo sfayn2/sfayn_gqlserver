@@ -1,4 +1,5 @@
 from typing import Protocol
+from ddd.order_management.application import dtos
 
 class ShipmentLookupServiceAbstract(Protocol):
     """
@@ -7,15 +8,15 @@ class ShipmentLookupServiceAbstract(Protocol):
     underlying persistence logic.
     """
 
-    def get_tenant_id_by_tracking_ref(self, tracking_reference: str) -> str | None:
+    def get_context_by_tracking_ref(self, tracking_reference: str) -> dtos.ShipmentLookupContextDTO | None:
         """
-        Retrieves the tenant ID associated with a given tracking reference.
+        Retrieves the tenant ID and order ID associated with a given tracking reference.
 
         Args:
             tracking_reference: The unique tracking identifier for the shipment.
 
         Returns:
-            The tenant ID as a string if found, otherwise None.
+            The tenant ID and order ID as a tuple of strings if found, otherwise None.
         """
         # This is the abstract method definition.
         # Implementation details (like Django ORM calls) are omitted.

@@ -51,6 +51,7 @@ class OrderDynamoMapper:
             items.append({
                 "pk": f"ORDER#{order.order_id}",
                 "sk": f"SHIPMENT#{s.shipment_id}",
+                "order_id": order.order_id,      # CRITICAL: For TrackingIndex lookup
                 "tenant_id": order.tenant_id,      # CRITICAL: For TrackingIndex lookup
                 "line1": s.shipment_address.line1 if s.shipment_address else None,
                 "line2": s.shipment_address.line2 if s.shipment_address else None,

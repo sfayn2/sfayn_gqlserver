@@ -55,20 +55,12 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             tenant_id = path_params.get("tenant_id")
             saas_id = path_params.get("saas_id") or path.rstrip("/").split("/")[-1]
 
-            if tenant_id:
-                command = commands.PublishShipmentTrackerTenantCommand.model_validate({
-                    "headers": headers,
-                    "raw_body": body,
-                    "request_path": path,
-                    "tenant_id": tenant_id
-                })
-            else:
-                command = commands.PublishShipmentTrackerCommand.model_validate({
-                    "headers": headers,
-                    "raw_body": body,
-                    "request_path": path,
-                    "saas_id": saas_id
-                })
+            command = commands.PublishShipmentTrackerCommand.model_validate({
+                "headers": headers,
+                "raw_body": body,
+                "request_path": path,
+                "tenant_id": saas_id if not tenant_id else tenant_id
+            })
         
         else:
             print(f"Unmatched webhook path: {path}")

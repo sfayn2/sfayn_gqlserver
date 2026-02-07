@@ -21,7 +21,7 @@ def handle_publish_add_order(
 
         # 2. Validate the raw payload with the external service
         # The service is responsible for signature checks, schema validation, etc.
-        validated_payload: dict = webhook_receiver_service.validate(
+        validated_payload: dict = webhook_receiver_service.validate_signature(
             tenant_id=command.tenant_id, 
             headers=command.headers,
             raw_body=command.raw_body,

@@ -1,4 +1,5 @@
 from __future__ import annotations
+import json
 from typing import Dict, Any, Optional
 from .shipping_webhook_parser_abstract import ShippingWebhookParserAbstract
 from .shipping_webhook_parser_factory import ShippingWebhookParserFactory
@@ -11,6 +12,10 @@ from ddd.order_management.domain import models
 
 # Define custom exceptions for specific error scenarios
 class ConfigurationError(Exception):
+    pass
+
+class InvalidPayloadError(Exception):
+    """Raised when the JSON payload is invalid (400 Bad Request)."""
     pass
 
 # ports.ShippingWebhookParserResolverAbstract
@@ -76,10 +81,23 @@ class ShippingWebhookParserResolver:
         #    raise RuntimeError(f"Failed to retrieve shipping config for tenant {tenant_id}: {e}")
 
     @classmethod
-    def resolve(cls, tenant_id: str, payload: Any) -> dtos.ShippingWebhookRequestDTO:
+    def parse(cls, tenant_id: str, order_id: str, raw_body: bytes) -> dtos.ShippingWebhookRequestDTO:
         """
         Orchestrates the creation of a shipment using the tenant's configured parser.
         """
+        # 3. Decode and parse the JSON payload
+        try:
+            # Assuming body is bytes and should be decoded to UTF-8
+            payload = json.loads(raw_body.decode('utf-8')) 
+        except (json.JSONDecodeError, UnicodeDecodeError):
+            # Raise specific error for the API handler to catch and return 400
+            raise InvalidPayloadError("Invalid JSON payload or encoding")
+
+        ## 4. Enrich the payload with domain data (e.g., tenant_id)
+        ## This is a common pattern in a service layer
+        payload["tenant_id"] = tenant_id
+        payload["order_id"] = order_id
+
         parser = cls._get_parser(tenant_id)
 
         result = parser.parse(payload)

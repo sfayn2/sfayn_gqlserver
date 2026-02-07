@@ -160,7 +160,7 @@ SAAS_CONFIG_SEEDS  = (
                 "provider": "wss",
                 "shared_secret": "2323434235235",
                 "max_age_seconds": 3000,
-                "tracking_reference_jmespath": "result.tracking_code || data.tracking_code",
+                "tracking_reference_jmespath": "tracking_number",
             },
             "add_order": {
                 "provider": "wss",

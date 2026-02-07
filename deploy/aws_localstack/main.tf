@@ -444,7 +444,7 @@ resource "aws_dynamodb_table" "tenantoms_db" {
     name               = "TrackingIndex"
     hash_key           = "tracking_reference" # This is the HASH key for the index
     projection_type    = "INCLUDE"            # Optimization: Only project what you need
-    non_key_attributes = ["tenant_id"]        # This allows .get('tenant_id') to work
+    non_key_attributes = ["tenant_id", "order_id"]        # This allows .get('tenant_id') to work
   }
 
 

@@ -12,6 +12,11 @@ class UserContextDTO(BaseModel):
     tenant_id: str
     roles: List[str] = Field(default_factory=list)
 
+class ShipmentLookupContextDTO(BaseModel):
+    tenant_id: str
+    order_id: str
+    tracking_reference: str
+
 
 class UserActionDTO(BaseModel):
     order_id: str

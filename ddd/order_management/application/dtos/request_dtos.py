@@ -95,9 +95,10 @@ class ConfirmShipmentRequestDTO(BaseModel):
     order_status: enums.OrderStatus
 
 class ShippingWebhookRequestDTO(BaseModel):
-    provider: str
+    #provider: str
     tracking_reference: str
     tenant_id: str
+    order_id: str
     status: str
     occured_at: datetime
-    raw_payload: dict
+    #raw_payload: dict
