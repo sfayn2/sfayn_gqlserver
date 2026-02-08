@@ -32,7 +32,7 @@ def handle_shipment_tracker_async_event(
 
             # 3. Call the EXACT domain method for that intent
             if status_action == enums.ShipmentStatus.IN_TRANSIT.value:
-                order.dispatch_shipment(sid, data.tracking_reference)
+                order.dispatch_shipment(sid)
             elif status_action == enums.ShipmentStatus.DELIVERED.value:
                 order.deliver_shipment(sid)
             elif status_action == enums.ShipmentStatus.CANCELLED.value:
