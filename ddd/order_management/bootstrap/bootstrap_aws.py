@@ -167,7 +167,7 @@ def bootstrap_aws():
             ),
         ],
         "order_management.internal_events.ConfirmedShipmentEvent": [
-            lambda event: handlers.handle_dispatch_shipment_async_event(
+            lambda event: handlers.handle_shipping_provider_create_shipment_async_event(
                 event=event,
                 user_action_service=user_action_service.DynamodbUserActionService(table_name=DYNAMODB_TABLE_NAME),
                 shipping_provider_service=shipping.ShippingProviderService,
@@ -209,6 +209,10 @@ def bootstrap_aws():
         commands.ConfirmShipmentCommand: lambda command, **deps: handlers.handle_confirm_shipment(
             command=command,
             #shipping_provider_service=shipping.ShippingProviderService,
+            **deps
+        ),
+        commands.DispatchShipmentCommand: lambda command, **deps: handlers.handle_dispatch_shipment(
+            command=command,
             **deps
         ),
         commands.DeliverShipmentCommand: lambda command, **deps: handlers.handle_deliver_shipment(

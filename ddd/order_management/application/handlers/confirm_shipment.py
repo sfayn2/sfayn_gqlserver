@@ -42,7 +42,7 @@ def handle_confirm_shipment(
 
             return dtos.ResponseDTO(
                 success=True,
-                message=f"Order {order.order_id} w Shipment Id {command.shipment_id} successfully confirmed."
+                message=f"Order {order.order_id} w Shipment Id {command.shipment_id} successfully marked as confirmed."
             )
 
 

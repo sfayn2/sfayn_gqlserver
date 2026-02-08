@@ -6,13 +6,13 @@ from .cancel_shipment import handle_cancel_shipment
 from .cancel_order import handle_cancel_order
 from .mark_as_completed import handle_mark_as_completed
 from .add_order import handle_add_order
+from .dispatch_shipment import handle_dispatch_shipment
 
 
 # Webhook publish
 from .webhook_publish_handlers import webhook_publish_command_handlers
 from .webhook_publish_handlers.publish_add_order import handle_publish_add_order
 from .webhook_publish_handlers.publish_shipment_tracker import handle_publish_shipment_tracker
-from .webhook_publish_handlers.publish_shipment_tracker_tenant import handle_publish_shipment_tracker_tenant
 
 # Other user action handlers
 from .user_action_handlers import user_action_command_handlers
@@ -25,7 +25,7 @@ from .get_order import handle_get_order
 
 # Async Events via Redis stream
 from .event_handlers.user_logged_in_async_event import handle_user_logged_in_async_event
-from .event_handlers.dispatch_shipment_async_event import handle_dispatch_shipment_async_event
+from .event_handlers.shipping_provider_create_shipment_async_event import handle_shipping_provider_create_shipment_async_event
 from .event_handlers.add_order_async_event import handle_add_order_async_event
 from .event_handlers.shipment_tracker_async_event import handle_shipment_tracker_async_event
 

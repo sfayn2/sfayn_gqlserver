@@ -42,6 +42,10 @@ class ConfirmedShipmentEvent(DomainEvent):
     shipment_id: str
 
 @dataclass(frozen=True)    
+class DispatchedShipmentEvent(DomainEvent):
+    shipment_id: str
+
+@dataclass(frozen=True)    
 class DeliveredShipmentEvent(DomainEvent):
     shipment_id: str
 

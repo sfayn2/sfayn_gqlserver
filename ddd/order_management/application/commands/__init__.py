@@ -8,7 +8,8 @@ from .commands import (
     AddShipmentCommand,
     ConfirmShipmentCommand,
     CancelShipmentCommand,
-    DeliverShipmentCommand
+    DeliverShipmentCommand,
+    DispatchShipmentCommand
 )
 
 from .user_action_commands import (

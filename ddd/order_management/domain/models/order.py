@@ -156,15 +156,45 @@ class Order:
     def total_line_item_qty(self) -> int:
         return sum(li.order_quantity for li in self.line_items)
 
-    def apply_shipment_dispatch(self, shipment_id: str, tracking_reference: str, shipment_amount: value_objects.Money, label_url: str):
+    def apply_fulfillment_data(
+        self, 
+        shipment_id: str, 
+        tracking_reference: str, 
+        shipment_amount: value_objects.Money, 
+        label_url: str
+    ):
+        """
+        Intent: Attach carrier data (tracking/label/cost) received from integration.
+        The shipment remains in CONFIRMED status.
+        """
+        shipment = self.get_shipment(shipment_id)
+        
+        # Invariant: Cannot attach label to a shipment that isn't confirmed
+        if shipment.shipment_status != enums.ShipmentStatus.CONFIRMED:
+            raise exceptions.DomainError(f"Cannot attach fulfillment data to {shipment.shipment_status} shipment.")
+
+        shipment.tracking_reference = tracking_reference
+        shipment.shipment_amount = shipment_amount
+        shipment.label_url = label_url
+        
+        self._update_modified_date()
+        # Note: We do NOT call update_shipping_progress() here because status hasn't changed.
+
+
+    def dispatch_shipment(self, shipment_id: str):
         shipment = self.get_shipment(shipment_id)
         if shipment.shipment_status != enums.ShipmentStatus.CONFIRMED:
             raise exceptions.DomainError("Only confirmed shipment can be dispatch")
-        shipment.shipment_amount = shipment_amount
-        shipment.tracking_reference = tracking_reference
-        shipment.label_url = label_url
 
         shipment.shipment_status = enums.ShipmentStatus.IN_TRANSIT
+
+        event = events.DispatchedShipmentEvent(
+            tenant_id=self.tenant_id,
+            order_id=self.order_id,
+            order_status=self.order_status,
+            shipment_id=shipment_id,
+        )
+        self.raise_event(event)
 
 
     def confirm_shipment(self, shipment_id: str):
@@ -215,21 +245,6 @@ class Order:
         )
         self.raise_event(event)
 
-    #def assign_tracking_reference(self, shipment_id: str, tracking_reference: str):
-    #    shipment = self.get_shipment(shipment_id)
-    #    if shipment.shipment_status not in (enums.ShipmentStatus.PENDING, enums.ShipmentStatus.SHIPPED):
-    #        raise exceptions.DomainError("Tracking reference can only be assign before delivery.")
-
-    #    shipment.tracking_reference = tracking_reference
-    #    self._update_modified_date()
-    #    #event = events.TrackingReferenceAssignedEvent(
-    #    #    tenant_id=self.tenant_id,
-    #    #    order_id=self.order_id,
-    #    #    shipment_id=shipment_id,
-    #    #)
-    #    #self.raise_event(event)
-
-
     def cancel_order(self):
         if not self.order_status in (enums.OrderStatus.PENDING, enums.OrderStatus.CONFIRMED):
             raise exceptions.DomainError(f"Order in {self.order_id} cannot be canceled.")
@@ -261,7 +276,7 @@ class Order:
         delivered: dict[str, int] = {}
 
         for sm in self.shipments:
-            if sm.shipment_status == enums.ShipmentStatus.SHIPPED:
+            if sm.shipment_status == enums.ShipmentStatus.IN_TRANSIT:
                 for sku, qty in sm.shipment_items_sku_qty.items():
                     shipped[sku] = shipped.get(sku, 0) + qty
             if sm.shipment_status == enums.ShipmentStatus.DELIVERED:
@@ -284,6 +299,15 @@ class Order:
             self.order_status = enums.OrderStatus.PARTIAL_SHIPPED
 
         self._update_modified_date()
+
+    def get_shipment_by_tracking(self, tracking_reference: str) -> models.Shipment:
+        shipment = next((s for s in self.shipments if s.tracking_reference == tracking_reference), None)
+        if not shipment:
+            raise exceptions.DomainError(
+                f"Shipment with tracking {tracking_reference} not found in order {self.order_id}"
+            )
+        return shipment
+
 
     
     def mark_as_completed(self):

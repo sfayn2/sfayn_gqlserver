@@ -1,6 +1,8 @@
 from __future__ import annotations
 from typing import Any
 from ddd.order_management.application import dtos
+from ddd.order_management.domain import enums
+
 # Consider using a standard library for time parsing like iso8601 or datetime
 from datetime import datetime
 
@@ -10,6 +12,13 @@ from datetime import datetime
 
 class ShippingWebhookParserError(Exception):
     pass
+
+EASYPOST_STATUS_MAPPING = {
+    "IN_TRANSIT": enums.ShipmentStatus.IN_TRANSIT,
+    "OUT_FOR_DELIVERY": enums.ShipmentStatus.IN_TRANSIT,
+    "DELIVERED": enums.ShipmentStatus.DELIVERED,
+    "FAILURE": enums.ShipmentStatus.CANCELLED,
+}
 
 class EasyPostShippingWebhookParser:
     """
@@ -36,10 +45,15 @@ class EasyPostShippingWebhookParser:
             # 2. Defensive Access: Use .get() where possible or wrap in try/except for mandatory keys.
 
             result = payload["result"]
+            external_status = result["status"].upper()
+            if external_status not in EASYPOST_STATUS_MAPPING:
+                raise ShippingWebhookParserError(f"Unrecognized status '{external_status}' in EasyPost payload.")    
+            # Map to internal enum / shipment workflow status
+            internal_status = EASYPOST_STATUS_MAPPING[external_status]
+
             tracking_reference = result["tracking_code"]
             tenant_id = result["metadata"]["tenant_id"]
             order_id = result["metadata"]["order_id"]
-            status = result["status"]
             occurred_at_str = payload.get("created_at") or payload.get("updated_at")
 
             # 3. Data Transformation: Convert the string timestamp into a proper datetime object
@@ -57,7 +71,7 @@ class EasyPostShippingWebhookParser:
                 #provider="easypost",
                 tracking_reference=tracking_reference,
                 tenant_id=tenant_id,
-                status=status,
+                status=internal_status,
                 occured_at=occurred_at,
                 order_id=order_id,
                 #raw_payload=payload

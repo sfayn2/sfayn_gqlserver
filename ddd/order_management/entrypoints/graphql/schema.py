@@ -14,6 +14,7 @@ class Mutation(graphene.ObjectType):
     add_shipment = mutations.add_shipment_mutation.AddShipmentMutation.Field()
     cancel_shipment = mutations.cancel_shipment_mutation.CancelShipmentMutation.Field()
     confirm_shipment = mutations.confirm_shipment_mutation.ConfirmShipmentMutation.Field()
+    dispatch_shipment = mutations.dispatch_shipment_mutation.DispatchShipmentMutation.Field()
     deliver_shipment = mutations.deliver_shipment_mutation.DeliverShipmentMutation.Field()
     cancel_order = mutations.cancel_order_mutation.CancelOrderMutation.Field()
     mark_as_completed = mutations.mark_as_completed_mutation.MarkAsCompletedMutation.Field()

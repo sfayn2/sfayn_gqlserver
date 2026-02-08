@@ -1,4 +1,6 @@
 from __future__ import annotations
+import uuid
+from typing import Union
 from ddd.order_management.application import (
     mappers, 
     commands, 
@@ -8,8 +10,8 @@ from ddd.order_management.application import (
 from ddd.order_management.domain import exceptions
 
 
-def handle_cancel_shipment(
-        command: commands.CancelShipmentCommand, 
+def handle_dispatch_shipment(
+        command: commands.DispatchShipmentCommand, 
         access_control: ports.AccessControl1Abstract,
         user_ctx: dtos.UserContextDTO,
         exception_handler: ports.ExceptionHandlerAbstract,
@@ -20,17 +22,17 @@ def handle_cancel_shipment(
 
             access_control.ensure_user_is_authorized_for(
                 user_ctx,
-                required_permission="cancel_shipment",
+                required_permission="dispatch_shipment",
                 required_scope={"role": ["vendor"] }
             )
 
             order = uow.order.get(order_id=command.order_id, tenant_id=user_ctx.tenant_id)
-            order.cancel_shipment(shipment_id=command.shipment_id)
+            order.dispatch_shipment(shipment_id=command.shipment_id)
 
             user_action_service.save_action(
                 dtos.UserActionDTO(
                     order_id=command.order_id,
-                    action="cancel_shipment",
+                    action="dispatch_shipment",
                     performed_by=user_ctx.sub,
                     user_input=command.model_dump(exclude_none=True)
                 )
@@ -41,7 +43,7 @@ def handle_cancel_shipment(
 
             return dtos.ResponseDTO(
                 success=True,
-                message=f"Order {order.order_id} w Shipment Id {command.shipment_id} successfully marked as canceled."
+                message=f"Order {order.order_id} w Shipment Id {command.shipment_id} successfully marked as dispatched."
             )
 
 
@@ -51,4 +53,6 @@ def handle_cancel_shipment(
     except Exception as e:
         # Delegate handling of UNEXPECTED exceptions to the infrastructure service
         return exception_handler.handle_unexpected(e)
+
+
 

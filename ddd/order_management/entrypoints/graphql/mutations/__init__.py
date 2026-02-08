@@ -6,6 +6,7 @@ from .cancel_shipment_mutation import CancelShipmentMutation
 from .cancel_order_mutation import CancelOrderMutation
 from .mark_as_completed_mutation import MarkAsCompletedMutation
 from .add_order_mutation import AddOrderMutation
+from .dispatch_shipment_mutation import DispatchShipmentMutation
 
 
 #Tenant specific user action

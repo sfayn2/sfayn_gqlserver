@@ -41,7 +41,7 @@ def handle_mark_as_completed(
 
             return dtos.ResponseDTO(
                 success=True,
-                message=f"Order {order.order_id} successfully mark as completed."
+                message=f"Order {order.order_id} successfully marked as completed."
             )
 
 

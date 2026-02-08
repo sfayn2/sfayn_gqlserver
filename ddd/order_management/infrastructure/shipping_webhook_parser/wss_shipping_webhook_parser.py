@@ -1,6 +1,7 @@
 from __future__ import annotations
 from typing import Any
 from ddd.order_management.application import dtos
+from ddd.order_management.domain import enums
 # Consider using a standard library for time parsing like iso8601 or datetime
 from datetime import datetime
 
@@ -10,6 +11,14 @@ from datetime import datetime
 
 class ShippingWebhookParserError(Exception):
     pass
+
+WSS_STATUS_MAPPING = {
+    "IN_TRANSIT": enums.ShipmentStatus.IN_TRANSIT,
+    "DELIVERED": enums.ShipmentStatus.DELIVERED,
+    "DELIVERED": enums.ShipmentStatus.DELIVERED,
+    "FAILURE": enums.ShipmentStatus.CANCELLED,
+}
+
 
 
 class WssShippingWebhookParser:
@@ -38,9 +47,16 @@ class WssShippingWebhookParser:
 
             #result = payload["result"]
             result = payload
+            external_status = result["status"].upper()
+
+            if external_status not in WSS_STATUS_MAPPING:
+                raise ShippingWebhookParserError(f"Unrecognized status '{external_status}' in WSS payload.")
+
+            # Map to internal enum / shipment workflow status
+            internal_status = WSS_STATUS_MAPPING[external_status]
+
             tracking_reference = result["tracking_number"]
             tenant_id = result["tenant_id"]
-            status = result["status"]
             occurred_at_str = result["occurred_at"]
             order_id = result["order_id"]
 
@@ -60,7 +76,7 @@ class WssShippingWebhookParser:
                 tracking_reference=tracking_reference,
                 tenant_id=tenant_id,
                 order_id=order_id,
-                status=status,
+                status=internal_status,
                 occured_at=occurred_at,
                 #raw_payload=payload
             )

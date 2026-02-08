@@ -81,7 +81,7 @@ class ShippingWebhookParserResolver:
         #    raise RuntimeError(f"Failed to retrieve shipping config for tenant {tenant_id}: {e}")
 
     @classmethod
-    def parse(cls, tenant_id: str, order_id: str, raw_body: bytes) -> dtos.ShippingWebhookRequestDTO:
+    def parse_provider_shipment_update(cls, tenant_id: str, order_id: str, raw_body: bytes) -> dtos.ShippingWebhookRequestDTO:
         """
         Orchestrates the creation of a shipment using the tenant's configured parser.
         """

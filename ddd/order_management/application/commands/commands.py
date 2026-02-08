@@ -56,6 +56,10 @@ class DeliverShipmentCommand(Command):
     order_id: str
     shipment_id: str
 
+class DispatchShipmentCommand(Command):
+    order_id: str
+    shipment_id: str
+
 class CancelShipmentCommand(Command):
     order_id: str
     shipment_id: str

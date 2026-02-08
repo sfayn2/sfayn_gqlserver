@@ -54,17 +54,14 @@ def handle_publish_shipment_tracker(
             validator_dto=mappers.ConfigMapper.to_shipment_tracker_config_dto
         )
 
-        # 4. Normalize the third-party schema into a generic internal DTO
-        normalized_dto: dtos.ShippingWebhookRequestDTO = shipping_webhook_parser.parse(
-            tenant_id=context.tenant_id,
-            order_id=context.order_id,
-            raw_body=command.raw_body
-        )
-
         # 5. Create an integration event DTO for the message bus
         integration_event = dtos.ShippingWebhookIntegrationEvent(
             event_type=dtos.IntegrationEventType.SHIPPING_TRACKER_WEBHOOK_RECEIVED,
-            data=normalized_dto # Use the correct DTO variable name
+            data=shipping_webhook_parser.parse_provider_shipment_update(
+                tenant_id=context.tenant_id,
+                order_id=context.order_id,
+                raw_body=command.raw_body,
+            )
         )
 
         # 6. Publish the event asynchronously for downstream consumers
