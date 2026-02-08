@@ -36,7 +36,7 @@ CONFIRM_SHIPMENT_ALREADY_CONFIRMED_INPUT = {
             # Valid confirmation of a PENDING shipment
             BASE_CONFIRM_SHIPMENT_INPUT,
             True,
-            "w Shipment Id SH-1 successfully confirmed.",
+            "w Shipment Id SH-1 successfully marked as confirmed.",
             enums.ShipmentStatus.CONFIRMED.value, # Status changes to CONFIRMED
         ),
         (

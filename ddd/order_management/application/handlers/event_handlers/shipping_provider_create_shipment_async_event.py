@@ -16,19 +16,18 @@ def handle_shipping_provider_create_shipment_async_event(
     with uow:
         data = event.data
         order = uow.order.get(order_id=data.order_id, tenant_id=data.tenant_id)
+        shipment = order.get_shipment_by_id(data.shipment_id)
         
-        # 1. Integration Call (WSS/EasyPost)
-        provider_result = shipping_provider_service.create_shipment(data.tenant_id, order, data.shipment_id) 
+        # 1. Integration Call (WSS/EasyPost/Self Delivered)
+        provider_result = shipping_provider_service.create_shipment(data.tenant_id, shipment)
 
-
-        if provider_result: # Not applicable to self delivery
-            # 2. Attach Data to Domain (Shipment Status stays CONFIRMED)
-            order.apply_fulfillment_data(
-                shipment_id=data.shipment_id,
-                tracking_reference=provider_result.tracking_number,
-                shipment_amount=provider_result.amount,
-                label_url=provider_result.label_url
-            )
+        # 2. Attach Data to Domain (Shipment Status stays CONFIRMED)
+        order.apply_fulfillment_data(
+            shipment_id=data.shipment_id,
+            tracking_reference=provider_result.tracking_number,
+            shipment_amount=provider_result.amount,
+            label_url=provider_result.label_url
+        )
 
         uow.order.save(order)
         uow.commit() # Saves the Tracking Ref and Label URL to DynamoDB

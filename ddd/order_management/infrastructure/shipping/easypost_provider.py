@@ -13,9 +13,6 @@ class EasyPostShippingProvider:
     def __init__(self, api_key: str, endpoint: str ):
         self.client = easypost.EasyPostClient(api_key)
 
-    def is_self_delivery(self) -> bool:
-        return False
-
     def create_shipment(self, shipment, tenant_id: str) -> dtos.CreateShipmentResponseDTO:
 
         easypost_shipment = self.client.shipment.create(

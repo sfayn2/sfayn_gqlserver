@@ -10,7 +10,7 @@ import pytest
             # expected_success
             True,
             # expected_message
-            "Order ORD-READY-TO-COMPLETE-PAID-1 successfully mark as completed."
+            "Order ORD-READY-TO-COMPLETE-PAID-1 successfully marked as completed."
         ),
         (
             "ORD-CONFIRMED_W_SHIPPED-1",

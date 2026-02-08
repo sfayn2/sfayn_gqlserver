@@ -17,6 +17,9 @@ class ConfigurationError(WebhookError):
 class ExtractTrackingError(WebhookError):
     pass
 
+class InvalidPayloadError(WebhookError):
+    pass
+
 class InvalidSignatureError(WebhookError):
     """Raised when the signature verification fails (401 Unauthorized)."""
     pass
@@ -75,7 +78,7 @@ class WebhookReceiverService:
 
 
     @classmethod 
-    def validate_signature(cls, tenant_id: str, headers, raw_body, request_path, validator_dto: ValidatorFunc) -> Dict[str, Any]:
+    def validate_signature(cls, tenant_id: str, headers, raw_body, request_path, validator_dto: ValidatorFunc):
         """
         Validates the request signature and decodes the payload.
         """
@@ -88,4 +91,20 @@ class WebhookReceiverService:
         if not verifier.verify(headers=headers, raw_body=raw_body, request_path=request_path):
             # Raise specific error for the API handler to catch and return 401
             raise InvalidSignatureError("Invalid webhook signature or SaSS/Tenant Configurator is not setup properly")
+
+    @classmethod
+    def get_payload(cls, raw_body: bytes) -> Dict[str, Any]:
+        """
+        Orchestrates the creation of a shipment using the tenant's configured parser.
+        """
+        # 3. Decode and parse the JSON payload
+        try:
+            # Assuming body is bytes and should be decoded to UTF-8
+            payload = json.loads(raw_body.decode('utf-8')) 
+        except (json.JSONDecodeError, UnicodeDecodeError):
+            # Raise specific error for the API handler to catch and return 400
+            raise InvalidPayloadError("Invalid JSON payload or encoding")
+
+        return payload
+
 

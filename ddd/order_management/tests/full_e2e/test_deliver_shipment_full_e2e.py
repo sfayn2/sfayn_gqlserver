@@ -11,7 +11,7 @@ import pytest
             # expected_success
             True,
             # expected_message
-            "Order ORD-CONFIRMED_W_SHIPPED-1 w Shipment Id SH-SHIPPED-SHIPPED-2 successfully delivered."
+            "Order ORD-CONFIRMED_W_SHIPPED-1 w Shipment Id SH-SHIPPED-SHIPPED-2 successfully marked as delivered."
         ),
         (
             "ORD-CONFIRMED_W_SHIPPED-1",

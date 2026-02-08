@@ -68,7 +68,7 @@ def graphene_client(mocker, user_context_tenant1_vendor_all_perms, fake_get_user
             # expected_success
             True,
             # expected_message
-            "Order ORD-CONFIRMED_W_SHIPPED-1 w Shipment Id SH-SHIPPED-PENDING-1 successfully shipped."
+            "Order ORD-CONFIRMED_W_SHIPPED-1 w Shipment Id SH-SHIPPED-PENDING-1 successfully marked as canceled."
         ),
         (
             "ORD-CONFIRMED_W_SHIPPED-1",
@@ -76,7 +76,7 @@ def graphene_client(mocker, user_context_tenant1_vendor_all_perms, fake_get_user
             # expected_success
             True,
             # expected_message
-            "Order ORD-CONFIRMED_W_SHIPPED-1 w Shipment Id SH-SHIPPED-CONFIRMED-1 successfully shipped."
+            "Order ORD-CONFIRMED_W_SHIPPED-1 w Shipment Id SH-SHIPPED-CONFIRMED-1 successfully marked as canceled."
         ),
     ]
 )

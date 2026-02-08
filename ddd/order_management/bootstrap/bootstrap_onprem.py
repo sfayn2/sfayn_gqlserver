@@ -115,7 +115,7 @@ def bootstrap_onprem():
     # ============ Configure which events get published ===========
     event_bus.EXTERNAL_EVENT_WHITELIST = []
     event_bus.INTERNAL_EVENT_WHITELIST = [
-        "add_order_webhook.received",
+        dtos.IntegrationEventType.ADD_ORDER_WEBHOOK_RECEIVED.value,
         dtos.IntegrationEventType.SHIPPING_TRACKER_WEBHOOK_RECEIVED.value,
     ]
 
@@ -149,7 +149,7 @@ def bootstrap_onprem():
 
     # ==================Internal async (redis/kafka/etc?) event handlers (within this service) ==================
     event_bus.ASYNC_INTERNAL_EVENT_HANDLERS.update({
-        "order_management.internal_events.AddOrderWebhookIntegrationEvent": [
+        dtos.IntegrationEventType.ADD_ORDER_WEBHOOK_RECEIVED.value: [
             lambda event: handlers.handle_add_order_async_event(
                 event=event,
                 user_action_service=user_action_service.UserActionService(),
@@ -163,6 +163,13 @@ def bootstrap_onprem():
                 shipping_provider_service=shipping.ShippingProviderService,
                 uow=repositories.DjangoOrderUnitOfWork()
             ),
+        ],
+        dtos.IntegrationEventType.SHIPPING_TRACKER_WEBHOOK_RECEIVED.value : [
+            lambda event: handlers.handle_shipment_tracker_async_event(
+                event=event,
+                user_action_service=user_action_service.UserActionService(),
+                uow=repositories.DjangoOrderUnitOfWork()
+            )
         ],
     })
 
@@ -222,6 +229,7 @@ def bootstrap_onprem():
             webhook_receiver.WebhookReceiverService,
             shipment_lookup_service.ShipmentLookupService(),
             tracking_reference_extractor=tracking_reference_extractor.TrackingReferenceExtractor
+        ),
         **handlers.user_action_command_handlers.get_command_handlers(commands, handlers, application_services, tenant_lookup_service)
     })
 

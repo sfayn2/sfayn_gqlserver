@@ -19,7 +19,7 @@ import pytest
             # expected_success
             True,
             # expected_message
-            "Order ORD-CONFIRMED_W_SHIPPED-1 w Shipment Id SH-SHIPPED-PENDING-1 successfully shipped."
+            "Order ORD-CONFIRMED_W_SHIPPED-1 w Shipment Id SH-SHIPPED-PENDING-1 successfully marked as canceled."
         ),
         (
             "ORD-CONFIRMED_W_SHIPPED-1",
@@ -27,7 +27,7 @@ import pytest
             # expected_success
             True,
             # expected_message
-            "Order ORD-CONFIRMED_W_SHIPPED-1 w Shipment Id SH-SHIPPED-CONFIRMED-1 successfully shipped."
+            "Order ORD-CONFIRMED_W_SHIPPED-1 w Shipment Id SH-SHIPPED-CONFIRMED-1 successfully marked as canceled."
         ),
     ]
 )

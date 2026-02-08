@@ -39,7 +39,7 @@ MARK_AS_COMPLETED_INVALID_STATE_INPUT = {
             # Valid completion of a suitable order (e.g., DELIVERED -> COMPLETED)
             BASE_MARK_AS_COMPLETED_INPUT,
             True,
-            "successfully mark as completed",
+            "successfully marked as completed",
             enums.OrderStatus.COMPLETED.value,
         ),
         (

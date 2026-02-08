@@ -17,11 +17,10 @@ def handle_publish_add_order(
     event_publisher: ports.EventPublisherAbstract
 ):
     try:
-        #import pdb;pdb.set_trace()
 
         # 2. Validate the raw payload with the external service
         # The service is responsible for signature checks, schema validation, etc.
-        validated_payload: dict = webhook_receiver_service.validate_signature(
+        webhook_receiver_service.validate_signature(
             tenant_id=command.tenant_id, 
             headers=command.headers,
             raw_body=command.raw_body,
@@ -29,15 +28,16 @@ def handle_publish_add_order(
             validator_dto=mappers.ConfigMapper.to_add_order_config_dto
         )
 
-        # 3. Normalize the third-party schema into a generic internal DTO
-        # This step maps the external format to your bounded context's ubiquitous language
-        normalized_event_data: dtos.AddOrderIntegrationDTO = dtos.AddOrderIntegrationDTO(**validated_payload)
         
-
         # 4. Create an integration event DTO for the message bus
         integration_event = dtos.AddOrderWebhookIntegrationEvent(
-            event_type="add_order_webhook.received",
-            data=normalized_event_data
+            event_type=dtos.IntegrationEventType.ADD_ORDER_WEBHOOK_RECEIVED,
+
+            # phase1: If external want to create an order in our system via webhook, they must send it in this specific contract AddOrderIntegrationDTO.
+            # phase2: we allow the customer to just "point" their Shopify/Magento webhook at our URL, and  system (the Resolver/Translator) does the work for them
+            data=dtos.AddOrderIntegrationDTO(**webhook_receiver_service.get_payload(
+                raw_body=command.raw_body
+            ))
         )
 
         # 5. Publish the event asynchronously for downstream consumers

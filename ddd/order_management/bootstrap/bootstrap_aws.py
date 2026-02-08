@@ -159,7 +159,7 @@ def bootstrap_aws():
 
     # ==================Internal async (redis/kafka/etc?) event handlers (within this service) ==================
     event_bus.ASYNC_INTERNAL_EVENT_HANDLERS.update({
-        "order_management.internal_events.AddOrderWebhookIntegrationEvent": [
+        dtos.IntegrationEventType.ADD_ORDER_WEBHOOK_RECEIVED.value: [
             lambda event: handlers.handle_add_order_async_event(
                 event=event,
                 user_action_service=user_action_service.DynamodbUserActionService(table_name=DYNAMODB_TABLE_NAME),

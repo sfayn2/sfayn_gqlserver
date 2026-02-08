@@ -13,9 +13,6 @@ class NinjaVanShippingProvider:
         self.api_key = api_key
         self.endpoint = endpoint.rstrip("/")
 
-    def is_self_delivery(self) -> bool:
-        return False
-
     def _headers(self) -> dict[str, str]:
         return {
             "Authorization": f"Bearer {self.api_key}",

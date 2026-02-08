@@ -34,7 +34,7 @@ CANCEL_SHIPMENT_SHIPPED_INPUT = {
             # Valid cancellation of a PENDING shipment
             BASE_CANCEL_SHIPMENT_INPUT,
             True,
-            "w Shipment Id SH-1 successfully shipped.",
+            "w Shipment Id SH-1 successfully marked as canceled.",
             enums.ShipmentStatus.CANCELLED.value,
         ),
         (
