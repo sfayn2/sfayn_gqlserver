@@ -1,8 +1,10 @@
 import json
 import base64
-from typing import Dict, Any, Union
+from typing import Dict, Any, Union, Optional
+from ddd.order_management.application import message_bus, commands
+from ddd.order_management.bootstrap import bootstrap_aws
+bootstrap_aws.bootstrap_aws()
 
-BOOTSTRAPPED = False
 
 
 def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
@@ -10,17 +12,10 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     High-Performance Webhook Receiver Adapter.
     Minimal logic to ensure sub-100ms response times.
     """
-    global BOOTSTRAPPED
-    if not BOOTSTRAPPED:
-        from ddd.order_management.application import message_bus, commands
-        from ddd.order_management.bootstrap import bootstrap_aws
-        bootstrap_aws.bootstrap_aws()
-        BOOTSTRAPPED = True
     # 1. Fast Extraction
     request_context = event.get("requestContext", {})
     path = request_context.get("path", event.get("path", ""))
     method = event.get("httpMethod", "").upper()
-    path_params = event.get("pathParameters") or {}
     
     # Normalize headers for signature verification logic (lowercase is standard)
     headers = {k.lower(): v for k, v in event.get("headers", {}).items()}
@@ -40,9 +35,10 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         return _response({"success": False, "message": "Method Not Allowed"}, 405)
 
     try:
+        command: Optional[commands.PublishAddOrderCommand | commands.PublishShipmentTrackerCommand] = None
         # 3. Routing Logic (Explicit & Strict)
         if "add-order" in path:
-            tenant_id = path_params.get("tenant_id") or path.rstrip("/").split("/")[-1]
+            tenant_id = path.rstrip("/").split("/")[-1]
             command = commands.PublishAddOrderCommand.model_validate({
                 "headers": headers,
                 "raw_body": body,
@@ -52,19 +48,20 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
 
         elif "shipment-tracker" in path:
             # Check explicit params first, then positional path segments
-            tenant_id = path_params.get("tenant_id")
-            saas_id = path_params.get("saas_id") or path.rstrip("/").split("/")[-1]
+            # it can be saas_id
+            tenant_id = path.rstrip("/").split("/")[-1]
 
             command = commands.PublishShipmentTrackerCommand.model_validate({
                 "headers": headers,
                 "raw_body": body,
                 "request_path": path,
-                "tenant_id": saas_id if not tenant_id else tenant_id
+                "tenant_id": tenant_id
             })
         
         else:
-            print(f"Unmatched webhook path: {path}")
-            return _response({"success": False, "message": "Not Found"}, 404)
+            msg = f"Unmatched webhook path: {path}"
+            print(msg)
+            return _response({"success": False, "message": msg }, 404)
 
         # 4. Dispatch to Domain
         # For webhooks, the message bus usually handles verification and queueing

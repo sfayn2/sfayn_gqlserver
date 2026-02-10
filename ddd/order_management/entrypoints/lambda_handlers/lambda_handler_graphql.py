@@ -1,15 +1,11 @@
 import json
+from ddd.order_management.entrypoints.graphql.schema import schema
+from ddd.order_management.bootstrap import bootstrap_aws
+bootstrap_aws.bootstrap_aws()
 
 
-BOOTSTRAPPED = False
 
 def handler(event, context):
-    global BOOTSTRAPPED
-    if not BOOTSTRAPPED:
-        from ddd.order_management.entrypoints.graphql.schema import schema
-        from ddd.order_management.bootstrap import bootstrap_aws
-        bootstrap_aws.bootstrap_aws()
-        BOOTSTRAPPED = True
 
     try:
         # 3. Defensive Parsing

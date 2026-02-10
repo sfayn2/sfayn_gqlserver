@@ -5,6 +5,13 @@ from typing import Mapping
 # from ddd.order_management.domain.services import DomainClock 
 # (You will need to ensure DomainClock is available or replace with a standard library approach)
 
+from ddd.order_management.domain import exceptions
+
+# Define custom exceptions for specific error scenarios
+class MissingHeadersError(exceptions.InvalidOrderOperation):
+    """Base class for webhook processing errors."""
+    pass
+
 # WebhookReceiverAbstract
 class EasyPostWebhookReceiver:
     """
@@ -28,11 +35,14 @@ class EasyPostWebhookReceiver:
             bool: True if the signature is valid and the request is fresh, False otherwise.
         """
         # EasyPost uses specific header names:
-        signature_header_v2 = headers.get("X-Hmac-Signature-V2", headers.get("x-hmac-signature-v2", ""))
-        timestamp_header = headers.get("X-Timestamp", headers.get("x-timestamp", "")) # RFC 2822 format
+        normalized_headers = {k.lower(): v for k, v in headers.items()}
+
+        signature_header_v2 = normalized_headers.get("x-hmac-signature-v2", "")
+        timestamp_header = normalized_headers.get("x-timestamp", "") # RFC 2822 format
 
         if not signature_header_v2 or not timestamp_header:
-            return False
+            raise MissingHeadersError(f"Required security headers missing: X-Hmac-Signature-V2, X-Timestamp."
+                                      " Ensure your request includes a valid HMAC signature and timestamp.")
 
         # 1. Check timestamp freshness (replay attack protection)
         if not self._is_timestamp_fresh(timestamp_header):
@@ -43,7 +53,7 @@ class EasyPostWebhookReceiver:
 
         # 3. Securely compare the expected signature with the received one
         # Note: EasyPost signature is a lowercase hex string
-        return hmac.compare_digest(expected_signature, signature_header_v2.lower())
+        return hmac.compare_digest(expected_signature, signature_header_v2)
 
     def _is_timestamp_fresh(self, timestamp_str: str) -> bool:
         """Checks if the timestamp is within the acceptable time window."""

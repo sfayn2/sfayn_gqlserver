@@ -4,6 +4,12 @@ import hmac, hashlib
 from typing import Mapping
 from ddd.order_management.application import ports
 from ddd.order_management.domain.services import DomainClock
+from ddd.order_management.domain import exceptions
+
+# Define custom exceptions for specific error scenarios
+class MissingHeadersError(exceptions.InvalidOrderOperation):
+    """Base class for webhook processing errors."""
+    pass
 
 
 
@@ -26,7 +32,8 @@ class WssWebhookReceiver:
         timestamp = normalized_headers.get("x-wss-timestamp", "") #to protect from replay
 
         if not signature or not timestamp:
-            return False
+            raise MissingHeadersError(f"Required security headers missing: x-wss-signature, x-wss-timestamp."
+                                      " Ensure your request includes a valid HMAC signature and timestamp.")
 
         # check freshness
         try:

@@ -134,3 +134,18 @@ def generic_request_post_shipment_tracker_webhook_tenant(client, tracker_data_di
         **custom_headers
     )
     return response
+
+@pytest.fixture
+def generic_request_post_add_order_webhook(client, order_data_dict, test_constants):
+    custom_headers = {
+        "HTTP_X_Wss_Signature": "ea956ca64bfa308dc858cef5010ff7cc5039f843345239e3b29ec33dabcfa2b7",
+        "HTTP_X-Wss-Timestamp": str(int(time.time())),
+    }
+    TENANT1 = test_constants.get("tenant1")
+    response = client.post(
+        reverse("add_order_webhook", args=[TENANT1]),
+        data=order_data_dict,
+        content_type="application/json",
+        **custom_headers
+    )
+    return response

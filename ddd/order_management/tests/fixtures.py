@@ -1,9 +1,9 @@
-import pytest, jwt, os
+import pytest, jwt, os, json, time
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives import serialization
 from typing import Optional
 from datetime import datetime, timedelta
-from ddd.order_management.application import dtos
+from ddd.order_management.application import dtos, commands
 from ddd.order_management.domain import (
     models,
     repositories as domain_ports,
@@ -201,3 +201,50 @@ def tracker_data_dict():
         "status": "DELIVERED",
         "occurred_at": "2025-12-07T10:00:00Z",
     }
+
+@pytest.fixture
+def order_data_dict(test_constants):
+    # The original Python dictionary you want to send in the POST request
+    TENANT1 = test_constants.get("tenant1")
+    return {
+        "external_ref": "EXT-REF-123",
+        "tenant_id": TENANT1,
+        "customer_details": {
+            "name": "John Doe",
+            "email": "john.doe@example.com",
+        },
+        "product_skus": [
+            # ... (the rest of your product data) ...
+             {
+                "product_sku": "SKU-PROD-A", 
+                "order_quantity": 1, 
+                "vendor_id": "vendor-1",
+                "product_name": "Product A",
+                "product_price": {"amount": "10.00", "currency": "USD"},
+                "package": {"weight_kg": "0.5"},
+            },
+            {
+                "product_sku": "SKU-PROD-B", 
+                "order_quantity": 2, 
+                "vendor_id": "vendor-1",
+                "product_name": "Product B",
+                "product_price": {"amount": "5.00", "currency": "USD"},
+                "package": {"weight_kg": "0.25"},
+            },
+        ],
+    }
+
+@pytest.fixture
+def add_order_valid_payload(order_data_dict, test_constants):
+
+    TENANT1 = test_constants.get("tenant1")
+
+    json_string = json.dumps(order_data_dict) # Converts the dict to a JSON string
+    encoded_order_data = json_string.encode("utf-8") # Now you can encode the string
+
+    return commands.PublishAddOrderCommand(
+        tenant_id=TENANT1,
+        raw_body=encoded_order_data,
+        headers={"header1": "xxxx"},
+        request_path="add_order_webhook"
+    )

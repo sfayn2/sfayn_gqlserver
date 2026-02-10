@@ -3,11 +3,12 @@ import jmespath
 import json
 from typing import Dict, Any, Optional, Callable
 from ddd.order_management.application import ports, dtos, mappers
+from ddd.order_management.domain import exceptions
 from .webhook_receiver_factory import WebhookReceiverFactory
 
 
 # Define custom exceptions for specific error scenarios
-class WebhookError(Exception):
+class WebhookError(exceptions.InvalidOrderOperation):
     """Base class for webhook processing errors."""
     pass
 
